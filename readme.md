@@ -15,16 +15,16 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>5. Configure Twitter bot.</p>
 <br>
 Features:
-User accounts<br>
-Time controls<br>
-Player ratings and matchmaking system <br>
-Save and review games<br>
-Server side validation of chess moves<br>
-Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)<br>
-Cron jobs<br>
-Logging(partially shown on GitHub)<br>
-Graceful shutdown<br>
-Automated deployment of web server to production environment(not shown on GitHub)<br>
+1. User accounts<br><br>
+2. Time controls<br><br>
+3. Player ratings and matchmaking system <br><br>
+4. Save and review games<br><br>
+5. Server side validation of chess moves<br><br>
+6. Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)<br><br>
+7. Cron jobs<br><br>
+8. Logging(partially shown on GitHub)<br><br>
+9. Graceful shutdown<br><br>
+10.  Automated deployment of web server to production environment(not shown on GitHub)<br><br>
 <br>
 ![Alt text](/img/screenshots/lobbyresize.png?raw=true "Chess Lobby")
 <br>
