@@ -5,7 +5,6 @@
 <br><br>
 There are missing folders as some sensitive data has been removed.
 <br><br>
-
 Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jonathan Chin
 
 <p><b>To Do List:</b></p>
@@ -14,6 +13,18 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>3. Three reptition draw, stalemate and 50 move rule partially supported, give full support.</p>
 <p>4. Add chess games from grandmasters into database and allow games to be searched.</p>
 <p>5. Configure Twitter bot.</p>
+<br>
+Features:
+User accounts<br>
+Time controls<br>
+Player ratings and matchmaking system <br>
+Save and review games<br>
+Server side validation of chess moves<br>
+Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)<br>
+Cron jobs<br>
+Logging(partially shown on GitHub)<br>
+Graceful shutdown<br>
+Automated deployment of web server to production environment(not shown on GitHub)<br>
 <br>
 ![Alt text](/img/screenshots/lobbyresize.png?raw=true "Chess Lobby")
 <br>
