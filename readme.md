@@ -15,18 +15,18 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>5. Configure Twitter bot.</p>
 <br>
 <b>Features:</b><br>
-1. User accounts<br><br>
-2. Time controls<br><br>
-3. Player ratings and matchmaking system <br><br>
-4. Save and review games<br><br>
-5. Server side validation of chess moves<br><br>
-6. Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)<br><br>
-7. Cron jobs<br><br>
-8. Logging(partially shown on GitHub)<br><br>
-9. Graceful shutdown<br><br>
-10.  Automated deployment of web server to production environment(not shown on GitHub)<br><br>
-11. Highscore board<br><br>
-12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.<br><br>
+<p>1. User accounts</p>
+<p>2. Time controls</p>
+<p>3. Player ratings and matchmaking system </p>
+<p>4. Save and review games</p>
+<p>5. Server side validation of chess moves</p>
+<p>6. Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)</p>
+<p>7. Cron jobs</p>
+<p>8. Logging(partially shown on GitHub)</p>
+<p>9. Graceful shutdown</p>
+<p>10.  Automated deployment of web server to production environment(not shown on GitHub)</p>
+<p>11. Highscore board</p>
+<p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
 <br>
 ![Alt text](/img/screenshots/lobbyresize.png?raw=true "Chess Lobby")
 <br>
