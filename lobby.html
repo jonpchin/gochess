@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="en"> 
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Play Chess -  Lobby</title>
+<link href="../css/design.css" rel="stylesheet" type = "text/css"/>
+<link rel='shortcut icon' href='../img/favicon.ico' type='image/x-icon'/>
+</head>
+<body>
+	<div>
+		<ul id="nav">
+		<li><a href="/memberHome">Main</a></li>
+		<li><a href="/server/lobby">Lobby</a></li>
+		<li><a href="/chess/memberChess">Chess</a></li>
+		<li><a href="/profile">Profile</a></li>
+		<li><a href="/settings">Settings</a></li>
+		<li><a href="/highscores">Scores</a></li>
+		<li><a href="/logout">Logout</a></li>
+		</ul>
+	</div>  
+    <h2>Chess Lobby</h2>
+	<h1><span id="checkwebsocket"></span></h1>
+	<span id="playerData"></span>
+	<table class="table2" id="seekmatch">
+		<tr>
+		<th>Player</th><th>Rating</th><th>Type</th><th>Time</th><th>Rating Range</th>
+		</tr>
+	</table>
+	
+	
+	<div id="seekparameters">
+		<p>Time Control</p>
+		<select id="timecontrol">
+		  <option value="1">1 Minute</option> 
+		  <option value="2">2 Minutes</option> 
+		  <option value="3">3 Minutes</option> 
+		  <option value="4">4 Minutes</option> 
+		  <option value="5" selected>5 Minutes</option>
+		  <option value="10">10 Minutes</option>
+		  <option value="15">15 Minutes</option>
+		  <option value="20">20 Minutes</option>
+		  <option value="30">30 Minutes</option>
+		  <option value="45">45 Minutes</option>
+		</select>
+		
+		<p>Min Rating</p>
+		<select id="minrating">
+		  <option value="500" selected>500</option> 
+		  <option value="1200">1200</option>
+		  <option value="1400">1400</option>
+		  <option value="1500">1500</option>
+		  <option value="1600">1600</option>
+		  <option value="1700">1700</option>
+		  <option value="1800">1800</option>
+		  <option value="1900">1900</option>
+		  <option value="2000">2000</option>
+		
+		</select>
+		<p>Max Rating</p>
+		<select id="maxrating">
+		  <option value="1200">1200</option>
+		  <option value="1400">1400</option>
+		  <option value="1500">1500</option>
+		  <option value="1600">1600</option>
+		  <option value="1700">1700</option>
+		  <option value="1800">1800</option>
+		  <option value="1900">1900</option>
+		  <option value="2000">2000</option>
+		  <option value="2200">2200</option>
+		  <option value="2700" selected>2700</option>
+		</select>
+		<button id="sendSeek">Send Seek</button>
+		<p>Username</p><p><input id="privateName" type="text" maxlength="12" size="12" ><button id="sendPrivateMatch">Send Private Match</button></p>
+	</div>	
+	<table class="table3" id="online">
+		<tr>
+		<th>Online Players</th>
+		</tr>
+	</table>
+		
+	<input type="hidden" id="user" value="{{.User}}" />
+	<input type="hidden" id="bullet" value="{{.Bullet}}" />
+	<input type="hidden" id="blitz" value="{{.Blitz}}" />
+	<input type="hidden" id="standard" value="{{.Standard}}" />
+	<div>
+		<textarea id="textbox" rows="7" cols="150" readonly>
+		</textarea>
+		<p>Message:<input id="message" type="text" maxlength="150" size="150" value="hello"><button id="sendButton">Send Message</button></p>	
+	</div>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="../js/jquery-2.1.4.min.js">\x3C/script>')</script>
+	<script src="../js/lobby.js"></script>
+</body>
+</html>

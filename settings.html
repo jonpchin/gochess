@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"> 
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Play Chess - Settings</title>
+<link href="css/design.css" rel="stylesheet" type = "text/css"/>
+<link rel='shortcut icon' href='img/favicon.ico' type='image/x-icon'/>
+</head>
+<body>
+<div>
+	<ul id="nav">
+	<li><a href="/memberHome">Main</a></li>
+	<li><a href="/server/lobby">Lobby</a></li>
+	<li><a href="/chess/memberChess">Chess</a></li>
+	<li><a href="/profile">Profile</a></li>
+	<li><a href="/settings">Settings</a></li>
+	<li><a href="/highscores">Scores</a></li>
+	<li><a href="/logout">Logout</a></li>
+	</ul>
+</div> 
+<h2>Settings</h2>
+<center>
+<b>Sound</b><div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="toggleSound" checked>
+    <label class="onoffswitch-label" for="toggleSound"> 
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+    </label>
+</div><br>
+<b>Premove</b><div class="onoffswitch" >
+     <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="togglePremove" checked>
+     <label class="onoffswitch-label" for="togglePremove"> 
+         <span class="onoffswitch-inner"></span>
+         <span class="onoffswitch-switch"></span>
+     </label>
+</div><br>
+<b>Chat</b><div class="onoffswitch" >
+     <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="toggleChat" checked>
+     <label class="onoffswitch-label" for="toggleChat"> 
+         <span class="onoffswitch-inner"></span>
+         <span class="onoffswitch-switch"></span>
+     </label>
+</div><br>
+<b>Spectator Mode</b><div class="onoffswitch" >
+     <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="toggleSpectate" checked>
+     <label class="onoffswitch-label" for="toggleSpectate"> 
+         <span class="onoffswitch-inner"></span>
+         <span class="onoffswitch-switch"></span>
+     </label>
+</div><br>
+<b>Auto promote to queen</b><div class="onoffswitch" >
+     <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="togglePromote" checked>
+     <label class="onoffswitch-label" for="togglePromote"> 
+         <span class="onoffswitch-inner"></span>
+         <span class="onoffswitch-switch"></span>
+     </label>
+</div><br>
+<b>Piece Theme</b><br>
+<input type="radio" id="wiki" name="group1" value="Wikipedia" checked> Wikipedia
+<img src="img/chesspieces/wikipedia/bK.png"  alt="Wikipedia chess theme">
+<input type="radio" id="uscf" name="group1" value="USCF" > USCF
+<img src="img/chesspieces/uscf/bK.png"  alt="USCF chess theme">
+<input type="radio" id="alpha" name="group1" value="Alpha"> Alpha
+<img src="img/chesspieces/alpha/bK.png"  alt="Alpha chess theme">
+</center>
+<script src="js/settings.js"></script>
+</body>
+</html>

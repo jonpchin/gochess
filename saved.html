@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"> 
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Play Chess - Saved</title>
+<link href="css/design.css" rel="stylesheet" type = "text/css"/>
+<link rel='shortcut icon' href='img/favicon.ico' type='image/x-icon'/>
+</head>
+<body>
+<div>
+	<ul id="nav">
+	<li><a href="/memberHome">Main</a></li>
+	<li><a href="/server/lobby">Lobby</a></li>
+	<li><a href="/chess/memberChess">Chess</a></li>
+	<li><a href="/profile">Profile</a></li>
+	<li><a href="/settings">Settings</a></li>
+	<li><a href="/highscores">Scores</a></li>
+	<li><a href="/logout">Logout</a></li>
+	</ul>
+</div> 
+<p>This is {{.User}}'s adjourned game page. Your opponent must be in the lobby or chess 
+room not playing a chess game to resume an adjourned game.</p>
+
+<table class="table4">
+	<tr>
+<th>White</th><th>White Rating</th><th>Black</th><th>Black Rating</th>
+<th>Black Minutes</th><th>Black Seconds</th><th>White Minutes</th><th>White Seconds</th>
+<th>Type</th><th>Time</th>
+<th>Moves</th><th>Status</th><th>Date</th><th>Time</th>
+	</tr>
+{{range .Games}}
+	<tr onclick="resumeGame({{.ID}}, {{.White}}, {{.Black}})"> 
+	<td>{{.White}}</td><td>{{.WhiteRating}}</td> <td>{{.Black}}</td><td>{{.BlackRating}}</td>
+	<td>{{.BlackMinutes}}</td><td>{{.BlackSeconds}}</td>
+	<td>{{.WhiteMinutes}}</td><td>{{.WhiteSeconds}}</td>
+	<td>{{.GameType}}</td><td>{{.TimeControl}}</td><td>{{.Total}}</td>
+	<td>{{.Status}}</td><td>{{.Date}}</td><td>{{.Time}}</td>
+	</tr>	
+{{end}}
+</table>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../js/jquery-2.1.4.min.js">\x3C/script>')</script>
+<script src="js/saved.js"></script>
+</body>
+</html>

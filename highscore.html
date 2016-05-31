@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="en"> 
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Play Chess - Highscore</title>
+<link href="css/design.css" rel="stylesheet" type = "text/css"/>
+<link rel='shortcut icon' href='img/favicon.ico' type='image/x-icon'/>
+</head>
+<body>
+<div>
+	<ul id="nav">
+	<li><a href="/memberHome">Main</a></li>
+	<li><a href="/server/lobby">Lobby</a></li>
+	<li><a href="/chess/memberChess">Chess</a></li>
+	<li><a href="/profile">Profile</a></li>
+	<li><a href="/settings">Settings</a></li>
+	<li><a href="/highscores">Scores</a></li>
+	<li><a href="/logout">Logout</a></li>
+	</ul>
+</div>  
+
+<p>Search Player:<input id="playerName" type="text" maxlength="12" size="20">
+<button id="searchPlayer">Search</button></p>	
+<table class="table5">
+<caption>Top Ten Bullet</caption>
+	<tr>
+<th>Rank</th><th>Player</th><th>Bullet</th>
+	</tr>
+{{range .Bullet}}
+	<tr onclick="reviewProfile({{.Name}})"> 
+	<td>{{.Index}}.</td><td>{{.Name}}</td><td>{{.Rating}}</td> 
+	</tr>	
+{{end}}
+</table>
+<table class="table6">
+<caption>Top Ten Blitz</caption>
+	<tr>
+<th>Rank</th><th>Player</th><th>Blitz</th>
+	</tr>
+{{range .Blitz}}
+	<tr onclick="reviewProfile({{.Name}})"> 
+	<td>{{.Index}}.</td><td>{{.Name}}</td><td>{{.Rating}}</td> 
+	</tr>	
+{{end}}
+</table>
+<table class="table7">
+<caption>Top Ten Standard</caption>
+	<tr>
+<th>Rank</th><th>Player</th><th>Standard</th>
+	</tr>
+{{range .Standard}}
+	<tr onclick="reviewProfile({{.Name}})"> 
+	<td>{{.Index}}.</td><td>{{.Name}}</td><td>{{.Rating}}</td> 
+	</tr>	
+{{end}}
+</table>
+<table class="table8">
+<caption>Newest Members</caption>
+	<tr>
+<th>Rank</th><th>Player</th><th>Date</th>
+	</tr>
+{{range .Recent}}
+	<tr onclick="reviewProfile({{.Name}})"> 
+	<td>{{.Index}}.</td><td>{{.Name}}</td><td>{{.Date}}</td> 
+	</tr>	
+{{end}}
+</table>
+<script src="js/profile.js"></script>
+</body>
+</html>
