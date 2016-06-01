@@ -2,7 +2,7 @@ if (!window.WebSocket){
 	console.log("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Edge");
 	$('#checkwebsocket').html("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
-var wsuri = "wss://goplaychess.com:443/chess";
+var wsuri = "wss://localhost:443/chess";
 var sock; 
 var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');

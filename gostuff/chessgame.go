@@ -93,6 +93,9 @@ type Table struct {
 	threeRepT [6]string //stores last 6 moves to check for three repetition of target move
 	repIndex int8 //stores the index of where threeRep should replace the next spot
 	
+	pawnMove int //keeps track of what move was the last pawn move made, used for fifty move rule
+	lastCapture int
+	
 	whiteTimeOut chan bool
 	blackTimeOut chan bool
 	gameOver 	 chan bool
@@ -159,5 +162,7 @@ func initGame(gameID int16) {
 	Verify.AllTables[gameID].whiteTimeOut = make(chan bool)
 	Verify.AllTables[gameID].blackTimeOut = make(chan bool)
 	Verify.AllTables[gameID].gameOver = make(chan bool)
-	//intitalize all starting moves in 
+	
+	Verify.AllTables[gameID].pawnMove = 0
+	Verify.AllTables[gameID].lastCapture = 0
 }

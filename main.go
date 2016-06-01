@@ -76,7 +76,7 @@ func main() {
     }()	
 	
 	go func() {
-		if err := http.ListenAndServeTLS(":443", "secret/combine.crt", "secret/go.key", nil); err != nil {
+		if err := http.ListenAndServeTLS(":443", "secret/device.crt", "secret/device.key", nil); err != nil {
 			fmt.Println("ListenAndServeTLS error: %v", err)
 		}
 	}()
@@ -409,6 +409,6 @@ func robot(w http.ResponseWriter, r *http.Request) {
 }
 
 func redir(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://goplaychess.com"+r.RequestURI, http.StatusMovedPermanently)
+	http.Redirect(w, r, "https://localhost"+r.RequestURI, http.StatusMovedPermanently)
 }
 
