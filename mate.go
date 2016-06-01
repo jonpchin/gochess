@@ -164,7 +164,81 @@ func isBlackStaleMate(gameID int16) bool {
 
 //checks if no material for mating, KvK, K+B vs K, K+B vs K+B, K+N vs K, K+N vs K+N.
 func noMaterial(gameID int16) bool{ 
-	return true
+	
+	//used to store piece count pawn=0 knight=1 bishop=2 rook=3 queen=4 king=5
+	var white [6]int
+	var black [6]int
+	
+	var i int8
+	var j int8
+	for i = 0; i < 8; i++ {
+		for j = 0; j < 8; j++ {
+			color := Verify.AllTables[gameID].ChessBoard[i][j]
+			if color[0:1] == "w" {
+			
+				switch color[1:2] {
+				case "P":
+					white[0]++;
+				case "N":
+					white[1]++;
+				case "B":
+					white[2]++;
+				case "R":
+					white[3]++;
+				case "Q":
+					white[4]++;
+				case "K":
+					white[5]++;
+				default:
+					fmt.Println("Incorrect piece mate.go no material 1")
+				}
+			}else if color[0:1] == "b"{
+				switch color[1:2] {
+				case "P":
+					black[0]++;
+				case "N":
+					black[1]++;
+				case "B":
+					black[2]++;
+				case "R":
+					black[3]++;
+				case "Q":
+					black[4]++;
+				case "K":
+					black[5]++;
+				default:
+					fmt.Println("Incorrect piece mate.go no material 2")
+			}else{
+				fmt.Printf("Invalid color type mate.go no material 3 location of i and j is %d %d", i, j)
+			}
+	}
+	
+	//KvK, K+B vs K, K+B vs K+B, K+N vs K, K+N vs K+N.
+	// pawn=0 knight=1 bishop=2 rook=3 queen=4 king=5
+	//KvK
+	if white[0] == 0 && white[1] == 0 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{ 
+		return true
+		//K+B vs K
+	}else if white[0] == 0 && white[1] == 0 & white[2]== 1 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+		return true
+		//K vs K+B	
+	}else if white[0] == 0 && white[1] == 0 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 1 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+		return true
+		//K+B vs K+B
+	}else if white[0] == 0 && white[1] == 0 & white[2]== 1 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 1 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+		return true
+		//K+N vs K
+	}else if white[0] == 0 && white[1] == 1 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+		return true
+		//K vs K+N
+	}else if white[0] == 0 && white[1] == 0 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 1 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+		return true
+		//K+N vs K+N
+	}else if white[0] == 0 && white[1] == 1 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 1 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+		return true
+	}
+	//otherwise insufficient mating material
+ 	return false
 }
 //checks if three reptition rule which leads to a draw. returns false if no three repetition is found
 func threeRep(gameID int16) bool{
@@ -184,8 +258,17 @@ func threeRep(gameID int16) bool{
 	return true
 }
 //checks if fifty moves have been made without a pawn push or capture
-func fiftyMoves(){
-	
+func fiftyMoves(gameID int16) bool{
+	var thisMove int
+	thisMove = (len(All.Games[game.ID].GameMoves) + 1) / 2
+	//no capture within 50 moves
+	if (thisMove - Verify.AllTables[gameID].lastCapture) >= 50{
+		return true
+		//no pawn move within 50 moves
+	}else if (thisMove - Verify.AllTables[gameID].lastPawn) >= 50{
+		return true
+	}
+	return false
 }
 
 //checks if a square is attacked by white in one turn, used to identify check and checkmates

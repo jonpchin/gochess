@@ -66,6 +66,8 @@ func chessVerify(source string, target string, gameID int16) bool {
 			if result == false {
 				return false
 			}
+			//then a succesful pawn move is made
+			Verify.AllTables[gameID].pawnMove = (len(All.Games[game.ID].GameMoves) + 1) / 2
 
 		} else {
 
@@ -73,6 +75,7 @@ func chessVerify(source string, target string, gameID int16) bool {
 			if result == false {
 				return false
 			}
+			Verify.AllTables[gameID].pawnMove = (len(All.Games[game.ID].GameMoves) + 1) / 2
 		}
 
 	case "N":
@@ -116,6 +119,11 @@ func chessVerify(source string, target string, gameID int16) bool {
 	}
 
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
+	
+	//if a piece is captured within 50 moves then 50 move rule effect is canceled
+	if capturedPiece != "-"{
+		Verify.AllTables[gameID].lastCapture = (len(All.Games[game.ID].GameMoves) + 1) / 2
+	}
 	//used to update king position if they are in check
 	if Verify.AllTables[gameID].kingUpdate == true {
 		if colorOnly == "b" {
