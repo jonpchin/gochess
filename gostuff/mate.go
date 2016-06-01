@@ -208,33 +208,35 @@ func noMaterial(gameID int16) bool{
 					black[5]++;
 				default:
 					fmt.Println("Incorrect piece mate.go no material 2")
+				}
 			}else{
 				fmt.Printf("Invalid color type mate.go no material 3 location of i and j is %d %d", i, j)
 			}
+		}
 	}
 	
 	//KvK, K+B vs K, K+B vs K+B, K+N vs K, K+N vs K+N.
 	// pawn=0 knight=1 bishop=2 rook=3 queen=4 king=5
 	//KvK
-	if white[0] == 0 && white[1] == 0 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{ 
+	if white[0] == 0 && white[1] == 0 && white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 && black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{ 
 		return true
 		//K+B vs K
-	}else if white[0] == 0 && white[1] == 0 & white[2]== 1 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+	}else if white[0] == 0 && white[1] == 0 && white[2]== 1 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 && black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
 		return true
 		//K vs K+B	
-	}else if white[0] == 0 && white[1] == 0 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 1 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+	}else if white[0] == 0 && white[1] == 0 && white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 && black[2]== 1 && black[3] == 0 && black[4] == 0 && black[5] == 1{
 		return true
 		//K+B vs K+B
-	}else if white[0] == 0 && white[1] == 0 & white[2]== 1 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 1 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+	}else if white[0] == 0 && white[1] == 0 && white[2]== 1 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 && black[2]== 1 && black[3] == 0 && black[4] == 0 && black[5] == 1{
 		return true
 		//K+N vs K
-	}else if white[0] == 0 && white[1] == 1 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+	}else if white[0] == 0 && white[1] == 1 && white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 0 && black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
 		return true
 		//K vs K+N
-	}else if white[0] == 0 && white[1] == 0 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 1 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+	}else if white[0] == 0 && white[1] == 0 && white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 1 && black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
 		return true
 		//K+N vs K+N
-	}else if white[0] == 0 && white[1] == 1 & white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 1 & black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
+	}else if white[0] == 0 && white[1] == 1 && white[2]== 0 && white[3] == 0 && white[4] == 0 && white[5] == 1 && black[0] == 0 && black[1] == 1 && black[2]== 0 && black[3] == 0 && black[4] == 0 && black[5] == 1{
 		return true
 	}
 	//otherwise insufficient mating material
@@ -260,12 +262,12 @@ func threeRep(gameID int16) bool{
 //checks if fifty moves have been made without a pawn push or capture
 func fiftyMoves(gameID int16) bool{
 	var thisMove int
-	thisMove = (len(All.Games[game.ID].GameMoves) + 1) / 2
+	thisMove = (len(All.Games[gameID].GameMoves) + 1) / 2
 	//no capture within 50 moves
 	if (thisMove - Verify.AllTables[gameID].lastCapture) >= 50{
 		return true
 		//no pawn move within 50 moves
-	}else if (thisMove - Verify.AllTables[gameID].lastPawn) >= 50{
+	}else if (thisMove - Verify.AllTables[gameID].pawnMove) >= 50{
 		return true
 	}
 	return false
