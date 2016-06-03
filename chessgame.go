@@ -89,10 +89,6 @@ type Table struct {
 	undoWPass bool //if this is true then white just did an en passent and it is used in undoMove()
 	undoBPass bool
 	
-	threeRepS [6]string //stores last 6 moves to check for three repetition of source move
-	threeRepT [6]string //stores last 6 moves to check for three repetition of target move
-	repIndex int8 //stores the index of where threeRep should replace the next spot
-	
 	pawnMove int //keeps track of what move was the last pawn move made, used for fifty move rule
 	lastCapture int
 	
@@ -157,7 +153,6 @@ func initGame(gameID int16) {
 	Verify.AllTables[gameID].undoWPass = false
 	Verify.AllTables[gameID].undoBPass = false
 	
-	Verify.AllTables[gameID].repIndex = 0
 	
 	Verify.AllTables[gameID].whiteTimeOut = make(chan bool)
 	Verify.AllTables[gameID].blackTimeOut = make(chan bool)
