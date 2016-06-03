@@ -10,9 +10,11 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p><b>To Do List:</b></p>
 <p>1. Allow players to search all chess games in Go Play Chess.</p>
 <p>2. Allow players to view other on-going games in real time.</p>
-<p>3. Three reptition draw, stalemate and 50 move rule partially supported, give full support.</p>
-<p>4. Add chess games from grandmasters into database and allow games to be searched.</p>
-<p>5. Configure Twitter bot.</p>
+<p>3. Add chess games from grandmasters into database and allow games to be searched.</p>
+<p>4. Configure Twitter bot.</p>
+<p>5. Sound on when king is in put in check in a game.</p>
+<p>6. Autoscroll to last line in chat.</p>
+<p>7. Fix bug with back end clock not syncing with front end clock.</p>
 <br>
 <b>Features:</b><br>
 <p>1. User accounts</p>

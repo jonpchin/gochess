@@ -36,7 +36,7 @@ func (c *Connection) LobbyConnect() {
 		if err := json.Unmarshal(message, &t); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:")
 			fmt.Println(string(reply))
-			fmt.Println("connection.go 1 Reader 1 ", err.Error())
+			fmt.Println("lobby.go 1 Reader 1 ", err.Error())
 			break
 		}
 		
@@ -125,7 +125,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("Connection.go error 7 Could not send message to ", c.clientIP, err.Error())
+						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
 					}
 					break
 				
@@ -140,7 +140,7 @@ func (c *Connection) LobbyConnect() {
 				//fetching rating from back end
 				errRate ,bullet, blitz, standard := GetRating(match.Name)
 				if errRate != ""{
-					fmt.Println("Cannot get rating connection.go match_seek")
+					fmt.Println("Cannot get rating lobby.go match_seek")
 					break
 				}
 				switch match.TimeControl {
@@ -192,7 +192,7 @@ func (c *Connection) LobbyConnect() {
 					for _, cs := range Chat.Lobby {
 						if err := websocket.Message.Send(cs, finalMessage); err != nil {
 							// we could not send the message to a peer
-							fmt.Println("Connection.go error 9 Could not send message to ", c.clientIP, err.Error())
+							fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
 
 						}
 					}
@@ -234,18 +234,18 @@ func (c *Connection) LobbyConnect() {
 				if err := json.Unmarshal(message, &match); err != nil {
 					log.Println("Just receieved a message I couldn't decode:")
 					log.Println(string(reply))
-					log.Println("Connection.go error 11 Exact error: " + err.Error())
+					log.Println("lobby.go error 11 Exact error: " + err.Error())
 					break
 				}
 				
 				//check if player already has a game started, if there is a game in progress alert player
 				if isPlayerInGame(match.Name, match.Opponent) == true{
-					log.Println("Line 320 connection.go Player already has a game. ")
+					log.Println("lobby.go Player already has a game. ")
 					//alerting player
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("error 10 connection.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("error 10 lobby.go Could not send message to ", c.clientIP, err.Error())
 					}
 					break
 				}
@@ -375,7 +375,7 @@ func (c *Connection) LobbyConnect() {
 
 				for _, cs := range Chat.Lobby {
 					if err := websocket.Message.Send(cs, string(startGame)); err != nil {
-						fmt.Println("error 12 error is ", err)
+						fmt.Println("lobby.go error 12 error is ", err)
 
 					}
 				}
@@ -399,7 +399,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("Connection.go error 7 Could not send message to ", c.clientIP, err.Error())
+						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
 					}
 					break
 				}
@@ -421,7 +421,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "absent"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("Connection.go error 7 Could not send message to ", c.clientIP, err.Error())
+						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
 					}
 					break
 				} 
@@ -499,7 +499,7 @@ func (c *Connection) LobbyConnect() {
 						if name == match.Opponent || name == match.Name{ //send to self and opponent
 							if err := websocket.Message.Send(Chat.Lobby[name], finalMessage); err != nil {
 							// we could not send the message to a peer
-							fmt.Println("Connection.go error 9 Could not send message to ", c.clientIP, err.Error())
+							fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
 
 							}
 						}

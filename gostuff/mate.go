@@ -152,12 +152,108 @@ func isWhiteStaleMate(gameID int16) bool {
 	if isWhiteInCheck(gameID) == true || isWhiteInMate(gameID) == true{
 		return false
 	}
+	var i int8
+	var j int8
+	for i=0; i<8; i++{
+		for j=0; j<8; j++{
+			piece := Verify.AllTables[gameID].ChessBoard[i][j]
+			if piece[0:1] == "w"{
+				switch piece[1:2]{
+			
+				case "P":
+					result := whitePawnStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				
+				case "N":
+					result := whiteKnightStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "B":
+					result := whiteBishopStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "R":
+					result := whiteRookStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "Q":
+					result := whiteQueenStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "K":
+					result := whiteKingStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				
+				default:
+					fmt.Println("Mate.go whiteStalemate not valid piece")
+				}
+			}
+			
+			
+				
+		}
+	}
 	return true
 }
 
 func isBlackStaleMate(gameID int16) bool {
 	if isBlackInCheck(gameID) == true || isBlackInMate(gameID) == true{
 		return false
+	}
+	var i int8
+	var j int8
+	for i=0; i<8; i++{
+		for j=0; j<8; j++{
+			piece := Verify.AllTables[gameID].ChessBoard[i][j]
+			if piece[0:1] == "b"{
+				switch piece[1:2]{
+			
+				case "P":
+					result := blackPawnStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				
+				case "N":
+					result := blackKnightStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "B":
+					result := blackBishopStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "R":
+					result := blackRookStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "Q":
+					result := blackQueenStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				case "K":
+					result := blackKingStaleMate(i, j, gameID)
+					if result == false {
+						return false
+					}
+				
+				default:
+					fmt.Println("Mate.go blackStalemate not valid piece")
+				}	
+			}
+			
+		}
 	}
 	return true
 }
@@ -209,8 +305,6 @@ func noMaterial(gameID int16) bool{
 				default:
 					fmt.Println("Incorrect piece mate.go no material 2")
 				}
-			}else{
-				fmt.Printf("Invalid color type mate.go no material 3 location of i and j is %d %d", i, j)
 			}
 		}
 	}
@@ -244,20 +338,55 @@ func noMaterial(gameID int16) bool{
 }
 //checks if three reptition rule which leads to a draw. returns false if no three repetition is found
 func threeRep(gameID int16) bool{
-	if Verify.AllTables[gameID].threeRepS[5] != Verify.AllTables[gameID].threeRepS[1] || Verify.AllTables[gameID].threeRepT[3] != Verify.AllTables[gameID].threeRepS[1]{
-		return false
-	}
-	if Verify.AllTables[gameID].threeRepT[5] != Verify.AllTables[gameID].threeRepT[1] || Verify.AllTables[gameID].threeRepS[3] != Verify.AllTables[gameID].threeRepT[1]{
-		return false
+	
+	var eightSrc string
+	var eightTar string
+	var sevenSrc string
+	var sevenTar string
+	var sixSrc string
+	var sixTar string
+	var fiveSrc string
+	var fiveTar string
+	var fourSrc string
+	var fourTar string
+	var threeSrc string
+	var threeTar string
+	var twoSrc string
+	var twoTar string
+	var oneSrc string
+	var oneTar string
+	
+	var length = len(All.Games[gameID].GameMoves)
+	
+	eightSrc = All.Games[gameID].GameMoves[length-1].S
+	eightTar = All.Games[gameID].GameMoves[length-1].T
+	
+	sevenSrc = All.Games[gameID].GameMoves[length-2].S
+	sevenTar = All.Games[gameID].GameMoves[length-2].T
+
+	sixSrc = All.Games[gameID].GameMoves[length-3].S
+	sixTar = All.Games[gameID].GameMoves[length-3].T
+
+	fiveSrc = All.Games[gameID].GameMoves[length-4].S
+	fiveTar = All.Games[gameID].GameMoves[length-4].T
+	
+	fourSrc = All.Games[gameID].GameMoves[length-5].S
+	fourTar = All.Games[gameID].GameMoves[length-5].T
+	
+	threeSrc = All.Games[gameID].GameMoves[length-6].S
+	threeTar = All.Games[gameID].GameMoves[length-6].T
+	
+	twoSrc = All.Games[gameID].GameMoves[length-7].S
+	twoTar = All.Games[gameID].GameMoves[length-7].T
+	
+	oneSrc = All.Games[gameID].GameMoves[length-8].S
+	oneTar = All.Games[gameID].GameMoves[length-8].T
+	
+	if eightSrc == fourSrc && eightTar == fourTar && sevenSrc == threeSrc && sevenTar == threeTar && sixSrc == twoSrc && sixTar == twoTar && fiveSrc == oneSrc && fiveTar == oneTar{
+		return true
 	}
 	
-	if Verify.AllTables[gameID].threeRepS[0] != Verify.AllTables[gameID].threeRepS[4] ||  Verify.AllTables[gameID].threeRepS[4] != Verify.AllTables[gameID].threeRepT[2]{
-		return false
-	}
-	if Verify.AllTables[gameID].threeRepT[0] != Verify.AllTables[gameID].threeRepT[4] ||  Verify.AllTables[gameID].threeRepT[4] != Verify.AllTables[gameID].threeRepS[2]{
-		return false
-	}
-	return true
+	return false
 }
 //checks if fifty moves have been made without a pawn push or capture
 func fiftyMoves(gameID int16) bool{

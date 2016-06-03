@@ -38,7 +38,7 @@ func (c *Connection) ChessConnect() {
 		if err := json.Unmarshal(message, &t); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:")
 			fmt.Println(string(reply))
-			fmt.Println("connection.go 1 Reader 1 ", err.Error())
+			fmt.Println("connection.go 1 ChessConnect 1 ", err.Error())
 			break
 		}
 		if c.username == t.Name {
@@ -52,7 +52,7 @@ func (c *Connection) ChessConnect() {
 				if err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
 					fmt.Println(string(message))
-					fmt.Println("connection.go 1 Reader 2 ", err.Error())
+					fmt.Println("connection.go 1 ChessConnect 2 ", err.Error())
 					break
 				}
 
@@ -120,12 +120,6 @@ func (c *Connection) ChessConnect() {
 				move.T = game.Target
 				//append move to back end storage for retrieval from database later
 				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
-				
-				//add move to threeRep
-				Verify.AllTables[game.ID].threeRepS[Verify.AllTables[game.ID].repIndex] = game.Source
-				Verify.AllTables[game.ID].threeRepT[Verify.AllTables[game.ID].repIndex] = game.Target
-				//increment repIndex
-				Verify.AllTables[game.ID].repIndex = (Verify.AllTables[game.ID].repIndex+1)%6
 
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; !ok { //don't send move if other guy dropped connection
 					//fmt.Println("other guy dropped");
@@ -134,7 +128,7 @@ func (c *Connection) ChessConnect() {
 
 				//sending move
 				if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &game); err != nil {
-					fmt.Println("error sending chess move, other player left")
+					fmt.Println("error sending chess move, other player left chessConnect")
 				}
 
 			case "chat_private":
@@ -611,6 +605,25 @@ func (c *Connection) ChessConnect() {
 
 				json.Unmarshal(message, &game)
 			
+				//checking to see if the side whose turn it is to move is in stalemate
+				if Verify.AllTables[game.ID].whiteTurn == true{
+					
+					if isWhiteStaleMate(game.ID) == true || noMaterial(game.ID) == true ||  threeRep(game.ID) == true || fiftyMoves(game.ID) == true{
+						fmt.Println("forced draw_game connection.go success 1")
+					}else{
+						break
+					}
+					
+				}else{
+					
+					if isBlackStaleMate(game.ID) == true || noMaterial(game.ID) == true ||  threeRep(game.ID) == true || fiftyMoves(game.ID) == true{
+						fmt.Println("forced draw_game connection.go success 2")
+					}else{
+						break
+					}
+					
+				}
+					
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
 
