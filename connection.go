@@ -659,7 +659,6 @@ func (c *Connection) ChessConnect() {
 				fmt.Println("I'm not familiar with type " + t.Type)
 			}
 		} else {
-			delete(Active.Clients, c.username)
 			log.Printf("IP %s Invalid websocket authentication in chess room.\n", c.clientIP)
 			return
 		}
