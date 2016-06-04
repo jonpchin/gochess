@@ -201,7 +201,7 @@ func (c *Connection) LobbyConnect() {
 
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
+					fmt.Println("Just receieved a message I couldn't decode in lobby.go cancel_match:")
 					fmt.Println(string(reply))
 					fmt.Println("Exact error: " + err.Error())
 					break
@@ -435,7 +435,7 @@ func (c *Connection) LobbyConnect() {
 				//fetching rating from back end
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
 				if errMessage != ""{
-					fmt.Println("Cannot get rating connection.go private_match")
+					fmt.Println("Cannot get rating lobby.go private_match")
 					break
 				}
 				switch match.TimeControl {
@@ -467,7 +467,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("match connection.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("match lobby.go Could not send message to ", c.clientIP, err.Error())
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -499,7 +499,7 @@ func (c *Connection) LobbyConnect() {
 						if name == match.Opponent || name == match.Name{ //send to self and opponent
 							if err := websocket.Message.Send(Chat.Lobby[name], finalMessage); err != nil {
 							// we could not send the message to a peer
-							fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
+								fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
 
 							}
 						}
@@ -511,7 +511,6 @@ func (c *Connection) LobbyConnect() {
 				fmt.Println("I'm not familiar with type " + t.Type)
 			}
 		} else {
-			delete(Chat.Lobby, c.username)
 			log.Printf("IP %s Invalid websocket authentication in lobby.\n", c.clientIP)
 			return
 		}

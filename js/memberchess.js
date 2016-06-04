@@ -232,6 +232,8 @@ window.onload = function() {
 				if(toggleChat !== "false"){
 					var datetime = timeStamp();
 					document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +": " + json.Text + '\n');
+					//scrolls chat to the bottom when it goes below the chat window
+					document.getElementById("textbox").scrollTop = document.getElementById("textbox").scrollHeight;
 				}
 				break;
 				
@@ -629,8 +631,6 @@ document.getElementById('rematchButton').onclick = function(){
 	
 $('#message').keypress(function(event) {
     if (event.which === 13) {
-       var msg = document.getElementById('message').value;
-	  
 	   $('#sendMessage').click();	
     }
 });

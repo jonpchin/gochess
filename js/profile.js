@@ -11,3 +11,10 @@ document.getElementById('searchPlayer').onclick = function(){
 	    var name = document.getElementById('playerName').value;
 		window.location = "profile?name=" + name; 
 }
+
+$('#playerName').keypress(function(event) {
+	console.log("yes");
+    if (event.which === 13) {  
+	   $('#searchPlayer').click();	
+    }
+});
