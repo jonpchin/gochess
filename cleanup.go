@@ -1,57 +1,57 @@
 package gostuff
 
-import(
+import (
+	"encoding/json"
 	"fmt"
 	"golang.org/x/net/websocket"
-	"encoding/json"
-	"os"
 	"log"
+	"os"
 	"time"
 )
 
 //this function gets executed on ctrl-c
-func Cleanup(){
-	
+func Cleanup() {
+
 	fmt.Println("Web server is shutting down...saving games please wait...")
-	
+
 	var message ChatInfo
 	message.Type = "massMessage"
 	message.Text = "ATTENTION: Web server is shutting down NOW for maintenance, brace for impact..."
-	
-	go func(){
+
+	go func() {
 		for _, value := range Active.Clients {
 			if err := websocket.JSON.Send(value, &message); err != nil {
 				// we could not send the message to a peer
-				fmt.Println("exitgame.go error  Could not send message to ",  err)
+				fmt.Println("exitgame.go error  Could not send message to ", err)
 			}
 		}
-		
+
 		for _, value := range Chat.Lobby {
 			if err := websocket.JSON.Send(value, &message); err != nil {
 				// we could not send the message to a peer
-				fmt.Println("exitgame.go error  Could not send message to ",  err)
+				fmt.Println("exitgame.go error  Could not send message to ", err)
 			}
 		}
 	}()
-	
+
 	for _, game := range All.Games {
 		//now store game in MySQL database
 		allMoves, err := json.Marshal(game.GameMoves)
-		if err == nil{		
+		if err == nil {
 			//gets length of all the moves in the game
 			totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 			saveGame(totalMoves, allMoves, game)
-		}else{
+		} else {
 			fmt.Println("Error in Cleanup.go cleanup 1")
 		}
-		
+
 	}
 	fmt.Println("All games are saved. Web server is shutting down in 1 second.")
 }
 
 //used when web server is shutting down to save all current games into database
-func saveGame(totalMoves int, allMoves []byte, game *ChessGame){
-	
+func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
+
 	moves := string(allMoves)
 	//fmt.Println("The game moves are ", moves)
 

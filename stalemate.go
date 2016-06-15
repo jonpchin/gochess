@@ -8,24 +8,24 @@ func blackPawnStaleMate(x int8, y int8, gameID int16) bool {
 		if Verify.AllTables[gameID].ChessBoard[x+2][y] == "-" { //make sure square is not blocked
 			capturedPiece := makeMove(x, y, x+2, y, "bP", gameID)
 			if isBlackInCheck(gameID) == true { //if black is in check then undo move as its not stalemate
-				undoMove(x, y, x+2, y, "bP", capturedPiece, gameID)		
-			}else{
+				undoMove(x, y, x+2, y, "bP", capturedPiece, gameID)
+			} else {
 				undoMove(x, y, x+2, y, "bP", capturedPiece, gameID)
 				return false //otherwise if there is a legal black pawn move and black is not in check its not stalemate
 			}
-			
+
 		}
 	}
 	if x+1 <= 7 && Verify.AllTables[gameID].ChessBoard[x+1][y] == "-" { //checking pawn movement of one square
 		capturedPiece := makeMove(x, y, x+1, y, "bP", gameID)
-		if isBlackInCheck(gameID) == true { 
+		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y, "bP", capturedPiece, gameID)
-			
-		}else{
+
+		} else {
 			undoMove(x, y, x+1, y, "bP", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if y+1 <= 7 && x+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y+1])[0:1] == "w" { //right capture
@@ -33,12 +33,12 @@ func blackPawnStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x+1, y+1, "bP", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y+1, "bP", capturedPiece, gameID)
-			
-		}else{
+
+		} else {
 			undoMove(x, y, x+1, y+1, "bP", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if y-1 >= 0 && x+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y-1])[0:1] == "w" { //left capture
@@ -46,12 +46,12 @@ func blackPawnStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x+1, y-1, "bP", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y-1, "bP", capturedPiece, gameID)
-			
-		}else{
+
+		} else {
 			undoMove(x, y, x+1, y-1, "bP", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if Verify.AllTables[gameID].blackPass[y] == true { //checking if black can enpassent with this pawn
 		if y+1 <= 7 && x+1 <= 7 && Verify.AllTables[gameID].ChessBoard[x][y+1] == "wP" { //checking if white pawn exist on the right
@@ -59,25 +59,24 @@ func blackPawnStaleMate(x int8, y int8, gameID int16) bool {
 			capturedPiece := makeMove(x, y, x+1, y+1, "bP", gameID)
 			if isBlackInCheck(gameID) == true {
 				undoMove(x, y, x+1, y+1, "bP", capturedPiece, gameID)
-				
-			}else{
+
+			} else {
 				undoMove(x, y, x+1, y+1, "bP", capturedPiece, gameID)
 				return false
 			}
-			
-			
+
 		}
 		if y-1 >= 0 && x+1 <= 7 && Verify.AllTables[gameID].ChessBoard[x][y-1] == "wP" { //checking left
 
 			capturedPiece := makeMove(x, y, x+1, y-1, "bP", gameID)
 			if isBlackInCheck(gameID) == true {
 				undoMove(x, y, x+1, y-1, "bP", capturedPiece, gameID)
-				
-			}else{
+
+			} else {
 				undoMove(x, y, x+1, y-1, "bP", capturedPiece, gameID)
 				return false
 			}
-			
+
 		}
 
 	}
@@ -91,24 +90,24 @@ func whitePawnStaleMate(x int8, y int8, gameID int16) bool { //x is row y is col
 			capturedPiece := makeMove(x, y, x-2, y, "wP", gameID)
 			if isWhiteInCheck(gameID) == true { //if white is no longer in check then its not mate
 				undoMove(x, y, x-2, y, "wP", capturedPiece, gameID)
-				
-			}else{
+
+			} else {
 				undoMove(x, y, x-2, y, "wP", capturedPiece, gameID)
 				return false
 			}
-			
+
 		}
 	}
 	if x-1 >= 0 && Verify.AllTables[gameID].ChessBoard[x-1][y] == "-" { //checking pawn movement of one square
 		capturedPiece := makeMove(x, y, x-1, y, "wP", gameID)
 		if isWhiteInCheck(gameID) == true { //if white is no longer in check then its not mate
 			undoMove(x, y, x-1, y, "wP", capturedPiece, gameID)
-			
-		}else{
-			undoMove(x, y, x-1, y, "wP", capturedPiece, gameID) 
+
+		} else {
+			undoMove(x, y, x-1, y, "wP", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x-1 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-1])[0:1] == "b" { //left capture
@@ -116,11 +115,11 @@ func whitePawnStaleMate(x int8, y int8, gameID int16) bool { //x is row y is col
 		capturedPiece := makeMove(x, y, x-1, y-1, "wP", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y-1, "wP", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y-1, "wP", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x-1 >= 0 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-1][y+1])[0:1] == "b" { //right capture
@@ -128,11 +127,11 @@ func whitePawnStaleMate(x int8, y int8, gameID int16) bool { //x is row y is col
 		capturedPiece := makeMove(x, y, x-1, y+1, "wP", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y+1, "wP", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y+1, "wP", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if Verify.AllTables[gameID].whitePass[y] == true { //checking if white can enpassent with this pawn
@@ -142,24 +141,24 @@ func whitePawnStaleMate(x int8, y int8, gameID int16) bool { //x is row y is col
 			capturedPiece := makeMove(x, y, x-1, y+1, "wP", gameID)
 			if isWhiteInCheck(gameID) == true {
 				undoMove(x, y, x-1, y+1, "wP", capturedPiece, gameID)
-				
-			}else{
+
+			} else {
 				undoMove(x, y, x-1, y+1, "wP", capturedPiece, gameID)
 				return false
 			}
-			
+
 		}
 		if y-1 >= 0 && x-1 >= 0 && Verify.AllTables[gameID].ChessBoard[x][y-1] == "bP" { //checking left
 
 			capturedPiece := makeMove(x, y, x-1, y-1, "wP", gameID)
 			if isWhiteInCheck(gameID) == true {
 				undoMove(x, y, x-1, y-1, "wP", capturedPiece, gameID)
-				
-			}else{
+
+			} else {
 				undoMove(x, y, x-1, y-1, "wP", capturedPiece, gameID)
 				return false
 			}
-			
+
 		}
 
 	}
@@ -177,88 +176,88 @@ func whiteKnightStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x-2, y-1, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-2, y-1, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-2, y-1, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	} //white can't capture own piece
 	if x-2 >= 0 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-2][y+1])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x-2, y+1, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-2, y+1, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-2, y+1, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x-1 >= 0 && y+2 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-1][y+2])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x-1, y+2, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y+2, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y+2, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+1 <= 7 && y+2 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y+2])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x+1, y+2, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+1, y+2, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y+2, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+2 <= 7 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+2][y+1])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x+2, y+1, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+2, y+1, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+2, y+1, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+2 <= 7 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+2][y-1])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x+2, y-1, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+2, y-1, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+2, y-1, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+1 <= 7 && y-2 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+1][y-2])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x+1, y-2, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+1, y-2, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y-2, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x-1 >= 0 && y-2 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-2])[0:1] != "w" {
 
 		capturedPiece := makeMove(x, y, x-1, y-2, "wN", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y-2, "wN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y-2, "wN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	return true
 }
@@ -269,88 +268,88 @@ func blackKnightStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x-2, y-1, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-2, y-1, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-2, y-1, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x-2 >= 0 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-2][y+1])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x-2, y+1, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-2, y+1, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-2, y+1, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x-1 >= 0 && y+2 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-1][y+2])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x-1, y+2, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-1, y+2, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y+2, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+1 <= 7 && y+2 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y+2])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x+1, y+2, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y+2, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y+2, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+2 <= 7 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+2][y+1])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x+2, y+1, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+2, y+1, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+2, y+1, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+2 <= 7 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+2][y-1])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x+2, y-1, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+2, y-1, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+2, y-1, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x+1 <= 7 && y-2 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+1][y-2])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x+1, y-2, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y-2, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y-2, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	if x-1 >= 0 && y-2 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-2])[0:1] != "b" {
 
 		capturedPiece := makeMove(x, y, x-1, y-2, "bN", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-1, y-2, "bN", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y-2, "bN", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 	return true
 }
@@ -367,11 +366,10 @@ func whiteBishopStaleMate(x int8, y int8, gameID int16) bool { //moves all possi
 		capturedPiece := makeMove(x, y, i, j, "wB", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -385,11 +383,10 @@ func whiteBishopStaleMate(x int8, y int8, gameID int16) bool { //moves all possi
 		capturedPiece := makeMove(x, y, i, j, "wB", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
@@ -403,11 +400,11 @@ func whiteBishopStaleMate(x int8, y int8, gameID int16) bool { //moves all possi
 		capturedPiece := makeMove(x, y, i, j, "wB", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
 		}
@@ -420,11 +417,11 @@ func whiteBishopStaleMate(x int8, y int8, gameID int16) bool { //moves all possi
 		capturedPiece := makeMove(x, y, i, j, "wB", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wB", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
 		}
@@ -444,11 +441,10 @@ func blackBishopStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bB", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break
@@ -462,11 +458,11 @@ func blackBishopStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bB", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by a piece
 		}
@@ -479,11 +475,11 @@ func blackBishopStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bB", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break
 		}
@@ -496,11 +492,11 @@ func blackBishopStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bB", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bB", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break
 		}
@@ -521,11 +517,11 @@ func whiteRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "wR", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, y, "wR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "wR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "b" {
 			break
 		}
@@ -538,11 +534,11 @@ func whiteRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "wR", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, y, "wR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "wR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "b" {
 			break
 		}
@@ -555,11 +551,11 @@ func whiteRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "wR", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x, j, "wR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "wR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "b" {
 			break //no need to check rest of squares if the square is already occupied by a piece
 		}
@@ -572,11 +568,11 @@ func whiteRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "wR", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x, j, "wR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "wR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "b" {
 			break //no need to check rest of squares if the square is already occupied by a piece
 		}
@@ -596,11 +592,11 @@ func blackRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "bR", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, y, "bR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "bR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "w" {
 			break
 		}
@@ -613,11 +609,11 @@ func blackRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "bR", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, y, "bR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "bR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "w" {
 			break
 		}
@@ -628,13 +624,13 @@ func blackRookStaleMate(x int8, y int8, gameID int16) bool {
 			break //no need to check rest of squares if the square is already occupied by a piece
 		}
 		capturedPiece := makeMove(x, y, x, j, "bR", gameID)
-		if isBlackInCheck(gameID) ==  true{
+		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x, j, "bR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "bR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "w" {
 			break
 		}
@@ -647,11 +643,11 @@ func blackRookStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "bR", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x, j, "bR", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "bR", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "w" {
 			break
 		}
@@ -672,11 +668,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
 		}
@@ -689,11 +685,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
 		}
@@ -706,11 +702,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
 		}
@@ -723,11 +719,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "b" {
 			break
 		}
@@ -742,11 +738,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, y, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "b" {
 			break
 		}
@@ -759,11 +755,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, i, y, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "b" {
 			break
 		}
@@ -776,11 +772,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x, j, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "b" {
 			break
 		}
@@ -793,11 +789,11 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "wQ", gameID)
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x, j, "wQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "wQ", capturedPiece, gameID)
 			return false
 		}
-		
+
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "b" {
 			break
 		}
@@ -818,11 +814,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -836,11 +831,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -854,11 +848,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -872,11 +865,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, j, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, j, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -892,12 +884,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, y, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -911,11 +901,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, i, y, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, i, y, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, i, y, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][y])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -929,11 +918,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x, j, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[i][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by enemy piece
@@ -947,11 +935,10 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 		capturedPiece := makeMove(x, y, x, j, "bQ", gameID)
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x, j, "bQ", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, j, "bQ", capturedPiece, gameID)
 			return false
 		}
-		
 
 		if (Verify.AllTables[gameID].ChessBoard[x][j])[0:1] == "w" {
 			break //no need to check rest of squares if the square is already occupied by a piece
@@ -976,11 +963,10 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y-1, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y-1, "wK", capturedPiece, gameID)
 			return false
 		}
-		
 
 	}
 
@@ -997,11 +983,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x-1 >= 0 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-1][y+1])[0:1] != "w" { //top right
@@ -1017,11 +1003,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x-1, y+1, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y+1, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x][y-1])[0:1] != "w" { //middle left
@@ -1037,11 +1023,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x, y-1, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, y-1, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x][y+1])[0:1] != "w" { //middle right
@@ -1057,11 +1043,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x, y+1, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, y+1, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x+1 <= 7 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+1][y-1])[0:1] != "w" { //bottom left
@@ -1077,11 +1063,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+1, y-1, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y-1, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y])[0:1] != "w" { //bottom middle
@@ -1097,11 +1083,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+1, y, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x+1 <= 7 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y+1])[0:1] != "w" { //bottom right
@@ -1117,11 +1103,11 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isWhiteInCheck(gameID) == true {
 			undoMove(x, y, x+1, y+1, "wK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y+1, "wK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	return true
@@ -1142,11 +1128,11 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-1, y-1, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y-1, "bK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y])[0:1] != "b" { //top middle
@@ -1162,12 +1148,12 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-1, y, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y, "bK", capturedPiece, gameID)
 
 			return false
 		}
-		
+
 	}
 
 	if x-1 >= 0 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x-1][y+1])[0:1] != "b" { //top right
@@ -1183,12 +1169,12 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x-1, y+1, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x-1, y+1, "bK", capturedPiece, gameID)
 
 			return false
 		}
-		
+
 	}
 
 	if y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x][y-1])[0:1] != "b" { //middle left
@@ -1204,12 +1190,12 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x, y-1, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, y-1, "bK", capturedPiece, gameID)
 
 			return false
 		}
-		
+
 	}
 
 	if y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x][y+1])[0:1] != "b" { //middle right
@@ -1225,12 +1211,12 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x, y+1, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x, y+1, "bK", capturedPiece, gameID)
 
 			return false
 		}
-		
+
 	}
 
 	if x+1 <= 7 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+1][y-1])[0:1] != "b" { //bottom left
@@ -1246,12 +1232,12 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y-1, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y-1, "bK", capturedPiece, gameID)
 
 			return false
 		}
-		
+
 	}
 
 	if x+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y])[0:1] != "b" { //bottom middle
@@ -1267,11 +1253,11 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y, "bK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	if x+1 <= 7 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y+1])[0:1] != "b" { //bottom right
@@ -1287,11 +1273,11 @@ func blackKingStaleMate(x int8, y int8, gameID int16) bool {
 
 		if isBlackInCheck(gameID) == true {
 			undoMove(x, y, x+1, y+1, "bK", capturedPiece, gameID)
-		}else{
+		} else {
 			undoMove(x, y, x+1, y+1, "bK", capturedPiece, gameID)
 			return false
 		}
-		
+
 	}
 
 	return true

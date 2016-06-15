@@ -2,7 +2,6 @@
 package gostuff
 
 import (
-	"bufio"
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
@@ -44,12 +43,12 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
-	
-    capID := template.HTMLEscapeString(r.FormValue("captchaId"))
+
+	capID := template.HTMLEscapeString(r.FormValue("captchaId"))
 	capSol := template.HTMLEscapeString(r.FormValue("captchaSolution"))
-	
-	if capSol == ""{ //then assume user was not displayed captcha
-		
+
+	if capSol == "" { //then assume user was not displayed captcha
+
 		//check if database connection is open
 		if db.Ping() != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Error 24"))
@@ -78,7 +77,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			log.Println("new.go ProcessLogin 2 ", err2)
 			return
 		}
-		
+
 		//if user entered password incorrect two times or more then they need to enter captcha to login
 		if captcha >= 2 {
 			w.Write([]byte("<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' /> You entered password incorrecty too many times. Now you need to enter captcha."))
@@ -88,13 +87,13 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		if pass != key {
 			browser := r.UserAgent()
 			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
-			
-			if captcha == 1{
+
+			if captcha == 1 {
 				w.Write([]byte("<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' />  You entered password incorrectly too many times. Now you need to enter captcha."))
-			}else{
+			} else {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
-			}	
-			
+			}
+
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
@@ -116,7 +115,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 			log.Printf("%s needs to activate his account before logging in.\n", userName)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. An email has been sent again containing your activation code."))
-		
+
 			//checking if token matches the one entered by user
 			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", userName).Scan(&tokenInDB, &email)
 			if err2 != nil {
@@ -154,14 +153,12 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		SessionManager[userName] = sessionID
 
 		w.Write([]byte("<script>window.location = '/memberHome'</script>"))
-		
-	
-		
-	}else if !captcha.VerifyString(capID, capSol) {
-	
+
+	} else if !captcha.VerifyString(capID, capSol) {
+
 		w.Write([]byte("<script>document.getElementById('captchaSolution').value = '';</script><img src='img/ajax/not-available.png' /> Wrong captcha solution! Please try again."))
 
-	} else {		
+	} else {
 
 		//check if database connection is open
 		if db.Ping() != nil {
@@ -192,7 +189,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//check if there was more then one incorrect login attempt
 			return
 		}
-			
+
 		if captcha == 5 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> This account has been deactivated becaue too many incorrect login attempts were made. An email has been sent to you on instructions on reactivating your account."))
 
@@ -222,20 +219,20 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			_, err = stmt.Exec(userName, token, email, date)
 			if err != nil {
 				fmt.Println("We are having trouble with our server. Please come back later. Report to admin Error 33")
-				log.Println("new.go ProcessLogin 7 ",err)
+				log.Println("new.go ProcessLogin 7 ", err)
 				return
 			}
 			//sends email to user with the token activation
 			SendAttempt(email, token, userName, r.RemoteAddr)
 			log.Println(err2)
 			return
-			
-		}else if captcha > 5 { //tell user on the front end that this account has too many login attempts, resends activation token
+
+		} else if captcha > 5 { //tell user on the front end that this account has too many login attempts, resends activation token
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> This account has been deactivated because too many incorrect login attempts were made. An email has been sent again regarding how to reactivate your account."))
 
 			err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userName).Scan(&token)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 8 ",err2)
+				log.Println("new.go ProcessLogin 8 ", err2)
 				return
 			}
 
@@ -247,18 +244,17 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			browser := r.UserAgent()
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
-			
 
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				log.Println("new.go ProcessLogin 9 ",err)
+				log.Println("new.go ProcessLogin 9 ", err)
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				log.Println("new.go ProcessLogin 10 ",err)
+				log.Println("new.go ProcessLogin 10 ", err)
 			}
 
 			return
@@ -270,18 +266,17 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			log.Printf("%s needs to activate his account before logging in.\n", userName)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. An email has been sent again containing your activation code."))
 
-
 			//checking if token matches the one entered by user
 			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", userName).Scan(&tokenInDB, &email)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 11 ",err2)
+				log.Println("new.go ProcessLogin 11 ", err2)
 			} else {
 				Sendmail(email, tokenInDB, userName)
 
 			}
 			return
 		}
-		
+
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		if err != nil {
@@ -304,7 +299,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &cookie)
 
 		SessionManager[userName] = sessionID
-		
+
 		w.Write([]byte("<script>window.location = '/memberHome'</script>"))
 	}
 
@@ -312,7 +307,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 //processes the users input when signing up
 func ProcessRegister(w http.ResponseWriter, r *http.Request) {
-	
+
 	if r.Method != "POST" {
 		w.WriteHeader(404)
 		http.ServeFile(w, r, "404.html")
@@ -322,28 +317,27 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 	if !captcha.VerifyString(template.HTMLEscapeString(r.FormValue("captchaId")), template.HTMLEscapeString(r.FormValue("captchaSolution"))) {
 		w.Write([]byte("<script>document.getElementById('captchaSolution').value = '';</script><img src='img/ajax/not-available.png' /> Wrong captcha solution"))
-		
-		
+
 	} else {
 
 		userName := template.HTMLEscapeString(r.FormValue("username"))
 		passWord := template.HTMLEscapeString(r.FormValue("pass"))
 		confirm := template.HTMLEscapeString(r.FormValue("confirm"))
 		email := template.HTMLEscapeString(r.FormValue("email"))
-		
+
 		if len(userName) < 3 || len(userName) > 12 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please choose a username between 3 and 12 characters long."))
-			
+
 		} else if passWord != confirm {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Your password and confirm password did not match"))
-		
+
 		} else if len(passWord) < 5 || len(passWord) > 32 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Password must be at between 5 to 32 characters long"))
-			
+
 		} else if len(email) < 5 || len(email) > 30 {
-			
+
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please choose an email between 5 and 30 characters long"))
-			
+
 		} else {
 
 			problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -354,7 +348,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			//check if database connection is open
 			if db.Ping() != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 27"))
-				log.Println("new.go processRegister 1 DATABASE DOWN!")	
+				log.Println("new.go processRegister 1 DATABASE DOWN!")
 				return
 			}
 
@@ -370,10 +364,10 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 
 			}
-			message := "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello "+ userName + "! Please check email for instructions to verify your account."
+			message := "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello " + userName + "! Please check email for instructions to verify your account."
 			//if reached here just notify user to check his email and continue on with the account creation
-			w.Write([]byte(message))					
-			
+			w.Write([]byte(message))
+
 			//hashing password
 			dk, err1 := scrypt.Key([]byte(passWord), []byte(userName), 16384, 8, 1, 32)
 			key := hex.EncodeToString(dk)
@@ -390,7 +384,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				log.Println("new.go processRegister 3 ", err)
 				return
 			}
-			
+
 			date := time.Now()
 			res, err := stmt.Exec(userName, key, email, date, date, r.RemoteAddr, "NO", 0)
 			if err != nil {
@@ -406,14 +400,14 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			log.Printf("Account %s and id %d was created in userinfo table.\n", userName, id)
-			
+
 			token := RandomString()
-			
+
 			//preparing token activation
 			stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 32"))
-				log.Println("new.go processRegister 6 ", err)	
+				log.Println("new.go processRegister 6 ", err)
 				return
 			}
 
@@ -425,21 +419,21 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			}
 			//sends email to user
 			Sendmail(email, token, userName)
-
+			
 			//setting up player's rating
 			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, bulletRD=?, blitzRD=?, standardRD=?")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 34"))
 				log.Println("new.go processRegister 7 ", err)
 				return
-				
+
 			}
 
 			res, err = stmt.Exec(userName, "1500", "1500", "1500", "350.0", "350.0", "350.0")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 35"))
-				log.Println(err)	
-				return			
+				log.Println(err)
+				return
 			}
 
 		}
@@ -449,12 +443,12 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 func CheckUserName(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		userName := template.HTMLEscapeString(r.FormValue("username"))
-		
+
 		//making sure username fits length requirement
-		if len(userName) < 3 || len(userName) > 12{
-			return;
-		}	
-		
+		if len(userName) < 3 || len(userName) > 12 {
+			return
+		}
+
 		//check if database connection is open
 		if db.Ping() != nil {
 			fmt.Printf("ERROR 2 PINGING DB IP: %s \n", r.RemoteAddr)
@@ -476,48 +470,7 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}
-	
-}
 
-func ReadFile() string {
-	config, err := os.Open("secret/config.txt")
-	defer config.Close()
-	if err != nil {
-		log.Println("new.go ReadFile 1 ", err)
-	}
-
-	scanner := bufio.NewScanner(config)
-	//creating new string to append database info
-	dbString := ""
-	scanner.Scan()
-	//user
-	dbData := scanner.Text()
-	dbString = dbString + dbData + ":"
-
-	//pass
-	scanner.Scan()
-	dbData = scanner.Text()
-	//decode
-	ans, _ := hex.DecodeString(dbData)
-
-	result, _ := base64.StdEncoding.DecodeString(string(ans))
-	answer := string(result)
-
-	dbString = dbString + answer + "@tcp("
-	//host
-	scanner.Scan()
-	dbData = scanner.Text()
-	dbString = dbString + dbData + ":"
-	//port
-	scanner.Scan()
-	dbData = scanner.Text()
-	dbString = dbString + dbData + ")/"
-	//database name
-	scanner.Scan()
-	dbData = scanner.Text()
-	dbString = dbString + dbData
-
-	return dbString
 }
 
 func RandomString() string {
@@ -527,7 +480,7 @@ func RandomString() string {
 	_, err := rand.Read(rb)
 
 	if err != nil {
-		fmt.Println("new.go RandomString 1 ",err)
+		fmt.Println("new.go RandomString 1 ", err)
 	}
 
 	token := base64.URLEncoding.EncodeToString(rb)

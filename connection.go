@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"golang.org/x/net/websocket"
 	"log"
-	"os"
 	"math/rand"
+	"os"
 	"time"
 )
-
 
 //reads in all incoming web sockets and sends them out to the correct users
 func (c *Connection) ChessConnect() {
@@ -68,11 +67,11 @@ func (c *Connection) ChessConnect() {
 				if result == false {
 					totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 					log.Printf("Invalid chess move by %s move %s - %s in gameID %d on move %d", c.username, game.Source, game.Target, game.ID, totalMoves)
-					
+
 					break
 				}
 				Verify.AllTables[game.ID].Connection <- true
-				
+
 				//printBoard(game.ID)
 
 				//checkin if there is a pending draw and if so it removes it
@@ -93,7 +92,7 @@ func (c *Connection) ChessConnect() {
 					//now switch clocks
 					go func() {
 						All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds = StartClock(game.ID, All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, "Black")
-						
+
 					}()
 
 				} else if All.Games[game.ID].Status == "Black" {
@@ -101,7 +100,7 @@ func (c *Connection) ChessConnect() {
 
 					go func() {
 						All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds = StartClock(game.ID, All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, "White")
-						
+
 					}()
 
 				} else {
@@ -113,7 +112,6 @@ func (c *Connection) ChessConnect() {
 				game.WhiteSeconds = All.Games[game.ID].WhiteSeconds
 				game.BlackMinutes = All.Games[game.ID].BlackMinutes
 				game.BlackSeconds = All.Games[game.ID].BlackSeconds
-				
 
 				var move Move
 				move.S = game.Source
@@ -132,7 +130,7 @@ func (c *Connection) ChessConnect() {
 				}
 
 			case "chat_private":
-		
+
 				if len(reply) > 500 {
 
 					log.Printf("User: %s IP %s has exeeded the 500 character limit by %d byte units.\n", t.Name, c.clientIP, len(reply))
@@ -144,7 +142,6 @@ func (c *Connection) ChessConnect() {
 				if counter > 4 {
 					elapsed := time.Since(start)
 					if elapsed < time.Second*10 {
-						
 
 						log.Printf("User: %s IP: %s was spamming chat.\n", t.Name, c.clientIP)
 						return
@@ -153,7 +150,7 @@ func (c *Connection) ChessConnect() {
 					counter = 0
 
 				}
-				
+
 				//checking if other player has disconnected from the websocket
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
 
@@ -169,30 +166,30 @@ func (c *Connection) ChessConnect() {
 					// we could not send the message to a peer
 					fmt.Println("Connection.go error 6 Could not send message to ", c.clientIP, err.Error())
 				}
-			
+
 			case "chess_game":
 
 				//if game match was not accepted then player name will not be stored in PrivateChat from match_accept
 				if _, ok := PrivateChat[t.Name]; !ok {
 					//closing socket
 					break
-				}				
-				
+				}
+
 				for _, game := range All.Games {
 					if game.WhitePlayer == t.Name || game.BlackPlayer == t.Name {
 						game.Type = "chess_game"
-								
+
 						//storing the golang data structure as a string to be sent to front end
 						result, _ := json.Marshal(game)
-						
+
 						//send to self the game info
 						websocket.Message.Send(c.websocket, string(result))
 
 					}
 				}
-			
+
 			case "abort_game":
-				
+
 				var game GameMove
 
 				json.Unmarshal(message, &game)
@@ -210,7 +207,7 @@ func (c *Connection) ChessConnect() {
 				}
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
-	
+
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
 
@@ -238,7 +235,7 @@ func (c *Connection) ChessConnect() {
 				}
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
-				
+
 				All.Games[game.ID].Status = "Agreed Draw"
 				//2 means the game is a draw and stored as an int in the database
 				All.Games[game.ID].Result = 2
@@ -261,12 +258,11 @@ func (c *Connection) ChessConnect() {
 				//gets length of all the moves in the game
 				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 				storeGame(totalMoves, allMoves, All.Games[game.ID])
-				
+
 				//now delete game from memory
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
-				
-				
+
 			case "game_over":
 				var game Fin
 				var result float64
@@ -331,7 +327,7 @@ func (c *Connection) ChessConnect() {
 
 					}
 				}
-				
+
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
 
@@ -382,7 +378,7 @@ func (c *Connection) ChessConnect() {
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
 			case "rematch":
-				
+
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
@@ -391,7 +387,7 @@ func (c *Connection) ChessConnect() {
 					break
 				}
 				//check length of name to make sure its 3-12 characters long, prevent hack abuse
-				if len(match.Opponent) < 3 || len(match.Opponent) > 12{
+				if len(match.Opponent) < 3 || len(match.Opponent) > 12 {
 					fmt.Println("Username is too long or too short")
 					break
 				}
@@ -404,7 +400,7 @@ func (c *Connection) ChessConnect() {
 
 				//fetching rating from back end
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
-				if errMessage != ""{
+				if errMessage != "" {
 					fmt.Println("Cannot get rating connection.go private_match")
 					break
 				}
@@ -431,7 +427,7 @@ func (c *Connection) ChessConnect() {
 					match.Rating = standard
 					match.GameType = "standard"
 				}
-				
+
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
 				if c.totalMatches >= 3 {
 					t.Type = "maxThree"
@@ -455,8 +451,8 @@ func (c *Connection) ChessConnect() {
 				//value := fmt.Sprintf("%d", start)
 				match.MatchID = start
 				//used in backend to keep track of all pending seeks waiting for a player to accept
-				Pending.Matches[start] = &match		
-				
+				Pending.Matches[start] = &match
+
 				if _, ok := PrivateChat[match.Opponent]; ok {
 					log.Println("rematch 1 connection.go Player already has a game. ")
 
@@ -466,9 +462,8 @@ func (c *Connection) ChessConnect() {
 						log.Println("rematch 2 connection.go Could not send message to ", c.clientIP, err.Error())
 					}
 				}
-				
-						
-			case "accept_rematch":		
+
+			case "accept_rematch":
 
 				var match SeekMatch
 				var game ChessGame
@@ -478,21 +473,21 @@ func (c *Connection) ChessConnect() {
 					log.Println("Connection.go error 11 Exact error: " + err.Error())
 					break
 				}
-				//isPlayerInGame function is located in socket.go		
-				if isPlayerInGame(match.Name, match.Opponent){
+				//isPlayerInGame function is located in socket.go
+				if isPlayerInGame(match.Name, match.Opponent) {
 					fmt.Println("connection.go accept rematch 12")
 					break
 				}
-				
+
 				//checking to make sure both player's rating is in range, used as a backend rating check
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
-				if errMessage != ""{
+				if errMessage != "" {
 					fmt.Println("Cannot get rating connection.go accept_match")
 					break
 				}
-				
+
 				game.Type = "chess_game"
-				
+
 				//bullet, blitz or standard game type
 				game.GameType = Pending.Matches[match.MatchID].GameType
 
@@ -596,34 +591,34 @@ func (c *Connection) ChessConnect() {
 					fmt.Println("error accept_rematch 2 is ", err)
 
 				}
-				
+
 				//starting white's clock first, this goroutine will keep track of both players clock for this game
 				go setClocks(game.ID, t.Name)
-			
+
 			case "draw_game":
 				var game GameMove
 
 				json.Unmarshal(message, &game)
-			
+
 				//checking to see if the side whose turn it is to move is in stalemate
-				if Verify.AllTables[game.ID].whiteTurn == true{
-					
-					if isWhiteStaleMate(game.ID) == true || noMaterial(game.ID) == true ||  threeRep(game.ID) == true || fiftyMoves(game.ID) == true{
+				if Verify.AllTables[game.ID].whiteTurn == true {
+
+					if isWhiteStaleMate(game.ID) == true || noMaterial(game.ID) == true || threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
 						fmt.Println("forced draw_game connection.go success 1")
-					}else{
+					} else {
 						break
 					}
-					
-				}else{
-					
-					if isBlackStaleMate(game.ID) == true || noMaterial(game.ID) == true ||  threeRep(game.ID) == true || fiftyMoves(game.ID) == true{
+
+				} else {
+
+					if isBlackStaleMate(game.ID) == true || noMaterial(game.ID) == true || threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
 						fmt.Println("forced draw_game connection.go success 2")
-					}else{
+					} else {
 						break
 					}
-					
+
 				}
-					
+
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
 
@@ -654,7 +649,6 @@ func (c *Connection) ChessConnect() {
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
 
-				
 			default:
 				fmt.Println("I'm not familiar with type " + t.Type)
 			}

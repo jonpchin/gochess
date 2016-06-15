@@ -57,7 +57,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
 			log.Println("account.go processResetPass 1 ", err2)
-			return  
+			return
 		}
 		if tokenInDB != token {
 			browser := r.UserAgent()

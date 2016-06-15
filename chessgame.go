@@ -88,13 +88,13 @@ type Table struct {
 
 	undoWPass bool //if this is true then white just did an en passent and it is used in undoMove()
 	undoBPass bool
-	
-	pawnMove int //keeps track of what move was the last pawn move made, used for fifty move rule
+
+	pawnMove    int //keeps track of what move was the last pawn move made, used for fifty move rule
 	lastCapture int
-	
+
 	whiteTimeOut chan bool
 	blackTimeOut chan bool
-	gameOver 	 chan bool
+	gameOver     chan bool
 	Connection   chan bool
 }
 
@@ -152,12 +152,11 @@ func initGame(gameID int16) {
 
 	Verify.AllTables[gameID].undoWPass = false
 	Verify.AllTables[gameID].undoBPass = false
-	
-	
+
 	Verify.AllTables[gameID].whiteTimeOut = make(chan bool)
 	Verify.AllTables[gameID].blackTimeOut = make(chan bool)
 	Verify.AllTables[gameID].gameOver = make(chan bool)
-	
+
 	Verify.AllTables[gameID].pawnMove = 0
 	Verify.AllTables[gameID].lastCapture = 0
 }

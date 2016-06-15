@@ -1,17 +1,17 @@
 package gostuff
 
-import(
+import (
 	"encoding/json"
 	"fmt"
 	"golang.org/x/net/websocket"
 	"log"
+	"math/rand"
 	"os"
 	"time"
-	"math/rand"
 )
 
 func (c *Connection) LobbyConnect() {
-	
+
 	defer broadCast(c.username) //remove user when they disconnect from socket
 	counter := 0
 	start := time.Now()
@@ -22,7 +22,7 @@ func (c *Connection) LobbyConnect() {
 
 	// direct all log messages to log.txt
 	log.SetOutput(logFile)
-	
+
 	for {
 		var reply string
 
@@ -39,12 +39,12 @@ func (c *Connection) LobbyConnect() {
 			fmt.Println("lobby.go 1 Reader 1 ", err.Error())
 			break
 		}
-		
-		if c.username == t.Name{
+
+		if c.username == t.Name {
 			switch t.Type {
-			
+
 			case "chat_all":
-				
+
 				if len(reply) > 225 {
 					log.Printf("User: %s IP %s has exeeded the 225 character limit by %d byte units.\n", t.Name, c.clientIP, len(reply))
 					return
@@ -85,20 +85,20 @@ func (c *Connection) LobbyConnect() {
 					websocket.Message.Send(c.websocket, result)
 
 				}
-				
+
 			case "fetch_players":
 				//send in array instead of sending individual
 				var player Online
-				
+
 				player.Type = "fetch_players"
 
 				for key, _ := range Chat.Lobby {
 					player.Name = key
 					websocket.JSON.Send(c.websocket, player)
 				}
-			
+
 			case "match_seek":
-				
+
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
 				if c.totalMatches >= 3 {
 					t.Type = "maxThree"
@@ -118,9 +118,9 @@ func (c *Connection) LobbyConnect() {
 					fmt.Println("Exact error: " + err.Error())
 					break
 				}
-				
+
 				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayerInGame(t.Name, match.Opponent) == true{
+				if isPlayerInGame(t.Name, match.Opponent) == true {
 					fmt.Println("Player is already in a game!")
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
@@ -128,7 +128,7 @@ func (c *Connection) LobbyConnect() {
 						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
 					}
 					break
-				
+
 				}
 
 				//verify.go
@@ -138,8 +138,8 @@ func (c *Connection) LobbyConnect() {
 				}
 
 				//fetching rating from back end
-				errRate ,bullet, blitz, standard := GetRating(match.Name)
-				if errRate != ""{
+				errRate, bullet, blitz, standard := GetRating(match.Name)
+				if errRate != "" {
 					fmt.Println("Cannot get rating lobby.go match_seek")
 					break
 				}
@@ -206,20 +206,18 @@ func (c *Connection) LobbyConnect() {
 					fmt.Println("Exact error: " + err.Error())
 					break
 				}
-				
-				
+
 				//number, _ := strconv.ParseInt(match.MatchID, 10, 0)
 				//deletes key from hash table
 				delete(Pending.Matches, match.MatchID)
-				
+
 				//deletes pending match counter
 				c.totalMatches--
 				//check if its a private match, if so then delete it and break out
-				if match.Opponent != ""{
+				if match.Opponent != "" {
 					fmt.Println("Private match deleted")
 					break //no need to continue as this is a private match
 				}
-				
 
 				go func() {
 					for _, cs := range Chat.Lobby {
@@ -227,8 +225,8 @@ func (c *Connection) LobbyConnect() {
 					}
 				}()
 
-			case "accept_match":			
-				
+			case "accept_match":
+
 				var match SeekMatch
 				var game ChessGame
 				if err := json.Unmarshal(message, &match); err != nil {
@@ -237,9 +235,9 @@ func (c *Connection) LobbyConnect() {
 					log.Println("lobby.go error 11 Exact error: " + err.Error())
 					break
 				}
-				
+
 				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayerInGame(match.Name, match.Opponent) == true{
+				if isPlayerInGame(match.Name, match.Opponent) == true {
 					log.Println("lobby.go Player already has a game. ")
 					//alerting player
 					t.Type = "alert"
@@ -249,16 +247,15 @@ func (c *Connection) LobbyConnect() {
 					}
 					break
 				}
-				
-				
+
 				//checking to make sure both player's rating is in range, used as a backend rating check
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
-				if errMessage != ""{
+				if errMessage != "" {
 					fmt.Println("Cannot get rating connection.go accept_match")
 					break
 				}
-				
-				if Pending.Matches[match.MatchID].Opponent == ""{ //only use this case for public matches
+
+				if Pending.Matches[match.MatchID].Opponent == "" { //only use this case for public matches
 					if Pending.Matches[match.MatchID].GameType == "bullet" && (bullet < Pending.Matches[match.MatchID].MinRating || bullet > Pending.Matches[match.MatchID].MaxRating) {
 						fmt.Println("Bullet Rating not in range.")
 						break
@@ -270,7 +267,7 @@ func (c *Connection) LobbyConnect() {
 						break
 					}
 				}
-				
+
 				//bullet, blitz or standard game type
 				game.GameType = Pending.Matches[match.MatchID].GameType
 
@@ -382,9 +379,9 @@ func (c *Connection) LobbyConnect() {
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game
 				go setClocks(game.ID, t.Name)
-			
+
 			case "private_match":
-				
+
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
@@ -392,8 +389,8 @@ func (c *Connection) LobbyConnect() {
 					fmt.Println("Exact error: " + err.Error())
 					break
 				}
-					//check if player already has a game started, if there is a game in progress alert player
-				if isPlayerInGame(match.Name, match.Opponent) == true{
+				//check if player already has a game started, if there is a game in progress alert player
+				if isPlayerInGame(match.Name, match.Opponent) == true {
 					fmt.Println("Player already has a game.")
 					//alerting player
 					t.Type = "alert"
@@ -403,18 +400,18 @@ func (c *Connection) LobbyConnect() {
 					}
 					break
 				}
-				
+
 				//check length of name to make sure its 3-12 characters long
-				if len(match.Opponent) < 3 || len(match.Opponent) > 12{
+				if len(match.Opponent) < 3 || len(match.Opponent) > 12 {
 					fmt.Println("Username is too long or too short")
 					break
 				}
 				//a player should not be able to match himself
-				if(t.Name == match.Opponent){
+				if t.Name == match.Opponent {
 					fmt.Println("You can't match yourself!")
-					break	
+					break
 				}
-				
+
 				//check if opponent is in the lobby or not
 				if _, ok := Chat.Lobby[match.Opponent]; !ok {
 					//alerting player
@@ -424,7 +421,7 @@ func (c *Connection) LobbyConnect() {
 						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
 					}
 					break
-				} 
+				}
 
 				//verify.go
 				if checkTime(match.TimeControl) == false {
@@ -434,7 +431,7 @@ func (c *Connection) LobbyConnect() {
 
 				//fetching rating from back end
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
-				if errMessage != ""{
+				if errMessage != "" {
 					fmt.Println("Cannot get rating lobby.go private_match")
 					break
 				}
@@ -461,7 +458,7 @@ func (c *Connection) LobbyConnect() {
 					match.Rating = standard
 					match.GameType = "standard"
 				}
-				
+
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
 				if c.totalMatches >= 3 {
 					t.Type = "maxThree"
@@ -496,17 +493,17 @@ func (c *Connection) LobbyConnect() {
 				finalMessage := string(result)
 				go func() {
 					for name, _ := range Chat.Lobby {
-						if name == match.Opponent || name == match.Name{ //send to self and opponent
+						if name == match.Opponent || name == match.Name { //send to self and opponent
 							if err := websocket.Message.Send(Chat.Lobby[name], finalMessage); err != nil {
-							// we could not send the message to a peer
+								// we could not send the message to a peer
 								fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
 
 							}
 						}
-						
+
 					}
 				}()
-	
+
 			default:
 				fmt.Println("I'm not familiar with type " + t.Type)
 			}
