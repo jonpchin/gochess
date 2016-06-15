@@ -53,10 +53,8 @@ func main() {
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
     
-	const filePath = "secret/config.txt"
-	
 	//setting up database
-	proceed := gostuff.DbSetup(filePath)
+	proceed := gostuff.DbSetup()
 
 	//setting up cron job
 	gostuff.StartCron()
