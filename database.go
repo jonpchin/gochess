@@ -50,9 +50,9 @@ type GoGame struct {
 var db *sql.DB
 
 //returns false if database setup failed
-func DbSetup(filePath string) bool {
+func DbSetup() bool {
 
-	dbString := ReadFile(filePath)
+	dbString := ReadFile()
 	var err error
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
@@ -70,8 +70,8 @@ func DbSetup(filePath string) bool {
 	return true
 }
 
-func ReadFile(filePath string) string {
-	config, err := os.Open(filePath)
+func ReadFile() string {
+	config, err := os.Open("secret/config.txt")
 	defer config.Close()
 	if err != nil {
 		log.Println("new.go ReadFile 1 ", err)
