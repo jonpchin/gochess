@@ -2,12 +2,15 @@ package gostuff
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"encoding/json"
 	"log"
 	"os"
 	"time"
+	"bufio"
+	"encoding/base64"
+	"encoding/hex"
 )
 
 //stores information about players games extracted from database when player clicks there profile
@@ -25,30 +28,31 @@ type ProfileGames struct {
 
 //an individual game
 type GoGame struct {
-	ID          int
-	White       string
-	Black       string
-	GameType    string
-	WhiteRating int
-	BlackRating int
+	ID           int
+	White        string
+	Black        string
+	GameType     string
+	WhiteRating  int
+	BlackRating  int
 	WhiteMinutes int
 	WhiteSeconds int
 	BlackMinutes int
 	BlackSeconds int
-	TimeControl int
-	Moves       string //json this back to a struct of Moves
-	Total       int
-	Result      int //2 means draw
-	Status      string
-	Date        string
-	Time        string
+	TimeControl  int
+	Moves        string //json this back to a struct of Moves
+	Total        int
+	Result       int //2 means draw
+	Status       string
+	Date         string
+	Time         string
 }
 
 var db *sql.DB
+
 //returns false if database setup failed
-func DbSetup() bool{
-	
-	dbString := ReadFile()
+func DbSetup(filePath string) bool {
+
+	dbString := ReadFile(filePath)
 	var err error
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
@@ -64,6 +68,47 @@ func DbSetup() bool{
 	}
 	fmt.Println("MySQL is now connected.")
 	return true
+}
+
+func ReadFile(filePath string) string {
+	config, err := os.Open(filePath)
+	defer config.Close()
+	if err != nil {
+		log.Println("new.go ReadFile 1 ", err)
+	}
+
+	scanner := bufio.NewScanner(config)
+	//creating new string to append database info
+	dbString := ""
+	scanner.Scan()
+	//user
+	dbData := scanner.Text()
+	dbString = dbString + dbData + ":"
+
+	//pass
+	scanner.Scan()
+	dbData = scanner.Text()
+	//decode
+	ans, _ := hex.DecodeString(dbData)
+
+	result, _ := base64.StdEncoding.DecodeString(string(ans))
+	answer := string(result)
+
+	dbString = dbString + answer + "@tcp("
+	//host
+	scanner.Scan()
+	dbData = scanner.Text()
+	dbString = dbString + dbData + ":"
+	//port
+	scanner.Scan()
+	dbData = scanner.Text()
+	dbString = dbString + dbData + ")/"
+	//database name
+	scanner.Scan()
+	dbData = scanner.Text()
+	dbString = dbString + dbData
+
+	return dbString
 }
 
 //fetches players bullet, blitz and standard rating
@@ -95,7 +140,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
-	
+
 	//check if database connection is open
 	if db.Ping() != nil {
 		log.Println("DATABASE DOWN! @GetRatingAndRD()")
@@ -231,7 +276,7 @@ func GetGames(name string) (storage []GoGame) {
 
 }
 
-func GetSaved(name string)(storage []GoGame){
+func GetSaved(name string) (storage []GoGame) {
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
@@ -258,12 +303,12 @@ func GetSaved(name string)(storage []GoGame){
 }
 
 //fetches saved game from database
-func fetchSavedGame(id string, user string) bool{
-	
+func fetchSavedGame(id string, user string) bool {
+
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
-	
+
 	var white string
 	var black string
 	var gametype string
@@ -277,27 +322,25 @@ func fetchSavedGame(id string, user string) bool{
 	var moves string
 	var totalmoves int
 	var status string
-	
-	
+
 	err = db.QueryRow("SELECT white, black, gametype, whiterating, blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white, &black, &gametype, &whiterating, &blackrating, &blackminutes, &blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves, &totalmoves, &status)
-	if err != nil{
+	if err != nil {
 		fmt.Println("database.go fetchSavedGame 1 ", err)
 	}
-	
-	
+
 	var game ChessGame
 	game.Type = "chess_game"
 	var holder []Move
 	//White for white to move or Black for black to move, white won, black won, stalemate or draw.
 	game.Status = status
-	
+
 	storage := []byte(moves)
 	err = json.Unmarshal(storage, &holder)
-	if err != nil{
+	if err != nil {
 		fmt.Println("database.go fetchSavedGame 2", err)
 	}
 	game.GameMoves = holder
-    game.WhitePlayer = white
+	game.WhitePlayer = white
 	game.BlackPlayer = black
 	game.WhiteRating = whiterating
 	game.BlackRating = blackrating
@@ -341,16 +384,15 @@ func fetchSavedGame(id string, user string) bool{
 	//intitalizes all the variables of the game
 	initGame(game.ID)
 
-
 	var result bool
-	total := len(game.GameMoves)	
-	
-	for i:=0; i<total; i++{
+	total := len(game.GameMoves)
+
+	for i := 0; i < total; i++ {
 		result = chessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.ID)
 		if result == false {
 			log.Println("something went wrong in move validation in fetchSavedGame of saved game id ", game.ID)
 			//undo all game setup and break out
-			delete(Verify.AllTables, game.ID)	
+			delete(Verify.AllTables, game.ID)
 			delete(All.Games, game.ID)
 			return false
 		}
@@ -360,7 +402,7 @@ func fetchSavedGame(id string, user string) bool{
 
 	//starting white's clock first, this goroutine will keep track of both players clock for this game
 	go setClocks(game.ID, user)
-	
+
 	//delete saved game from database now that its in memory
 	stmt, err := db.Prepare("DELETE FROM saved where id=?")
 	if err != nil {

@@ -122,10 +122,8 @@ window.onload = function() {
    						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
 					});
 				}
-				
-				
+	
 			}
-		
 		}
 		else if(json.Type === "fetch_players"){
 			
@@ -155,7 +153,6 @@ window.onload = function() {
 				//sock.close();
 				window.location = "/chess/memberChess";
 			}
-			
 		}
 		else if(json.Type === "private_match"){
 			if(json.Name === user){
@@ -171,8 +168,7 @@ window.onload = function() {
 				});
 				if(toggleSound !== "false"){
 					challenge.play();//plays sound to notify player they got a private match sent to them
-				}
-				
+				}	
 			}
 		}
 		else if(json.Type === "cancel_match"){
@@ -206,7 +202,6 @@ window.onload = function() {
 		else{
 			console.log("Unknown API type");	
 		}
-
     }
 	document.getElementById('sendButton').onclick = function(){
 	    var msg = document.getElementById('message').value;

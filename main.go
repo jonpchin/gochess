@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
-	"html/template"
-	"net/http"
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/GoChess/gostuff"
 	"golang.org/x/net/websocket"
-	"os/signal"
+	"html/template"
+	"net/http"
 	"os"
+	"os/signal"
 	"syscall"
 )
 
 func main() {
-	
+
 	http.HandleFunc("/", mainPage)
 	http.HandleFunc("/memberHome", memberHome)
 	http.HandleFunc("/login", login)
@@ -52,14 +52,16 @@ func main() {
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
+    
+	const filePath = "secret/config.txt"
 	
 	//setting up database
-	proceed := gostuff.DbSetup()
-		
+	proceed := gostuff.DbSetup(filePath)
+
 	//setting up cron job
 	gostuff.StartCron()
 	//removes games older then 30 days from database
-	if proceed == true{
+	if proceed == true {
 		gostuff.RemoveOldGames()
 		//fetch high score data from database
 		gostuff.UpdateHighScore()
@@ -67,27 +69,25 @@ func main() {
 
 	//setting up clean up function for graceful shutdown
 	c := make(chan os.Signal, 1)
-    signal.Notify(c, os.Interrupt)
-    signal.Notify(c, syscall.SIGTERM)
-    go func() {
-        <-c
-        gostuff.Cleanup()
-        os.Exit(1)
-    }()	
-	
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGTERM)
+	go func() {
+		<-c
+		gostuff.Cleanup()
+		os.Exit(1)
+	}()
+
 	go func() {
 		if err := http.ListenAndServeTLS(":443", "secret/device.crt", "secret/device.key", nil); err != nil {
 			fmt.Println("ListenAndServeTLS error: %v", err)
 		}
 	}()
 	fmt.Println("Web server is now running.")
-//	gostuff.ConvertPGN()	
-	
+	//	gostuff.ConvertPGN()
+
 	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {
 		fmt.Println("ListenAndServe error: %v", err)
 	}
-	//one time function call which converts all localhost pgn files into MySQL database
-	
 }
 
 func mainPage(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +96,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "404.html")
 		return
 	}
-
 	http.ServeFile(w, r, "index.html")
 }
 
@@ -170,7 +169,6 @@ func resetpass(w http.ResponseWriter, r *http.Request) {
 	if err := formTemplate.Execute(w, &d); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
 }
 
 func lobby(w http.ResponseWriter, r *http.Request) {
@@ -185,9 +183,9 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 				var memberHome = template.Must(template.ParseFiles("lobby.html"))
 				var bulletRating, blitzRating, standardRating int16
 				var errMessage string
-				
+
 				errMessage, bulletRating, blitzRating, standardRating = gostuff.GetRating(username.Value)
-				if errMessage != ""{
+				if errMessage != "" {
 					fmt.Println("Problem fetching rating lobby main.go")
 				}
 				p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating, Standard: standardRating}
@@ -198,7 +196,6 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 	}
 
 	w.WriteHeader(404)
@@ -224,7 +221,6 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")
@@ -302,7 +298,6 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")
@@ -352,15 +347,15 @@ func settings(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "404.html")
 }
 
-func highscores(w http.ResponseWriter, r *http.Request){
+func highscores(w http.ResponseWriter, r *http.Request) {
 	username, err := r.Cookie("username")
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				
+
 				var highscores = template.Must(template.ParseFiles("highscore.html"))
-				
+
 				var p gostuff.ScoreBoard
 				p = gostuff.LeaderBoard.Scores
 
@@ -368,7 +363,7 @@ func highscores(w http.ResponseWriter, r *http.Request){
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return
-				
+
 			}
 		}
 	}
@@ -411,4 +406,3 @@ func robot(w http.ResponseWriter, r *http.Request) {
 func redir(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://localhost"+r.RequestURI, http.StatusMovedPermanently)
 }
-

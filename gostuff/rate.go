@@ -37,7 +37,7 @@ func ComputeRating(name string, gameID int16, gameType string, result float64) {
 
 	//update player's rating and notify them of rating change, also determine player color to assign correct rating
 	if All.Games[gameID].WhitePlayer == name {
-		_ ,bullet, blitz, standard, bulletRD, blitzRD, standardRD = GetRatingAndRD(name)
+		_, bullet, blitz, standard, bulletRD, blitzRD, standardRD = GetRatingAndRD(name)
 		_, oBullet, oBlitz, oStandard, oBulletRD, oBlitzRD, oStandardRD = GetRatingAndRD(PrivateChat[name])
 	} else {
 		_, bullet, blitz, standard, bulletRD, blitzRD, standardRD = GetRatingAndRD(PrivateChat[name])

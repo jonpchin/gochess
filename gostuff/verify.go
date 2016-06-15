@@ -119,9 +119,9 @@ func chessVerify(source string, target string, gameID int16) bool {
 	}
 
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
-	
+
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
-	if capturedPiece != "-"{
+	if capturedPiece != "-" {
 		Verify.AllTables[gameID].lastCapture = (len(All.Games[gameID].GameMoves) + 1) / 2
 	}
 	//used to update king position if they are in check

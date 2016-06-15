@@ -40,7 +40,6 @@ type SeekMatch struct {
 	MaxRating   int16
 }
 
-
 //used to store two player's name for redirecting on the front end in JavaScript
 type AcceptMatch struct {
 	Type         string
@@ -82,7 +81,7 @@ func EnterLobby(ws *websocket.Conn) {
 				//gets total number of pending matches a player has
 				total = countMatches(username.Value)
 				Client := &Connection{username.Value, ws, ip, total}
-				
+
 				//only difference between lobby and chatroom is the two lines below
 				Chat.Lobby[username.Value] = ws
 				Client.LobbyConnect()
@@ -90,6 +89,7 @@ func EnterLobby(ws *websocket.Conn) {
 		}
 	}
 }
+
 //websocket handler for gameroom
 func EnterChess(ws *websocket.Conn) {
 
@@ -130,9 +130,9 @@ func countMatches(player string) int8 { //player should have no more then 3 seek
 
 //broadcast to chess room that player has disconnected socket
 func broadCast(user string) {
-	
+
 	delete(Chat.Lobby, user)
-	
+
 	var on Online
 	on.Type = "broadcast"
 	on.Name = user
@@ -147,36 +147,36 @@ func broadCast(user string) {
 }
 
 //function is called when player leaves the chess room
-func exitGame(user string){
+func exitGame(user string) {
 	//check if user is in PrivateChat map, delete player key's if necessary
 	if _, ok := PrivateChat[user]; ok {
-		if checkTable(user) == false{
-			var t ChatInfo 
+		if checkTable(user) == false {
+			var t ChatInfo
 			t.Type = "leave"
 			t.Text = user + " has left the chess room."
 			var otherPlayer = PrivateChat[user]
 
 			removePendingMatches(user)
-			
+
 			if _, pass := Active.Clients[otherPlayer]; pass {
 				if err := websocket.JSON.Send(Active.Clients[otherPlayer], &t); err != nil {
 					// we could not send the message to a peer
-					fmt.Println("exitgame.go error  Could not send message to ",  err)
+					fmt.Println("exitgame.go error  Could not send message to ", err)
 				}
 				delete(PrivateChat, user)
 				delete(PrivateChat, otherPlayer)
 			}
-			
+
 		}
-		
+
 	}
 	delete(Active.Clients, user)
 }
 
 //returns true if a player is at a given table
-func checkTable(user string) bool{
+func checkTable(user string) bool {
 	for _, table := range All.Games {
-		if table.WhitePlayer == user || table.BlackPlayer == user{
+		if table.WhitePlayer == user || table.BlackPlayer == user {
 			return true
 		}
 	}
@@ -184,21 +184,22 @@ func checkTable(user string) bool{
 }
 
 //returns true if a player or opponent has a game started
-func isPlayerInGame(name ,opponent string) bool{
+func isPlayerInGame(name, opponent string) bool {
 	for _, game := range All.Games {
-		if game.WhitePlayer == name || game.BlackPlayer == name{
+		if game.WhitePlayer == name || game.BlackPlayer == name {
 			return true
 		}
-		if game.WhitePlayer == opponent || game.BlackPlayer == opponent{
+		if game.WhitePlayer == opponent || game.BlackPlayer == opponent {
 			return true
 		}
 	}
 	return false
 }
+
 //checks if a player is in the lobby
-func isPlayerInLobby(player string) bool{
+func isPlayerInLobby(player string) bool {
 	for name, _ := range Chat.Lobby {
-		if  name == player{
+		if name == player {
 			return true
 		}
 	}
@@ -206,9 +207,9 @@ func isPlayerInLobby(player string) bool{
 }
 
 //checks if player is in chess room
-func isPlayerInChess(player string) bool{
+func isPlayerInChess(player string) bool {
 	for name, _ := range Active.Clients {
-		if  name == player{
+		if name == player {
 			return true
 		}
 	}
@@ -216,11 +217,11 @@ func isPlayerInChess(player string) bool{
 }
 
 //remove all pending matches from a player
-func removePendingMatches(name string){
+func removePendingMatches(name string) {
 	for key, value := range Pending.Matches {
 		//deletes all pending matches for either players
-		if value.Name == name || value.Opponent == name{
+		if value.Name == name || value.Opponent == name {
 			delete(Pending.Matches, key)
 		}
-	}	
+	}
 }

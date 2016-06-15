@@ -148,14 +148,12 @@ window.onload = function() {
 		}
 	    sock.send(JSON.stringify(message));
 		
-		
 		//checks to see if a game exist for the player in order to resume the game
 		var checkGame = {
 			Type: "chess_game",
 			Name: user
 		}
 		sock.send(JSON.stringify(checkGame));
-		
     }
 	
     sock.onclose = function(e) {
@@ -269,15 +267,13 @@ window.onload = function() {
 						moveCounter++;
 					}
 					onSnapEnd(); //used to update castling and en passent positions
-			
 				}
 				else{
 					if(toggleSound !== "false"){
 						//play sound when game starts
 						gameSound.play();
 					}
-					chessGameOver = false; 
-					
+					chessGameOver = false; 		
 					
 					//reset game position to brand new game, used for rematch
 					board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
@@ -286,8 +282,7 @@ window.onload = function() {
 					
 					document.getElementById("abortButton").disabled = false;
 					document.getElementById("drawButton").disabled = false;
-					document.getElementById("resignButton").disabled = false;
-					
+					document.getElementById("resignButton").disabled = false;		
 				}
 				
 				//formating time for clock
@@ -300,15 +295,13 @@ window.onload = function() {
 				if (user === json.WhitePlayer){
 					
 					document.getElementById("bottom").innerHTML = "W: " + json.WhitePlayer + "(" + json.WhiteRating +")";
-					document.getElementById("top").innerHTML = "B: " + json.BlackPlayer + "(" + json.BlackRating +")";
-					
+					document.getElementById("top").innerHTML = "B: " + json.BlackPlayer + "(" + json.BlackRating +")";			
 				}
 				else{
 					//flips board white on top black on bottom
 					$('#flipOrientationBtn').click();
 					document.getElementById("bottom").innerHTML = "B: " + json.BlackPlayer + "(" + json.BlackRating +")";
 					document.getElementById("top").innerHTML = "W: " + json.WhitePlayer + "(" + json.WhiteRating +")";
-	
 				}
 				
 				if(json.Status === "White"){
@@ -325,8 +318,7 @@ window.onload = function() {
 						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
 						blackClock.start($('#bottomtime').val());
 						blackClock.pause();
-					}
-					
+					}		
 				}
 				//else if (json.Status === "Black)
 				else {
@@ -447,7 +439,6 @@ window.onload = function() {
 			default:
 				console.log("Unknown API type json.Type is " + json.Type);
 		}
-
     }
 	document.getElementById('sendMessage').onclick = function(){
 	    var msg = document.getElementById('message').value;
@@ -493,14 +484,12 @@ window.onload = function() {
 			}
 		    sock.send(JSON.stringify(message));
 		}
-		
-		
+			
 		var datetime = timeStamp();
 		document.getElementById('textbox').innerHTML += (datetime + " You offer your opponent a draw." + '\n');
-		document.getElementById("drawButton").disabled = true; 
-		
+		document.getElementById("drawButton").disabled = true; 		
 	}
-	
+
 	document.getElementById('resignButton').onclick = function(){
 		if (window.confirm("Do you really want to resign?")) { 
   			var message = {
@@ -508,12 +497,9 @@ window.onload = function() {
 				Name: user,
 				ID: matchID
 			}
-		    sock.send(JSON.stringify(message));
-			
+		    sock.send(JSON.stringify(message));		
 		}
 	}
-	
-
 };
 function finishGame(color){ //color is the color player that is checkmated
  
@@ -524,7 +510,6 @@ function finishGame(color){ //color is the color player that is checkmated
 			Status: color
 	}
 	sock.send(JSON.stringify(message));
-
 }
 	
 //game is now drawn
@@ -558,8 +543,7 @@ function sendMove(src, dest){
 //go forward one move
 document.getElementById('goForward').onclick = function(){
 
-	if(moveCounter < moves.length){
-		
+	if(moveCounter < moves.length){	
 		moveCounter++;
 	}
 	//make a global array and iterate forwards through the global array when going forward
@@ -584,7 +568,6 @@ document.getElementById('goEnd').onclick = function(){
 		board.move(moves[i][0] + "-" + moves[i][1]);
 	}
 	moveCounter = moves.length;	
-	
 } 
 
 //offers player a rematch or accepts it if the other player offers
@@ -610,7 +593,7 @@ document.getElementById('rematchButton').onclick = function(){
 		}
 		var datetime = timeStamp();
 		document.getElementById('textbox').innerHTML += (datetime + " You offer your opponent a rematch." + '\n');
-	    
+		    
 	}
 	else{ //else value === "Accept Rematch"
 		var message = {
@@ -625,9 +608,7 @@ document.getElementById('rematchButton').onclick = function(){
 	//hiding button after click to prevent rematch abuse
 	$('#rematchButton').hide();
 	sock.send(JSON.stringify(message));
-
 } 
-
 	
 $('#message').keypress(function(event) {
     if (event.which === 13) {

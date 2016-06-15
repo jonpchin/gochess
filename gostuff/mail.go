@@ -8,9 +8,10 @@ import (
 	"gopkg.in/gomail.v2"
 	"log"
 	"os"
+	"fmt"
 )
-
-func Sendmail(target string, token string, name string) {
+//returns true if sucessful sent email
+func Sendmail(target string, token string, name string){
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
@@ -26,7 +27,7 @@ func Sendmail(target string, token string, name string) {
 	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", answer)
 
 	if err := d.DialAndSend(m); err != nil {
-		log.Println(err)
+		fmt.Println("error in Sendmail mail.go ", err)
 	}
 }
 
@@ -47,7 +48,7 @@ func SendAttempt(target string, token string, name string, ip string) {
 	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", answer)
 
 	if err := d.DialAndSend(m); err != nil {
-		log.Println(err)
+		fmt.Println("error in SendAttempt mail.go ", err)
 	}
 }
 
@@ -58,7 +59,7 @@ func SendForgot(target string, token string) {
 	m.SetHeader("To", target)
 	m.SetHeader("Subject", "Reset Password for Go Play Chess")
 	message := "Your token to reset your pass is : " + token +
-		"<br><br><a href='https://localhost/resetpass?token="+ token +"'>Please click here to type your token code and reset your password.</a>" +
+		"<br><br><a href='https://localhost/resetpass?token=" + token + "'>Please click here to type your token code and reset your password.</a>" +
 		"<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 
@@ -67,7 +68,7 @@ func SendForgot(target string, token string) {
 	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", answer)
 
 	if err := d.DialAndSend(m); err != nil {
-		log.Println(err)
+		fmt.Println("error in SendForgot mail.go ", err)
 	}
 }
 
@@ -80,7 +81,7 @@ func mailConfig() string {
 	readFile, err := os.Open("secret/mailpass.txt")
 	defer readFile.Close()
 	if err != nil {
-		log.Println(err)
+		fmt.Println("mailconfig mail.go ", err)
 	}
 
 	scanner := bufio.NewScanner(readFile)
