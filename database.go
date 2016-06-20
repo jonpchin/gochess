@@ -368,27 +368,14 @@ func fetchSavedGame(id string, user string) bool {
 	//used in backend to keep track of all pending games waiting for a player to accept
 	All.Games[start] = &game
 
-	//setting up back end move verification
-	var table Table
-	table.ChessBoard = [][]string{
-		[]string{"bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"},
-		[]string{"bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"},
-		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-		[]string{"wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"},
-		[]string{"wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"},
-	}
-	Verify.AllTables[game.ID] = &table
 	//intitalizes all the variables of the game
-	initGame(game.ID)
+	InitGame(game.ID)
 
 	var result bool
 	total := len(game.GameMoves)
 
 	for i := 0; i < total; i++ {
-		result = chessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.ID)
+		result = ChessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.ID)
 		if result == false {
 			log.Println("something went wrong in move validation in fetchSavedGame of saved game id ", game.ID)
 			//undo all game setup and break out

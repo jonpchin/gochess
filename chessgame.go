@@ -96,6 +96,8 @@ type Table struct {
 	blackTimeOut chan bool
 	gameOver     chan bool
 	Connection   chan bool
+	
+	moveCount int //keeps track of how many moves are made (moveCount+1) /2 to get move number 
 }
 
 //active and running games on the server
@@ -120,7 +122,22 @@ var Verify = struct {
 var PrivateChat = make(map[string]string)
 
 //intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
-func initGame(gameID int16) {
+func InitGame(gameID int16) {
+	
+	//setting up back end move verification
+	var table Table
+	table.ChessBoard = [][]string{
+		[]string{"bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"},
+		[]string{"bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"},
+		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
+		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
+		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
+		[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
+		[]string{"wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"},
+		[]string{"wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"},
+	}
+	Verify.AllTables[gameID] = &table
+	
 	for i := 0; i < 8; i++ {
 		Verify.AllTables[gameID].whitePawns[i] = false
 		Verify.AllTables[gameID].blackPawns[i] = false
@@ -159,4 +176,5 @@ func initGame(gameID int16) {
 
 	Verify.AllTables[gameID].pawnMove = 0
 	Verify.AllTables[gameID].lastCapture = 0
+	Verify.AllTables[gameID].moveCount = 0
 }

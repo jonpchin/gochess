@@ -352,21 +352,8 @@ func (c *Connection) LobbyConnect() {
 				PrivateChat[acceptmatch.Name] = acceptmatch.TargetPlayer
 				PrivateChat[acceptmatch.TargetPlayer] = acceptmatch.Name
 
-				//setting up back end move verification
-				var table Table
-				table.ChessBoard = [][]string{
-					[]string{"bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"},
-					[]string{"bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"},
-					[]string{"wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"},
-				}
-				Verify.AllTables[game.ID] = &table
 				//intitalizes all the variables of the game
-				initGame(game.ID)
+				InitGame(game.ID)
 
 				startGame, _ := json.Marshal(acceptmatch)
 
