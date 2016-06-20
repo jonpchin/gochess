@@ -63,7 +63,7 @@ func (c *Connection) ChessConnect() {
 
 				var result bool
 				//check if its correct players turn and if move is valid before sending
-				result = chessVerify(game.Source, game.Target, game.ID)
+				result = ChessVerify(game.Source, game.Target, game.ID)
 				if result == false {
 					totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 					log.Printf("Invalid chess move by %s move %s - %s in gameID %d on move %d", c.username, game.Source, game.Target, game.ID, totalMoves)
@@ -562,23 +562,9 @@ func (c *Connection) ChessConnect() {
 					}
 				}
 
-				//no need to setup private chat for players as its already setup
 
-				//setting up back end move verification
-				var table Table
-				table.ChessBoard = [][]string{
-					[]string{"bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"},
-					[]string{"bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"-", "-", "-", "-", "-", "-", "-", "-"},
-					[]string{"wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"},
-					[]string{"wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"},
-				}
-				Verify.AllTables[game.ID] = &table
 				//intitalizes all the variables of the game
-				initGame(game.ID)
+				InitGame(game.ID)
 
 				startGame, _ := json.Marshal(game)
 

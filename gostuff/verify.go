@@ -5,7 +5,7 @@ import (
 )
 
 //returns true if the move is valid otherwise it returns false
-func chessVerify(source string, target string, gameID int16) bool {
+func ChessVerify(source string, target string, gameID int16) bool {
 	if len(source) != 2 {
 		fmt.Println("Invalid input length")
 		return false
@@ -67,7 +67,7 @@ func chessVerify(source string, target string, gameID int16) bool {
 				return false
 			}
 			//then a succesful pawn move is made
-			Verify.AllTables[gameID].pawnMove = (len(All.Games[gameID].GameMoves) + 1) / 2
+			Verify.AllTables[gameID].pawnMove = (Verify.AllTables[gameID].moveCount + 1) / 2
 
 		} else {
 
@@ -75,7 +75,7 @@ func chessVerify(source string, target string, gameID int16) bool {
 			if result == false {
 				return false
 			}
-			Verify.AllTables[gameID].pawnMove = (len(All.Games[gameID].GameMoves) + 1) / 2
+			Verify.AllTables[gameID].pawnMove = (Verify.AllTables[gameID].moveCount + 1) / 2
 		}
 
 	case "N":
@@ -182,6 +182,7 @@ func chessVerify(source string, target string, gameID int16) bool {
 	}
 	Verify.AllTables[gameID].undoWPass = false //no longer need to watch out for undo en passent
 	Verify.AllTables[gameID].undoBPass = false
+	Verify.AllTables[gameID].pawnMove++
 	switchTurns(gameID)
 	return true
 }
