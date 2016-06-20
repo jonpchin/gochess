@@ -42,9 +42,15 @@ func ChessVerify(source string, target string, gameID int16) bool {
 
 	//identifying the piece that was selected
 	piece := Verify.AllTables[gameID].ChessBoard[newSourceRow][newSourceCol]
+	
+	//no piece was selected
+	if piece[0:1] == "-" {
+		return false
+	}
 	//piece without color specification
 	noColorPiece := piece[1:2]
 	colorOnly := piece[0:1]
+	
 
 	if (Verify.AllTables[gameID].whiteTurn == true && colorOnly == "b") || (Verify.AllTables[gameID].whiteTurn == false && colorOnly == "w") || source == "-" {
 		return false
@@ -122,7 +128,7 @@ func ChessVerify(source string, target string, gameID int16) bool {
 
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
 	if capturedPiece != "-" {
-		Verify.AllTables[gameID].lastCapture = (len(All.Games[gameID].GameMoves) + 1) / 2
+		Verify.AllTables[gameID].lastCapture = (Verify.AllTables[gameID].pawnMove + 1) / 2
 	}
 	//used to update king position if they are in check
 	if Verify.AllTables[gameID].kingUpdate == true {
