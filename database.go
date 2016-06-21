@@ -369,13 +369,13 @@ func fetchSavedGame(id string, user string) bool {
 	All.Games[start] = &game
 
 	//intitalizes all the variables of the game
-	InitGame(game.ID)
+	initGame(game.ID)
 
 	var result bool
 	total := len(game.GameMoves)
 
 	for i := 0; i < total; i++ {
-		result = ChessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.ID)
+		result = chessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.ID)
 		if result == false {
 			log.Println("something went wrong in move validation in fetchSavedGame of saved game id ", game.ID)
 			//undo all game setup and break out
