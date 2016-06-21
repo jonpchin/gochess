@@ -5,7 +5,7 @@ import (
 )
 
 //returns true if the move is valid otherwise it returns false
-func ChessVerify(source string, target string, gameID int16) bool {
+func chessVerify(source string, target string, gameID int16) bool {
 	if len(source) != 2 {
 		fmt.Println("Invalid input length")
 		return false
