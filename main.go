@@ -37,6 +37,7 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
+	http.HandleFunc("computer/engine", engine)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -52,6 +53,7 @@ func main() {
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
+	http.Handle("/computer", websocket.Handler(gostuff.PlayComputer))
     
 	//setting up database
 	proceed := gostuff.DbSetup()
@@ -99,14 +101,14 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 
 func login(w http.ResponseWriter, r *http.Request) {
 
-	var formTemplate = template.Must(template.ParseFiles("login.html"))
+	var login = template.Must(template.ParseFiles("login.html"))
 
 	d := struct {
 		CaptchaId string
 	}{
 		captcha.New(),
 	}
-	if err := formTemplate.Execute(w, &d); err != nil {
+	if err := login.Execute(w, &d); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -119,27 +121,27 @@ func screenshots(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "screenshots.html")
 }
 func register(w http.ResponseWriter, r *http.Request) {
-	var formTemplate = template.Must(template.ParseFiles("register.html"))
+	var register = template.Must(template.ParseFiles("register.html"))
 
 	d := struct {
 		CaptchaId string
 	}{
 		captcha.New(),
 	}
-	if err := formTemplate.Execute(w, &d); err != nil {
+	if err := register.Execute(w, &d); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func activate(w http.ResponseWriter, r *http.Request) {
-	var formTemplate = template.Must(template.ParseFiles("activate.html"))
+	var activate = template.Must(template.ParseFiles("activate.html"))
 
 	d := struct {
 		CaptchaId string
 	}{
 		captcha.New(),
 	}
-	if err := formTemplate.Execute(w, &d); err != nil {
+	if err := activate.Execute(w, &d); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -178,7 +180,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				var memberHome = template.Must(template.ParseFiles("lobby.html"))
+				var lobby = template.Must(template.ParseFiles("lobby.html"))
 				var bulletRating, blitzRating, standardRating int16
 				var errMessage string
 
@@ -188,7 +190,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 				}
 				p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating, Standard: standardRating}
 
-				if err := memberHome.Execute(w, &p); err != nil {
+				if err := lobby.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return
@@ -210,10 +212,10 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				//fmt.Println(r.URL.Query().Get("moves"))
-				var memberHome = template.Must(template.ParseFiles("memberchess.html"))
+				var memberChess = template.Must(template.ParseFiles("memberchess.html"))
 				p := gostuff.Person{User: username.Value}
 
-				if err := memberHome.Execute(w, &p); err != nil {
+				if err := memberChess.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return
@@ -278,7 +280,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 					inputName = name
 				}
 
-				var memberHome = template.Must(template.ParseFiles("profile.html"))
+				var playerProfile = template.Must(template.ParseFiles("profile.html"))
 
 				//rounding floats
 				bulletN := gostuff.Round(bulletRating)
@@ -290,7 +292,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 				p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR, Games: all}
 
-				if err := memberHome.Execute(w, &p); err != nil {
+				if err := playerProfile.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return
@@ -392,6 +394,29 @@ func saved(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+	}
+	w.WriteHeader(404)
+	http.ServeFile(w, r, "404.html")
+}
+
+func engine(w http.ResponseWriter, r *http.Request) {
+	username, err := r.Cookie("username")
+	if err == nil {
+
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+
+				var engine = template.Must(template.ParseFiles("engine.html"))
+				p := gostuff.Person{User: username.Value}
+
+				if err := engine.Execute(w, &p); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
+				return
+			}
+		}
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")

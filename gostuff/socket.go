@@ -20,6 +20,13 @@ type Connection struct {
 	totalMatches int8
 }
 
+//used to identify who the socket connection is in chess engine room
+type ConnectionEngine struct {
+	username     string
+	websocket    *websocket.Conn
+	clientIP     string
+}
+
 //stores information for a message from chat for JSON
 type ChatInfo struct {
 	Type string
@@ -58,6 +65,12 @@ var Chat = struct {
 	sync.RWMutex
 	Lobby map[string]*websocket.Conn
 }{Lobby: make(map[string]*websocket.Conn)}
+
+//number of active users in the chess engine room
+var Fight = struct {
+	sync.RWMutex
+	Engine map[string]*websocket.Conn
+}{Engine: make(map[string]*websocket.Conn)}
 
 //used to display online players
 type Online struct {
@@ -109,6 +122,26 @@ func EnterChess(ws *websocket.Conn) {
 				Active.Clients[username.Value] = ws
 
 				Client.ChessConnect()
+			}
+		}
+	}
+}
+
+//websocket handler for chess engine
+func PlayComputer(ws *websocket.Conn) {
+	username, err := ws.Request().Cookie("username")
+	if err == nil {
+		sessionID, err := ws.Request().Cookie("sessionID")
+		if err == nil {
+			if SessionManager[username.Value] == sessionID.Value {
+
+				defer ws.Close()
+				ip := ws.Request().RemoteAddr
+
+				Client := &ConnectionEngine{username.Value, ws, ip}
+				Fight.Engine[username.Value] = ws
+
+				Client.EngineSetup()
 			}
 		}
 	}

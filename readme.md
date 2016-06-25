@@ -12,7 +12,7 @@ There are missing folders as some sensitive data has been removed.
 <br>
 
 Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jonathan Chin
-<b>Features:</b><br>
+<br><b>Features:</b><br>
 <p>1. User accounts</p>
 <p>2. Time controls</p>
 <p>3. Player ratings and matchmaking system </p>
