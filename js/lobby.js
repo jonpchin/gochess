@@ -4,6 +4,9 @@ if (!window.WebSocket){
 }
 var wsuri = "wss://localhost:443/server";
 var sock = new WebSocket(wsuri);
+$(window).on('beforeunload', function(){
+	sock.close();
+});  
 
 var user = document.getElementById('user').value;
 var bullet = document.getElementById('bullet').value;
@@ -11,6 +14,7 @@ var blitz = document.getElementById('blitz').value;
 var standard = document.getElementById('standard').value;
 
 window.onload = function() {	
+	
 	//setting up user preferences
 	var challenge = new Audio('../sound/challenge.mp3');
 	var toggleSound = getCookie("sound");
@@ -42,7 +46,7 @@ window.onload = function() {
     sock.onclose = function(e) {
 		var datetime =  timeStamp();
 		document.getElementById('textbox').innerHTML += (datetime + " " + "Connection lost. Please refresh to reconnect." + '\n');
-    }
+	}
 	
     sock.onmessage = function(e) {
 		
@@ -294,7 +298,6 @@ function timeStamp(){ //returns timestamp
 	return datetime;
 }
 
-
 function reviewProfile(name){ //when a player clicks a name under online players it will redirect to players profile
 	window.location = "/profile?name=" + name;
 }
@@ -311,7 +314,6 @@ function getCookie(cname) { //gets cookies value
 }
 
 function getPlayerInfo(name){ //returns all three ratings of players and if there are in a game
-
 	$('#playerData').html('<img src="../img/ajax/loading.gif" />');
     $.ajax({
   		url: 'getPlayerData',
@@ -324,3 +326,4 @@ function getPlayerInfo(name){ //returns all three ratings of players and if ther
    		}	
     });
 } 
+

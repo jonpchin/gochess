@@ -67,11 +67,9 @@ func (c *Connection) ChessConnect() {
 				if result == false {
 					totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 					log.Printf("Invalid chess move by %s move %s - %s in gameID %d on move %d", c.username, game.Source, game.Target, game.ID, totalMoves)
-
 					break
 				}
 				Verify.AllTables[game.ID].Connection <- true
-
 				//printBoard(game.ID)
 
 				//checkin if there is a pending draw and if so it removes it
@@ -132,7 +130,6 @@ func (c *Connection) ChessConnect() {
 			case "chat_private":
 
 				if len(reply) > 500 {
-
 					log.Printf("User: %s IP %s has exeeded the 500 character limit by %d byte units.\n", t.Name, c.clientIP, len(reply))
 					return
 				}
@@ -148,7 +145,6 @@ func (c *Connection) ChessConnect() {
 					}
 					start = time.Now()
 					counter = 0
-
 				}
 
 				//checking if other player has disconnected from the websocket
@@ -184,7 +180,6 @@ func (c *Connection) ChessConnect() {
 
 						//send to self the game info
 						websocket.Message.Send(c.websocket, string(result))
-
 					}
 				}
 
@@ -561,7 +556,6 @@ func (c *Connection) ChessConnect() {
 						delete(Pending.Matches, key)
 					}
 				}
-
 
 				//intitalizes all the variables of the game
 				initGame(game.ID)

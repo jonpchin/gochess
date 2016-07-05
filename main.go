@@ -244,7 +244,6 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")
@@ -325,7 +324,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 			}
 		}
-
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")
@@ -363,7 +361,6 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return
-
 			}
 		}
 	}
@@ -393,7 +390,6 @@ func saved(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")

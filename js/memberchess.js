@@ -46,7 +46,6 @@ var toggleChat = getCookie("chat");
 var timeGet;
 
 window.onload = function() {
-	
 	var whiteRating;
 	var blackRating;
 	//timeGet is a global variable and is not located here
@@ -137,6 +136,9 @@ window.onload = function() {
 	//hide export PGN button and add favorites button as player is not reviewing a game
 	$('#exportPGN').hide();
 	sock = new WebSocket(wsuri);
+	$(window).on('beforeunload', function(){
+		sock.close();
+	});  
 
     sock.onopen = function() {
 
@@ -162,7 +164,7 @@ window.onload = function() {
              			+ currentdate.getMinutes() + ":" 
              			+ currentdate.getSeconds();
 		document.getElementById('textbox').innerHTML += (datetime + " " + "Connection lost. Please refresh to reconnect if you are in a game." + '\n');
-    }
+	}
 
     sock.onmessage = function(e) {
 		var json = JSON.parse(e.data);

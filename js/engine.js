@@ -2,7 +2,7 @@ if (!window.WebSocket){
 	console.log("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Edge");
 	$('#checkwebsocket').html("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
-var wsuri = "wss://localhost:443/engine";
+var wsuri = "wss://localhost:443/computer";
 var sock; 
 var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
@@ -137,6 +137,10 @@ window.onload = function() {
 	//hide export PGN button and add favorites button as player is not reviewing a game
 	$('#exportPGN').hide();
 	sock = new WebSocket(wsuri);
+	
+	$(window).on('beforeunload', function(){
+		sock.close();
+	});  
 
     sock.onopen = function() {
 
