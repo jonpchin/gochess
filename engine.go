@@ -10,7 +10,7 @@ import(
 
 func (c *ConnectionEngine) EngineSetup(){
 	
-	defer exitGame(c.username) //remove user when they disconnect from socket
+	defer delete(Fight.Engine, c.username) //remove user when they disconnect from socket
 
 	logFile, _ := os.OpenFile("logs/chat.txt", os.O_APPEND|os.O_WRONLY, 0666)
 
@@ -32,7 +32,7 @@ func (c *ConnectionEngine) EngineSetup(){
 		if err := json.Unmarshal(message, &t); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:")
 			fmt.Println(string(reply))
-			fmt.Println("connection.go 1 ChessConnect 1 ", err.Error())
+			fmt.Println("connection.go 1 EngineSetup() ", err.Error())
 			break
 		}
 		if c.username == t.Name {
