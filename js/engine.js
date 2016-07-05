@@ -138,6 +138,7 @@ window.onload = function() {
 	$('#exportPGN').hide();
 	sock = new WebSocket(wsuri);
 	
+	//prevents firefox bug of websocket interruption in console window
 	$(window).on('beforeunload', function(){
 		sock.close();
 	});  

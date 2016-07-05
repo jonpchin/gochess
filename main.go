@@ -66,6 +66,8 @@ func main() {
 		//fetch high score data from database
 		gostuff.UpdateHighScore()
 	}
+	
+	gostuff.SpawnProcess()
 
 	//setting up clean up function for graceful shutdown
 	c := make(chan os.Signal, 1)
@@ -83,7 +85,7 @@ func main() {
 		}
 	}()
 	fmt.Println("Web server is now running.")
-	//	gostuff.ConvertPGN()
+	//gostuff.ConvertPGN()
 
 	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {
 		fmt.Println("ListenAndServe error: %v", err)
