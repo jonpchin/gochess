@@ -74,7 +74,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		err2 := db.QueryRow("SELECT password, verify, captcha, email FROM userinfo WHERE username=?", userName).Scan(&pass, &verify, &captcha, &email)
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
-			log.Println("new.go ProcessLogin 2 ", err2)
+			log.Println("Incorrect login for ", userName)
 			return
 		}
 
@@ -172,7 +172,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		key := hex.EncodeToString(dk)
 		if err1 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 25"))
-			log.Println(err1)
+			log.Println("error in hasing password new.go ", err1)
 			return
 		}
 
@@ -414,7 +414,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			res, err = stmt.Exec(userName, token, email, date)
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 33"))
-				log.Println(err)
+				log.Println("error in executing token activation new.go", err)
 				return
 			}
 			//sends email to user
@@ -432,7 +432,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			res, err = stmt.Exec(userName, "1500", "1500", "1500", "350.0", "350.0", "350.0")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 35"))
-				log.Println(err)
+				log.Println("error in setting up player's rating new.go", err)
 				return
 			}
 
