@@ -20,12 +20,12 @@ type Connection struct {
 	totalMatches int8
 }
 
-//used to identify who the socket connection is in chess engine room
+/*used to identify who the socket connection is in chess engine room
 type ConnectionEngine struct {
 	username     string
 	websocket    *websocket.Conn
 	clientIP     string
-}
+}*/
 
 //stores information for a message from chat for JSON
 type ChatInfo struct {
@@ -66,11 +66,12 @@ var Chat = struct {
 	Lobby map[string]*websocket.Conn
 }{Lobby: make(map[string]*websocket.Conn)}
 
-//number of active users in the chess engine room
+/*
+number of active users in the chess engine room
 var Fight = struct {
 	sync.RWMutex
 	Engine map[string]*websocket.Conn
-}{Engine: make(map[string]*websocket.Conn)}
+}{Engine: make(map[string]*websocket.Conn)}*/
 
 //used to display online players
 type Online struct {
@@ -128,6 +129,7 @@ func EnterChess(ws *websocket.Conn) {
 }
 
 //websocket handler for chess engine
+/*
 func PlayComputer(ws *websocket.Conn) {
 	username, err := ws.Request().Cookie("username")
 	if err == nil {
@@ -146,7 +148,7 @@ func PlayComputer(ws *websocket.Conn) {
 		}
 	}
 }
-
+*/
 //returns the total number of seeks that a player has pending in the lobby
 func countMatches(player string) int8 { //player should have no more then 3 seeks at a time
 

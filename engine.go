@@ -1,5 +1,6 @@
-package gostuff
 
+package gostuff
+/*
 import(
 	"fmt"
 	"os"
@@ -71,4 +72,4 @@ func (c *ConnectionEngine) EngineSetup(){
 			return
 		}
 	}
-}
+} */
