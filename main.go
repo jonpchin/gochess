@@ -37,7 +37,7 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
-	http.HandleFunc("/computer/engine", engine)
+//	http.HandleFunc("/computer/engine", engine)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -53,7 +53,7 @@ func main() {
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
-	http.Handle("/computer", websocket.Handler(gostuff.PlayComputer))
+//	http.Handle("/computer", websocket.Handler(gostuff.PlayComputer))
     
 	//setting up database
 	proceed := gostuff.DbSetup()
@@ -67,7 +67,7 @@ func main() {
 		gostuff.UpdateHighScore()
 	}
 	
-	gostuff.SpawnProcess()
+//	gostuff.SpawnProcess()
 
 	//setting up clean up function for graceful shutdown
 	c := make(chan os.Signal, 1)
@@ -80,7 +80,7 @@ func main() {
 	}()
 
 	go func() {
-		if err := http.ListenAndServeTLS(":443", "secret/device.crt", "secret/device.key", nil); err != nil {
+		if err := http.ListenAndServeTLS(":443", "secret/combine.crt", "secret/go.key", nil); err != nil {
 			fmt.Println("ListenAndServeTLS error: %v", err)
 		}
 	}()
@@ -425,5 +425,5 @@ func robot(w http.ResponseWriter, r *http.Request) {
 }
 
 func redir(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://localhost"+r.RequestURI, http.StatusMovedPermanently)
+	http.Redirect(w, r, "https://goplaychess.com"+r.RequestURI, http.StatusMovedPermanently)
 }

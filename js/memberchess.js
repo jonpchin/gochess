@@ -2,7 +2,7 @@ if (!window.WebSocket){
 	console.log("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Edge");
 	$('#checkwebsocket').html("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
-var wsuri = "wss://localhost:443/chess";
+var wsuri = "wss://goplaychess.com:443/chess";
 var sock; 
 var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
@@ -54,6 +54,9 @@ window.onload = function() {
 	
 	//hide button on initial load
     $('#rematchButton').hide();
+	document.getElementById("abortButton").disabled = true;
+	document.getElementById("drawButton").disabled = true;
+	document.getElementById("resignButton").disabled = true;
 	
 	//action listener for exporting game to PGN file
 	document.getElementById('exportPGN').onclick = function(){
@@ -95,9 +98,6 @@ window.onload = function() {
 		whiteRating = whiteR;
 		blackRating = blackR;
 			
-		document.getElementById("abortButton").disabled = true;
-		document.getElementById("drawButton").disabled = true;
-		document.getElementById("resignButton").disabled = true;
 		document.getElementById("bottomtime").value = timeGet + ":00"; //setting up name and time of player when they are going over game
 		document.getElementById("toptime").value =	timeGet + ":00";
 		document.getElementById("bottom").innerHTML = "W: " + whiteName + "(" + whiteR + ")";
@@ -238,6 +238,9 @@ window.onload = function() {
 				break;
 				
 			case "chess_game":
+				document.getElementById("abortButton").disabled = false;
+				document.getElementById("drawButton").disabled = false;
+				document.getElementById("resignButton").disabled = false;
 				//storing matchID in global variable used in sending moves for verification
 				matchID = json.ID;
 				WhiteSide = json.WhitePlayer;
