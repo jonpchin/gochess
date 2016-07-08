@@ -219,7 +219,6 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("%d row was deleted from the activate table by user %s\n", affect, userName)
-
 	}
 }
 

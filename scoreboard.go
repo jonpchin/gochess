@@ -1,7 +1,6 @@
 package gostuff
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -67,9 +66,9 @@ func UpdateHighScore() {
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Bullet[i].Name, &score.Bullet[i].Rating); err != nil {
-			fmt.Println("scoreBoard.go updateHighScore() 2 ", err)
+			log.Println("scoreBoard.go updateHighScore() 2 ", err)
 		}
-		//		fmt.Printf("name is %s rating is %d\n", score.Bullet[i].Name, score.Bullet[i].Rating)
+		//fmt.Printf("name is %s rating is %d\n", score.Bullet[i].Name, score.Bullet[i].Rating)
 		score.Bullet[i].Index = i + 1
 		i++
 
@@ -81,16 +80,16 @@ func UpdateHighScore() {
 	rows, err = db.Query(query)
 
 	if err != nil {
-		fmt.Println("scoreBoard.go updateHighScore() 2 ", err)
+		log.Println("scoreBoard.go updateHighScore() 3 ", err)
 		return
 	}
 
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Blitz[i].Name, &score.Blitz[i].Rating); err != nil {
-			fmt.Println("scoreBoard.go updateHighScore() 3 ", err)
+			log.Println("scoreBoard.go updateHighScore() 4 ", err)
 		}
-		//		fmt.Printf("name is %s rating is %d\n", score.Blitz[i].Name, score.Blitz[i].Rating)
+
 		score.Blitz[i].Index = i + 1
 		i++
 
@@ -102,16 +101,16 @@ func UpdateHighScore() {
 	rows, err = db.Query(query)
 
 	if err != nil {
-		fmt.Println("scoreBoard.go updateHighScore() 3 ", err)
+		log.Println("scoreBoard.go updateHighScore() 5 ", err)
 		return
 	}
 
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Standard[i].Name, &score.Standard[i].Rating); err != nil {
-			fmt.Println("scoreBoard.go updateHighScore() 4 ", err)
+			log.Println("scoreBoard.go updateHighScore() 6 ", err)
 		}
-		//		fmt.Printf("name is %s rating is %d\n", score.Standard[i].Name, score.Standard[i].Rating)
+
 		score.Standard[i].Index = i + 1
 		i++
 
@@ -123,16 +122,16 @@ func UpdateHighScore() {
 	rows, err = db.Query(query)
 
 	if err != nil {
-		fmt.Println("scoreBoard.go updateHighScore() 3 ", err)
+		log.Println("scoreBoard.go updateHighScore() 7 ", err)
 		return
 	}
 
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Recent[i].Name, &score.Recent[i].Date); err != nil {
-			fmt.Println("scoreBoard.go updateHighScore() 4 ", err)
+			log.Println("scoreBoard.go updateHighScore() 8 ", err)
 		}
-		//		fmt.Printf("name is %s date is %s\n", score.Recent[i].Name, score.Recent[i].Date)
+
 		score.Recent[i].Index = i + 1
 		i++
 

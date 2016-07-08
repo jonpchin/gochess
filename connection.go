@@ -57,7 +57,7 @@ func (c *Connection) ChessConnect() {
 
 				//check to make sure game exists to prevent nil pointer dereference
 				if _, ok := All.Games[game.ID]; !ok {
-					fmt.Println("No such game exists.")
+					fmt.Println("No such game exists for ", t.Name)
 					break
 				}
 
@@ -102,7 +102,7 @@ func (c *Connection) ChessConnect() {
 					}()
 
 				} else {
-					fmt.Println("Invalid game status, most likely game is over")
+					fmt.Println("Invalid game status, most likely game is over for ", t.Name)
 					break
 				}
 
@@ -314,12 +314,10 @@ func (c *Connection) ChessConnect() {
 				//notifying players game is over
 				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
 					fmt.Println("error gameover 1 connection.go error is ", err)
-
 				}
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
 						fmt.Println("connection.go gameover 2 error is ", err)
-
 					}
 				}
 
@@ -582,13 +580,11 @@ func (c *Connection) ChessConnect() {
 
 				//checking to see if the side whose turn it is to move is in stalemate
 				if Verify.AllTables[game.ID].whiteTurn == true {
-
 					if isWhiteStaleMate(game.ID) == true || noMaterial(game.ID) == true || threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
 						fmt.Println("forced draw_game connection.go success 1")
 					} else {
 						break
 					}
-
 				} else {
 
 					if isBlackStaleMate(game.ID) == true || noMaterial(game.ID) == true || threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
@@ -596,7 +592,6 @@ func (c *Connection) ChessConnect() {
 					} else {
 						break
 					}
-
 				}
 
 				Verify.AllTables[game.ID].Connection <- true

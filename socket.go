@@ -20,13 +20,6 @@ type Connection struct {
 	totalMatches int8
 }
 
-/*used to identify who the socket connection is in chess engine room
-type ConnectionEngine struct {
-	username     string
-	websocket    *websocket.Conn
-	clientIP     string
-}*/
-
 //stores information for a message from chat for JSON
 type ChatInfo struct {
 	Type string
@@ -65,13 +58,6 @@ var Chat = struct {
 	sync.RWMutex
 	Lobby map[string]*websocket.Conn
 }{Lobby: make(map[string]*websocket.Conn)}
-
-/*
-number of active users in the chess engine room
-var Fight = struct {
-	sync.RWMutex
-	Engine map[string]*websocket.Conn
-}{Engine: make(map[string]*websocket.Conn)}*/
 
 //used to display online players
 type Online struct {
@@ -128,27 +114,6 @@ func EnterChess(ws *websocket.Conn) {
 	}
 }
 
-//websocket handler for chess engine
-/*
-func PlayComputer(ws *websocket.Conn) {
-	username, err := ws.Request().Cookie("username")
-	if err == nil {
-		sessionID, err := ws.Request().Cookie("sessionID")
-		if err == nil {
-			if SessionManager[username.Value] == sessionID.Value {
-
-				defer ws.Close()
-				ip := ws.Request().RemoteAddr
-
-				Client := &ConnectionEngine{username.Value, ws, ip}
-				Fight.Engine[username.Value] = ws
-
-				Client.EngineSetup()
-			}
-		}
-	}
-}
-*/
 //returns the total number of seeks that a player has pending in the lobby
 func countMatches(player string) int8 { //player should have no more then 3 seeks at a time
 
@@ -176,7 +141,6 @@ func broadCast(user string) {
 
 			// we could not send the message to a peer
 			fmt.Println("broadcast error ", err)
-
 		}
 	}
 }
@@ -195,15 +159,13 @@ func exitGame(user string) {
 
 			if _, pass := Active.Clients[otherPlayer]; pass {
 				if err := websocket.JSON.Send(Active.Clients[otherPlayer], &t); err != nil {
-					// we could not send the message to a peer
+					//we could not send the message to a peer
 					fmt.Println("exitgame.go error  Could not send message to ", err)
 				}
 				delete(PrivateChat, user)
 				delete(PrivateChat, otherPlayer)
 			}
-
 		}
-
 	}
 	delete(Active.Clients, user)
 }
@@ -254,6 +216,7 @@ func isPlayerInChess(player string) bool {
 //remove all pending matches from a player
 func removePendingMatches(name string) {
 	for key, value := range Pending.Matches {
+		
 		//deletes all pending matches for either players
 		if value.Name == name || value.Opponent == name {
 			delete(Pending.Matches, key)
