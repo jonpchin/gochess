@@ -103,3 +103,71 @@ func TestKnght(t *testing.T){
 		t.Error("knight_test.go 8 black captures white knight")
 	}
 }
+
+func TestBishop(t *testing.T){
+	
+	var legal bool
+	const gameID = 0
+	initGame(gameID)
+	
+	legal = chessVerify("f1", "b5", gameID)
+	if legal == true{
+		t.Error("bishop_test.go 1")
+	}
+	legal = chessVerify("e2", "e3", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 2")
+	}
+	legal = chessVerify("a7", "a6", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 2")
+	}
+	legal = chessVerify("f1", "b5", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 3")
+	}
+	legal = chessVerify("g7", "g6", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 4")
+	}
+	legal = chessVerify("b5", "d7", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 5")
+	}
+	legal = chessVerify("c8", "d7", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 6")
+	}
+	legal = chessVerify("b2", "b4", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 7")
+	}
+	legal = chessVerify("f8", "g7", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 8")
+	}
+	legal = chessVerify("c1", "a3", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 9")
+	}
+	legal = chessVerify("g7", "h8", gameID)
+	if legal == true{
+		t.Error("bishop_test.go 10")
+	}
+	legal = chessVerify("a3", "a4", gameID)
+	if legal == true{
+		t.Error("bishop_test.go 11")
+	}
+	legal = chessVerify("a3", "b4", gameID)
+	if legal == true{
+		t.Error("bishop_test.go 12")
+	}
+	legal = chessVerify("g7", "a1", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 13")
+	}
+	legal = chessVerify("a3", "c5", gameID)
+	if legal == false{
+		t.Error("bishop_test.go 14")
+	}
+}

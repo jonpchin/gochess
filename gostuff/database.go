@@ -74,7 +74,7 @@ func ReadFile() string {
 	config, err := os.Open("secret/config.txt")
 	defer config.Close()
 	if err != nil {
-		log.Println("new.go ReadFile 1 ", err)
+		log.Println("database.go ReadFile 1 ", err)
 	}
 
 	scanner := bufio.NewScanner(config)
@@ -128,11 +128,10 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 	err2 := db.QueryRow("SELECT bullet, blitz, standard FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard)
 
 	if err2 != nil {
-		log.Println(err2)
+		log.Println("database.go GetRating 1 ", err2)
 		return "No such player", 0, 0, 0
 	}
 	return "", bullet, blitz, standard
-
 }
 
 //fetches players bullet, blitz and standard rating and RD
@@ -151,7 +150,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 	err2 := db.QueryRow("SELECT bullet, blitz, standard, bulletRD, blitzRD, standardRD FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard, &bulletRD, &blitzRD, &standardRD)
 
 	if err2 != nil {
-		log.Println(err2)
+		log.Println("database.go GetRating 2 ", err2)
 		return "No such player", 0, 0, 0, 0, 0, 0
 	}
 	return "", bullet, blitz, standard, bulletRD, blitzRD, standardRD
@@ -166,25 +165,25 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN!")
+		log.Println("database.go updateRating 1 DATABASE DOWN!")
 		return
 	}
 
 	//setting verify to yes and deleting row from activate table
 	stmt, err := db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType + "RD=?" + " where username=?")
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go updateRating 2 ",err)
 		return
 	}
 
 	res, err := stmt.Exec(whiteRating, whiteRD, white)
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go updateRating 3 ", err)
 		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go updateRating 4 ", err)
 		return
 	}
 
@@ -193,18 +192,18 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	//setting verify to yes and deleting row from activate table
 	stmt, err = db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType + "RD=?" + " where username=?")
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go updateRating 5 ", err)
 		return
 	}
 
 	res, err = stmt.Exec(blackRating, blackRD, black)
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go updateRating 6 ", err)
 		return
 	}
 	affect, err = res.RowsAffected()
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go updateRating 7 ", err)
 		return
 	}
 
@@ -214,7 +213,6 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 //stores game into MySQL database as a string
 func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	moves := string(allMoves)
-	//	fmt.Println("The game moves are ", moves)
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -222,29 +220,28 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN!")
+		log.Println("database.go storeGame 1 DATABASE DOWN!")
 		return
 	}
 
 	//preparing token activation
 	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, result=?, status=?, date=?, time=?")
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go storeGame 2 ", err)
 		return
 	}
 	date := time.Now()
 	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves, game.Result, game.Status, date, date)
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go storeGame 3 ", err)
 		return
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Println(err)
+		log.Println("database.go storeGame 4 ", err)
 		return
 	}
 	log.Printf("Game ID %d has been updated in the games table.\n", id)
-
 }
 
 //gets all games by player from database and stores them in array of structs
@@ -256,7 +253,7 @@ func GetGames(name string) (storage []GoGame) {
 
 	rows, err := db.Query("SELECT * FROM games WHERE white=? or black=?", name, name)
 	if err != nil {
-		fmt.Println("error is", err)
+		log.Println("database.go GetGames 1 ", err)
 	}
 	defer rows.Close()
 
@@ -267,7 +264,7 @@ func GetGames(name string) (storage []GoGame) {
 		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, &all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
-			fmt.Println("The error  is", err)
+			log.Println("database.go GetGames 2 ", err)
 		}
 		storage = append(storage, all)
 
@@ -283,7 +280,7 @@ func GetSaved(name string) (storage []GoGame) {
 
 	rows, err := db.Query("SELECT * FROM saved WHERE white=? or black=?", name, name)
 	if err != nil {
-		fmt.Println("error is", err)
+		log.Println("database.go GetSaved 1 ", err)
 	}
 	defer rows.Close()
 
@@ -294,7 +291,7 @@ func GetSaved(name string) (storage []GoGame) {
 		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.WhiteRating, &all.BlackRating, &all.BlackMinutes, &all.BlackSeconds, &all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
-			fmt.Println("The error  is", err)
+			log.Println("database.go GetSaved 2 ", err)
 		}
 		storage = append(storage, all)
 
@@ -325,7 +322,7 @@ func fetchSavedGame(id string, user string) bool {
 
 	err = db.QueryRow("SELECT white, black, gametype, whiterating, blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white, &black, &gametype, &whiterating, &blackrating, &blackminutes, &blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves, &totalmoves, &status)
 	if err != nil {
-		fmt.Println("database.go fetchSavedGame 1 ", err)
+		log.Println("database.go fetchSavedGame 1 ", err)
 	}
 
 	var game ChessGame
@@ -337,7 +334,7 @@ func fetchSavedGame(id string, user string) bool {
 	storage := []byte(moves)
 	err = json.Unmarshal(storage, &holder)
 	if err != nil {
-		fmt.Println("database.go fetchSavedGame 2", err)
+		log.Println("database.go fetchSavedGame 2", err)
 	}
 	game.GameMoves = holder
 	game.WhitePlayer = white

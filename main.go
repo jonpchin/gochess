@@ -37,7 +37,6 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
-//	http.HandleFunc("/computer/engine", engine)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -53,7 +52,6 @@ func main() {
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
-//	http.Handle("/computer", websocket.Handler(gostuff.PlayComputer))
     
 	//setting up database
 	proceed := gostuff.DbSetup()
@@ -199,7 +197,6 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")
 }
@@ -387,29 +384,6 @@ func saved(w http.ResponseWriter, r *http.Request) {
 				p := gostuff.ProfileGames{User: name, Games: all}
 
 				if err := saved.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
-		}
-	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
-}
-
-func engine(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
-
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
-
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
-				var engine = template.Must(template.ParseFiles("engine.html"))
-				p := gostuff.Person{User: username.Value}
-
-				if err := engine.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return
