@@ -118,7 +118,7 @@ func (c *Connection) ChessConnect() {
 				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
 
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; !ok { //don't send move if other guy dropped connection
-					//fmt.Println("other guy dropped");
+					//fmt.Println("connection.go 123");
 					break
 				}
 
