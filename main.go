@@ -210,7 +210,6 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				//fmt.Println(r.URL.Query().Get("moves"))
 				var memberChess = template.Must(template.ParseFiles("memberchess.html"))
 				p := gostuff.Person{User: username.Value}
 
