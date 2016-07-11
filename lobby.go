@@ -104,7 +104,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("match connection.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("match lobby.go Could not send message to ", c.clientIP, err.Error())
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
