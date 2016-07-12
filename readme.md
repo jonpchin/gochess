@@ -25,7 +25,7 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>10.  Automated deployment of web server to production environment(not shown on GitHub)</p>
 <p>11. Highscore board</p>
 <p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
-
+<br>
 <p><b>To Do List:</b></p>
 <p>1. Allow players to search all chess games in Go Play Chess.</p>
 <p>2. Allow players to view other on-going games in real time.</p>
