@@ -2,7 +2,7 @@ if (!window.WebSocket){
 	console.log("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Edge");
 	$('#checkwebsocket').html("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
-var wsuri = "wss://goplaychess.com:443/chess";
+var wsuri = "wss://localhost:443/chess";
 var sock; 
 var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
@@ -290,7 +290,7 @@ window.onload = function() {
 					document.getElementById("resignButton").disabled = false;		
 				}
 				
-				//formating time for clock
+				//formating time for clock 
 				json.WhiteMinutes = json.WhiteMinutes < 10 ? "0" + json.WhiteMinutes : json.WhiteMinutes;
 				json.WhiteSeconds = json.WhiteSeconds < 10 ? "0" + json.WhiteSeconds : json.WhiteSeconds;
 	            
@@ -298,15 +298,15 @@ window.onload = function() {
 				json.BlackSeconds = json.BlackSeconds < 10 ? "0" + json.BlackSeconds : json.BlackSeconds;
 				
 				if (user === json.WhitePlayer){
-					
-					document.getElementById("bottom").innerHTML = "W: " + json.WhitePlayer + "(" + json.WhiteRating +")";
-					document.getElementById("top").innerHTML = "B: " + json.BlackPlayer + "(" + json.BlackRating +")";			
+														
+					document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
+					document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";			
 				}
 				else{
 					//flips board white on top black on bottom
 					$('#flipOrientationBtn').click();
-					document.getElementById("bottom").innerHTML = "B: " + json.BlackPlayer + "(" + json.BlackRating +")";
-					document.getElementById("top").innerHTML = "W: " + json.WhitePlayer + "(" + json.WhiteRating +")";
+					document.getElementById("bottom").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";
+					document.getElementById("top").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
 				}
 				
 				if(json.Status === "White"){
