@@ -60,7 +60,11 @@ func main() {
 	gostuff.StartCron()
 	//removes games older then 30 days from database
 	if proceed == true {
-		gostuff.RemoveOldGames()
+		// Number of days used to remove old games, forgot and activate tokens
+		days := "30"
+		gostuff.RemoveOldGames(days)
+		gostuff.RemoveOldActivate(days)
+		gostuff.RemoveOldForgot(days)
 		//fetch high score data from database
 		gostuff.UpdateHighScore()
 	}
