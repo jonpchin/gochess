@@ -100,8 +100,9 @@ window.onload = function() {
 			
 		document.getElementById("bottomtime").value = timeGet + ":00"; //setting up name and time of player when they are going over game
 		document.getElementById("toptime").value =	timeGet + ":00";
-		document.getElementById("bottom").innerHTML = "W: " + whiteName + "(" + whiteR + ")";
-		document.getElementById("top").innerHTML = "B: " + blackName + "(" + blackR + ")";
+		document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + whiteName + "'>" + whiteName + "</a>(" + whiteR +")";
+		document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + blackName  + "'>" + blackName + "</a>(" + blackR +")";			
+
 		
 		var review = JSON.parse(reviewMoves);
 		var length = 0;
