@@ -236,7 +236,9 @@ func (c *Connection) ChessConnect() {
 				All.Games[game.ID].Result = 2
 
 				//rate.go
-				ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
+				if All.Games[game.ID].Rated == "Yes"{
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
+				}
 
 				//closing web socket on front end for self and opponent
 				websocket.Message.Send(Active.Clients[t.Name], reply)
@@ -309,7 +311,9 @@ func (c *Connection) ChessConnect() {
 				storeGame(totalMoves, allMoves, All.Games[game.ID])
 
 				//update ratings
-				ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
+				if All.Games[game.ID].Rated == "Yes"{
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
+				}
 
 				//notifying players game is over
 				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
@@ -359,7 +363,9 @@ func (c *Connection) ChessConnect() {
 				storeGame(totalMoves, allMoves, All.Games[game.ID])
 
 				//rate.go
-				ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
+				if All.Games[game.ID].Rated == "Yes"{
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
+				}
 
 				//letting both players know that a resignation occured
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
@@ -532,6 +538,7 @@ func (c *Connection) ChessConnect() {
 				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.BlackSeconds = 0
 				game.PendingDraw = false
+				game.Rated = Pending.Matches[match.MatchID].Rated
 
 				var start int16 = 0
 				for {
@@ -602,7 +609,9 @@ func (c *Connection) ChessConnect() {
 				All.Games[game.ID].Result = 2
 
 				//rate.go
-				ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
+				if All.Games[game.ID].Rated == "Yes"{
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
+				}
 
 				//closing web socket on front end for self and opponent
 				websocket.Message.Send(Active.Clients[t.Name], reply)

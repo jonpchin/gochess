@@ -38,6 +38,7 @@ type SeekMatch struct {
 	TimeControl int
 	MinRating   int16
 	MaxRating   int16
+	Rated       string
 }
 
 //used to store two player's name for redirecting on the front end in JavaScript

@@ -319,6 +319,7 @@ func (c *Connection) LobbyConnect() {
 				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.BlackSeconds = 0
 				game.PendingDraw = false
+				game.Rated = Pending.Matches[match.MatchID].Rated;
 
 				var start int16 = 0
 				for {
