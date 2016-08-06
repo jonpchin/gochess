@@ -227,14 +227,16 @@ window.onload = function() {
 		var min = dropdown.options[dropdown.selectedIndex].value;
 		var dropdown = document.getElementById('maxrating'); 
 		var max = dropdown.options[dropdown.selectedIndex].value;
-		var dropdown = document
+		var dropdown = document.getElementById('isRated');
+		var isRated = dropdown.options[dropdown.selectedIndex].value;
 			
 		var message = {
 			Type: "match_seek",
 			Name: user,
 			TimeControl: parseInt(time, 10),
 			MinRating: parseInt(min, 10),
-			MaxRating: parseInt(max, 10)
+			MaxRating: parseInt(max, 10),
+			Rated: isRated
 		}
 	    sock.send(JSON.stringify(message));
 	}

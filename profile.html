@@ -22,8 +22,8 @@ If a player becomes inactive RD will rise over time. Result Key: Black won=0, Wh
 <p><a href="/saved?user={{.User}}">View adjourned games</a><p>
 <table class="table1">
 	<tr>
-<th>White</th><th>White Rating</th><th>Black</th><th>Black Rating</th><th>Type</th><th>Time</th>
-<th>Moves</th><th>Result</th><th>Status</th><th>Date</th><th>Time</th>
+<th>White</th><th>White Rating</th><th>Black</th><th>Black Rating</th><th>Type</th><th>Rated</th>
+<th>Time</th><th>Moves</th><th>Result</th><th>Status</th><th>Date</th><th>Time</th>
 	</tr>
 {{range .Games}}
 	<tr onclick="reviewGame({{.Moves}}, {{.White}}, {{.Black}}, {{.WhiteRating}}, {{.BlackRating}}, {{.TimeControl}}, {{.Result}}, {{.Date}})"> 

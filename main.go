@@ -83,14 +83,14 @@ func main() {
 
 	go func() {
 		if err := http.ListenAndServeTLS(":443", "secret/device.crt", "secret/device.key", nil); err != nil {
-			fmt.Println("ListenAndServeTLS error: %v", err)
+			fmt.Printf("ListenAndServeTLS error: %v\n", err)
 		}
 	}()
 	fmt.Println("Web server is now running.")
 	//gostuff.ConvertPGN()
 
 	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {
-		fmt.Println("ListenAndServe error: %v", err)
+		fmt.Printf("ListenAndServe error: %v\n", err)
 	}
 }
 

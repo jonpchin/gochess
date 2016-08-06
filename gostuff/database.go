@@ -126,7 +126,8 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 	}
 
 	//looking up players rating
-	err2 := db.QueryRow("SELECT bullet, blitz, standard FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard)
+	err2 := db.QueryRow("SELECT bullet, blitz, standard FROM rating WHERE username=?",
+		name).Scan(&bullet, &blitz, &standard)
 
 	if err2 != nil {
 		log.Println("database.go GetRating 1 ", err2)
@@ -136,7 +137,9 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 }
 
 //fetches players bullet, blitz and standard rating and RD
-func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulletRD, blitzRD, standardRD float64) {
+func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulletRD,
+	blitzRD, standardRD float64) {
+		
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
@@ -148,7 +151,9 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 	}
 
 	//looking up players rating
-	err2 := db.QueryRow("SELECT bullet, blitz, standard, bulletRD, blitzRD, standardRD FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard, &bulletRD, &blitzRD, &standardRD)
+	err2 := db.QueryRow("SELECT bullet, blitz, standard, bulletRD, blitzRD, standardRD " +
+		"FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard,
+		 &bulletRD, &blitzRD, &standardRD)
 
 	if err2 != nil {
 		log.Println("database.go GetRating 2 ", err2)
@@ -158,7 +163,8 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 }
 
 //updates both players chess rating
-func updateRating(gameType string, white string, whiteRating float64, whiteRD float64, black string, blackRating float64, blackRD float64) {
+func updateRating(gameType string, white string, whiteRating float64, whiteRD float64,
+	black string, blackRating float64, blackRD float64) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -171,7 +177,8 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	}
 
 	//setting verify to yes and deleting row from activate table
-	stmt, err := db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType + "RD=?" + " where username=?")
+	stmt, err := db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType +
+		"RD=?" + " where username=?")
 	if err != nil {
 		log.Println("database.go updateRating 2 ",err)
 		return
@@ -191,7 +198,8 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	log.Printf("%s rating has changed and %d row was updated.\n", white, affect)
 
 	//setting verify to yes and deleting row from activate table
-	stmt, err = db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType + "RD=?" + " where username=?")
+	stmt, err = db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType +
+		"RD=?" + " where username=?")
 	if err != nil {
 		log.Println("database.go updateRating 5 ", err)
 		return
@@ -226,13 +234,17 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	}
 
 	//preparing token activation
-	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, rated=? whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, result=?, status=?, date=?, time=?")
+	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, rated=?, " +
+		"whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, result=?, status=?," +
+		" date=?, time=?")
 	if err != nil {
 		log.Println("database.go storeGame 2 ", err)
 		return
 	}
 	date := time.Now()
-	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated, game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves, game.Result, game.Status, date, date)
+	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated,
+		game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves,
+		game.Result, game.Status, date, date)
 	if err != nil {
 		log.Println("database.go storeGame 3 ", err)
 		return
@@ -262,7 +274,9 @@ func GetGames(name string) (storage []GoGame) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated, &all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, &all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
+		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated, 
+			&all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, 
+			&all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
 			log.Println("database.go GetGames 2 ", err)
@@ -289,13 +303,14 @@ func GetSaved(name string) (storage []GoGame) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.WhiteRating, &all.BlackRating, &all.BlackMinutes, &all.BlackSeconds, &all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total, &all.Status, &all.Date, &all.Time)
+		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated, 
+			&all.WhiteRating, &all.BlackRating, &all.BlackMinutes, &all.BlackSeconds, 
+			&all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total, 
+			&all.Status, &all.Date, &all.Time)
 		if err != nil {
-
 			log.Println("database.go GetSaved 2 ", err)
 		}
 		storage = append(storage, all)
-
 	}
 	return storage
 }
@@ -310,6 +325,7 @@ func fetchSavedGame(id string, user string) bool {
 	var white string
 	var black string
 	var gametype string
+	var rated string
 	var whiterating int16
 	var blackrating int16
 	var blackminutes int
@@ -321,7 +337,12 @@ func fetchSavedGame(id string, user string) bool {
 	var totalmoves int
 	var status string
 
-	err = db.QueryRow("SELECT white, black, gametype, whiterating, blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white, &black, &gametype, &whiterating, &blackrating, &blackminutes, &blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves, &totalmoves, &status)
+	err = db.QueryRow("SELECT white, black, gametype, rated, whiterating, " +
+		"blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, " +
+		"timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white,
+		&black, &gametype, &gametype, &whiterating, &blackrating, &blackminutes, 
+		&blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves,
+		&totalmoves, &status)
 	if err != nil {
 		log.Println("database.go fetchSavedGame 1 ", err)
 	}
@@ -344,6 +365,7 @@ func fetchSavedGame(id string, user string) bool {
 	game.BlackRating = blackrating
 	game.TimeControl = timecontrol
 	game.GameType = gametype
+	game.Rated = rated
 	game.Status = status
 
 	game.WhiteMinutes = whiteminutes

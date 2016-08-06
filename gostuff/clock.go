@@ -24,12 +24,15 @@ func setClocks(gameID int16, name string) {
 
 			result = 0.0
 			//update ratings
-			ComputeRating(name, gameID, All.Games[gameID].GameType, result)
+			if All.Games[gameID].Rated == "Yes"{
+				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
+			}
 
 			//Black won as white ran out of time
 			All.Games[gameID].Status = "Black won on time"
 			All.Games[gameID].Type = "game_over"
 			All.Games[gameID].Result = 0
+			
 			//now store game in MySQL database
 			allMoves, err := json.Marshal(All.Games[gameID].GameMoves)
 			if err != nil {
@@ -90,7 +93,7 @@ func setClocks(gameID int16, name string) {
 
 			return
 		case <-Verify.AllTables[gameID].gameOver:
-			//	fmt.Println("Game is over but clocks have not ran out so break out of clocks")
+			//fmt.Println("Game is over but clocks have not ran out so break out of clocks")
 			return
 		}
 	}
@@ -115,7 +118,7 @@ func StartClock(gameID int16, minutes int, seconds int, color string) (int, int)
 			remainingMinutes := clock / 60
 			remainingSeconds := clock % 60
 
-			//				fmt.Printf("Clock here is %d %d color is %s\n",  remainingMinutes, remainingSeconds, color)
+			//fmt.Printf("Clock here is %d %d color is %s\n",  remainingMinutes, remainingSeconds, color)
 			return remainingMinutes, remainingSeconds
 
 		case <-timerChan:
