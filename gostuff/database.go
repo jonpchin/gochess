@@ -225,13 +225,13 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	}
 
 	//preparing token activation
-	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, result=?, status=?, date=?, time=?")
+	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, rated=? whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, result=?, status=?, date=?, time=?")
 	if err != nil {
 		log.Println("database.go storeGame 2 ", err)
 		return
 	}
 	date := time.Now()
-	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves, game.Result, game.Status, date, date)
+	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated, game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves, game.Result, game.Status, date, date)
 	if err != nil {
 		log.Println("database.go storeGame 3 ", err)
 		return
@@ -261,7 +261,7 @@ func GetGames(name string) (storage []GoGame) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, &all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
+		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated &all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, &all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
 			log.Println("database.go GetGames 2 ", err)

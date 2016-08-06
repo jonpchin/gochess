@@ -28,7 +28,7 @@ If a player becomes inactive RD will rise over time. Result Key: Black won=0, Wh
 {{range .Games}}
 	<tr onclick="reviewGame({{.Moves}}, {{.White}}, {{.Black}}, {{.WhiteRating}}, {{.BlackRating}}, {{.TimeControl}}, {{.Result}}, {{.Date}})"> 
 	<td>{{.White}}</td><td>{{.WhiteRating}}</td> <td>{{.Black}}</td><td>{{.BlackRating}}</td>
-	<td>{{.GameType}}</td><td>{{.TimeControl}}</td><td>{{.Total}}</td><td>{{.Result}}</td>
+	<td>{{.GameType}}</td><td>{{.Rated}}</td><td>{{.TimeControl}}</td><td>{{.Total}}</td><td>{{.Result}}</td>
 	<td>{{.Status}}</td><td>{{.Date}}</td><td>{{.Time}}</td>
 	</tr>	
 {{end}}

@@ -72,7 +72,9 @@ func setClocks(gameID int16, name string) {
 			storeGame(totalMoves, allMoves, All.Games[gameID])
 
 			//update ratings
-			ComputeRating(name, gameID, All.Games[gameID].GameType, result)
+			if All.Games[gameID.].Rated == "Yes"{
+				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
+			}
 
 			//notifiy both player that white won on time
 			if _, ok := Active.Clients[PrivateChat[name]]; ok { // send data if other guy is still connected
@@ -88,7 +90,7 @@ func setClocks(gameID int16, name string) {
 
 			return
 		case <-Verify.AllTables[gameID].gameOver:
-			//				fmt.Println("Game is over but clocks have not ran out so break out of clocks")
+			//	fmt.Println("Game is over but clocks have not ran out so break out of clocks")
 			return
 		}
 	}

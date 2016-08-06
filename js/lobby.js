@@ -85,7 +85,7 @@ window.onload = function() {
 				if(json.Opponent !== ""){ //then its a private match
 					$('#seekmatch').html(function() {
 					
-						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Opponent + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Opponent + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
 					});
 					if(toggleSound !== "false"){
 						challenge.play();//plays sound to notify player they got a private match sent to them
@@ -95,7 +95,7 @@ window.onload = function() {
 					
 					$('#seekmatch').html(function() {
 						
-						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
+						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
 					});
 				}
 				
@@ -117,13 +117,13 @@ window.onload = function() {
 				if(json.Opponent !== ""){ //then its a private match
 					
 					$('#seekmatch').html(function() {
-	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
 					});
 					
 				}
 				else{
 					$('#seekmatch').html(function() {
-   						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
+   						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
 					});
 				}
 	
@@ -163,12 +163,12 @@ window.onload = function() {
 				
 				$('#seekmatch').html(function() {
 					
-					return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Your-Match" + '</td></tr>';
+					return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Your-Match" + '</td></tr>';
 				});
 			}
 			else{
 				$('#seekmatch').html(function() {
-   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
 				});
 				if(toggleSound !== "false"){
 					challenge.play();//plays sound to notify player they got a private match sent to them
@@ -227,6 +227,7 @@ window.onload = function() {
 		var min = dropdown.options[dropdown.selectedIndex].value;
 		var dropdown = document.getElementById('maxrating'); 
 		var max = dropdown.options[dropdown.selectedIndex].value;
+		var dropdown = document
 			
 		var message = {
 			Type: "match_seek",
@@ -243,6 +244,8 @@ window.onload = function() {
 		var opponent = document.getElementById('privateName').value;
 		var dropdown = document.getElementById('timecontrol');
 		var time = dropdown.options[dropdown.selectedIndex].value;
+		var dropdown = document.getElementById('isRated');
+		var isRated = dropdown.options[dropdown.selectedIndex].value;
 		var length = opponent.length;
 		
 		if(length < 3 || length > 12){ //checking if name meets length requirements
@@ -260,7 +263,8 @@ window.onload = function() {
 			Type: "private_match",
 			Name: user,
 			Opponent: opponent,
-			TimeControl: parseInt(time, 10)
+			TimeControl: parseInt(time, 10),
+			Rated: isRated
 		}
 	    sock.send(JSON.stringify(message));
 	}
@@ -322,7 +326,6 @@ function getPlayerInfo(name){ //returns all three ratings of players and if ther
    		data : { 'username': name},
    		success : function(data) {			
       		$('#playerData').html(data);	
-			
    		}	
     });
 } 
