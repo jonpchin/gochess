@@ -45,6 +45,7 @@ type GoGame struct {
 	Status       string
 	Date         string
 	Time         string
+	Rated		 string
 }
 
 var db *sql.DB
@@ -261,7 +262,7 @@ func GetGames(name string) (storage []GoGame) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated &all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, &all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
+		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated, &all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, &all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
 			log.Println("database.go GetGames 2 ", err)
