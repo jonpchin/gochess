@@ -272,18 +272,26 @@ func (c *Connection) ChessConnect() {
 				}
 
 				var checkMate bool
+				var mater string
+				var mated string
 				if game.Status == "White" {
 					checkMate = isWhiteInMate(game.ID)
+					mater = All.Games[game.ID].BlackPlayer
+					mated = All.Games[game.ID].WhitePlayer
 				} else if game.Status == "Black" {
+					mater = All.Games[game.ID].WhitePlayer
+					mated = All.Games[game.ID].BlackPlayer
 					checkMate = isBlackInMate(game.ID)
 				} else {
 					fmt.Println("Invalid game status for checking mate.")
 				}
-
+				//gets length of all the moves in the game
+				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
+				
 				if checkMate == true {
-					fmt.Println("It is Checkmate!")
+					log.Println(mater," has checkmated", mated, "in", totalMoves, "moves.")
 				} else {
-					fmt.Println("No Checkmate for player, could be bug or cheat attempt.", c.username)
+					log.Println("No Checkmate for player, could be bug or cheat attempt by", mater, "on move", totalMoves, "against", mated)
 					break
 				}
 
@@ -305,8 +313,6 @@ func (c *Connection) ChessConnect() {
 				if err != nil {
 					fmt.Println("Error marshalling data to store in MySQL")
 				}
-				//gets length of all the moves in the game
-				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 
 				storeGame(totalMoves, allMoves, All.Games[game.ID])
 

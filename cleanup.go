@@ -72,7 +72,7 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 		return
 	}
 	date := time.Now()
-	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.WhiteRating, game.BlackRating, game.BlackMinutes, game.BlackSeconds, game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves, game.Status, date, date)
+	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated, game.WhiteRating, game.BlackRating, game.BlackMinutes, game.BlackSeconds, game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves, game.Status, date, date)
 	if err != nil {
 		log.Println("Cleanup.go saveGame 2 ", err)
 		return
