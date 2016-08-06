@@ -84,7 +84,7 @@ func ComputeRating(name string, gameID int16, gameType string, result float64) {
 	} else {
 		fmt.Println("Not a valid game type")
 	}
-
+	
 	var r Nrating
 	r.Type = "rating"
 	r.WhiteRating = whiteRating

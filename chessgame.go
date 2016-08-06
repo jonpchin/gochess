@@ -22,7 +22,7 @@ type ChessGame struct {
 	WhiteMinutes int
 	WhiteSeconds int
 	PendingDraw  bool //used to keep track if a player has offered a draw
-	IsRated      bool //true if the game is rated, false if the game is unrated
+	Rated        string //Yes if the game is rated, No if the game is unrated
 }
 
 //source and destination of piece moves

@@ -66,20 +66,20 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	}
 
 	//preparing token activation
-	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?, whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
+	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, rated=?, whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?, whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
 	if err != nil {
-		log.Println(err)
+		log.Println("Cleanup.go saveGame 1 ", err)
 		return
 	}
 	date := time.Now()
 	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.WhiteRating, game.BlackRating, game.BlackMinutes, game.BlackSeconds, game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves, game.Status, date, date)
 	if err != nil {
-		log.Println(err)
+		log.Println("Cleanup.go saveGame 2 ", err)
 		return
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Println(err)
+		log.Println("Cleanup.go saveGame 3 ", err)
 		return
 	}
 	log.Printf("Game ID %d has been updated in the saved table.\n", id)
