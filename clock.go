@@ -72,7 +72,7 @@ func setClocks(gameID int16, name string) {
 			storeGame(totalMoves, allMoves, All.Games[gameID])
 
 			//update ratings
-			if All.Games[gameID.].Rated == "Yes"{
+			if All.Games[gameID].Rated == "Yes"{
 				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
 			}
 
