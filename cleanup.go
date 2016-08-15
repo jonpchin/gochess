@@ -22,14 +22,14 @@ func Cleanup() {
 		for _, value := range Active.Clients {
 			if err := websocket.JSON.Send(value, &message); err != nil {
 				// we could not send the message to a peer
-				fmt.Println("exitgame.go error  Could not send message to ", err)
+				fmt.Println("cleanup.go CleanUp() error 1  Could not send message to ", err)
 			}
 		}
 
 		for _, value := range Chat.Lobby {
 			if err := websocket.JSON.Send(value, &message); err != nil {
 				// we could not send the message to a peer
-				fmt.Println("exitgame.go error  Could not send message to ", err)
+				fmt.Println("cleanup.go CleanUp() error 2  Could not send message to ", err)
 			}
 		}
 	}()
@@ -66,13 +66,18 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	}
 
 	//preparing token activation
-	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, rated=?, whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?, whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
+	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, rated=?," +
+		" whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?," +
+		" whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
 	if err != nil {
 		log.Println("Cleanup.go saveGame 1 ", err)
 		return
 	}
 	date := time.Now()
-	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated, game.WhiteRating, game.BlackRating, game.BlackMinutes, game.BlackSeconds, game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves, game.Status, date, date)
+	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated,
+		game.WhiteRating, game.BlackRating, game.BlackMinutes, game.BlackSeconds,
+		game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves,
+		game.Status, date, date)
 	if err != nil {
 		log.Println("Cleanup.go saveGame 2 ", err)
 		return

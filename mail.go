@@ -17,8 +17,9 @@ func Sendmail(target string, token string, name string){
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
 	m.SetHeader("To", target)
 	m.SetHeader("Subject", "Welcome to Go Play Chess!")
-	message := "Hello " + name + ",<br><br>Welcome to <b>Go Play Chess</b>!<br><br>Your token is " + token +
-		"<br><br><a href='https://localhost/activate?user=" + name + "&token=" + token + "'>Please click here to activate your account.</a>" +
+	message := "Hello " + name + ",<br><br>Welcome to <b>Go Play Chess</b>! " +
+		"<a href='https://localhost/activate?user=" + name + "&token=" + token + "'>Please click here to activate your account.</a>" +
+		" Your token is " + token +
 		"<br><br>Have fun!<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 
