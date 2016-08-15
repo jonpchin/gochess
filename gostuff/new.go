@@ -26,7 +26,7 @@ type Person struct {
 	Bullet   int16
 	Blitz    int16
 	Standard int16
-	//  email   string
+	//email   string
 }
 
 //process user input when signing in
@@ -97,16 +97,15 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				fmt.Println("Error in captcha section 3")
+				log.Println("Error in captcha section 3")
 				return
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				fmt.Println("Error in captcha section 4")
+				log.Println("Error in captcha section 4")
 			}
-
 			return
 		}
 		if verify != "YES" {
@@ -121,7 +120,9 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			if err2 != nil {
 				log.Println("new.go ProcessLogin 3 ", err2)
 			} else {
-				Sendmail(email, tokenInDB, userName)
+				go func(email, tokenInDB, userName string){
+					Sendmail(email, tokenInDB, userName)
+				}(email, tokenInDB, userName)
 			}
 			return
 		}
@@ -187,6 +188,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			//check if there was more then one incorrect login attempt
+			log.Println("new.go ProcessLogin error 6", err2)
 			return
 		}
 
@@ -196,35 +198,34 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//increment captcha counter
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				fmt.Println("Our web server is having problems. Report to admin error 26")
+				log.Println("new.go ProcessLogin error 7")
 				return
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				fmt.Println("Our web server is having problems. Report to admin error 27")
+				log.Println("new.go ProcessLogin error 8")
 				return
 			}
 
 			//create activation token in database and send user notifying them that their was five incorrect login attempts
 			stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 			if err != nil {
-				fmt.Println("Our web server is having problems. Report to admin error 32")
-				log.Println("new.go ProcessLogin 6 ", err)
+				log.Println("new.go ProcessLogin 9 ", err)
 				return
 			}
 			date := time.Now()
 			token = RandomString()
 			_, err = stmt.Exec(userName, token, email, date)
 			if err != nil {
-				fmt.Println("We are having trouble with our server. Please come back later. Report to admin Error 33")
-				log.Println("new.go ProcessLogin 7 ", err)
+				log.Println("new.go ProcessLogin 10 ", err)
 				return
 			}
 			//sends email to user with the token activation
-			SendAttempt(email, token, userName, r.RemoteAddr)
-			log.Println(err2)
+			go func(email, token, userName, address string){
+				SendAttempt(email, token, userName, address)
+			}(email, token, userName, r.RemoteAddr)
 			return
 
 		} else if captcha > 5 { //tell user on the front end that this account has too many login attempts, resends activation token
@@ -232,12 +233,15 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 			err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userName).Scan(&token)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 8 ", err2)
+				log.Println("new.go ProcessLogin 11 ", err2)
 				return
 			}
 
 			//sends email again to user with the token activation
-			SendAttempt(email, token, userName, r.RemoteAddr)
+			go func(email, token, userName, address string){
+				SendAttempt(email, token, userName, address)
+			}(email, token, userName, r.RemoteAddr)
+			
 			return
 		}
 		if pass != key {
@@ -248,15 +252,14 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				log.Println("new.go ProcessLogin 9 ", err)
+				log.Println("new.go ProcessLogin 12 ", err)
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				log.Println("new.go ProcessLogin 10 ", err)
+				log.Println("new.go ProcessLogin 13 ", err)
 			}
-
 			return
 		}
 		if verify != "YES" {
@@ -269,10 +272,12 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//checking if token matches the one entered by user
 			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", userName).Scan(&tokenInDB, &email)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 11 ", err2)
+				log.Println("new.go ProcessLogin 14 ", err2)
 			} else {
-				Sendmail(email, tokenInDB, userName)
-
+				
+				go func(email, tokenInDB, userName string){
+					Sendmail(email, tokenInDB, userName)
+				}(email, tokenInDB, userName)		
 			}
 			return
 		}
@@ -280,12 +285,12 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		if err != nil {
-			log.Println("new.go ProcessLogin 12 ", err)
+			log.Println("new.go ProcessLogin 15 ", err)
 		}
 
 		_, err = stmt.Exec(0, userName)
 		if err != nil {
-			log.Println("new.go ProcessLogin 13 ", err)
+			log.Println("new.go ProcessLogin 16 ", err)
 		}
 
 		expiration := time.Now().Add(3 * 24 * time.Hour)
@@ -302,7 +307,6 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 		w.Write([]byte("<script>window.location = '/memberHome'</script>"))
 	}
-
 }
 
 //processes the users input when signing up
@@ -418,7 +422,9 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			//sends email to user
-			Sendmail(email, token, userName)
+			go func(email, token, userName string){
+				Sendmail(email, token, userName)
+			}(email, token, userName)
 			
 			//setting up player's rating
 			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, bulletRD=?, blitzRD=?, standardRD=?")
@@ -435,7 +441,6 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				log.Println("error in setting up player's rating new.go", err)
 				return
 			}
-
 		}
 	}
 }
@@ -467,10 +472,8 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("ERROR 3 CHECKNAME IP is %s\n", r.RemoteAddr)
 		default:
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Username taken"))
-
 		}
 	}
-
 }
 
 func RandomString() string {

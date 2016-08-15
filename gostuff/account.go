@@ -2,7 +2,6 @@ package gostuff
 
 import (
 	"encoding/hex"
-	"fmt"
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/scrypt"
@@ -196,7 +195,6 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		// this is safe
 		//db.Query("SELECT name FROM users WHERE age=?", req.FormValue("age"))
 
-		// delete
 		stmt, err = db.Prepare("DELETE FROM activate where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 15."))
@@ -206,7 +204,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 
 		res, err = stmt.Exec(userName)
 		if err != nil {
-			fmt.Println("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 16.")
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 16."))
 			log.Println("account.go processActivate 6 ", err)
 
 			return
@@ -214,11 +212,14 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		stmt.Close()
 		affect, err = res.RowsAffected()
 		if err != nil {
-			fmt.Println("Something is wrong with the server. Tell admin error 17.")
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 17."))
 			log.Println("account.go processActivate 7 ", err)
 			return
 		}
 		log.Printf("%d row was deleted from the activate table by user %s\n", affect, userName)
+		
+		//once a user activates his acccount update the highscore board so it shows him as new user
+		UpdateHighScore()
 	}
 }
 
@@ -300,9 +301,10 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%d rows were affected by the the token activation check.\n", affect)
 
 		//sends pasword reset information to email of user
-		SendForgot(email, token)
+		go func(email, token string){
+			SendForgot(email, token)
+		}(email, token)
 
 		w.Write([]byte("<img src='img/ajax/available.png' /> Your password reset information has been sent your email."))
-
 	}
 }

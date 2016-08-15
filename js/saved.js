@@ -1,5 +1,5 @@
-//checks if the other player is online in the lobby or game room, if not pops up an alert saying
-//the user needs to either be in the lobby or game room
+//checks if the other player is online in the lobby, if not pops up an alert saying
+//the user needs to be in the lobby
 function resumeGame(id, white, black){
 	$.ajax({
   		url: 'resumeGame',

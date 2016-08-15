@@ -289,7 +289,7 @@ func (c *Connection) ChessConnect() {
 				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 				
 				if checkMate == true {
-					log.Println(mater," has checkmated", mated, "in", totalMoves, "moves.")
+					log.Println(mater, "has checkmated", mated, "in", totalMoves, "moves.")
 				} else {
 					log.Println("No Checkmate for player, could be bug or cheat attempt by", mater, "on move", totalMoves, "against", mated)
 					break

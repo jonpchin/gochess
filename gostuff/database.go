@@ -235,8 +235,8 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 
 	//preparing token activation
 	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, rated=?, " +
-		"whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, result=?, status=?," +
-		" date=?, time=?")
+		"whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, " +
+		"result=?, status=?, date=?, time=?")
 	if err != nil {
 		log.Println("database.go storeGame 2 ", err)
 		return
