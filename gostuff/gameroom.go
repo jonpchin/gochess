@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//reads in all incoming web sockets and sends them out to the correct users
+// Manages web sockets for the game room
 func (c *Connection) ChessConnect() {
 
 	defer exitGame(c.username) //remove user when they disconnect from socket

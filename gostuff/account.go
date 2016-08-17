@@ -121,7 +121,6 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("%d row was deleted from the activate table by user %s\n", affect, userName)
 		w.Write([]byte("<img src='img/ajax/available.png' /> Your password is now changed!"))
-
 	}
 }
 
