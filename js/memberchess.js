@@ -42,8 +42,9 @@ var blackClock = new Tock({
 var toggleSound = getCookie("sound");
 var toggleChat = getCookie("chat");
 
-//store initial game time and use for rematch
+//store initial game time and whether game is rated, used for rematch
 var timeGet;
+var isRatedRematch;
 
 window.onload = function() {
 	var whiteRating;
@@ -249,6 +250,7 @@ window.onload = function() {
 
 				//if its move zero store time control so it can be used in rematch
 				timeGet = json.TimeControl;
+				isRatedRematch = json.Rated;
 				
 				//if the game moves are not null then restore the moves back
 				if(json.GameMoves != null){
@@ -595,6 +597,7 @@ document.getElementById('rematchButton').onclick = function(){
 			Type: "rematch",
 			Name: user,	
 			Opponent: fighter,
+			Rated: isRatedRematch,
 			TimeControl: timeGet
 		}
 		var datetime = timeStamp();
