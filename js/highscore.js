@@ -13,7 +13,6 @@ document.getElementById('searchPlayer').onclick = function(){
 }
 
 $('#playerName').keypress(function(event) {
-	console.log("yes");
     if (event.which === 13) {  
 	   $('#searchPlayer').click();	
     }

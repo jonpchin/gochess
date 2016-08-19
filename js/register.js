@@ -125,3 +125,36 @@ document.getElementById('register').onclick = function(){
 
 }
 
+//when user presses enter on username input it will jump to password input
+$('#username').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#pass').focus();
+    }
+});
+
+//when user presses enter on password input it will jump to confirm input
+$('#pass').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#confirm').focus();
+    }
+});
+
+//when user presses enter on confirm input it will jump to email input
+$('#confirm').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#email').focus();
+    }
+});
+
+//when user press enter on email it will jump to captcha
+$('#email').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#captchaSolution').focus();
+    }
+});
+//when user presses enter on captcha it will submit the form
+$('#captchaSolution').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#register').click();
+    }
+});

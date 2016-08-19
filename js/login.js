@@ -91,3 +91,16 @@ document.getElementById('login').onclick = function(){
 	});
 
 }
+//when user presses enter on username input it will jump to password input
+$('#user').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#password').focus();
+    }
+});
+
+//when user presses enter on password input box it will trigger the login button
+$('#password').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#login').click();	
+    }
+});

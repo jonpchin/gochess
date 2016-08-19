@@ -59,8 +59,8 @@ func SendForgot(target string, token string) {
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
 	m.SetHeader("To", target)
 	m.SetHeader("Subject", "Reset Password for Go Play Chess")
-	message := "Your token to reset your pass is : " + token +
-		"<br><br><a href='https://localhost/resetpass?token=" + token + "'>Please click here to type your token code and reset your password.</a>" +
+	message := "<a href='https://localhost/resetpass?token=" + token + "'>Please click here to type your token code and reset your password.</a>" +
+		"Your token to reset your pass is : " + token +
 		"<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 

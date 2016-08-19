@@ -58,6 +58,7 @@ function copyParams(){ //checks the url parameters if there any and copies them 
 	var token = parseUrl();
 	if (token){
 		document.getElementById('token').value = token;
+		$('#user').focus();
 	}
 }
 
@@ -110,3 +111,27 @@ document.getElementById('resetpass').onclick = function(){
 	});
 
 }
+
+$('#user').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#pass').focus();
+    }
+});
+
+$('#pass').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#confirm').focus();
+    }
+});
+
+$('#confirm').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#captchaSolution').focus();
+    }
+});
+
+$('#captchaSolution').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#resetpass').click();
+    }
+});

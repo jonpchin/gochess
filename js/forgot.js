@@ -66,3 +66,20 @@ document.getElementById('submit').onclick = function(){
 	});
 
 }
+$('#user').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#email').focus();
+    }
+});
+
+$('#email').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#captchaSolution').focus();
+    }
+});
+
+$('#captchaSolution').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#submit').click();
+    }
+});

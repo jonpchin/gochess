@@ -20,19 +20,25 @@
 RD is rating deviation. If a rating is under 80 RD it is considered accurate. The more games played the lower the RD. 
 If a player becomes inactive RD will rise over time. Result Key: Black won=0, White won=1, Draw=2</p>
 <p><a href="/saved?user={{.User}}">View adjourned games</a><p>
-<table class="table1">
-	<tr>
-<th>White</th><th>White Rating</th><th>Black</th><th>Black Rating</th><th>Type</th><th>Rated</th>
-<th>Time</th><th>Moves</th><th>Result</th><th>Status</th><th>Date</th><th>Time</th>
-	</tr>
-{{range .Games}}
-	<tr onclick="reviewGame({{.Moves}}, {{.White}}, {{.Black}}, {{.WhiteRating}}, {{.BlackRating}}, {{.TimeControl}}, {{.Result}}, {{.Date}})"> 
-	<td>{{.White}}</td><td>{{.WhiteRating}}</td> <td>{{.Black}}</td><td>{{.BlackRating}}</td>
-	<td>{{.GameType}}</td><td>{{.Rated}}</td><td>{{.TimeControl}}</td><td>{{.Total}}</td><td>{{.Result}}</td>
-	<td>{{.Status}}</td><td>{{.Date}}</td><td>{{.Time}}</td>
-	</tr>	
-{{end}}
-</table>
+
+{{ $length := len .Games }} 
+{{ if eq $length 0 }}
+    <center>No active games within the past 30 days have been found.</center>
+{{else}}
+	<table class="table1">
+		<tr>
+	<th>White</th><th>White Rating</th><th>Black</th><th>Black Rating</th><th>Type</th><th>Rated</th>
+	<th>Time</th><th>Moves</th><th>Result</th><th>Status</th><th>Date</th><th>Time</th>
+		</tr>
+	{{range .Games}}
+		<tr onclick="reviewGame({{.Moves}}, {{.White}}, {{.Black}}, {{.WhiteRating}}, {{.BlackRating}}, {{.TimeControl}}, {{.Result}}, {{.Date}})"> 
+		<td>{{.White}}</td><td>{{.WhiteRating}}</td> <td>{{.Black}}</td><td>{{.BlackRating}}</td>
+		<td>{{.GameType}}</td><td>{{.Rated}}</td><td>{{.TimeControl}}</td><td>{{.Total}}</td><td>{{.Result}}</td>
+		<td>{{.Status}}</td><td>{{.Date}}</td><td>{{.Time}}</td>
+		</tr>	
+	{{end}}
+	</table>
+{{ end }}
 
 <p><img src="img/icons/light.png" alt="lightning">Bullet : {{.Bullet}}</p>
 <p>BulletRD : {{.BulletRD}}</p><br>

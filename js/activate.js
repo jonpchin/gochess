@@ -37,6 +37,10 @@ function copyParams(){ //checks the url parameters if there any and copies them 
 		var token = url.token;
 		document.getElementById('user').value = user;
 		document.getElementById('token').value = token;
+		
+		//focus the the cursor onto the captcha box
+		$('#captchaSolution').focus();
+		   
 	}
 }
 
@@ -90,3 +94,10 @@ document.getElementById('register').onclick = function(){
 	});
 
 }
+
+//when user presses enter on captcha it will submit the form
+$('#captchaSolution').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#register').click();
+    }
+});
