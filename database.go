@@ -340,7 +340,7 @@ func fetchSavedGame(id string, user string) bool {
 	err = db.QueryRow("SELECT white, black, gametype, rated, whiterating, " +
 		"blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, " +
 		"timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white,
-		&black, &gametype, &gametype, &whiterating, &blackrating, &blackminutes, 
+		&black, &gametype, &rated, &whiterating, &blackrating, &blackminutes, 
 		&blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves,
 		&totalmoves, &status)
 	if err != nil {
