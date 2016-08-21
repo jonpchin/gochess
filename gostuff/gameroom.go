@@ -511,7 +511,6 @@ func (c *Connection) ChessConnect() {
 
 					} else {
 						game.WhiteRating = standard
-
 					}
 
 					game.BlackRating = Pending.Matches[match.MatchID].Rating
@@ -576,11 +575,9 @@ func (c *Connection) ChessConnect() {
 				//starting game for both players
 				if err := websocket.Message.Send(Active.Clients[game.WhitePlayer], string(startGame)); err != nil {
 					fmt.Println("error accept_rematch 1 is ", err)
-
 				}
 				if err := websocket.Message.Send(Active.Clients[game.BlackPlayer], string(startGame)); err != nil {
 					fmt.Println("error accept_rematch 2 is ", err)
-
 				}
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game

@@ -17,7 +17,7 @@ func SpawnProcess(){
 	    fmt.Println(string(output))
 
 	}else if runtime.GOOS == "linux"{ //then its a linux machine
-		cmd, err := exec.Command("cd ../../michaeldv/donna/bin & ls").Output()
+		cmd, err := exec.Command("cd ../../michaeldv/donna/bin && ls").Output()
 	    if err != nil {
 	        panic(err)
 	    }

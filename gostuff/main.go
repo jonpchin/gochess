@@ -53,35 +53,32 @@ func main() {
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
     
-	go func(){
-		//setting up database
-		proceed := gostuff.DbSetup()
+	//setting up database
+	proceed := gostuff.DbSetup()
+
+	//setting up cron job
+	gostuff.StartCron()
+	//removes games older then 30 days from database
+	if proceed == true {
+		// Number of days used to remove old games, forgot and activate tokens
+		days := "30"
+		gostuff.RemoveOldGames(days)
+		gostuff.RemoveOldActivate(days)
+		gostuff.RemoveOldForgot(days)
+		//fetch high score data from database
+		gostuff.UpdateHighScore()
+	}
 	
-		//setting up cron job
-		gostuff.StartCron()
-		//removes games older then 30 days from database
-		if proceed == true {
-			// Number of days used to remove old games, forgot and activate tokens
-			days := "30"
-			gostuff.RemoveOldGames(days)
-			gostuff.RemoveOldActivate(days)
-			gostuff.RemoveOldForgot(days)
-			//fetch high score data from database
-			gostuff.UpdateHighScore()
-			gostuff.ExportDatabase()
-		}
-		
-		//gostuff.SpawnProcess()
-	
-		//setting up clean up function for graceful shutdown
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		signal.Notify(c, syscall.SIGTERM)
-		go func() {
-			<-c
-			gostuff.Cleanup()
-			os.Exit(1)
-		}()
+//	gostuff.SpawnProcess()
+
+	//setting up clean up function for graceful shutdown
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGTERM)
+	go func() {
+		<-c
+		gostuff.Cleanup()
+		os.Exit(1)
 	}()
 
 	go func() {
