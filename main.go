@@ -54,8 +54,8 @@ func main() {
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
     
 	go func(){
-		//setting up database
-		proceed := gostuff.DbSetup()
+		//setting up database, the directory location of database backups is passed in
+		proceed := gostuff.DbSetup("./../backup")
 	
 		//setting up cron job
 		gostuff.StartCron()

@@ -51,15 +51,26 @@ type GoGame struct {
 var db *sql.DB
 
 //returns false if database setup failed
-func DbSetup() bool {
+func DbSetup(backLocation string) bool {
 
+	//Checks if backup folder for database export exists
+	exists, err := isDirOrFileExists(backLocation)
+	if err != nil{
+		fmt.Println("database.go DbSetup 0, error checking if directory exists", err)
+	}
+	if exists == false{
+		err := os.Mkdir(backLocation, 0777)
+		if err != nil{
+			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
+		}
+	}	
+	
 	dbString, database := ReadFile()
-	var err error
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
 	//	db.SetMaxIdleConns(20)
 	if err != nil {
-		fmt.Println("Error opening Database DBSetup 1", err)
+		fmt.Println("Error opening Database DBSetup 2", err)
 		return false
 	}
 	
@@ -69,7 +80,7 @@ func DbSetup() bool {
 		//checking if database exist
 		db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
 		if result == ""{
-			fmt.Println("database.go DbSetup 2 Database", database, "does not exist")
+			fmt.Println("database.go DbSetup 3 Database", database, "does not exist")
 			
 			// TODO: Attempt to import an existing backup database, if
 			// that is not available then import template database
