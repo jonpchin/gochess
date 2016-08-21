@@ -10,6 +10,7 @@ import (
 func StartCron() {
 	c := cron.New()
 	c.AddFunc("@daily", updateRD)
+	c.AddFunc("@daily", ExportDatabase)
 	c.AddFunc("@hourly", UpdateHighScore)
 	c.Start()
 }

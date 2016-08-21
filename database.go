@@ -53,25 +53,43 @@ var db *sql.DB
 //returns false if database setup failed
 func DbSetup() bool {
 
-	dbString := ReadFile()
+	dbString, database := ReadFile()
 	var err error
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
 	//	db.SetMaxIdleConns(20)
 	if err != nil {
-		fmt.Println("Error opening Database DBSetup", err)
+		fmt.Println("Error opening Database DBSetup 1", err)
 		return false
 	}
-
+	
 	if db.Ping() != nil {
-		fmt.Println("MySQL is down!!!")
-		return false
+		
+		var result string
+		//checking if database exist
+		db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
+		if result == ""{
+			fmt.Println("database.go DbSetup 2 Database", database, "does not exist")
+			
+			// TODO: Attempt to import an existing backup database, if
+			// that is not available then import template database
+			// if that is also not available then return false
+			// if database is imported attempt to reconnect to database
+			// using same credentials
+			
+			return false
+			
+		}else{
+			fmt.Println("MySQL is down!!!")
+			return false
+		}
+		
 	}
 	fmt.Println("MySQL is now connected.")
 	return true
 }
 
-func ReadFile() string {
+func ReadFile() (string, string) {
 	config, err := os.Open("secret/config.txt")
 	defer config.Close()
 	if err != nil {
@@ -107,9 +125,10 @@ func ReadFile() string {
 	//database name
 	scanner.Scan()
 	dbData = scanner.Text()
+	db := dbData
 	dbString = dbString + dbData
 
-	return dbString
+	return dbString, db
 }
 
 //fetches players bullet, blitz and standard rating
