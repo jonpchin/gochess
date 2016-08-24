@@ -50,16 +50,16 @@ type GoGame struct {
 
 var db *sql.DB
 
-//returns false if database setup failed
-func DbSetup(backLocation string) bool {
+//returns false if database setup failed, backup directory is passed in
+func DbSetup(backup string) bool {
 
 	//Checks if backup folder for database export exists
-	exists, err := isDirOrFileExists(backLocation)
+	exists, err := isDirOrFileExists(backup)
 	if err != nil{
 		fmt.Println("database.go DbSetup 0, error checking if directory exists", err)
 	}
 	if exists == false{
-		err := os.Mkdir(backLocation, 0777)
+		err := os.Mkdir(backup, 0777)
 		if err != nil{
 			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
 		}
@@ -81,17 +81,34 @@ func DbSetup(backLocation string) bool {
 		db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
 		if result == ""{
 			fmt.Println("database.go DbSetup 3 Database", database, "does not exist")
+			fmt.Println("Please wait while database is imported...")
+	
+			result := importDatabase()
+			if result == false{
+				result = importTemplateDatabase()
+				if result == false{
+					fmt.Println(" database.go Dbsetup FAILED to import both databases!")
+					return false
+				}else{
+					fmt.Println("Template database sucessfully imported!")
+				}
+			}else{
+				fmt.Println("GoChess database sucessfully imported!")
+			}
+			// Opening up database again to see if newly imported database can connect
+			db, err = sql.Open("mysql", dbString)
+			if err != nil {
+				fmt.Println("Error opening new Database DBSetup 4", err)
+				return false
+			}
+			if db.Ping() != nil {
+				fmt.Println("database.go Dbsetup 5 MySQL is down!!!")
+				return false
+			}
 			
-			// TODO: Attempt to import an existing backup database, if
-			// that is not available then import template database
-			// if that is also not available then return false
-			// if database is imported attempt to reconnect to database
-			// using same credentials
-			
-			return false
 			
 		}else{
-			fmt.Println("MySQL is down!!!")
+			fmt.Println("database.go Dbsetup 6 MySQL is down!!!")
 			return false
 		}
 		

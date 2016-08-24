@@ -68,7 +68,7 @@ func main() {
 			gostuff.RemoveOldForgot(days)
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
-			gostuff.ExportDatabase()
+			//gostuff.ExportDatabase()
 		}
 		
 		//gostuff.SpawnProcess()
