@@ -20,3 +20,34 @@ func ExportDatabase(){
 		fmt.Println("Error in exporting database, please check logs")
 	}
 }
+
+//imports the main gochess database, returns true if sucessful
+func importDatabase() bool{
+	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problems.Close()
+	log.SetOutput(problems)
+	
+	_, err := exec.Command("cmd.exe", "/C", "cd.. && bash importGoChess.sh").Output()
+	if err != nil{
+		log.Println("backup.go importDatabase 1", err)
+		fmt.Println("Error in importing gochess database, please check logs")
+		return false
+	}
+	return true
+}
+
+//imports template database, returns true if sucessful
+func importTemplateDatabase() bool{
+	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problems.Close()
+	log.SetOutput(problems)
+	
+	_, err := exec.Command("cmd.exe", "/C", "cd.. && bash importTemplate.sh").Output()
+	if err != nil{
+		log.Println("backup.go importTemplateDatabase 1", err)
+		fmt.Println("Error in importing template database, please check logs")
+		return false
+	}
+	
+	return true
+}
