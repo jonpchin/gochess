@@ -485,10 +485,8 @@ func (c *Connection) LobbyConnect() {
 							if err := websocket.Message.Send(Chat.Lobby[name], finalMessage); err != nil {
 								// we could not send the message to a peer
 								fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
-
 							}
 						}
-
 					}
 				}()
 

@@ -75,6 +75,7 @@ func DbSetup(backup string) bool {
 	}
 	
 	if db.Ping() != nil {
+		fmt.Println("Database ping failed. Please check if the database server is running.")
 		
 		var result string
 		//checking if database exist
@@ -106,12 +107,10 @@ func DbSetup(backup string) bool {
 				return false
 			}
 			
-			
 		}else{
 			fmt.Println("database.go Dbsetup 6 MySQL is down!!!")
 			return false
 		}
-		
 	}
 	fmt.Println("MySQL is now connected.")
 	return true
