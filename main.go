@@ -103,11 +103,12 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "404.html")
 		return
 	}
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	http.ServeFile(w, r, "index.html")
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	var login = template.Must(template.ParseFiles("login.html"))
 
 	d := struct {
@@ -121,13 +122,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func help(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	http.ServeFile(w, r, "help.html")
 }
 
 func screenshots(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	http.ServeFile(w, r, "screenshots.html")
 }
 func register(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	var register = template.Must(template.ParseFiles("register.html"))
 
 	d := struct {
@@ -141,6 +145,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func activate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	var activate = template.Must(template.ParseFiles("activate.html"))
 
 	d := struct {
@@ -153,6 +158,7 @@ func activate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func forgot(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	var formTemplate = template.Must(template.ParseFiles("forgot.html"))
 
 	d := struct {
@@ -166,6 +172,7 @@ func forgot(w http.ResponseWriter, r *http.Request) {
 }
 
 func resetpass(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "private, max-age=432000")
 	var formTemplate = template.Must(template.ParseFiles("resetpass.html"))
 
 	d := struct {
@@ -186,7 +193,8 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
+				
+				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var lobby = template.Must(template.ParseFiles("lobby.html"))
 				var bulletRating, blitzRating, standardRating int16
 				var errMessage string
@@ -216,7 +224,8 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
+				
+				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var memberChess = template.Must(template.ParseFiles("memberchess.html"))
 				p := gostuff.Person{User: username.Value}
 
@@ -239,7 +248,7 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
+				w.Header().Set("Cache-Control", "private, max-age=432000")
 				var memberHome = template.Must(template.ParseFiles("memberHome.html"))
 				p := gostuff.Person{User: username.Value}
 
@@ -263,7 +272,8 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
+				
+				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var all []gostuff.GoGame
 				var ratErr string
 				var bulletRating, blitzRating, standardRating, bulletRD, blitzRD, standardRD float64
@@ -339,8 +349,9 @@ func settings(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
-
+			
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
+				w.Header().Set("Cache-Control", "private, max-age=86400")
 				http.ServeFile(w, r, "settings.html")
 				return
 			}
@@ -356,7 +367,8 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
+				
+				w.Header().Set("Cache-Control", "private, max-age=3600")
 				var highscores = template.Must(template.ParseFiles("highscore.html"))
 
 				var p gostuff.ScoreBoard
@@ -380,6 +392,8 @@ func saved(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
+			
+				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var all []gostuff.GoGame
 
 				name := r.URL.Query().Get("user")
