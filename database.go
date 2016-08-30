@@ -328,10 +328,8 @@ func GetGames(name string) (storage []GoGame) {
 			log.Println("database.go GetGames 2 ", err)
 		}
 		storage = append(storage, all)
-
 	}
 	return storage
-
 }
 
 func GetSaved(name string) (storage []GoGame) {
