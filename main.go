@@ -103,12 +103,12 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "404.html")
 		return
 	}
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "index.html")
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	var login = template.Must(template.ParseFiles("login.html"))
 
 	d := struct {
@@ -122,16 +122,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func help(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "help.html")
 }
 
 func screenshots(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "screenshots.html")
 }
 func register(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	var register = template.Must(template.ParseFiles("register.html"))
 
 	d := struct {
@@ -145,7 +145,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func activate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	var activate = template.Must(template.ParseFiles("activate.html"))
 
 	d := struct {
@@ -158,7 +158,7 @@ func activate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func forgot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	var formTemplate = template.Must(template.ParseFiles("forgot.html"))
 
 	d := struct {
@@ -172,7 +172,7 @@ func forgot(w http.ResponseWriter, r *http.Request) {
 }
 
 func resetpass(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "private, max-age=432000")
+	w.Header().Set("Cache-Control", "public, max-age=432000")
 	var formTemplate = template.Must(template.ParseFiles("resetpass.html"))
 
 	d := struct {
@@ -336,7 +336,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				http.ServeFile(w, r, "index.html")
 				return
-
 			}
 		}
 	}

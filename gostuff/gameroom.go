@@ -82,34 +82,69 @@ func (c *Connection) ChessConnect() {
 					websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &t)
 					websocket.JSON.Send(Active.Clients[t.Name], &t)
 				}
-
+				
+				
 				//now switch to the other players turn
 				if All.Games[game.ID].Status == "White" {
 					All.Games[game.ID].Status = "Black"
 
 					//now switch clocks
 					go func() {
+						var clock ClockMove
+						clock.Type = "sync_clock"
+						
 						All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds = StartClock(game.ID, All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, "Black")
+						clock.BlackMinutes = All.Games[game.ID].BlackMinutes
+						clock.BlackSeconds = All.Games[game.ID].BlackSeconds
+						clock.UpdateWhite = false
+						
+						//don't send clock if player dropped conection
+						if _, ok := Active.Clients[t.Name]; ok { 
+							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
+								fmt.Println("gameroom.go error 2 sending clock")
+							}
+						}
 
+						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { 
+						
+							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
+								fmt.Println("gameroom.go error 2 sending clock")
+							}
+						}								
 					}()
 
 				} else if All.Games[game.ID].Status == "Black" {
 					All.Games[game.ID].Status = "White"
 
 					go func() {
+						var clock ClockMove
+						clock.Type = "sync_clock"
+						
 						All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds = StartClock(game.ID, All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, "White")
+						clock.WhiteMinutes = All.Games[game.ID].WhiteMinutes
+						clock.WhiteSeconds = All.Games[game.ID].WhiteSeconds
+						clock.UpdateWhite = true
+						
+						//check if player is still connected
+						if _, ok := Active.Clients[t.Name]; ok { 
 
+							//sending clock
+							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
+								fmt.Println("gameroom.go clock 3, error sending clock")
+							}
+						}
+						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { 
+		
+							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
+								fmt.Println("gameroom.go clock 4, error sending clock")
+							}
+						}				
 					}()
 
 				} else {
 					fmt.Println("Invalid game status, most likely game is over for ", t.Name)
 					break
 				}
-
-				game.WhiteMinutes = All.Games[game.ID].WhiteMinutes
-				game.WhiteSeconds = All.Games[game.ID].WhiteSeconds
-				game.BlackMinutes = All.Games[game.ID].BlackMinutes
-				game.BlackSeconds = All.Games[game.ID].BlackSeconds
 
 				var move Move
 				move.S = game.Source

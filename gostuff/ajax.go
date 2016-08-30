@@ -70,7 +70,6 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Write([]byte("true"))
 			return
-
 		}
 
 	} else if user.Value == black {
@@ -85,7 +84,6 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Write([]byte("true"))
 			return
-
 		}
 
 	} else {

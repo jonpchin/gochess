@@ -68,7 +68,6 @@ func (c *Connection) LobbyConnect() {
 
 							// we could not send the message to a peer
 							fmt.Println("lobby.go error 2 Could not send message to ", c.clientIP, err.Error())
-
 						}
 					}
 				}()
@@ -128,7 +127,6 @@ func (c *Connection) LobbyConnect() {
 						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
 					}
 					break
-
 				}
 
 				//verify.go
@@ -193,7 +191,6 @@ func (c *Connection) LobbyConnect() {
 						if err := websocket.Message.Send(cs, finalMessage); err != nil {
 							// we could not send the message to a peer
 							fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
-
 						}
 					}
 				}()
@@ -361,7 +358,6 @@ func (c *Connection) LobbyConnect() {
 				for _, cs := range Chat.Lobby {
 					if err := websocket.Message.Send(cs, string(startGame)); err != nil {
 						fmt.Println("lobby.go error 12 error is ", err)
-
 					}
 				}
 

@@ -31,6 +31,12 @@ type GameMove struct {
 	ID           int16
 	Source       string
 	Target       string
+}
+
+//stores the minutes and seconds per move
+type ClockMove struct {
+	Type         string
+	UpdateWhite  bool //If true then update white's clock
 	WhiteMinutes int
 	WhiteSeconds int
 	BlackMinutes int

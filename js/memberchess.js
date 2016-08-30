@@ -202,7 +202,7 @@ window.onload = function() {
 				board.move(json.Source + "-" + json.Target);
 				moveCounter++;
 				//make the premove that was stored if its stored
-				if(preMoveYes === true){
+				if(preMoveYes){
 					var result = onDrop(srcPreMove, targetPreMove)
 					if(result === 'snapback'){
 						//return
@@ -214,20 +214,35 @@ window.onload = function() {
 					removeHighlights('color');		
 				}
 	
-				if(user === WhiteSide){
-//					document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-				//	document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds;	
-				}
-				else if(user === BlackSide){
-//					document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
-				//	document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-				}		
+					
 				onSnapEnd();
 				whiteClock.pause();
 	            blackClock.pause();
 				if(toggleSound !== "false"){
 					moveSound.play();
 				}
+				break;
+			case "sync_clock":
+				if(user === WhiteSide){
+					if(json.UpdateWhite){
+						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds);
+					}
+					else{
+						document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds;	
+					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds);
+					}
+				}
+				else if(user === BlackSide){
+					if(json.UpdateWhite){
+						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds);
+					}
+					else{
+						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
+					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds);
+					}			
+				}	
 				break;
 			
 			case "chat_private":

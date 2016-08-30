@@ -118,7 +118,7 @@ func StartClock(gameID int16, minutes int, seconds int, color string) (int, int)
 			remainingMinutes := clock / 60
 			remainingSeconds := clock % 60
 
-			//fmt.Printf("Clock here is %d %d color is %s\n",  remainingMinutes, remainingSeconds, color)
+			// fmt.Printf("Clock here is %d %d color is %s\n",  remainingMinutes, remainingSeconds, color)
 			return remainingMinutes, remainingSeconds
 
 		case <-timerChan:
