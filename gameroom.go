@@ -82,8 +82,7 @@ func (c *Connection) ChessConnect() {
 					websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &t)
 					websocket.JSON.Send(Active.Clients[t.Name], &t)
 				}
-				
-				
+
 				//now switch to the other players turn
 				if All.Games[game.ID].Status == "White" {
 					All.Games[game.ID].Status = "Black"
@@ -93,9 +92,15 @@ func (c *Connection) ChessConnect() {
 						var clock ClockMove
 						clock.Type = "sync_clock"
 						
-						All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds = StartClock(game.ID, All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, "Black")
+						All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, All.Games[game.ID].BlackMilli = StartClock(game.ID, All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, All.Games[game.ID].BlackMilli, "Black")
+
+						if _, ok := All.Games[game.ID]; !ok { 
+							return
+						}						
+						
 						clock.BlackMinutes = All.Games[game.ID].BlackMinutes
 						clock.BlackSeconds = All.Games[game.ID].BlackSeconds
+						clock.BlackMilli   = All.Games[game.ID].BlackMilli
 						clock.UpdateWhite = false
 						
 						//don't send clock if player dropped conection
@@ -120,10 +125,16 @@ func (c *Connection) ChessConnect() {
 						var clock ClockMove
 						clock.Type = "sync_clock"
 						
-						All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds = StartClock(game.ID, All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, "White")
+						All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, All.Games[game.ID].WhiteMilli = StartClock(game.ID, All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, All.Games[game.ID].WhiteMilli, "White")
+						
+						if _, ok := All.Games[game.ID]; !ok { 
+							return
+						}		
+						
 						clock.WhiteMinutes = All.Games[game.ID].WhiteMinutes
 						clock.WhiteSeconds = All.Games[game.ID].WhiteSeconds
-						clock.UpdateWhite = true
+						clock.WhiteMilli   = All.Games[game.ID].WhiteMilli
+						clock.UpdateWhite  = true
 						
 						//check if player is still connected
 						if _, ok := Active.Clients[t.Name]; ok { 
@@ -236,7 +247,7 @@ func (c *Connection) ChessConnect() {
 					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
 				}
 				Verify.AllTables[game.ID].Connection <- true
-				Verify.AllTables[game.ID].gameOver <- true
+				Verify.AllTables[game.ID].gameOver <- true	
 
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
@@ -265,6 +276,7 @@ func (c *Connection) ChessConnect() {
 				}
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
+				
 
 				All.Games[game.ID].Status = "Agreed Draw"
 				//2 means the game is a draw and stored as an int in the database
@@ -343,6 +355,7 @@ func (c *Connection) ChessConnect() {
 				}
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
+		
 				//now store game in MySQL database
 				allMoves, err := json.Marshal(All.Games[game.ID].GameMoves)
 				if err != nil {
@@ -414,7 +427,7 @@ func (c *Connection) ChessConnect() {
 				}
 
 				websocket.Message.Send(Active.Clients[t.Name], reply)
-
+					
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
 			case "rematch":
@@ -570,15 +583,17 @@ func (c *Connection) ChessConnect() {
 
 				//no moves yet so nill/null
 				game.GameMoves = nil
-
-				game.TimeControl = Pending.Matches[match.MatchID].TimeControl
+				game.TimeControl  = Pending.Matches[match.MatchID].TimeControl
+				
 				//for simplicity we will only allow minutes
 				game.WhiteMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.WhiteSeconds = 0
+				game.WhiteMilli   = 0
 				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.BlackSeconds = 0
-				game.PendingDraw = false
-				game.Rated = Pending.Matches[match.MatchID].Rated
+				game.BlackMilli   = 0
+				game.PendingDraw  = false
+				game.Rated        = Pending.Matches[match.MatchID].Rated
 
 				var start int16 = 0
 				for {
@@ -641,7 +656,7 @@ func (c *Connection) ChessConnect() {
 
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
-
+				
 				All.Games[game.ID].Status = "Forced Draw"
 				//2 means the game is a draw and stored as an int in the database
 				All.Games[game.ID].Result = 2
@@ -665,8 +680,8 @@ func (c *Connection) ChessConnect() {
 				}
 				//gets length of all the moves in the game
 				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
-				storeGame(totalMoves, allMoves, All.Games[game.ID])
-
+				storeGame(totalMoves, allMoves, All.Games[game.ID])			
+				
 				//now delete game from memory
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)

@@ -402,22 +402,23 @@ func fetchSavedGame(id string, user string) bool {
 	if err != nil {
 		log.Println("database.go fetchSavedGame 2", err)
 	}
-	game.GameMoves = holder
+	game.GameMoves   = holder
 	game.WhitePlayer = white
 	game.BlackPlayer = black
 	game.WhiteRating = whiterating
 	game.BlackRating = blackrating
 	game.TimeControl = timecontrol
-	game.GameType = gametype
-	game.Rated = rated
-	game.Status = status
+	game.GameType    = gametype
+	game.Rated       = rated
+	game.Status      = status
 
 	game.WhiteMinutes = whiteminutes
 	game.WhiteSeconds = whiteseconds
+	game.WhiteMilli   = 0
 	game.BlackMinutes = blackminutes
 	game.BlackSeconds = blackseconds
-
-	game.PendingDraw = false
+	game.BlackMilli   = 0
+	game.PendingDraw  = false
 
 	var start int16 = 0
 	for {
