@@ -19,8 +19,10 @@ type ChessGame struct {
 	TimeControl  int
 	BlackMinutes int
 	BlackSeconds int
+	BlackMilli   int
 	WhiteMinutes int
 	WhiteSeconds int
+	WhiteMilli   int
 	PendingDraw  bool //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
 }
@@ -39,8 +41,10 @@ type ClockMove struct {
 	UpdateWhite  bool //If true then update white's clock
 	WhiteMinutes int
 	WhiteSeconds int
+	WhiteMilli   int
 	BlackMinutes int
 	BlackSeconds int
+	BlackMilli   int
 }
 
 //only holds source and destination
@@ -103,7 +107,7 @@ type Table struct {
 	blackTimeOut chan bool
 	gameOver     chan bool
 	Connection   chan bool
-	
+
 	moveCount int //keeps track of how many moves are made (moveCount+1) /2 to get move number 
 }
 

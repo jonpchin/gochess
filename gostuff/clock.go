@@ -13,7 +13,7 @@ func setClocks(gameID int16, name string) {
 	var result float64
 	go func() {
 
-		All.Games[gameID].WhiteMinutes, All.Games[gameID].WhiteSeconds = StartClock(gameID, All.Games[gameID].WhiteMinutes, All.Games[gameID].WhiteSeconds, "White")
+		All.Games[gameID].WhiteMinutes, All.Games[gameID].WhiteSeconds, All.Games[gameID].WhiteMilli = StartClock(gameID, All.Games[gameID].WhiteMinutes, All.Games[gameID].WhiteSeconds, All.Games[gameID].WhiteMilli, "White")
 
 	}()
 
@@ -100,13 +100,13 @@ func setClocks(gameID int16, name string) {
 }
 
 //returns the remaining time of players's clock
-func StartClock(gameID int16, minutes int, seconds int, color string) (int, int) {
+func StartClock(gameID int16, minutes int, seconds int, milliseconds int, color string) (int, int, int) {
 
-	timerChan := time.NewTicker(time.Second).C
+	timerChan := time.NewTicker(time.Millisecond).C
 
-	clock := (60 * minutes) + seconds
+	clock := (60000 * minutes) + (seconds * 1000) + milliseconds
 	if clock <= 0 {
-		return 0, 0
+		return 0, 0, 0
 	}
 
 	Verify.AllTables[gameID].Connection = make(chan bool)
@@ -115,24 +115,24 @@ func StartClock(gameID int16, minutes int, seconds int, color string) (int, int)
 		select {
 		case <-Verify.AllTables[gameID].Connection:
 
-			remainingMinutes := clock / 60
-			remainingSeconds := clock % 60
-
+			remainingMinutes := (clock / 60000)
+			remainingSeconds := (clock / 1000) % 60
+			remainingMilli := clock % 1000
 			// fmt.Printf("Clock here is %d %d color is %s\n",  remainingMinutes, remainingSeconds, color)
-			return remainingMinutes, remainingSeconds
+			return remainingMinutes, remainingSeconds, remainingMilli
 
 		case <-timerChan:
 
 			clock--
 			if clock <= 0 && color == "White" {
 				Verify.AllTables[gameID].whiteTimeOut <- true
-				return 0, 0
+				return 0, 0, 0
 			} else if clock <= 0 && color == "Black" {
 				Verify.AllTables[gameID].blackTimeOut <- true
-				return 0, 0
+				return 0, 0, 0
 			}
 		}
 	}
 
-	return 0, 0
+	return 0, 0, 0
 }

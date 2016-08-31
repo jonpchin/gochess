@@ -313,8 +313,10 @@ func (c *Connection) LobbyConnect() {
 				//for simplicity we will only allow minutes
 				game.WhiteMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.WhiteSeconds = 0
+				game.WhiteMilli   = 0
 				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.BlackSeconds = 0
+				game.BlackMilli   = 0
 				game.PendingDraw = false
 				game.Rated = Pending.Matches[match.MatchID].Rated;
 
