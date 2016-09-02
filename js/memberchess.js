@@ -226,21 +226,21 @@ window.onload = function() {
 				if(user === WhiteSide){
 					if(json.UpdateWhite){
 						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli;
-						console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli);
+					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli);
 					}
 					else{
 						document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli;	
-						console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
+					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
 					}
 				}
 				else if(user === BlackSide){
 					if(json.UpdateWhite){
 						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli;
-						console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds  + "." + json.WhiteMilli);
+					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds  + "." + json.WhiteMilli);
 					}
 					else{
 						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli;
-						console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
+					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
 					}			
 				}	
 				break;

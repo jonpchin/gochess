@@ -13,11 +13,16 @@ func ExportDatabase(){
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
-	
+
 	_, err := exec.Command("cmd.exe", "/C", "cd.. && bash backup.sh").Output()
 	if err != nil{
 		log.Println("backup.go ExportDatabase 1", err)
 		fmt.Println("Error in exporting database, please check logs")
+	}
+	
+	result := compress("./../backup/gochess.zip", []string{"./../backup/gochess.sql"})
+	if result == true{
+		fmt.Println("Database file succesfully compressed!")
 	}
 }
 
@@ -26,6 +31,12 @@ func importDatabase() bool{
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
+	
+	result := unzip("./../backup/gochess.zip", "./../backup")
+	
+	if result == false{
+		return false
+	}
 	
 	_, err := exec.Command("cmd.exe", "/C", "cd.. && bash importGoChess.sh").Output()
 	if err != nil{
