@@ -80,8 +80,10 @@ window.onload = function() {
 	
 	var token = parseUrl();
 	var reviewMoves = token.moves;
-	
+	reviewGame = false;
 	if (typeof reviewMoves !== "undefined"){
+		
+		reviewGame = true;
 		
 		var whiteName = token.white;
 		var blackName = token.black;
@@ -132,7 +134,6 @@ window.onload = function() {
 			moveCounter++;
 		}
 		onSnapEnd();
-		reviewGame = true;
 		return; //prevents game from loading if game is being reviewed	
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
@@ -525,7 +526,10 @@ window.onload = function() {
 	}
 };
 function finishGame(color){ //color is the color player that is checkmated
- 
+ 	//prevents sending null sock.send() when going over a game
+	if(reviewGame){
+		return;
+	}
 	var message = {
 			Type: "game_over",
 			Name: user,	

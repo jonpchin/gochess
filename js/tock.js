@@ -1,8 +1,4 @@
-/**
-* Tock by Mr Chimp - github.com/mrchimp/tock
-* Based on code by James Edwards:
-*    sitepoint.com/creating-accurate-timers-in-javascript/
-*/
+/* Tock by Mr Chimp - github.com/mrchimp/tockBased on code by James Edwards:    sitepoint.com/creating-accurate-timers-in-javascript */
 
 // Implements Date.now() for ie lt 9
 Date.now = Date.now || function() { return +new Date(); };
