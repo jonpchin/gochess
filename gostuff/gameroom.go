@@ -37,7 +37,7 @@ func (c *Connection) ChessConnect() {
 		if err := json.Unmarshal(message, &t); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:")
 			fmt.Println(string(reply))
-			fmt.Println("connection.go 1 ChessConnect 1 ", err.Error())
+			fmt.Println("gameroom.go 1 ChessConnect 1 ", err.Error())
 			break
 		}
 		if c.username == t.Name {
@@ -51,7 +51,7 @@ func (c *Connection) ChessConnect() {
 				if err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
 					fmt.Println(string(message))
-					fmt.Println("connection.go 1 ChessConnect 2 ", err.Error())
+					fmt.Println("gameroom.go 1 ChessConnect 2 ", err.Error())
 					break
 				}
 
@@ -164,7 +164,7 @@ func (c *Connection) ChessConnect() {
 				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
 
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; !ok { //don't send move if other guy dropped connection
-					//fmt.Println("connection.go 123");
+					//fmt.Println("gameroom.go 123");
 					break
 				}
 
@@ -371,11 +371,11 @@ func (c *Connection) ChessConnect() {
 
 				//notifying players game is over
 				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
-					fmt.Println("error gameover 1 connection.go error is ", err)
+					fmt.Println("error gameover 1 gameroom.go error is ", err)
 				}
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						fmt.Println("connection.go gameover 2 error is ", err)
+						fmt.Println("gameroom.go gameover 2 error is ", err)
 					}
 				}
 
@@ -454,7 +454,7 @@ func (c *Connection) ChessConnect() {
 				//fetching rating from back end
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
 				if errMessage != "" {
-					fmt.Println("Cannot get rating connection.go private_match")
+					fmt.Println("Cannot get rating gameroom.go private_match")
 					break
 				}
 				switch match.TimeControl {
@@ -486,7 +486,7 @@ func (c *Connection) ChessConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Active.Clients[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("match connection.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("match gameroom.go Could not send message to ", c.clientIP, err.Error())
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -507,12 +507,12 @@ func (c *Connection) ChessConnect() {
 				Pending.Matches[start] = &match
 
 				if _, ok := PrivateChat[match.Opponent]; ok {
-					log.Println("rematch 1 connection.go Player already has a game. ")
+					log.Println("rematch 1 gameroom.go Player already has a game. ")
 
 					t.Type = "rematch"
 					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("rematch 2 connection.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("rematch 2 gameroom.go Could not send message to ", c.clientIP, err.Error())
 					}
 				}
 
@@ -528,14 +528,14 @@ func (c *Connection) ChessConnect() {
 				}
 				//isPlayerInGame function is located in socket.go
 				if isPlayerInGame(match.Name, match.Opponent) {
-					fmt.Println("connection.go accept rematch 12")
+					fmt.Println("gameroom.go accept rematch 12")
 					break
 				}
 
 				//checking to make sure both player's rating is in range, used as a backend rating check
 				errMessage, bullet, blitz, standard := GetRating(match.Name)
 				if errMessage != "" {
-					fmt.Println("Cannot get rating connection.go accept_match")
+					fmt.Println("Cannot get rating gameroom.go accept_match")
 					break
 				}
 
@@ -641,14 +641,14 @@ func (c *Connection) ChessConnect() {
 				//checking to see if the side whose turn it is to move is in stalemate
 				if Verify.AllTables[game.ID].whiteTurn == true {
 					if isWhiteStaleMate(game.ID) == true || noMaterial(game.ID) == true || threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
-						fmt.Println("forced draw_game connection.go success 1")
+						fmt.Println("forced draw_game gameroom.go success 1")
 					} else {
 						break
 					}
 				} else {
 
 					if isBlackStaleMate(game.ID) == true || noMaterial(game.ID) == true || threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
-						fmt.Println("forced draw_game connection.go success 2")
+						fmt.Println("forced draw_game gameroom.go success 2")
 					} else {
 						break
 					}
