@@ -55,9 +55,9 @@ func (c *Connection) ChessConnect() {
 					break
 				}
 
-				//check to make sure game exists to prevent nil pointer dereference
+				//this can also be triggered when a player starts moving pieces on the board alone
+				//also prevents a move from being sent if a game hasn't started
 				if _, ok := All.Games[game.ID]; !ok {
-					fmt.Println("No such game exists for ", t.Name)
 					break
 				}
 
