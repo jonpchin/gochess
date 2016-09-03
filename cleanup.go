@@ -61,11 +61,10 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN!")
+		log.Println("cleanup.go saveGame 0 DATABASE DOWN!")
 		return
 	}
 
-	//preparing token activation
 	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, rated=?," +
 		" whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?," +
 		" whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
