@@ -80,7 +80,7 @@ window.onload = function() {
 	
 	var token = parseUrl();
 	var reviewMoves = token.moves;
-	reviewGame = false;
+
 	if (typeof reviewMoves !== "undefined"){
 		
 		reviewGame = true;
