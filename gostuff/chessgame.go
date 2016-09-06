@@ -33,6 +33,7 @@ type GameMove struct {
 	ID           int16
 	Source       string
 	Target       string
+	Promotion    string
 }
 
 //stores the minutes and seconds per move
@@ -47,10 +48,11 @@ type ClockMove struct {
 	BlackMilli   int
 }
 
-//only holds source and destination
+//only holds source and destination, as well as pawn promotion
 type Move struct {
 	S string
 	T string
+	P string
 }
 
 type Nrating struct {
@@ -109,6 +111,7 @@ type Table struct {
 	Connection   chan bool
 
 	moveCount int //keeps track of how many moves are made (moveCount+1) /2 to get move number 
+	promotion string //keeps track of the piece that is being promoted too
 }
 
 //active and running games on the server
@@ -188,4 +191,6 @@ func initGame(gameID int16) {
 	Verify.AllTables[gameID].pawnMove = 0
 	Verify.AllTables[gameID].lastCapture = 0
 	Verify.AllTables[gameID].moveCount = 0
+	
+	Verify.AllTables[gameID].promotion = "q" //default to queen promotion
 }

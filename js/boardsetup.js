@@ -5,7 +5,6 @@ statusEl = $('#status'),
 fenEl = $('#fen'),
 pgnEl = $('#pgn');
 
-
 //used to store whether or not the game is over due to resignation or mututal draw agreement
 var chessGameOver;
 //stores the moves of all the games, use length of moves to determine if abort button should be disabled
@@ -23,8 +22,13 @@ var targetPreMove;
 //user preferences
 var togglePremove = getCookie("premove");
 var pieceTheme = getCookie("pieceTheme");
+var togglePromotion = getCookie("promote");
 //used to check if a player is viewing a game
 var reviewGame = false;
+
+//default piece pawn promotes to when it reaches the end of the board
+//q=queen, r=rook, b=bishop, n=knight
+var pawnPromotion = "q";
 
 function defaultTheme(){
 	if (pieceTheme === ""){
@@ -48,14 +52,18 @@ var onDragStart = function(source, piece, position, orientation) {
     	(BlackSide === user && piece.search(/^w/) !== -1)) {
     	return false;
     }
-	
-    
 };
 
-var onDrop = function(source, target) {
+var onDrop = function(source, target, skipPromotion=false) {
+	
+	console.log(skipPromotion);
+	
+	//game.turn() returns back "w" for white or "b" for black
+	var color = game.turn();
+	
 	//only allow premove if user enabled in preferences, by default premove is enabled
 	if(togglePremove !== "false"){
-		if( (game.turn() === 'w' && BlackSide === user) || (game.turn() === 'b' && WhiteSide === user)   ){
+		if( (color === 'w' && BlackSide === user) || (color === 'b' && WhiteSide === user)   ){
 			preMoveYes = true;
 			srcPreMove = source;
 			targetPreMove = target;
@@ -64,12 +72,28 @@ var onDrop = function(source, target) {
 			return;
 		}
 	}
-    
+	if (togglePromotion === "false" && skipPromotion === false){
+		//check if its a pawn promotion
+		isPromote = checkPawnPromote(source, target, color);
+		if(isPromote){
+			
+			//this function will set the pawPromotion global variable
+			showPawnPromotionPopup(source, target, color);
+			
+			//the close box was clicked so it returns back to the initital position
+			if(pawnPromotion === "x"){
+				//reseting the default pawn promotion to queen
+				pawnPromotion = "q";
+			}
+			return;
+		}
+	}
+
 	// see if the move is legal
 	var move = game.move({
     	from: source,
     	to: target,
-    	promotion: 'q' // NOTE: always promote to a queen for example simplicity
+    	promotion: pawnPromotion // NOTE: always promote to a queen for example simplicity
   	});
 	
   	// illegal move
@@ -147,7 +171,6 @@ var cfg = {
 	pieceTheme: '../img/chesspieces/'+ pieceTheme +'/{piece}.png'
 };
 
-
 board = ChessBoard('board', cfg);
 
 updateStatus();
@@ -170,4 +193,67 @@ function getCookie(cname) { //gets cookies value
         if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
     }
     return "";
+}
+//returns true if its a pawn promotion
+function checkPawnPromote(source, target, color){
+	
+	if(color === "w"){
+		if(source[1] === "7" && target[1] === "8"){
+			return true;
+		}
+	}
+	else{
+		if(source[1] === "2" && target[1] === "1"){
+			return true;
+		}
+	}
+	return false;
+}
+
+function showPawnPromotionPopup(source, target, color){
+	var modal = document.getElementById("myModal");
+	modal.style.display = "block";
+	
+	if(color === "w"){
+		modal.getElementsByClassName("modal-content")[0].innerHTML='<p><span id="closeModal" class="close">x</span>' +
+    		'<img id=promoteQ src="../img/chesspieces/'+ pieceTheme + '/wQ.png" alt=White Queen>' +
+			'<img id=promoteR src="../img/chesspieces/'+ pieceTheme + '/wR.png" alt=White Rook>' +
+			'<img id=promoteB src="../img/chesspieces/'+ pieceTheme + '/wB.png" alt=White Bishop>' +
+			'<img id=promoteN src="../img/chesspieces/'+ pieceTheme + '/wN.png" alt=White Knight>';		
+	}
+	else{
+		modal.getElementsByClassName("modal-content")[0].innerHTML='<p><span id="closeModal" class="close">x</span>' +
+    		'<img id=promoteQ src="../img/chesspieces/'+ pieceTheme + '/bQ.png" alt=Black Queen>' +
+			'<img id=promoteR src="../img/chesspieces/'+ pieceTheme + '/bR.png" alt=Black Rook>'   +
+			'<img id=promoteB src="../img/chesspieces/'+ pieceTheme + '/bB.png" alt=Black Bishop>' +
+			'<img id=promoteN src="../img/chesspieces/'+ pieceTheme + '/bN.png" alt=Black Knight>';
+	}
+	
+	document.getElementById('promoteQ').onclick = function(){
+		pawnPromotion = "q";
+		modal.style.display = "none";
+		onDrop(source, target, true);
+	}
+	
+	document.getElementById('promoteR').onclick = function(){
+		pawnPromotion = "r";
+		modal.style.display = "none";
+		onDrop(source, target, true);
+	}
+	
+	document.getElementById('promoteB').onclick = function(){
+		pawnPromotion = "b";
+		modal.style.display = "none";
+		onDrop(source, target, true);
+	}
+	document.getElementById('promoteN').onclick = function(){
+		pawnPromotion = "n";
+		modal.style.display = "none";
+		onDrop(source, target, true);
+	}
+	
+	document.getElementById('closeModal').onclick = function() {
+	    pawnPromotion = 'x';
+		modal.style.display = "none";
+	}
 }

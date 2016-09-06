@@ -63,7 +63,7 @@ func (c *Connection) ChessConnect() {
 
 				var result bool
 				//check if its correct players turn and if move is valid before sending
-				result = chessVerify(game.Source, game.Target, game.ID)
+				result = chessVerify(game.Source, game.Target, game.Promotion, game.ID)
 				if result == false {
 					totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
 					log.Printf("Invalid chess move by %s move %s - %s in gameID %d on move %d", c.username, game.Source, game.Target, game.ID, totalMoves)
@@ -160,6 +160,7 @@ func (c *Connection) ChessConnect() {
 				var move Move
 				move.S = game.Source
 				move.T = game.Target
+				move.P = game.Promotion
 				//append move to back end storage for retrieval from database later
 				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
 

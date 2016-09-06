@@ -5,7 +5,7 @@ import (
 )
 
 //returns true if the move is valid otherwise it returns false
-func chessVerify(source string, target string, gameID int16) bool {
+func chessVerify(source string, target string, promotion string, gameID int16) bool {
 	if len(source) != 2 {
 		fmt.Println("Invalid input length")
 		return false
@@ -123,7 +123,9 @@ func chessVerify(source string, target string, gameID int16) bool {
 		return false
 
 	}
-
+	if promotion != ""{
+		Verify.AllTables[gameID].promotion = promotion
+	}
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
 
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
@@ -228,9 +230,9 @@ func makeMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, pi
 	//if pawn reaches the 8th or 1st rank auto promote to queen for now
 
 	if targetRow == 0 && piece == "wP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "wQ" //white queen promotion
+		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + Verify.AllTables[gameID].promotion 
 	} else if targetRow == 7 && piece == "bP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "bQ" //black queen promtion
+		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "b" + Verify.AllTables[gameID].promotion 
 	} else {
 		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = piece //place the piece to its new target square
 	}
