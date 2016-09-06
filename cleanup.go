@@ -44,7 +44,6 @@ func Cleanup() {
 		} else {
 			fmt.Println("Error in Cleanup.go cleanup 1")
 		}
-
 	}
 	fmt.Println("All games are saved. Web server is shutting down in 1 second.")
 }
