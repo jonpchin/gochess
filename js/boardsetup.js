@@ -26,6 +26,9 @@ var togglePromotion = getCookie("promote");
 //used to check if a player is viewing a game
 var reviewGame = false;
 
+//used when pausing the promotion so user can click which piece
+var skipPromotion = false;
+
 //default piece pawn promotes to when it reaches the end of the board
 //q=queen, r=rook, b=bishop, n=knight
 var pawnPromotion = "q";
@@ -54,10 +57,8 @@ var onDragStart = function(source, piece, position, orientation) {
     }
 };
 
-var onDrop = function(source, target, skipPromotion=false) {
-	
-	console.log(skipPromotion);
-	
+var onDrop = function(source, target) {
+
 	//game.turn() returns back "w" for white or "b" for black
 	var color = game.turn();
 	
@@ -106,8 +107,13 @@ var onDrop = function(source, target, skipPromotion=false) {
 	//starting player's clock on move 1
   
 	sendMove(source, target)
-
+	
 	updateStatus();	
+	
+	if(skipPromotion){
+		board.position(game.fen());
+		skipPromotion = false;
+	}
 };
 
 // update the board position after the piece snap 
@@ -232,24 +238,28 @@ function showPawnPromotionPopup(source, target, color){
 	document.getElementById('promoteQ').onclick = function(){
 		pawnPromotion = "q";
 		modal.style.display = "none";
-		onDrop(source, target, true);
+		skipPromotion = true;
+		onDrop(source, target);
 	}
 	
 	document.getElementById('promoteR').onclick = function(){
 		pawnPromotion = "r";
 		modal.style.display = "none";
-		onDrop(source, target, true);
+		skipPromotion = true;
+		onDrop(source, target);
 	}
 	
 	document.getElementById('promoteB').onclick = function(){
 		pawnPromotion = "b";
 		modal.style.display = "none";
-		onDrop(source, target, true);
+		skipPromotion = true;
+		onDrop(source, target);
 	}
 	document.getElementById('promoteN').onclick = function(){
 		pawnPromotion = "n";
 		modal.style.display = "none";
-		onDrop(source, target, true);
+		skipPromotion = true;
+		onDrop(source, target);
 	}
 	
 	document.getElementById('closeModal').onclick = function() {

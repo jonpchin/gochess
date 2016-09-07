@@ -22,7 +22,6 @@ var whiteClock = new Tock({
 			$('#toptime').val(whiteClock.msToTime(whiteClock.lap()));	
 		}  
     }
-
 });
 
 var blackClock = new Tock({
@@ -214,7 +213,6 @@ window.onload = function() {
 					preMoveYes = false;
 					removeHighlights('color');		
 				}
-	
 					
 				onSnapEnd();
 				whiteClock.pause();
