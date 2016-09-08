@@ -106,7 +106,7 @@ var onDrop = function(source, target) {
  	moveCounter++;
 	//starting player's clock on move 1
   
-	sendMove(source, target)
+	sendMove(source, target, pawnPromotion);
 	
 	updateStatus();	
 	

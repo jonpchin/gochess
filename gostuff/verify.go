@@ -2,6 +2,7 @@ package gostuff
 
 import (
 	"fmt"
+	"strings"
 )
 
 //returns true if the move is valid otherwise it returns false
@@ -119,6 +120,7 @@ func chessVerify(source string, target string, promotion string, gameID int16) b
 		}
 
 	default:
+		fmt.Println(noColorPiece)
 		fmt.Println("Error not valid piece")
 		return false
 
@@ -230,9 +232,9 @@ func makeMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, pi
 	//if pawn reaches the 8th or 1st rank auto promote to queen for now
 
 	if targetRow == 0 && piece == "wP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + Verify.AllTables[gameID].promotion 
+		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + strings.ToUpper(Verify.AllTables[gameID].promotion) 
 	} else if targetRow == 7 && piece == "bP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "b" + Verify.AllTables[gameID].promotion 
+		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "b" + strings.ToUpper(Verify.AllTables[gameID].promotion) 
 	} else {
 		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = piece //place the piece to its new target square
 	}

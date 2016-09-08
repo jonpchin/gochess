@@ -177,7 +177,7 @@ window.onload = function() {
 			    var move = game.move({
 				    from: json.Source,
 				    to: json.Target,
-				    promotion: 'q' // NOTE: always promote to a queen for example simplicity
+				    promotion: json.Promotion // NOTE: always promote to a queen for example simplicity
 			    });
 			
 			    // illegal move
@@ -548,14 +548,15 @@ function drawGame(){
 }
 
 //this function is called from boardsetup.js
-function sendMove(src, dest){
+function sendMove(src, dest, pawnPromotion){
 		
 	var message = {
 		Type: "send_move",
 		Name: user,	
 		ID: matchID,
 		Source: src,
-		Target: dest
+		Target: dest,
+		Promotion: pawnPromotion
 	}
     sock.send(JSON.stringify(message));
 
