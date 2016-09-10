@@ -24,7 +24,7 @@ func setClocks(gameID int16, name string) {
 
 			result = 0.0
 			//update ratings
-			if All.Games[gameID].Rated == "Yes"{
+			if All.Games[gameID].Rated == "Yes" {
 				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
 			}
 
@@ -32,7 +32,7 @@ func setClocks(gameID int16, name string) {
 			All.Games[gameID].Status = "Black won on time"
 			All.Games[gameID].Type = "game_over"
 			All.Games[gameID].Result = 0
-			
+
 			//now store game in MySQL database
 			allMoves, err := json.Marshal(All.Games[gameID].GameMoves)
 			if err != nil {
@@ -75,7 +75,7 @@ func setClocks(gameID int16, name string) {
 			storeGame(totalMoves, allMoves, All.Games[gameID])
 
 			//update ratings
-			if All.Games[gameID].Rated == "Yes"{
+			if All.Games[gameID].Rated == "Yes" {
 				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
 			}
 

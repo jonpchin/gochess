@@ -5,13 +5,14 @@ import (
 	"bufio"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"gopkg.in/gomail.v2"
 	"log"
 	"os"
-	"fmt"
 )
+
 //returns true if sucessful sent email
-func Sendmail(target string, token string, name string){
+func Sendmail(target string, token string, name string) {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")

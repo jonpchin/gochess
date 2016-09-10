@@ -23,17 +23,17 @@ type ChessGame struct {
 	WhiteMinutes int
 	WhiteSeconds int
 	WhiteMilli   int
-	PendingDraw  bool //used to keep track if a player has offered a draw
+	PendingDraw  bool   //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
 }
 
 //source and destination of piece moves
 type GameMove struct {
-	Type         string
-	ID           int16
-	Source       string
-	Target       string
-	Promotion    string
+	Type      string
+	ID        int16
+	Source    string
+	Target    string
+	Promotion string
 }
 
 //stores the minutes and seconds per move
@@ -110,7 +110,7 @@ type Table struct {
 	gameOver     chan bool
 	Connection   chan bool
 
-	moveCount int //keeps track of how many moves are made (moveCount+1) /2 to get move number 
+	moveCount int    //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string //keeps track of the piece that is being promoted too
 }
 
@@ -137,7 +137,7 @@ var PrivateChat = make(map[string]string)
 
 //intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
 func initGame(gameID int16) {
-	
+
 	//setting up back end move verification
 	var table Table
 	table.ChessBoard = [][]string{
@@ -151,7 +151,7 @@ func initGame(gameID int16) {
 		[]string{"wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"},
 	}
 	Verify.AllTables[gameID] = &table
-	
+
 	for i := 0; i < 8; i++ {
 		Verify.AllTables[gameID].whitePawns[i] = false
 		Verify.AllTables[gameID].blackPawns[i] = false
@@ -191,6 +191,6 @@ func initGame(gameID int16) {
 	Verify.AllTables[gameID].pawnMove = 0
 	Verify.AllTables[gameID].lastCapture = 0
 	Verify.AllTables[gameID].moveCount = 0
-	
+
 	Verify.AllTables[gameID].promotion = "q" //default to queen promotion
 }

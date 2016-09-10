@@ -84,7 +84,7 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 
 //remove games older then 30 days to clean up profile page, activated only on server startup
 func RemoveOldGames(days string) {
-	
+
 	//DELETE FROM games WHERE date < NOW() - INTERVAL 100 DAY;
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -112,11 +112,11 @@ func RemoveOldGames(days string) {
 	if err != nil {
 		log.Println("cron.go 11 ", err)
 	}
-	log.Printf("%d rows were deleted from games because they were older then " + days + " days.\n", affect)
+	log.Printf("%d rows were deleted from games because they were older then "+days+" days.\n", affect)
 }
 
 // Remove old entries in activate table in database
-func RemoveOldActivate(days string){
+func RemoveOldActivate(days string) {
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
@@ -143,12 +143,12 @@ func RemoveOldActivate(days string){
 	if err != nil {
 		log.Println("cron.go 14 ", err)
 	}
-	log.Printf("%d rows were deleted from activate table because they were older then " + days + " days.\n", affect)
+	log.Printf("%d rows were deleted from activate table because they were older then "+days+" days.\n", affect)
 }
 
 // Remove old entries in the forgot table in the database
 // If the entry is older then the days parameter then it will be deleted
-func RemoveOldForgot(days string){
+func RemoveOldForgot(days string) {
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
@@ -175,5 +175,5 @@ func RemoveOldForgot(days string){
 	if err != nil {
 		log.Println("cron.go 17 ", err)
 	}
-	log.Printf("%d rows were deleted from forgot table because they were older then " + days + " days.\n", affect)
+	log.Printf("%d rows were deleted from forgot table because they were older then "+days+" days.\n", affect)
 }

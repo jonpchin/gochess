@@ -217,7 +217,7 @@ func isPlayerInChess(player string) bool {
 //remove all pending matches from a player
 func removePendingMatches(name string) {
 	for key, value := range Pending.Matches {
-		
+
 		//deletes all pending matches for either players
 		if value.Name == name || value.Opponent == name {
 			delete(Pending.Matches, key)
