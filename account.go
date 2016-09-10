@@ -216,7 +216,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("%d row was deleted from the activate table by user %s\n", affect, userName)
-		
+
 		//once a user activates his acccount update the highscore board so it shows him as new user
 		UpdateHighScore()
 	}
@@ -300,7 +300,7 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%d rows were affected by the the token activation check.\n", affect)
 
 		//sends pasword reset information to email of user
-		go func(email, token string){
+		go func(email, token string) {
 			SendForgot(email, token)
 		}(email, token)
 

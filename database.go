@@ -1,16 +1,16 @@
 package gostuff
 
 import (
+	"bufio"
 	"database/sql"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"os"
 	"time"
-	"bufio"
-	"encoding/base64"
-	"encoding/hex"
 )
 
 //stores information about players games extracted from database when player clicks there profile
@@ -45,7 +45,7 @@ type GoGame struct {
 	Status       string
 	Date         string
 	Time         string
-	Rated		 string
+	Rated        string
 }
 
 var db *sql.DB
@@ -55,16 +55,16 @@ func DbSetup(backup string) bool {
 
 	//Checks if backup folder for database export exists
 	exists, err := isDirOrFileExists(backup)
-	if err != nil{
+	if err != nil {
 		fmt.Println("database.go DbSetup 0, error checking if directory exists", err)
 	}
-	if exists == false{
+	if exists == false {
 		err := os.Mkdir(backup, 0777)
-		if err != nil{
+		if err != nil {
 			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
 		}
-	}	
-	
+	}
+
 	dbString, database := ReadFile()
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
@@ -73,27 +73,27 @@ func DbSetup(backup string) bool {
 		fmt.Println("Error opening Database DBSetup 2", err)
 		return false
 	}
-	
+
 	if db.Ping() != nil {
 		fmt.Println("Database ping failed. Please check if the database server is running.")
-		
+
 		var result string
 		//checking if database exist
 		db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
-		if result == ""{
+		if result == "" {
 			fmt.Println("database.go DbSetup 3 Database", database, "does not exist")
 			fmt.Println("Please wait while database is imported...")
-	
+
 			result := importDatabase()
-			if result == false{
+			if result == false {
 				result = importTemplateDatabase()
-				if result == false{
+				if result == false {
 					fmt.Println(" database.go Dbsetup FAILED to import both databases!")
 					return false
-				}else{
+				} else {
 					fmt.Println("Template database sucessfully imported!")
 				}
-			}else{
+			} else {
 				fmt.Println("GoChess database sucessfully imported!")
 			}
 			// Opening up database again to see if newly imported database can connect
@@ -106,8 +106,8 @@ func DbSetup(backup string) bool {
 				fmt.Println("database.go Dbsetup 5 MySQL is down!!!")
 				return false
 			}
-			
-		}else{
+
+		} else {
 			fmt.Println("database.go Dbsetup 6 MySQL is down!!!")
 			return false
 		}
@@ -185,7 +185,7 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 //fetches players bullet, blitz and standard rating and RD
 func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulletRD,
 	blitzRD, standardRD float64) {
-		
+
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
@@ -197,9 +197,9 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 	}
 
 	//looking up players rating
-	err2 := db.QueryRow("SELECT bullet, blitz, standard, bulletRD, blitzRD, standardRD " +
+	err2 := db.QueryRow("SELECT bullet, blitz, standard, bulletRD, blitzRD, standardRD "+
 		"FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard,
-		 &bulletRD, &blitzRD, &standardRD)
+		&bulletRD, &blitzRD, &standardRD)
 
 	if err2 != nil {
 		log.Println("database.go GetRating 2 ", err2)
@@ -226,7 +226,7 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	stmt, err := db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType +
 		"RD=?" + " where username=?")
 	if err != nil {
-		log.Println("database.go updateRating 2 ",err)
+		log.Println("database.go updateRating 2 ", err)
 		return
 	}
 
@@ -320,8 +320,8 @@ func GetGames(name string) (storage []GoGame) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated, 
-			&all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves, 
+		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated,
+			&all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves,
 			&all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
@@ -347,9 +347,9 @@ func GetSaved(name string) (storage []GoGame) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated, 
-			&all.WhiteRating, &all.BlackRating, &all.BlackMinutes, &all.BlackSeconds, 
-			&all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total, 
+		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated,
+			&all.WhiteRating, &all.BlackRating, &all.BlackMinutes, &all.BlackSeconds,
+			&all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total,
 			&all.Status, &all.Date, &all.Time)
 		if err != nil {
 			log.Println("database.go GetSaved 2 ", err)
@@ -381,10 +381,10 @@ func fetchSavedGame(id string, user string) bool {
 	var totalmoves int
 	var status string
 
-	err = db.QueryRow("SELECT white, black, gametype, rated, whiterating, " +
-		"blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, " +
+	err = db.QueryRow("SELECT white, black, gametype, rated, whiterating, "+
+		"blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, "+
 		"timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white,
-		&black, &gametype, &rated, &whiterating, &blackrating, &blackminutes, 
+		&black, &gametype, &rated, &whiterating, &blackrating, &blackminutes,
 		&blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves,
 		&totalmoves, &status)
 	if err != nil {
@@ -402,23 +402,23 @@ func fetchSavedGame(id string, user string) bool {
 	if err != nil {
 		log.Println("database.go fetchSavedGame 2", err)
 	}
-	game.GameMoves   = holder
+	game.GameMoves = holder
 	game.WhitePlayer = white
 	game.BlackPlayer = black
 	game.WhiteRating = whiterating
 	game.BlackRating = blackrating
 	game.TimeControl = timecontrol
-	game.GameType    = gametype
-	game.Rated       = rated
-	game.Status      = status
+	game.GameType = gametype
+	game.Rated = rated
+	game.Status = status
 
 	game.WhiteMinutes = whiteminutes
 	game.WhiteSeconds = whiteseconds
-	game.WhiteMilli   = 0
+	game.WhiteMilli = 0
 	game.BlackMinutes = blackminutes
 	game.BlackSeconds = blackseconds
-	game.BlackMilli   = 0
-	game.PendingDraw  = false
+	game.BlackMilli = 0
+	game.PendingDraw = false
 
 	var start int16 = 0
 	for {

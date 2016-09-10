@@ -120,7 +120,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			if err2 != nil {
 				log.Println("new.go ProcessLogin 3 ", err2)
 			} else {
-				go func(email, tokenInDB, userName string){
+				go func(email, tokenInDB, userName string) {
 					Sendmail(email, tokenInDB, userName)
 				}(email, tokenInDB, userName)
 			}
@@ -223,7 +223,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			//sends email to user with the token activation
-			go func(email, token, userName, address string){
+			go func(email, token, userName, address string) {
 				SendAttempt(email, token, userName, address)
 			}(email, token, userName, r.RemoteAddr)
 			return
@@ -238,10 +238,10 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			}
 
 			//sends email again to user with the token activation
-			go func(email, token, userName, address string){
+			go func(email, token, userName, address string) {
 				SendAttempt(email, token, userName, address)
 			}(email, token, userName, r.RemoteAddr)
-			
+
 			return
 		}
 		if pass != key {
@@ -274,10 +274,10 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			if err2 != nil {
 				log.Println("new.go ProcessLogin 14 ", err2)
 			} else {
-				
-				go func(email, tokenInDB, userName string){
+
+				go func(email, tokenInDB, userName string) {
 					Sendmail(email, tokenInDB, userName)
-				}(email, tokenInDB, userName)		
+				}(email, tokenInDB, userName)
 			}
 			return
 		}
@@ -422,10 +422,10 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			//sends email to user
-			go func(email, token, userName string){
+			go func(email, token, userName string) {
 				Sendmail(email, token, userName)
 			}(email, token, userName)
-			
+
 			//setting up player's rating
 			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, bulletRD=?, blitzRD=?, standardRD=?")
 			if err != nil {

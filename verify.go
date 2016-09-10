@@ -43,7 +43,7 @@ func chessVerify(source string, target string, promotion string, gameID int16) b
 
 	//identifying the piece that was selected
 	piece := Verify.AllTables[gameID].ChessBoard[newSourceRow][newSourceCol]
-	
+
 	//no piece was selected
 	if piece[0:1] == "-" {
 		return false
@@ -51,7 +51,6 @@ func chessVerify(source string, target string, promotion string, gameID int16) b
 	//piece without color specification
 	noColorPiece := piece[1:2]
 	colorOnly := piece[0:1]
-	
 
 	if (Verify.AllTables[gameID].whiteTurn == true && colorOnly == "b") || (Verify.AllTables[gameID].whiteTurn == false && colorOnly == "w") || source == "-" {
 		return false
@@ -125,7 +124,7 @@ func chessVerify(source string, target string, promotion string, gameID int16) b
 		return false
 
 	}
-	if promotion != ""{
+	if promotion != "" {
 		Verify.AllTables[gameID].promotion = promotion
 	}
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
@@ -232,9 +231,9 @@ func makeMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, pi
 	//if pawn reaches the 8th or 1st rank auto promote to queen for now
 
 	if targetRow == 0 && piece == "wP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + strings.ToUpper(Verify.AllTables[gameID].promotion) 
+		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + strings.ToUpper(Verify.AllTables[gameID].promotion)
 	} else if targetRow == 7 && piece == "bP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "b" + strings.ToUpper(Verify.AllTables[gameID].promotion) 
+		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "b" + strings.ToUpper(Verify.AllTables[gameID].promotion)
 	} else {
 		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = piece //place the piece to its new target square
 	}
