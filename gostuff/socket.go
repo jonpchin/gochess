@@ -118,8 +118,7 @@ func EnterChess(ws *websocket.Conn) {
 //returns the total number of seeks that a player has pending in the lobby
 func countMatches(player string) int8 { //player should have no more then 3 seeks at a time
 
-	var total int8
-	total = 0
+	var total int8 = 0
 
 	for _, match := range Pending.Matches {
 		if match.Name == player {

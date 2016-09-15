@@ -105,7 +105,6 @@ window.onload = function() {
 		document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + whiteName + "'>" + whiteName + "</a>(" + whiteR +")";
 		document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + blackName  + "'>" + blackName + "</a>(" + blackR +")";			
 
-		
 		var review = JSON.parse(reviewMoves);
 		var length = 0;
 		if(review !== null){

@@ -57,7 +57,7 @@ var onDragStart = function(source, piece, position, orientation) {
     }
 };
 
-var onDrop = function(source, target) {
+var onDrop = function(source, target, piece) {
 
 	//game.turn() returns back "w" for white or "b" for black
 	var color = game.turn();
@@ -75,7 +75,7 @@ var onDrop = function(source, target) {
 	}
 	if (togglePromotion === "false" && skipPromotion === false){
 		//check if its a pawn promotion
-		isPromote = checkPawnPromote(source, target, color);
+		isPromote = checkPawnPromote(source, target, piece);
 		if(isPromote){
 			
 			//this function will set the pawPromotion global variable
@@ -201,14 +201,14 @@ function getCookie(cname) { //gets cookies value
     return "";
 }
 //returns true if its a pawn promotion
-function checkPawnPromote(source, target, color){
+function checkPawnPromote(source, target, piece){
 	
-	if(color === "w"){
+	if(piece === "wP"){
 		if(source[1] === "7" && target[1] === "8"){
 			return true;
 		}
 	}
-	else{
+	else if(piece === "bP"){
 		if(source[1] === "2" && target[1] === "1"){
 			return true;
 		}

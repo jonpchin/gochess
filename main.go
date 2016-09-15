@@ -52,11 +52,11 @@ func main() {
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
-    
-	go func(){
+
+	go func() {
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./../backup")
-	
+
 		//setting up cron job
 		gostuff.StartCron()
 		//removes games older then 30 days from database
@@ -68,11 +68,11 @@ func main() {
 			gostuff.RemoveOldForgot(days)
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
-//			gostuff.ExportDatabase()
+			//			gostuff.ExportDatabase()
 		}
-		
+
 		//gostuff.SpawnProcess()
-	
+
 		//setting up clean up function for graceful shutdown
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
@@ -193,7 +193,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				
+
 				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var lobby = template.Must(template.ParseFiles("lobby.html"))
 				var bulletRating, blitzRating, standardRating int16
@@ -224,7 +224,7 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				
+
 				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var memberChess = template.Must(template.ParseFiles("memberchess.html"))
 				p := gostuff.Person{User: username.Value}
@@ -272,7 +272,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				
+
 				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var all []gostuff.GoGame
 				var ratErr string
@@ -348,7 +348,7 @@ func settings(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
-			
+
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 				w.Header().Set("Cache-Control", "private, max-age=86400")
 				http.ServeFile(w, r, "settings.html")
@@ -366,7 +366,7 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				
+
 				w.Header().Set("Cache-Control", "private, max-age=3600")
 				var highscores = template.Must(template.ParseFiles("highscore.html"))
 
@@ -391,7 +391,7 @@ func saved(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-			
+
 				w.Header().Set("Cache-Control", "private, max-age=86400")
 				var all []gostuff.GoGame
 
