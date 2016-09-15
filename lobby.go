@@ -60,7 +60,6 @@ func (c *Connection) LobbyConnect() {
 					}
 					start = time.Now()
 					counter = 0
-
 				}
 				go func() {
 					for _, cs := range Chat.Lobby {
@@ -82,7 +81,6 @@ func (c *Connection) LobbyConnect() {
 					}
 					result := string(match)
 					websocket.Message.Send(c.websocket, result)
-
 				}
 
 			case "fetch_players":
@@ -283,7 +281,6 @@ func (c *Connection) LobbyConnect() {
 
 					} else {
 						game.WhiteRating = standard
-
 					}
 
 					game.BlackRating = Pending.Matches[match.MatchID].Rating

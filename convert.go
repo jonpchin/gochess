@@ -19,14 +19,7 @@ type ConvertChessGame struct {
 	BlackElo  string
 	ECO       string
 	EventDate string
-	Moves     []ConvertMove
-}
-
-//similar to Move struct except it contains a promote property
-type ConvertMove struct {
-	S string
-	T string
-	P string //promition, check whether P is "" which signifies there is no promotion involved
+	Moves     []Move
 }
 
 //converts text file pgn and prints it out
@@ -48,7 +41,7 @@ func ConvertPGN() {
 		}
 
 		// print out tags
-		//        fmt.Println(game.Tags["Site"])
+		// fmt.Println(game.Tags["Site"])
 
 		newGame.Event = game.Tags["Event"]
 		newGame.Site = game.Tags["Site"]
@@ -63,7 +56,7 @@ func ConvertPGN() {
 		newGame.EventDate = game.Tags["EventDate"]
 
 		var temp string
-		newGame.Moves = make([]ConvertMove, len(game.Moves))
+		newGame.Moves = make([]Move, len(game.Moves))
 		for key, move := range game.Moves {
 
 			temp = move.String()[0:2]
@@ -86,7 +79,7 @@ func ConvertPGN() {
 		}
 
 		storeGrandMaster(&newGame, allMoves)
-		//		fmt.Println(newGame)
+		//fmt.Println(newGame)
 
 	}
 }

@@ -88,7 +88,7 @@ func DbSetup(backup string) bool {
 			if result == false {
 				result = importTemplateDatabase()
 				if result == false {
-					fmt.Println(" database.go Dbsetup FAILED to import both databases!")
+					fmt.Println("database.go Dbsetup FAILED to import both databases!")
 					return false
 				} else {
 					fmt.Println("Template database sucessfully imported!")
