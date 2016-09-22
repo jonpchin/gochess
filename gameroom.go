@@ -253,6 +253,23 @@ func (c *Connection) ChessConnect() {
 				delete(All.Games, game.ID)
 				delete(Verify.AllTables, game.ID)
 
+			case "update_spectate":
+				
+				var game ChessGame	
+				
+				err := json.Unmarshal(message, &game)
+				if err != nil {
+					fmt.Println("Just receieved a message I couldn't decode:")
+					fmt.Println(string(message))
+					fmt.Println("gameroom.go 1 ChessConnect 2 ", err.Error())
+					break
+				}
+				Verify.AllTables[game.ID].spectate = game.Spectate;
+				fmt.Println(game)
+					
+			case "spectate_game":
+				fmt.Println("Game is being spectated")
+			
 			case "offer_draw":
 
 				var game GameMove

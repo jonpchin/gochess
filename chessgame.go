@@ -25,6 +25,7 @@ type ChessGame struct {
 	WhiteMilli   int
 	PendingDraw  bool   //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
+	Spectate     bool
 }
 
 //source and destination of piece moves
@@ -112,6 +113,7 @@ type Table struct {
 
 	moveCount int    //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string //keeps track of the piece that is being promoted too
+	spectate  bool
 }
 
 //active and running games on the server
