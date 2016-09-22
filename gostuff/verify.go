@@ -228,7 +228,6 @@ func makeMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, pi
 	capturedPiece := Verify.AllTables[gameID].ChessBoard[targetRow][targetCol]
 	//make the source square blank as now the piece is no longer there
 	Verify.AllTables[gameID].ChessBoard[sourceRow][sourceCol] = "-"
-	//if pawn reaches the 8th or 1st rank auto promote to queen for now
 
 	if targetRow == 0 && piece == "wP" {
 		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + strings.ToUpper(Verify.AllTables[gameID].promotion)

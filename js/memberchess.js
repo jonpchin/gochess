@@ -40,6 +40,7 @@ var blackClock = new Tock({
 //getting user preferences
 var toggleSound = getCookie("sound");
 var toggleChat = getCookie("chat");
+var toggleSpectate = getCookie("spectate");
 
 //store initial game time and whether game is rated, used for rematch
 var timeGet;
@@ -256,6 +257,19 @@ window.onload = function() {
 				document.getElementById("abortButton").disabled = false;
 				document.getElementById("drawButton").disabled = false;
 				document.getElementById("resignButton").disabled = false;
+				
+				// if spectate is turned off then other people cannot view this game
+				if(toggleSpectate !== "false"){
+					var spectateMessage = {
+						Type: "update_spectae",
+						Name: user,
+						ID: matchID
+						Spectate: "Yes"
+					}
+				    sock.send(JSON.stringify(spectateMessage));	
+					console.log("Spectate is on");
+				}
+				
 				//storing matchID in global variable used in sending moves for verification
 				matchID = json.ID;
 				WhiteSide = json.WhitePlayer;

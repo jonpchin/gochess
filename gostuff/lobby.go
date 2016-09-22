@@ -126,7 +126,7 @@ func (c *Connection) LobbyConnect() {
 					}
 					break
 				}
-
+						
 				//verify.go
 				if checkTime(match.TimeControl) == false {
 					fmt.Println("An invalid time control has been selected.")
@@ -316,6 +316,7 @@ func (c *Connection) LobbyConnect() {
 				game.BlackMilli = 0
 				game.PendingDraw = false
 				game.Rated = Pending.Matches[match.MatchID].Rated
+				game.Spectate = false
 
 				var start int16 = 0
 				for {

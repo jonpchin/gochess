@@ -154,11 +154,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 
 		//checking if token matches the one entered by user
 		err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userName).Scan(&tokenInDB)
-		if err2 != nil {
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination"))
-			log.Println("account.go processActivate 1", err2)
-		}
-		if tokenInDB != token {
+		if err2 != nil || tokenInDB != token {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination"))
 			browser := r.UserAgent()
 			log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
@@ -190,10 +186,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		//now user may login so we can redirect while token deletion proceeds in the background
 		message := "<script>window.location = 'login?user=" + userName + "';</script>"
 		w.Write([]byte(message))
-
-		// this is safe
-		//db.Query("SELECT name FROM users WHERE age=?", req.FormValue("age"))
-
+		
 		stmt, err = db.Prepare("DELETE FROM activate where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 15."))
