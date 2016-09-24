@@ -261,15 +261,14 @@ func (c *Connection) ChessConnect() {
 				if err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
 					fmt.Println(string(message))
-					fmt.Println("gameroom.go 1 ChessConnect 2 ", err.Error())
+					fmt.Println("gameroom.go 1 ChessConnect updateSpectate ", err.Error())
 					break
 				}
 				Verify.AllTables[game.ID].spectate = game.Spectate;
-				fmt.Println(game)
 					
 			case "spectate_game":
 				fmt.Println("Game is being spectated")
-			
+
 			case "offer_draw":
 
 				var game GameMove
@@ -299,30 +298,19 @@ func (c *Connection) ChessConnect() {
 				//2 means the game is a draw and stored as an int in the database
 				All.Games[game.ID].Result = 2
 
-				//rate.go
-				if All.Games[game.ID].Rated == "Yes" {
-					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
-				}
-
 				//closing web socket on front end for self and opponent
 				websocket.Message.Send(Active.Clients[t.Name], reply)
 
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
 				}
-
-				//now store game in MySQL database
-				allMoves, err := json.Marshal(All.Games[game.ID].GameMoves)
-				if err != nil {
-					fmt.Println("Error marshalling data to store in MySQL")
+				
+				//rate.go
+				if All.Games[game.ID].Rated == "Yes" {
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
 				}
-				//gets length of all the moves in the game
-				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
-				storeGame(totalMoves, allMoves, All.Games[game.ID])
 
-				//now delete game from memory
-				delete(All.Games, game.ID)
-				delete(Verify.AllTables, game.ID)
+				wrapUpGame(game.ID)
 
 			case "game_over":
 				var game Fin
@@ -373,19 +361,6 @@ func (c *Connection) ChessConnect() {
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
 
-				//now store game in MySQL database
-				allMoves, err := json.Marshal(All.Games[game.ID].GameMoves)
-				if err != nil {
-					fmt.Println("Error marshalling data to store in MySQL")
-				}
-
-				storeGame(totalMoves, allMoves, All.Games[game.ID])
-
-				//update ratings
-				if All.Games[game.ID].Rated == "Yes" {
-					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
-				}
-
 				//notifying players game is over
 				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
 					fmt.Println("error gameover 1 gameroom.go error is ", err)
@@ -394,10 +369,14 @@ func (c *Connection) ChessConnect() {
 					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
 						fmt.Println("gameroom.go gameover 2 error is ", err)
 					}
+				}				
+				
+				//update ratings
+				if All.Games[game.ID].Rated == "Yes" {
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
 				}
-
-				delete(All.Games, game.ID)
-				delete(Verify.AllTables, game.ID)
+				
+				wrapUpGame(game.ID)
 
 			case "resign":
 
@@ -422,31 +401,19 @@ func (c *Connection) ChessConnect() {
 
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
-
-				//now store game in MySQL database
-				allMoves, err := json.Marshal(All.Games[game.ID].GameMoves)
-				if err != nil {
-					fmt.Println("Error marshalling data to store in MySQL")
-				}
-				//gets length of all the moves in the game
-				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
-
-				storeGame(totalMoves, allMoves, All.Games[game.ID])
-
-				//rate.go
-				if All.Games[game.ID].Rated == "Yes" {
-					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
-				}
-
+				
 				//letting both players know that a resignation occured
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
 				}
+				websocket.Message.Send(Active.Clients[t.Name], reply)				
+				
+				//rate.go
+				if All.Games[game.ID].Rated == "Yes" {
+					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
+				}
+				wrapUpGame(game.ID)				
 
-				websocket.Message.Send(Active.Clients[t.Name], reply)
-
-				delete(All.Games, game.ID)
-				delete(Verify.AllTables, game.ID)
 			case "rematch":
 
 				var match SeekMatch
@@ -689,19 +656,7 @@ func (c *Connection) ChessConnect() {
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
 				}
-
-				//now store game in MySQL database
-				allMoves, err := json.Marshal(All.Games[game.ID].GameMoves)
-				if err != nil {
-					fmt.Println("Error marshalling data to store in MySQL")
-				}
-				//gets length of all the moves in the game
-				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
-				storeGame(totalMoves, allMoves, All.Games[game.ID])
-
-				//now delete game from memory
-				delete(All.Games, game.ID)
-				delete(Verify.AllTables, game.ID)
+				wrapUpGame(game.ID)
 
 			default:
 				fmt.Println("I'm not familiar with type " + t.Type)
@@ -711,4 +666,21 @@ func (c *Connection) ChessConnect() {
 			return
 		}
 	}
+}
+
+// Cleanup function to store in database and delete from memory
+func wrapUpGame(id int16){
+	
+	//now store game in MySQL database
+	allMoves, err := json.Marshal(All.Games[id].GameMoves)
+	if err != nil {
+		fmt.Println("Error marshalling data to store in MySQL")
+	}
+	//gets length of all the moves in the game
+	totalMoves := (len(All.Games[id].GameMoves) + 1) / 2
+	storeGame(totalMoves, allMoves, All.Games[id])
+
+	//now delete game from memory
+	delete(All.Games, id)
+	delete(Verify.AllTables, id)
 }

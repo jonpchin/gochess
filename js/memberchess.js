@@ -261,9 +261,9 @@ window.onload = function() {
 				// if spectate is turned off then other people cannot view this game
 				if(toggleSpectate !== "false"){
 					var spectateMessage = {
-						Type: "update_spectae",
+						Type: "update_spectate",
 						Name: user,
-						ID: matchID
+						ID: matchID,
 						Spectate: "Yes"
 					}
 				    sock.send(JSON.stringify(spectateMessage));	

@@ -316,7 +316,7 @@ func (c *Connection) LobbyConnect() {
 				game.BlackMilli = 0
 				game.PendingDraw = false
 				game.Rated = Pending.Matches[match.MatchID].Rated
-				game.Spectate = false
+				game.Spectate = "No"
 
 				var start int16 = 0
 				for {
