@@ -119,7 +119,7 @@ window.onload = function() {
 			var move = game.move({
 			    from: review[i].S,
 			    to: review[i].T,
-			    promotion: review[i].P // NOTE: always promote to a queen for example simplicity
+			    promotion: review[i].P
 		    });	
 
 		    updateStatus();
@@ -291,7 +291,7 @@ window.onload = function() {
 						var move = game.move({
 						    from: json.GameMoves[i].S,
 						    to: json.GameMoves[i].T,
-						    promotion: 'q' // NOTE: always promote to a queen for example simplicity
+						    promotion: json.GameMoves[i].P // NOTE: always promote to a queen for example simplicity
 					     });
 					
 			
