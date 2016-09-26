@@ -668,7 +668,7 @@ func (c *Connection) ChessConnect() {
 	}
 }
 
-// Cleanup function to store in database and delete from memory
+// Cleanup function to store game in database and delete from memory
 func wrapUpGame(id int16){
 	
 	//now store game in MySQL database
