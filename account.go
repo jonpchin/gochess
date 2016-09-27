@@ -140,7 +140,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		userName := template.HTMLEscapeString(r.FormValue("user"))
 		token := template.HTMLEscapeString(r.FormValue("token"))
 
-		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY|log.Lshortfile, 0666)
 		defer problems.Close()
 		log.SetOutput(problems)
 

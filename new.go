@@ -41,6 +41,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	passWord := template.HTMLEscapeString(r.FormValue("password"))
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	logger := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 	defer problems.Close()
 	log.SetOutput(problems)
 
@@ -74,7 +75,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		err2 := db.QueryRow("SELECT password, verify, captcha, email FROM userinfo WHERE username=?", userName).Scan(&pass, &verify, &captcha, &email)
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
-			log.Println("Incorrect login for ", userName)
+			logger.Println("Incorrect login for ", userName)
 			return
 		}
 
