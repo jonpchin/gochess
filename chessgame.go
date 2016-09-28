@@ -49,6 +49,13 @@ type ClockMove struct {
 	BlackMilli   int
 }
 
+// used to unmarshall game ID that is being observed by player(Name)
+type SpectateGame struct {
+	Type string
+	ID   int16
+	Name string
+}
+
 //only holds source and destination, as well as pawn promotion
 type Move struct {
 	S string
