@@ -41,13 +41,13 @@ func UpdateHighScore() {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	var score ScoreBoard
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN! scoreboard.go @updateHighScore() ping")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 	var query string
@@ -57,7 +57,7 @@ func UpdateHighScore() {
 	rows, err := db.Query(query)
 
 	if err != nil {
-		log.Println("scoreBoard.go updateHighScore() 1 ", err)
+		log.Println(err)
 		return
 	}
 	defer rows.Close()
@@ -66,7 +66,7 @@ func UpdateHighScore() {
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Bullet[i].Name, &score.Bullet[i].Rating); err != nil {
-			log.Println("scoreBoard.go updateHighScore() 2 ", err)
+			log.Println(err)
 		}
 		//fmt.Printf("name is %s rating is %d\n", score.Bullet[i].Name, score.Bullet[i].Rating)
 		score.Bullet[i].Index = i + 1
@@ -80,14 +80,14 @@ func UpdateHighScore() {
 	rows, err = db.Query(query)
 
 	if err != nil {
-		log.Println("scoreBoard.go updateHighScore() 3 ", err)
+		log.Println(err)
 		return
 	}
 
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Blitz[i].Name, &score.Blitz[i].Rating); err != nil {
-			log.Println("scoreBoard.go updateHighScore() 4 ", err)
+			log.Println(err)
 		}
 
 		score.Blitz[i].Index = i + 1
@@ -101,14 +101,14 @@ func UpdateHighScore() {
 	rows, err = db.Query(query)
 
 	if err != nil {
-		log.Println("scoreBoard.go updateHighScore() 5 ", err)
+		log.Println(err)
 		return
 	}
 
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Standard[i].Name, &score.Standard[i].Rating); err != nil {
-			log.Println("scoreBoard.go updateHighScore() 6 ", err)
+			log.Println(err)
 		}
 
 		score.Standard[i].Index = i + 1
@@ -122,14 +122,14 @@ func UpdateHighScore() {
 	rows, err = db.Query(query)
 
 	if err != nil {
-		log.Println("scoreBoard.go updateHighScore() 7 ", err)
+		log.Println(err)
 		return
 	}
 
 	for rows.Next() {
 
 		if err := rows.Scan(&score.Recent[i].Name, &score.Recent[i].Date); err != nil {
-			log.Println("scoreBoard.go updateHighScore() 8 ", err)
+			log.Println(err)
 		}
 
 		score.Recent[i].Index = i + 1

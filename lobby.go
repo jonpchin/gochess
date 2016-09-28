@@ -17,11 +17,8 @@ func (c *Connection) LobbyConnect() {
 	start := time.Now()
 
 	logFile, _ := os.OpenFile("logs/chat.txt", os.O_APPEND|os.O_WRONLY, 0666)
-
 	defer logFile.Close()
-
-	// direct all log messages to log.txt
-	log.SetOutput(logFile)
+	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
 
 	for {
 		var reply string
@@ -101,7 +98,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("match lobby.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", c.clientIP, err.Error())
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -126,7 +123,7 @@ func (c *Connection) LobbyConnect() {
 					}
 					break
 				}
-						
+
 				//verify.go
 				if checkTime(match.TimeControl) == false {
 					fmt.Println("An invalid time control has been selected.")
@@ -238,7 +235,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("error 10 lobby.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", c.clientIP, err.Error())
 					}
 					break
 				}

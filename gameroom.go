@@ -254,9 +254,9 @@ func (c *Connection) ChessConnect() {
 				delete(Verify.AllTables, game.ID)
 
 			case "update_spectate":
-				
-				var game ChessGame	
-				
+
+				var game ChessGame
+
 				err := json.Unmarshal(message, &game)
 				if err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
@@ -264,8 +264,8 @@ func (c *Connection) ChessConnect() {
 					fmt.Println("gameroom.go 1 ChessConnect updateSpectate ", err.Error())
 					break
 				}
-				Verify.AllTables[game.ID].spectate = game.Spectate;
-					
+				Verify.AllTables[game.ID].spectate = game.Spectate
+
 			case "spectate_game":
 				fmt.Println("Game is being spectated")
 
@@ -304,7 +304,7 @@ func (c *Connection) ChessConnect() {
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
 				}
-				
+
 				//rate.go
 				if All.Games[game.ID].Rated == "Yes" {
 					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, 0.5)
@@ -369,13 +369,13 @@ func (c *Connection) ChessConnect() {
 					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
 						fmt.Println("gameroom.go gameover 2 error is ", err)
 					}
-				}				
-				
+				}
+
 				//update ratings
 				if All.Games[game.ID].Rated == "Yes" {
 					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
 				}
-				
+
 				wrapUpGame(game.ID)
 
 			case "resign":
@@ -401,18 +401,18 @@ func (c *Connection) ChessConnect() {
 
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
-				
+
 				//letting both players know that a resignation occured
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
 				}
-				websocket.Message.Send(Active.Clients[t.Name], reply)				
-				
+				websocket.Message.Send(Active.Clients[t.Name], reply)
+
 				//rate.go
 				if All.Games[game.ID].Rated == "Yes" {
 					ComputeRating(t.Name, game.ID, All.Games[game.ID].GameType, result)
 				}
-				wrapUpGame(game.ID)				
+				wrapUpGame(game.ID)
 
 			case "rematch":
 
@@ -669,8 +669,8 @@ func (c *Connection) ChessConnect() {
 }
 
 // Cleanup function to store game in database and delete from memory
-func wrapUpGame(id int16){
-	
+func wrapUpGame(id int16) {
+
 	//now store game in MySQL database
 	allMoves, err := json.Marshal(All.Games[id].GameMoves)
 	if err != nil {
