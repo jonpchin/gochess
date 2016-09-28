@@ -268,6 +268,17 @@ func (c *Connection) ChessConnect() {
 
 			case "spectate_game":
 				fmt.Println("Game is being spectated")
+				
+				var spectate SpectateGame
+				
+				if err := json.Unmarshal(message, &spectate); err != nil {
+					fmt.Println("Just receieved a message I couldn't decode:")
+					fmt.Println(string(reply))
+					fmt.Println("gameroom.go spectate_game ", err.Error())
+					break
+				}
+				// search table of games for the ID in spectate and return the data back
+				// to the spectator
 
 			case "offer_draw":
 

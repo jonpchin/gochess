@@ -80,6 +80,7 @@ window.onload = function() {
 	
 	var token = parseUrl();
 	var reviewMoves = token.moves;
+	var observeGame = token.spectate;
 
 	if (typeof reviewMoves !== "undefined"){
 		
@@ -134,6 +135,16 @@ window.onload = function() {
 		}
 		onSnapEnd();
 		return; //prevents game from loading if game is being reviewed	
+	}
+	else if(typeof observeGame !== "undefined"){
+		console.log("Game is currently being spectated");
+		
+		var message = {
+			Type:  "spectate_game",
+			Name:  user,
+			ID:    id
+		}
+	    sock.send(JSON.stringify(message));
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
 	$('#exportPGN').hide();
