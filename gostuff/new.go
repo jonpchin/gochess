@@ -41,9 +41,8 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	passWord := template.HTMLEscapeString(r.FormValue("password"))
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	logger := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	capID := template.HTMLEscapeString(r.FormValue("captchaId"))
 	capSol := template.HTMLEscapeString(r.FormValue("captchaSolution"))
@@ -62,7 +61,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		key := hex.EncodeToString(dk)
 		if err1 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 25"))
-			log.Println("new.go ProcessLogin 1 ", err1)
+			log.Println(err1)
 			return
 		}
 
@@ -75,7 +74,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		err2 := db.QueryRow("SELECT password, verify, captcha, email FROM userinfo WHERE username=?", userName).Scan(&pass, &verify, &captcha, &email)
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
-			logger.Println("Incorrect login for ", userName)
+			log.Println("Incorrect login for ", userName)
 			return
 		}
 
@@ -98,14 +97,14 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				log.Println("Error in captcha section 3")
+				log.Println(err)
 				return
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				log.Println("Error in captcha section 4")
+				log.Println(err)
 			}
 			return
 		}
@@ -119,7 +118,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//checking if token matches the one entered by user
 			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", userName).Scan(&tokenInDB, &email)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 3 ", err2)
+				log.Println(err2)
 			} else {
 				go func(email, tokenInDB, userName string) {
 					Sendmail(email, tokenInDB, userName)
@@ -137,7 +136,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 		_, err = stmt.Exec(0, userName)
 		if err != nil {
-			log.Println("new.go ProcessLogin 5 ", err)
+			log.Println(err)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Error in captcha section 4"))
 			return
 		}
@@ -165,7 +164,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		//check if database connection is open
 		if db.Ping() != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Error 24"))
-			log.Println("new.go DATABASE DOWN!")
+			log.Println("DATABASE DOWN!")
 			return
 		}
 
@@ -174,7 +173,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		key := hex.EncodeToString(dk)
 		if err1 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 25"))
-			log.Println("error in hasing password new.go ", err1)
+			log.Println(err1)
 			return
 		}
 
@@ -189,7 +188,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			//check if there was more then one incorrect login attempt
-			log.Println("new.go ProcessLogin error 6", err2)
+			log.Println(err2)
 			return
 		}
 
@@ -199,28 +198,28 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//increment captcha counter
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				log.Println("new.go ProcessLogin error 7")
+				log.Println(err)
 				return
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				log.Println("new.go ProcessLogin error 8")
+				log.Println(err)
 				return
 			}
 
 			//create activation token in database and send user notifying them that their was five incorrect login attempts
 			stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 			if err != nil {
-				log.Println("new.go ProcessLogin 9 ", err)
+				log.Println(err)
 				return
 			}
 			date := time.Now()
 			token = RandomString()
 			_, err = stmt.Exec(userName, token, email, date)
 			if err != nil {
-				log.Println("new.go ProcessLogin 10 ", err)
+				log.Println(err)
 				return
 			}
 			//sends email to user with the token activation
@@ -234,7 +233,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 			err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userName).Scan(&token)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 11 ", err2)
+				log.Println(err2)
 				return
 			}
 
@@ -253,13 +252,13 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 			if err != nil {
-				log.Println("new.go ProcessLogin 12 ", err)
+				log.Println(err)
 			}
 			captcha = captcha + 1
 
 			_, err = stmt.Exec(captcha, userName)
 			if err != nil {
-				log.Println("new.go ProcessLogin 13 ", err)
+				log.Println(err)
 			}
 			return
 		}
@@ -273,7 +272,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//checking if token matches the one entered by user
 			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", userName).Scan(&tokenInDB, &email)
 			if err2 != nil {
-				log.Println("new.go ProcessLogin 14 ", err2)
+				log.Println(err2)
 			} else {
 
 				go func(email, tokenInDB, userName string) {
@@ -286,12 +285,12 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		if err != nil {
-			log.Println("new.go ProcessLogin 15 ", err)
+			log.Println(err)
 		}
 
 		_, err = stmt.Exec(0, userName)
 		if err != nil {
-			log.Println("new.go ProcessLogin 16 ", err)
+			log.Println(err)
 		}
 
 		expiration := time.Now().Add(3 * 24 * time.Hour)
@@ -347,13 +346,12 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 			problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 			defer problems.Close()
-
-			log.SetOutput(problems)
+			log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 			//check if database connection is open
 			if db.Ping() != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 27"))
-				log.Println("new.go processRegister 1 DATABASE DOWN!")
+				log.Println("DATABASE DOWN!")
 				return
 			}
 
@@ -378,7 +376,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			key := hex.EncodeToString(dk)
 			if err1 != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 28"))
-				log.Println("new.go processRegister 2 ", err)
+				log.Println(err)
 				return
 			}
 
@@ -386,7 +384,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			stmt, err := db.Prepare("INSERT userinfo SET username=?, password=?, email=?, date=?, time=?, host=?, verify=?, captcha=?")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 29"))
-				log.Println("new.go processRegister 3 ", err)
+				log.Println(err)
 				return
 			}
 
@@ -394,14 +392,14 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			res, err := stmt.Exec(userName, key, email, date, date, r.RemoteAddr, "NO", 0)
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 30"))
-				log.Println("new.go processRegister 4 ", err)
+				log.Println(err)
 				return
 			}
 
 			id, err := res.LastInsertId()
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 31"))
-				log.Println("new.go processRegister 5 ", err)
+				log.Println(err)
 				return
 			}
 			log.Printf("Account %s and id %d was created in userinfo table.\n", userName, id)
@@ -412,14 +410,14 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 32"))
-				log.Println("new.go processRegister 6 ", err)
+				log.Println(err)
 				return
 			}
 
 			res, err = stmt.Exec(userName, token, email, date)
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 33"))
-				log.Println("error in executing token activation new.go", err)
+				log.Println(err)
 				return
 			}
 			//sends email to user
@@ -431,7 +429,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, bulletRD=?, blitzRD=?, standardRD=?")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 34"))
-				log.Println("new.go processRegister 7 ", err)
+				log.Println(err)
 				return
 
 			}
@@ -439,7 +437,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			res, err = stmt.Exec(userName, "1500", "1500", "1500", "350.0", "350.0", "350.0")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 35"))
-				log.Println("error in setting up player's rating new.go", err)
+				log.Println(err)
 				return
 			}
 		}

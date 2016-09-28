@@ -31,7 +31,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 
 		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 		defer problems.Close()
-		log.SetOutput(problems)
+		log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 		//check if password and confirm match
 		if passWord != confirm {
@@ -78,20 +78,20 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		key := hex.EncodeToString(dk)
 		if err1 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 4."))
-			log.Println("account.go processResetPass 3 ", err)
+			log.Println(err)
 			return
 		}
 
 		res, err := stmt.Exec(key, userName)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 5."))
-			log.Println("account.go processResetPass 4 ", err)
+			log.Println(err)
 			return
 		}
 		affect, err := res.RowsAffected()
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 6."))
-			log.Println("account.go processResetPass 5 ", err)
+			log.Println(err)
 			return
 		}
 
@@ -101,21 +101,21 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		stmt, err = db.Prepare("DELETE FROM forgot where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 7."))
-			log.Println("account.go processResetPass 6 ", err)
+			log.Println(err)
 			return
 		}
 
 		res, err = stmt.Exec(userName)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 8"))
-			log.Println("account.go processResetPass 7 ", err)
+			log.Println(err)
 			return
 		}
 		stmt.Close()
 		affect, err = res.RowsAffected()
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 9."))
-			log.Println("account.go processResetPass 8 ", err)
+			log.Println(err)
 			return
 		}
 
@@ -140,14 +140,14 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		userName := template.HTMLEscapeString(r.FormValue("user"))
 		token := template.HTMLEscapeString(r.FormValue("token"))
 
-		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY|log.Lshortfile, 0666)
+		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 		defer problems.Close()
-		log.SetOutput(problems)
+		log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 		//check if database connection is open
 		if db.Ping() != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png'/> We are having trouble with our server. Report to admin Error 11"))
-			log.Println("DATABASE DOWN! account.go ProcessActivate 0")
+			log.Println("DATABASE DOWN!")
 			return
 		}
 		var tokenInDB string
@@ -164,20 +164,20 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		stmt, err := db.Prepare("UPDATE userinfo SET verify=?, captcha=? where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 12."))
-			log.Println("account.go processActivate 2 ", err)
+			log.Println(err)
 			return
 		}
 
 		res, err := stmt.Exec("YES", 0, userName)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 13."))
-			log.Println("account.go processActivate 3 ", err)
+			log.Println(err)
 			return
 		}
 		affect, err := res.RowsAffected()
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 14."))
-			log.Println("account.go processActivate 4 ", err)
+			log.Println(err)
 			return
 		}
 
@@ -186,26 +186,25 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		//now user may login so we can redirect while token deletion proceeds in the background
 		message := "<script>window.location = 'login?user=" + userName + "';</script>"
 		w.Write([]byte(message))
-		
+
 		stmt, err = db.Prepare("DELETE FROM activate where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 15."))
-			log.Println("account.go processActivate 5 ", err)
+			log.Println(err)
 			return
 		}
 
 		res, err = stmt.Exec(userName)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 16."))
-			log.Println("account.go processActivate 6 ", err)
-
+			log.Println(err)
 			return
 		}
 		stmt.Close()
 		affect, err = res.RowsAffected()
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 17."))
-			log.Println("account.go processActivate 7 ", err)
+			log.Println(err)
 			return
 		}
 		log.Printf("%d row was deleted from the activate table by user %s\n", affect, userName)
@@ -233,7 +232,7 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 
 		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 		defer problems.Close()
-		log.SetOutput(problems)
+		log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 		//check if database connection is open
 		if db.Ping() != nil {
@@ -244,9 +243,8 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		//checking if email and username entered matches what is in database
 		err2 := db.QueryRow("SELECT email FROM userinfo WHERE username=?", userName).Scan(&match)
 		if err2 != nil {
-
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong email/username combination."))
-			log.Println("account.go processForgot 1 ", err2)
+			log.Println(err2)
 			return
 		}
 		if match != email {
@@ -270,23 +268,22 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		//preparing token activation
 		stmt, err := db.Prepare("INSERT forgot SET username=?, token=?, expire=?")
 		if err != nil {
-
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Report to admin Error 20"))
-			log.Println("account.go processForgot 2 ", err)
+			log.Println(err)
 			return
 		}
 		date := time.Now()
 		res, err := stmt.Exec(userName, token, date)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Report to admin Error 21"))
-			log.Println("account.go processForgot 3 ", err)
+			log.Println(err)
 			return
 		}
 		stmt.Close()
 		affect, err := res.RowsAffected()
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Report to admin Error 22"))
-			log.Println("account.go processForgot 4 ", err)
+			log.Println(err)
 			return
 		}
 

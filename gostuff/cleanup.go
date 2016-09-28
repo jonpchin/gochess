@@ -56,11 +56,11 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("cleanup.go saveGame 0 DATABASE DOWN!")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 
@@ -68,7 +68,7 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 		" whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?," +
 		" whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
 	if err != nil {
-		log.Println("Cleanup.go saveGame 1 ", err)
+		log.Println(err)
 		return
 	}
 	date := time.Now()
@@ -77,12 +77,12 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 		game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves,
 		game.Status, date, date)
 	if err != nil {
-		log.Println("Cleanup.go saveGame 2 ", err)
+		log.Println(err)
 		return
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
-		log.Println("Cleanup.go saveGame 3 ", err)
+		log.Println(err)
 		return
 	}
 	log.Printf("Game ID %d has been updated in the saved table.\n", id)
