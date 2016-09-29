@@ -19,7 +19,7 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
@@ -30,54 +30,54 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 	stmt, err := db.Prepare("update rating set bulletRD=bulletRD+1 where bulletRD < 250")
 
 	if err != nil {
-		log.Println("cron.go 1", err)
+		log.Println(err)
 		return
 	}
 
 	res, err := stmt.Exec()
 	if err != nil {
-		log.Println("cron.go 2 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println("cron.go 3 ", err)
+		log.Println(err)
 	}
 	log.Printf("%d rows were updated in bullet ratingRD table.\n", affect)
 
 	stmt, err = db.Prepare("update rating set blitzRD=blitzRD+1 where blitzRD < 250")
 
 	if err != nil {
-		log.Println("cron.go 4 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err = stmt.Exec()
 	if err != nil {
-		log.Println("cron.go 5 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err = res.RowsAffected()
 	if err != nil {
-		log.Println("cron.go 6 ", err)
+		log.Println(err)
 	}
 	log.Printf("%d rows were updated in blitz ratingRD table.\n", affect)
 
 	stmt, err = db.Prepare("update rating set standardRD=standardRD+1 where standardRD < 250")
 
 	if err != nil {
-		log.Println("cron.go 7 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err = stmt.Exec()
 	if err != nil {
-		log.Println("cron.go 7 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err = res.RowsAffected()
 	if err != nil {
-		log.Println("cron.go 8 ", err)
+		log.Println(err)
 	}
 	log.Printf("%d rows were updated in standard ratingRD table.\n", affect)
 }
@@ -88,29 +88,29 @@ func RemoveOldGames(days string) {
 	//DELETE FROM games WHERE date < NOW() - INTERVAL 100 DAY;
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN! @RemoveOldGames() ping")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 
 	stmt, err := db.Prepare("DELETE FROM games WHERE date < NOW() - INTERVAL " + days + " DAY")
 
 	if err != nil {
-		log.Println("cron.go 9 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err := stmt.Exec()
 	if err != nil {
-		log.Println("cron.go 10 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println("cron.go 11 ", err)
+		log.Println(err)
 	}
 	log.Printf("%d rows were deleted from games because they were older then "+days+" days.\n", affect)
 }
@@ -119,29 +119,29 @@ func RemoveOldGames(days string) {
 func RemoveOldActivate(days string) {
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN! @RemoveOldActivate() ping")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 
 	stmt, err := db.Prepare("DELETE FROM activate WHERE expire < NOW() - INTERVAL " + days + " DAY")
 
 	if err != nil {
-		log.Println("cron.go 12 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err := stmt.Exec()
 	if err != nil {
-		log.Println("cron.go 13 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println("cron.go 14 ", err)
+		log.Println(err)
 	}
 	log.Printf("%d rows were deleted from activate table because they were older then "+days+" days.\n", affect)
 }
@@ -151,29 +151,29 @@ func RemoveOldActivate(days string) {
 func RemoveOldForgot(days string) {
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN! @RemoveOldForgot() ping")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 
 	stmt, err := db.Prepare("DELETE FROM forgot WHERE expire < NOW() - INTERVAL " + days + " DAY")
 
 	if err != nil {
-		log.Println("cron.go 15 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err := stmt.Exec()
 	if err != nil {
-		log.Println("cron.go 16 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println("cron.go 17 ", err)
+		log.Println(err)
 	}
 	log.Printf("%d rows were deleted from forgot table because they were older then "+days+" days.\n", affect)
 }

@@ -6,12 +6,6 @@ import (
 	"sync"
 )
 
-//used to identify what kind of message it for incoming socket messages for JSON and check authentication
-type APITypeOnly struct {
-	Type string
-	Name string
-}
-
 //used to identify who the socket connection is
 type Connection struct {
 	username     string
@@ -60,7 +54,8 @@ var Chat = struct {
 	Lobby map[string]*websocket.Conn
 }{Lobby: make(map[string]*websocket.Conn)}
 
-//used to display online players
+// stores information of players that are online
+// used to identify what kind of message it for incoming socket messages for JSON and check authentication
 type Online struct {
 	Type string
 	Name string

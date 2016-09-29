@@ -121,6 +121,7 @@ type Table struct {
 	moveCount int    //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string //keeps track of the piece that is being promoted too
 	spectate  string
+	observers []string // list of user names who are observing this table
 }
 
 //active and running games on the server

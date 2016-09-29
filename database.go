@@ -163,11 +163,11 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN! @GetRating() ping")
+		log.Println("DATABASE DOWN!")
 		return "Database down", 0, 0, 0
 	}
 
@@ -176,7 +176,7 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 		name).Scan(&bullet, &blitz, &standard)
 
 	if err2 != nil {
-		log.Println("database.go GetRating 1 ", err2)
+		log.Println(err2)
 		return "No such player", 0, 0, 0
 	}
 	return "", bullet, blitz, standard
@@ -188,11 +188,11 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("DATABASE DOWN! @GetRatingAndRD()")
+		log.Println("DATABASE DOWN!")
 		return "DB down @GetRatingAndRD()", 0, 0, 0, 0, 0, 0
 	}
 
@@ -202,7 +202,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 		&bulletRD, &blitzRD, &standardRD)
 
 	if err2 != nil {
-		log.Println("database.go GetRating 2 ", err2)
+		log.Println(err2)
 		return "No such player", 0, 0, 0, 0, 0, 0
 	}
 	return "", bullet, blitz, standard, bulletRD, blitzRD, standardRD
@@ -214,11 +214,11 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("database.go updateRating 1 DATABASE DOWN!")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 
@@ -226,18 +226,18 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	stmt, err := db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType +
 		"RD=?" + " where username=?")
 	if err != nil {
-		log.Println("database.go updateRating 2 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err := stmt.Exec(whiteRating, whiteRD, white)
 	if err != nil {
-		log.Println("database.go updateRating 3 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println("database.go updateRating 4 ", err)
+		log.Println(err)
 		return
 	}
 
@@ -247,18 +247,18 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	stmt, err = db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType +
 		"RD=?" + " where username=?")
 	if err != nil {
-		log.Println("database.go updateRating 5 ", err)
+		log.Println(err)
 		return
 	}
 
 	res, err = stmt.Exec(blackRating, blackRD, black)
 	if err != nil {
-		log.Println("database.go updateRating 6 ", err)
+		log.Println(err)
 		return
 	}
 	affect, err = res.RowsAffected()
 	if err != nil {
-		log.Println("database.go updateRating 7 ", err)
+		log.Println(err)
 		return
 	}
 
@@ -271,11 +271,11 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		log.Println("database.go storeGame 1 DATABASE DOWN!")
+		log.Println("DATABASE DOWN!")
 		return
 	}
 
@@ -284,7 +284,7 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 		"whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, " +
 		"result=?, status=?, date=?, time=?")
 	if err != nil {
-		log.Println("database.go storeGame 2 ", err)
+		log.Println(err)
 		return
 	}
 	date := time.Now()
@@ -292,7 +292,7 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 		game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves,
 		game.Result, game.Status, date, date)
 	if err != nil {
-		log.Println("database.go storeGame 3 ", err)
+		log.Println(err)
 		return
 	}
 	id, err := res.LastInsertId()
@@ -308,11 +308,11 @@ func GetGames(name string) (storage []GoGame) {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	rows, err := db.Query("SELECT * FROM games WHERE white=? or black=?", name, name)
 	if err != nil {
-		log.Println("database.go GetGames 1 ", err)
+		log.Println(err)
 	}
 	defer rows.Close()
 
@@ -325,7 +325,7 @@ func GetGames(name string) (storage []GoGame) {
 			&all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
 		if err != nil {
 
-			log.Println("database.go GetGames 2 ", err)
+			log.Println(err)
 		}
 		storage = append(storage, all)
 	}
@@ -335,11 +335,11 @@ func GetGames(name string) (storage []GoGame) {
 func GetSaved(name string) (storage []GoGame) {
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	rows, err := db.Query("SELECT * FROM saved WHERE white=? or black=?", name, name)
 	if err != nil {
-		log.Println("database.go GetSaved 1 ", err)
+		log.Println(err)
 	}
 	defer rows.Close()
 
@@ -352,7 +352,7 @@ func GetSaved(name string) (storage []GoGame) {
 			&all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total,
 			&all.Status, &all.Date, &all.Time)
 		if err != nil {
-			log.Println("database.go GetSaved 2 ", err)
+			log.Println(err)
 		}
 		storage = append(storage, all)
 	}
@@ -364,7 +364,7 @@ func fetchSavedGame(id string, user string) bool {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
-	log.SetOutput(problems)
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
 	var white string
 	var black string
@@ -388,7 +388,7 @@ func fetchSavedGame(id string, user string) bool {
 		&blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves,
 		&totalmoves, &status)
 	if err != nil {
-		log.Println("database.go fetchSavedGame 1 ", err)
+		log.Println(err)
 	}
 
 	var game ChessGame
@@ -400,7 +400,7 @@ func fetchSavedGame(id string, user string) bool {
 	storage := []byte(moves)
 	err = json.Unmarshal(storage, &holder)
 	if err != nil {
-		log.Println("database.go fetchSavedGame 2", err)
+		log.Println(err)
 	}
 	game.GameMoves = holder
 	game.WhitePlayer = white
@@ -458,22 +458,21 @@ func fetchSavedGame(id string, user string) bool {
 	//delete saved game from database now that its in memory
 	stmt, err := db.Prepare("DELETE FROM saved where id=?")
 	if err != nil {
-		log.Println("database.go fetchSavedGame 3 ", err)
+		log.Println(err)
 		return false
 	}
 
 	res, err := stmt.Exec(id)
 	if err != nil {
-		log.Println("database.go fetchSavedGame 4 ", err)
+		log.Println(err)
 		return false
 	}
 	stmt.Close()
 	affect, err := res.RowsAffected()
 	if err != nil {
-		log.Println("database.go fetchSavedGame 5 ", err)
+		log.Println(err)
 		return false
 	}
 	log.Printf("%d row was deleted from the saved table by user %s\n", affect, user)
-
 	return true
 }
