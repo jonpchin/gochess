@@ -28,7 +28,7 @@ func (c *Connection) LobbyConnect() {
 			break
 		}
 
-		var t APITypeOnly
+		var t Online
 		message := []byte(reply)
 		if err := json.Unmarshal(message, &t); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:")
@@ -61,7 +61,6 @@ func (c *Connection) LobbyConnect() {
 				go func() {
 					for _, cs := range Chat.Lobby {
 						if err := websocket.Message.Send(cs, reply); err != nil {
-
 							// we could not send the message to a peer
 							fmt.Println("lobby.go error 2 Could not send message to ", c.clientIP, err.Error())
 						}
@@ -224,13 +223,13 @@ func (c *Connection) LobbyConnect() {
 				if err := json.Unmarshal(message, &match); err != nil {
 					log.Println("Just receieved a message I couldn't decode:")
 					log.Println(string(reply))
-					log.Println("lobby.go error 11 Exact error: " + err.Error())
+					log.Println(err.Error())
 					break
 				}
 
 				//check if player already has a game started, if there is a game in progress alert player
 				if isPlayerInGame(match.Name, match.Opponent) == true {
-					log.Println("lobby.go Player already has a game. ")
+					log.Println("Player already has a game. ")
 					//alerting player
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
@@ -265,10 +264,9 @@ func (c *Connection) LobbyConnect() {
 
 				//seting up the game info such as white/black player, time control, etc
 				rand.Seed(time.Now().UnixNano())
-				randomNum := rand.Intn(2)
 
 				//randomly selects both players to be white or black
-				if randomNum == 0 {
+				if rand.Intn(2) == 0 {
 					game.WhitePlayer = match.Name
 					if game.GameType == "bullet" {
 						game.WhiteRating = bullet

@@ -466,7 +466,9 @@ window.onload = function() {
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " Your can only have a max of three pending matches." + '\n');
 				break;
-	
+			case "spectate_game":
+				console.log("You are now spectating a game.");
+				break;
 			case "massMessage":
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " " + json.Text + '\n');

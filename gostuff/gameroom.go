@@ -20,9 +20,7 @@ func (c *Connection) ChessConnect() {
 	logFile, _ := os.OpenFile("logs/chat.txt", os.O_APPEND|os.O_WRONLY, 0666)
 
 	defer logFile.Close()
-
-	// direct all log messages to log.txt
-	log.SetOutput(logFile)
+	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
 
 	for {
 		var reply string
@@ -32,7 +30,7 @@ func (c *Connection) ChessConnect() {
 			break
 		}
 
-		var t APITypeOnly
+		var t Online
 		message := []byte(reply)
 		if err := json.Unmarshal(message, &t); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:")
@@ -261,7 +259,7 @@ func (c *Connection) ChessConnect() {
 				if err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
 					fmt.Println(string(message))
-					fmt.Println("gameroom.go 1 ChessConnect updateSpectate ", err.Error())
+					fmt.Println("gameroom.go ChessConnect updateSpectate ", err.Error())
 					break
 				}
 				Verify.AllTables[game.ID].spectate = game.Spectate
@@ -273,12 +271,41 @@ func (c *Connection) ChessConnect() {
 				
 				if err := json.Unmarshal(message, &spectate); err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(reply))
-					fmt.Println("gameroom.go spectate_game ", err.Error())
+					fmt.Println(string(message))
+					fmt.Println("gameroom.go spectate_game 1", err.Error())
 					break
 				}
 				// search table of games for the ID in spectate and return the data back
 				// to the spectator
+				if _, ok := Verify.AllTables[spectate.ID]; ok {
+			
+					var game ChessGame
+					game.Type         = "spectate_game"
+					game.WhitePlayer  = All.Games[spectate.ID].WhitePlayer
+					game.BlackPlayer  = All.Games[spectate.ID].BlackPlayer
+					game.WhiteRating  = All.Games[spectate.ID].WhiteRating
+					game.BlackRating  = All.Games[spectate.ID].BlackRating
+					game.GameMoves    = All.Games[spectate.ID].GameMoves
+					game.Status       = All.Games[spectate.ID].Status
+					game.Result       = All.Games[spectate.ID].Result
+					game.GameType     = All.Games[spectate.ID].GameType
+					game.TimeControl  = All.Games[spectate.ID].TimeControl  
+					game.BlackMinutes = All.Games[spectate.ID].BlackMinutes
+					game.BlackSeconds = All.Games[spectate.ID].WhiteSeconds
+					game.WhiteMinutes = All.Games[spectate.ID].WhiteMinutes 
+					
+					
+					viewGame, err := json.Marshal(game)
+					if err != nil{
+						fmt.Println("Just receieved a message I couldn't encode:")
+						fmt.Println("gameroom.go spectate_game 2", err.Error())
+						break
+					}
+					
+					if _, ok := Active.Clients[spectate.Name]; ok { // send data if other guy is still connected
+						websocket.Message.Send(Active.Clients[spectate.Name], string(viewGame))
+					}
+				}
 
 			case "offer_draw":
 
@@ -329,7 +356,7 @@ func (c *Connection) ChessConnect() {
 
 				if err := json.Unmarshal(message, &game); err != nil {
 					log.Println("Just receieved a message I couldn't decode:")
-					log.Println(string(reply))
+					log.Println(string(message))
 					log.Println("Connection.go error 11 Exact error: " + err.Error())
 					break
 				}
@@ -430,7 +457,7 @@ func (c *Connection) ChessConnect() {
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(reply))
+					fmt.Println(string(message))
 					fmt.Println("Exact error: " + err.Error())
 					break
 				}
@@ -502,12 +529,12 @@ func (c *Connection) ChessConnect() {
 				Pending.Matches[start] = &match
 
 				if _, ok := PrivateChat[match.Opponent]; ok {
-					log.Println("rematch 1 gameroom.go Player already has a game. ")
+					log.Println("Player already has a game. ")
 
 					t.Type = "rematch"
 					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("rematch 2 gameroom.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", c.clientIP, err.Error())
 					}
 				}
 
@@ -517,8 +544,8 @@ func (c *Connection) ChessConnect() {
 				var game ChessGame
 				if err := json.Unmarshal(message, &match); err != nil {
 					log.Println("Just receieved a message I couldn't decode:")
-					log.Println(string(reply))
-					log.Println("Connection.go error 11 Exact error: " + err.Error())
+					log.Println(string(message))
+					log.Println(err.Error())
 					break
 				}
 				//isPlayerInGame function is located in socket.go
