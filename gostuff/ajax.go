@@ -14,16 +14,28 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPlayerData(w http.ResponseWriter, r *http.Request) { //displays player data when mouse hovers over
-	userName := template.HTMLEscapeString(r.FormValue("username"))
-
-	if len(userName) < 3 || len(userName) > 12 {
+	username, err := r.Cookie("username")
+	if err != nil{
+		return
+	}
+	
+	sessionID, err := r.Cookie("sessionID")
+	if err != nil{
+		return
+	}
+	
+	if SessionManager[username.Value] != sessionID.Value {
+		return
+	}
+	
+	if len(username.Value) < 3 || len(username.Value) > 12 {
 		w.Write([]byte("Invalid name"))
 		return
 	}
 
 	//getting player raating
-	err, bulletRating, blitzRating, standardRating := GetRating(userName)
-	if err != "" {
+	ratingError, bulletRating, blitzRating, standardRating := GetRating(username.Value)
+	if ratingError != "" {
 		w.Write([]byte("Service is down."))
 		return
 	}
@@ -36,12 +48,12 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) { //displays player d
 	status := ""
 	icon := "ready"
 	//second username is nil as it only checks one name
-	if isPlayerInGame(userName, "") == true {
-		status = "vs. " + PrivateChat[userName]
+	if isPlayerInGame(username.Value, "") == true {
+		status = "vs. " + PrivateChat[username.Value]
 		icon = "playing"
 	}
 
-	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" + userName + " " + status +
+	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" + username.Value + " " + status +
 		"<br><img src='../img/icons/bullet.png' alt='bullet'>" + bullet +
 		"<img src='../img/icons/blitz.png' alt='blitz'>" + blitz +
 		"<img src='../img/icons/standard.png' alt='standard'>" + standard

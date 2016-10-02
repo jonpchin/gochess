@@ -324,8 +324,6 @@ function getPlayerInfo(name){ //returns all three ratings of players and if ther
     $.ajax({
   		url: 'getPlayerData',
    		type: 'post',
-   		dataType: 'html',
-   		data : { 'username': name},
    		success : function(data) {			
       		$('#playerData').html(data);	
    		}	

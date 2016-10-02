@@ -52,7 +52,7 @@ type ClockMove struct {
 // used to unmarshall game ID that is being observed by player(Name)
 type SpectateGame struct {
 	Type string
-	ID   int16
+	ID   int16 `json:"ID,string"`
 	Name string
 }
 

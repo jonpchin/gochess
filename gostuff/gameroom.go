@@ -278,7 +278,8 @@ func (c *Connection) ChessConnect() {
 				// search table of games for the ID in spectate and return the data back
 				// to the spectator
 				if _, ok := Verify.AllTables[spectate.ID]; ok {
-			
+					
+					/*
 					var game ChessGame
 					game.Type         = "spectate_game"
 					game.WhitePlayer  = All.Games[spectate.ID].WhitePlayer
@@ -293,18 +294,24 @@ func (c *Connection) ChessConnect() {
 					game.BlackMinutes = All.Games[spectate.ID].BlackMinutes
 					game.BlackSeconds = All.Games[spectate.ID].WhiteSeconds
 					game.WhiteMinutes = All.Games[spectate.ID].WhiteMinutes 
+					*/
 					
-					
-					viewGame, err := json.Marshal(game)
+					viewGame, err := json.Marshal(All.Games[spectate.ID])
 					if err != nil{
 						fmt.Println("Just receieved a message I couldn't encode:")
 						fmt.Println("gameroom.go spectate_game 2", err.Error())
 						break
 					}
 					
-					if _, ok := Active.Clients[spectate.Name]; ok { // send data if other guy is still connected
-						websocket.Message.Send(Active.Clients[spectate.Name], string(viewGame))
-					}
+					// send data to all spectators
+					if _, ok := Active.Clients[spectate.Name]; ok { 
+						err := websocket.Message.Send(Active.Clients[spectate.Name], string(viewGame))
+						if err != nil{
+							fmt.Println(err)
+						}
+					}					
+				}else{
+					log.Println(t.Name, " tried viewing a game that doesn't exist.")
 				}
 
 			case "offer_draw":

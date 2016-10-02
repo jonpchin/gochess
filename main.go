@@ -42,6 +42,7 @@ func main() {
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
 	http.HandleFunc("/resumeGame", gostuff.ResumeGame)
+//	http.HandleFunc("/isPlayerInGame", gostuff.isPlayerInGame)
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 

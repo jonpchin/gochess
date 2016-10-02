@@ -80,8 +80,7 @@ window.onload = function() {
 	
 	var token = parseUrl();
 	var reviewMoves = token.moves;
-	var observeGame = token.spectate;
-
+	
 	if (typeof reviewMoves !== "undefined"){
 		
 		reviewGame = true;
@@ -136,19 +135,10 @@ window.onload = function() {
 		onSnapEnd();
 		return; //prevents game from loading if game is being reviewed	
 	}
-	else if(typeof observeGame !== "undefined"){
-		console.log("Game is currently being spectated");
-		
-		var message = {
-			Type:  "spectate_game",
-			Name:  user,
-			ID:    id
-		}
-	    sock.send(JSON.stringify(message));
-	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
 	$('#exportPGN').hide();
-	sock = new WebSocket(wsuri);
+	
+	sock = new WebSocket(wsuri);	
 	$(window).on('beforeunload', function(){
 		sock.close();
 	});  
@@ -163,12 +153,36 @@ window.onload = function() {
 		}
 	    sock.send(JSON.stringify(message));
 		
-		//checks to see if a game exist for the player in order to resume the game
-		var checkGame = {
-			Type: "chess_game",
-			Name: user
+		var observeGame = token.spectate;
+		
+		 $.ajax({
+	  		url: 'isPlayerInGame',
+	   		type: 'post',
+	   		dataType: 'html',
+	   		data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
+	   		success : function(data) {			
+	      		$('#submit-result').html(data);	
+	   		}	
+	    });
+		
+		// Only allow a player to either view a game or play an on going game
+		if(typeof observeGame !== "undefined"){
+			console.log("Game is currently being spectated");
+			
+			var message = {
+				Type:  "spectate_game",
+				Name:  user,
+				ID:    token.id.toString()
+			}
+		    sock.send(JSON.stringify(message));
+		}else{
+			//checks to see if a game exist for the player in order to resume the game
+			var checkGame = {
+				Type: "chess_game",
+				Name: user
+			}
+			sock.send(JSON.stringify(checkGame));
 		}
-		sock.send(JSON.stringify(checkGame));
     }
 	
     sock.onclose = function(e) {
@@ -208,7 +222,6 @@ window.onload = function() {
 				//disables abort button
 				if($('#abortButton').is(':disabled') === false && moves.length >= 1){
 					document.getElementById("abortButton").disabled = true; 
-					
 				}
 				board.move(json.Source + "-" + json.Target);
 				moveCounter++;
@@ -468,6 +481,8 @@ window.onload = function() {
 				break;
 			case "spectate_game":
 				console.log("You are now spectating a game.");
+				console.log(json.WhitePlayer);
+				console.log(json.BlackPlayer);
 				break;
 			case "massMessage":
 				var datetime = timeStamp();
@@ -488,6 +503,7 @@ window.onload = function() {
 				console.log("Unknown API type json.Type is " + json.Type);
 		}
     }
+	
 	document.getElementById('sendMessage').onclick = function(){
 	    var msg = document.getElementById('message').value;
 		
