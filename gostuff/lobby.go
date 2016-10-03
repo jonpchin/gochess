@@ -346,7 +346,7 @@ func (c *Connection) LobbyConnect() {
 				PrivateChat[acceptmatch.TargetPlayer] = acceptmatch.Name
 
 				//intitalizes all the variables of the game
-				initGame(game.ID)
+				initGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
 
 				startGame, _ := json.Marshal(acceptmatch)
 

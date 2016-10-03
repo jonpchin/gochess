@@ -322,7 +322,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 func logout(w http.ResponseWriter, r *http.Request) {
 
 	username, err := r.Cookie("username")
-	if err == nil {
+	if err == nil && len(username.Value) >= 3 && len(username.Value) <= 12 {
 
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {

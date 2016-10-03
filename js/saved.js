@@ -7,7 +7,6 @@ function resumeGame(id, white, black){
    		dataType: 'html',
    		data : {'id': id, 'white': white, 'black': black},
    		success : function(data) {			
-//      	$('#submit-result').html(data);	
 			if(data === "true"){
 				window.location = "/chess/memberChess";
 			}

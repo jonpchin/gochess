@@ -9,7 +9,7 @@ var moveSound = new Audio('../sound/chessmove.mp3');
 var gameSound = new Audio('../sound/startgame.mp3');
 
 //global array of FEN strings, used when pressing back button
-var totalFEN = []
+var totalFEN = [];
 
 var whiteClock = new Tock({
 	countdown: true,
@@ -154,35 +154,25 @@ window.onload = function() {
 	    sock.send(JSON.stringify(message));
 		
 		var observeGame = token.spectate;
-		
-		 $.ajax({
-	  		url: 'isPlayerInGame',
-	   		type: 'post',
-	   		dataType: 'html',
-	   		data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
-	   		success : function(data) {			
-	      		$('#submit-result').html(data);	
-	   		}	
-	    });
-		
-		// Only allow a player to either view a game or play an on going game
+
+		// If a game is being spectated then do not load chess_game
 		if(typeof observeGame !== "undefined"){
-			console.log("Game is currently being spectated");
-			
+				console.log("Game is currently being spectated");
+				
 			var message = {
 				Type:  "spectate_game",
 				Name:  user,
 				ID:    token.id.toString()
 			}
-		    sock.send(JSON.stringify(message));
+			sock.send(JSON.stringify(message));
 		}else{
-			//checks to see if a game exist for the player in order to resume the game
-			var checkGame = {
+			var chess_game = {
 				Type: "chess_game",
 				Name: user
 			}
-			sock.send(JSON.stringify(checkGame));
+			sock.send(JSON.stringify(chess_game));
 		}
+		
     }
 	
     sock.onclose = function(e) {

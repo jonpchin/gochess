@@ -146,7 +146,7 @@ var Verify = struct {
 var PrivateChat = make(map[string]string)
 
 //intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
-func initGame(gameID int16) {
+func initGame(gameID int16, name string, fighter string) {
 
 	//setting up back end move verification
 	var table Table
@@ -203,4 +203,8 @@ func initGame(gameID int16) {
 	Verify.AllTables[gameID].moveCount = 0
 
 	Verify.AllTables[gameID].promotion = "q" //default to queen promotion
+	
+	// the players playing the game are also observers
+	Verify.AllTables[gameID].observers = append(Verify.AllTables[gameID].observers, name)
+	Verify.AllTables[gameID].observers = append(Verify.AllTables[gameID].observers, fighter)
 }

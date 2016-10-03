@@ -266,7 +266,6 @@ func (c *Connection) ChessConnect() {
 
 			case "spectate_game":
 				fmt.Println("Game is being spectated")
-				
 				var spectate SpectateGame
 				
 				if err := json.Unmarshal(message, &spectate); err != nil {
@@ -275,26 +274,14 @@ func (c *Connection) ChessConnect() {
 					fmt.Println("gameroom.go spectate_game 1", err.Error())
 					break
 				}
+				
+				defer func(name string, id int16){
+					Verify.AllTables[spectate.ID].observers = removeViewer(name, id)
+				}(t.Name, spectate.ID)
+				
 				// search table of games for the ID in spectate and return the data back
 				// to the spectator
 				if _, ok := Verify.AllTables[spectate.ID]; ok {
-					
-					/*
-					var game ChessGame
-					game.Type         = "spectate_game"
-					game.WhitePlayer  = All.Games[spectate.ID].WhitePlayer
-					game.BlackPlayer  = All.Games[spectate.ID].BlackPlayer
-					game.WhiteRating  = All.Games[spectate.ID].WhiteRating
-					game.BlackRating  = All.Games[spectate.ID].BlackRating
-					game.GameMoves    = All.Games[spectate.ID].GameMoves
-					game.Status       = All.Games[spectate.ID].Status
-					game.Result       = All.Games[spectate.ID].Result
-					game.GameType     = All.Games[spectate.ID].GameType
-					game.TimeControl  = All.Games[spectate.ID].TimeControl  
-					game.BlackMinutes = All.Games[spectate.ID].BlackMinutes
-					game.BlackSeconds = All.Games[spectate.ID].WhiteSeconds
-					game.WhiteMinutes = All.Games[spectate.ID].WhiteMinutes 
-					*/
 					
 					viewGame, err := json.Marshal(All.Games[spectate.ID])
 					if err != nil{
@@ -304,11 +291,12 @@ func (c *Connection) ChessConnect() {
 					}
 					
 					// send data to all spectators
-					if _, ok := Active.Clients[spectate.Name]; ok { 
-						err := websocket.Message.Send(Active.Clients[spectate.Name], string(viewGame))
+					for _, name := range Verify.AllTables[spectate.ID].observers {
+						fmt.Println(name)
+						err := websocket.Message.Send(Active.Clients[name], string(viewGame))
 						if err != nil{
 							fmt.Println(err)
-						}
+						}		
 					}					
 				}else{
 					log.Println(t.Name, " tried viewing a game that doesn't exist.")
@@ -647,7 +635,7 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//intitalizes all the variables of the game
-				initGame(game.ID)
+				initGame(game.ID, game.WhitePlayer, game.BlackPlayer)
 
 				startGame, _ := json.Marshal(game)
 
