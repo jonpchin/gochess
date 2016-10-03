@@ -434,7 +434,7 @@ func fetchSavedGame(id string, user string) bool {
 	All.Games[start] = &game
 
 	//intitalizes all the variables of the game
-	initGame(game.ID)
+	initGame(game.ID, white, black)
 
 	var result bool
 	total := len(game.GameMoves)

@@ -218,3 +218,15 @@ func removePendingMatches(name string) {
 		}
 	}
 }
+
+//remove player from the table that they were viewing when they leave the chess room
+func removeViewer(name string, id int16) []string {
+
+	var remainingViewers []string
+    for _, value := range Verify.AllTables[id].observers {
+        if name != value {
+            remainingViewers = append(remainingViewers, value)
+        }
+    }
+    return remainingViewers
+}

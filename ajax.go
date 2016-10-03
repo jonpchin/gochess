@@ -13,9 +13,10 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(cap))
 }
 
-func GetPlayerData(w http.ResponseWriter, r *http.Request) { //displays player data when mouse hovers over
+//displays player data when mouse hovers over
+func GetPlayerData(w http.ResponseWriter, r *http.Request) { 
 	username, err := r.Cookie("username")
-	if err != nil{
+	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
 		return
 	}
 	
@@ -25,11 +26,6 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) { //displays player d
 	}
 	
 	if SessionManager[username.Value] != sessionID.Value {
-		return
-	}
-	
-	if len(username.Value) < 3 || len(username.Value) > 12 {
-		w.Write([]byte("Invalid name"))
 		return
 	}
 
@@ -62,7 +58,19 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) { //displays player d
 }
 
 func ResumeGame(w http.ResponseWriter, r *http.Request) {
-	user, _ := r.Cookie("username")
+	user, err := r.Cookie("username")
+	if err != nil || len(user.Value) < 3 || len(user.Value) > 12 {
+		return
+	}
+	
+	sessionID, err := r.Cookie("sessionID")
+	if err != nil{
+		return
+	}
+	
+	if SessionManager[user.Value] != sessionID.Value {
+		return
+	}
 	id := template.HTMLEscapeString(r.FormValue("id"))
 	white := template.HTMLEscapeString(r.FormValue("white"))
 	black := template.HTMLEscapeString(r.FormValue("black"))
