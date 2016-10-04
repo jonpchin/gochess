@@ -8,7 +8,9 @@ func TestPawn(t *testing.T) {
 
 	var legal bool
 	const gameID = 0
-	initGame(gameID)
+	// pass in blank string for white and black players as spectators
+	//don't matter for testing
+	initGame(gameID, "", "")
 
 	legal = chessVerify("e2", "e4", "", gameID)
 	if legal == false {
@@ -68,7 +70,7 @@ func TestKnght(t *testing.T) {
 
 	var legal bool
 	const gameID = 0
-	initGame(gameID)
+	initGame(gameID, "", "")
 
 	legal = chessVerify("g1", "e2", "", gameID)
 	if legal == true {
@@ -108,7 +110,7 @@ func TestBishop(t *testing.T) {
 
 	var legal bool
 	const gameID = 0
-	initGame(gameID)
+	initGame(gameID, "", "")
 
 	legal = chessVerify("f1", "b5", "", gameID)
 	if legal == true {
