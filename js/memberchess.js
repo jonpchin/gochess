@@ -171,8 +171,7 @@ window.onload = function() {
 				Name: user
 			}
 			sock.send(JSON.stringify(chess_game));
-		}
-		
+		}		
     }
 	
     sock.onclose = function(e) {

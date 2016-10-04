@@ -133,21 +133,12 @@ func (c *Connection) ChessConnect() {
 						clock.WhiteSeconds = All.Games[game.ID].WhiteSeconds
 						clock.WhiteMilli = All.Games[game.ID].WhiteMilli
 						clock.UpdateWhite = true
-
-						//check if player is still connected
-						if _, ok := Active.Clients[t.Name]; ok {
-
-							//sending clock
-							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
-								fmt.Println("gameroom.go clock 3, error sending clock")
-							}
-						}
-						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
-
-							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
-								fmt.Println("gameroom.go clock 4, error sending clock")
-							}
-						}
+						
+						for _, name := range Verify.AllTables[game.ID].observe.Names {
+							if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
+								fmt.Println("gameroom.go clock 3, error sending clock to", name)
+							}	
+						}						
 					}()
 
 				} else {
@@ -161,16 +152,12 @@ func (c *Connection) ChessConnect() {
 				move.P = game.Promotion
 				//append move to back end storage for retrieval from database later
 				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
-
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; !ok { //don't send move if other guy dropped connection
-					//fmt.Println("gameroom.go 123");
-					break
-				}
-
-				//sending move
-				if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &game); err != nil {
-					fmt.Println("error sending chess move, other player left chessConnect")
-				}
+				
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
+						fmt.Println("error sending chess move to", name)
+					}	
+				}					
 
 			case "chat_private":
 
@@ -191,22 +178,16 @@ func (c *Connection) ChessConnect() {
 					start = time.Now()
 					counter = 0
 				}
-
-				//checking if other player has disconnected from the websocket
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
-
-					//sending message to target person
-					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						// we could not send the message to a peer
-						fmt.Println("Connection.go error 5 Could not send message to ", c.clientIP, err.Error())
+				gameID, exist := getGameID(t.Name)
+				if exist {
+					for _, name := range Verify.AllTables[gameID].observe.Names {
+						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+							// we could not send the message to a peer
+							fmt.Println("Connection.go error 5 Could not send message to ", name, err.Error())
+						}
 					}
 				}
-
-				//sending message to self
-				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
-					// we could not send the message to a peer
-					fmt.Println("Connection.go error 6 Could not send message to ", c.clientIP, err.Error())
-				}
+					
 
 			case "chess_game":
 
@@ -276,7 +257,9 @@ func (c *Connection) ChessConnect() {
 				}
 				
 				defer func(name string, id int16){
-					Verify.AllTables[spectate.ID].observers = removeViewer(name, id)
+					Verify.AllTables[id].observe.Lock()
+					Verify.AllTables[id].observe.Names = removeViewer(name, id)
+					Verify.AllTables[id].observe.Unlock()
 				}(t.Name, spectate.ID)
 				
 				// search table of games for the ID in spectate and return the data back
@@ -291,7 +274,7 @@ func (c *Connection) ChessConnect() {
 					}
 					
 					// send data to all spectators
-					for _, name := range Verify.AllTables[spectate.ID].observers {
+					for _, name := range Verify.AllTables[spectate.ID].observe.Names {
 						fmt.Println(name)
 						err := websocket.Message.Send(Active.Clients[name], string(viewGame))
 						if err != nil{

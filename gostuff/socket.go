@@ -223,12 +223,23 @@ func removePendingMatches(name string) {
 func removeViewer(name string, id int16) []string {
 	
 	// TODO: Make sure to prevent race conditions for observers slice
-	
 	var remainingViewers []string
-    for _, value := range Verify.AllTables[id].observers {
+	
+    for _, value := range Verify.AllTables[id].observe.Names {
         if name != value {
             remainingViewers = append(remainingViewers, value)
         }
     }
     return remainingViewers
+}
+
+//gets the game ID that a player is currently playing
+//the bool indicates whether the player has a game playering
+func getGameID(name string) (int16, bool){
+	for key, value := range All.Games {
+		if name == value.WhitePlayer  || name == value.BlackPlayer {
+			return key, true
+		}
+	}
+	return 0, false
 }
