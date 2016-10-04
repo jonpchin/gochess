@@ -75,6 +75,12 @@ type Fin struct { //used to hold the result when a player is mated
 	Status string
 }
 
+// contains an array of names observing the table
+type Observers struct{
+	sync.RWMutex
+	Names []string
+}
+
 //used to verify players games
 type Table struct {
 	ChessBoard [][]string
@@ -121,7 +127,7 @@ type Table struct {
 	moveCount int    //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string //keeps track of the piece that is being promoted too
 	spectate  string
-	observers []string // list of user names who are observing this table
+	observe Observers // list of user names who are observing this table
 }
 
 //active and running games on the server
@@ -205,6 +211,6 @@ func initGame(gameID int16, name string, fighter string) {
 	Verify.AllTables[gameID].promotion = "q" //default to queen promotion
 	
 	// the players playing the game are also observers
-	Verify.AllTables[gameID].observers = append(Verify.AllTables[gameID].observers, name)
-	Verify.AllTables[gameID].observers = append(Verify.AllTables[gameID].observers, fighter)
+	Verify.AllTables[gameID].observe.Names = append(Verify.AllTables[gameID].observe.Names, name)
+	Verify.AllTables[gameID].observe.Names = append(Verify.AllTables[gameID].observe.Names, fighter)
 }
