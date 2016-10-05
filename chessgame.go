@@ -25,7 +25,7 @@ type ChessGame struct {
 	WhiteMilli   int
 	PendingDraw  bool   //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
-	Spectate     string
+	Spectate     bool
 }
 
 //source and destination of piece moves
@@ -54,6 +54,7 @@ type SpectateGame struct {
 	Type string
 	ID   int16 `json:"ID,string"`
 	Name string
+	Spectate string
 }
 
 //only holds source and destination, as well as pawn promotion
@@ -126,7 +127,6 @@ type Table struct {
 
 	moveCount int    //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string //keeps track of the piece that is being promoted too
-	spectate  string
 	observe Observers // list of user names who are observing this table
 }
 
