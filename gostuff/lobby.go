@@ -173,16 +173,9 @@ func (c *Connection) LobbyConnect() {
 
 				Pending.Matches[start] = &match
 
-				result, err := json.Marshal(match)
-				if err != nil {
-					fmt.Println("Just receieved a message I couldn't encode on error 8", err)
-					break
-				}
-
-				finalMessage := string(result)
 				go func() {
 					for _, cs := range Chat.Lobby {
-						if err := websocket.Message.Send(cs, finalMessage); err != nil {
+						if err := websocket.JSON.Send(cs, &match); err != nil {
 							// we could not send the message to a peer
 							fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
 						}
@@ -311,7 +304,7 @@ func (c *Connection) LobbyConnect() {
 				game.BlackMilli = 0
 				game.PendingDraw = false
 				game.Rated = Pending.Matches[match.MatchID].Rated
-				game.Spectate = "No"
+				game.Spectate = false
 
 				var start int16 = 0
 				for {
@@ -348,10 +341,8 @@ func (c *Connection) LobbyConnect() {
 				//intitalizes all the variables of the game
 				initGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
 
-				startGame, _ := json.Marshal(acceptmatch)
-
 				for _, cs := range Chat.Lobby {
-					if err := websocket.Message.Send(cs, string(startGame)); err != nil {
+					if err := websocket.JSON.Send(cs, &acceptmatch); err != nil {
 						fmt.Println("lobby.go error 12 error is ", err)
 					}
 				}

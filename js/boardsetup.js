@@ -168,8 +168,14 @@ var removeHighlights = function(color) {
     .removeClass('highlight-' + color);
 };
 
+// parse url to see if game is being spectated, if it then disable drag and drop
+var urlToken = parseUrl();
+var setDrag = true;
+if(typeof urlToken.spectate !== "undefined"){
+	setDrag = false;
+}
 var cfg = {
-	draggable: true,
+	draggable: setDrag,
 	position: 'start',
 	onDragStart: onDragStart,
 	onDrop: onDrop,
@@ -266,4 +272,14 @@ function showPawnPromotionPopup(source, target, color){
 	    pawnPromotion = 'x';
 		modal.style.display = "none";
 	}
+}
+
+function parseUrl() { //fetches all variables in url and returns them in a json struct
+  var query = location.search.substr(1);
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
 }

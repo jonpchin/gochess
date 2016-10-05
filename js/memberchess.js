@@ -152,12 +152,11 @@ window.onload = function() {
 			Text: "has joined the chess room."
 		}
 	    sock.send(JSON.stringify(message));
-		
-		var observeGame = token.spectate;
 
 		// If a game is being spectated then do not load chess_game
-		if(typeof observeGame !== "undefined"){
-				console.log("Game is currently being spectated");
+		if(typeof token.spectate !== "undefined"){
+			// since game is attempting to be spectated disable
+			// appropriate game controls and piece movement
 				
 			var message = {
 				Type:  "spectate_game",
@@ -234,6 +233,7 @@ window.onload = function() {
 					moveSound.play();
 				}
 				break;
+				
 			case "sync_clock":
 				if(user === WhiteSide){
 					if(json.UpdateWhite){
@@ -272,17 +272,18 @@ window.onload = function() {
 				document.getElementById("resignButton").disabled = false;
 				
 				// if spectate is turned off then other people cannot view this game
+				var spectateResult = "No";
 				if(toggleSpectate !== "false"){
-					var spectateMessage = {
-						Type: "update_spectate",
-						Name: user,
-						ID: matchID,
-						Spectate: "Yes"
-					}
-				    sock.send(JSON.stringify(spectateMessage));	
-					console.log("Spectate is on");
+					spectateResult = "Yes";
 				}
-				
+				var spectateMessage = {
+					Type: "update_spectate",
+					Name: user,
+					ID: matchID,
+					Spectate: spectateResult
+				}
+				sock.send(JSON.stringify(spectateMessage));	
+
 				//storing matchID in global variable used in sending moves for verification
 				matchID = json.ID;
 				WhiteSide = json.WhitePlayer;
@@ -419,10 +420,12 @@ window.onload = function() {
 				document.getElementById('textbox').innerHTML += (datetime + " " + json.Name + " resigned." + '\n');
 				gameOver();
 				break;
+				
 			case "leave":
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " " + json.Text + '\n');
 				break;
+				
 			case "abort_game":
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +" has aborted the game. "+ '\n');
@@ -457,22 +460,19 @@ window.onload = function() {
 				}else{
 					document.getElementById('textbox').innerHTML += (datetime + " Your new rating is " + json.BlackRating + '\n');
 				}
-				
 				break;
+				
 			case "rematch":
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " Your opponent offers you a rematch." + '\n');
 				document.getElementById('rematchButton').value = "Accept Rematch";
 				break;
+				
 			case "match_three":
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " Your can only have a max of three pending matches." + '\n');
 				break;
-			case "spectate_game":
-				console.log("You are now spectating a game.");
-				console.log(json.WhitePlayer);
-				console.log(json.BlackPlayer);
-				break;
+				
 			case "massMessage":
 				var datetime = timeStamp();
 				document.getElementById('textbox').innerHTML += (datetime + " " + json.Text + '\n');
@@ -697,16 +697,6 @@ function gameOver(){
 	if(toggleSound !== "false"){
 		gameSound.play();
 	}
-}
-
-function parseUrl() { //fetches all variables in url and returns them in a json struct
-  var query = location.search.substr(1);
-  var result = {};
-  query.split("&").forEach(function(part) {
-    var item = part.split("=");
-    result[item[0]] = decodeURIComponent(item[1]);
-  });
-  return result;
 }
 
 function detectMobile(){ //tries to detect if user is using a mobile device
