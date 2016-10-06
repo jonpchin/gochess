@@ -3,11 +3,12 @@ package gostuff
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/websocket"
 	"log"
 	"math/rand"
 	"os"
 	"time"
+
+	"golang.org/x/net/websocket"
 )
 
 func (c *Connection) LobbyConnect() {
@@ -69,14 +70,7 @@ func (c *Connection) LobbyConnect() {
 			case "fetch_matches":
 				//send in array instead of sending individual
 				for _, value := range Pending.Matches {
-					match, err := json.Marshal(value)
-					if err != nil {
-						fmt.Println("Just receieved a message I couldn't encode: on fetch_matches")
-						fmt.Println("Exact error: " + err.Error())
-						break
-					}
-					result := string(match)
-					websocket.Message.Send(c.websocket, result)
+					websocket.JSON.Send(c.websocket, &value)
 				}
 
 			case "fetch_players":
@@ -170,7 +164,6 @@ func (c *Connection) LobbyConnect() {
 				//value := fmt.Sprintf("%d", start)
 				match.MatchID = start
 				//used in backend to keep track of all pending games waiting for a player to accept
-
 				Pending.Matches[start] = &match
 
 				go func() {
@@ -191,8 +184,6 @@ func (c *Connection) LobbyConnect() {
 					break
 				}
 
-				//number, _ := strconv.ParseInt(match.MatchID, 10, 0)
-				//deletes key from hash table
 				delete(Pending.Matches, match.MatchID)
 
 				//deletes pending match counter
@@ -434,7 +425,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("match lobby.go Could not send message to ", c.clientIP, err.Error())
+						log.Println("match lobby.go Could not send message to ", t.Name, c.clientIP, err.Error())
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -454,19 +445,12 @@ func (c *Connection) LobbyConnect() {
 				//used in backend to keep track of all pending seeks waiting for a player to accept
 				Pending.Matches[start] = &match
 
-				result, err := json.Marshal(match)
-				if err != nil {
-					fmt.Println("Just receieved a message I couldn't encode on error 8", err)
-					break
-				}
-
-				finalMessage := string(result)
 				go func() {
 					for name, _ := range Chat.Lobby {
 						if name == match.Opponent || name == match.Name { //send to self and opponent
-							if err := websocket.Message.Send(Chat.Lobby[name], finalMessage); err != nil {
+							if err := websocket.JSON.Send(Chat.Lobby[name], &match); err != nil {
 								// we could not send the message to a peer
-								fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
+								log.Println("Could not send message to ", name, c.clientIP, err.Error())
 							}
 						}
 					}

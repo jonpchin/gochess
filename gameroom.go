@@ -3,11 +3,12 @@ package gostuff
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/websocket"
 	"log"
 	"math/rand"
 	"os"
 	"time"
+
+	"golang.org/x/net/websocket"
 )
 
 // Manages web sockets for the game room
@@ -58,7 +59,7 @@ func (c *Connection) ChessConnect() {
 				if _, ok := All.Games[game.ID]; !ok {
 					break
 				}
-				
+
 				// spectators should not be able to make moves for the two chess players
 				if t.Name != All.Games[game.ID].WhitePlayer && t.Name != All.Games[game.ID].BlackPlayer {
 					fmt.Println(t.Name, "tried to cheat by making a move as a spectator")
@@ -139,14 +140,21 @@ func (c *Connection) ChessConnect() {
 						clock.WhiteSeconds = All.Games[game.ID].WhiteSeconds
 						clock.WhiteMilli = All.Games[game.ID].WhiteMilli
 						clock.UpdateWhite = true
-						
-						for _, name := range Verify.AllTables[game.ID].observe.Names {
-							if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
-								log.Println("error sending clock to", name)
-							}	
-						}						
-					}()
 
+						for _, name := range Verify.AllTables[game.ID].observe.Names {
+							if _, ok := Active.Clients[name]; ok {
+								if err := websocket.JSON.Send(Active.Clients[name], &clock); err != nil {
+									log.Println("error sending clock to", name)
+								}
+								// do not remove self from spectator
+							} else if name != t.Name {
+								//remove spectator if they are not viewing game
+								Verify.AllTables[game.ID].observe.Lock()
+								Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
+								Verify.AllTables[game.ID].observe.Unlock()
+							}
+						}
+					}()
 				} else {
 					log.Println("Invalid game status, most likely game is over for ", t.Name)
 					break
@@ -158,18 +166,18 @@ func (c *Connection) ChessConnect() {
 				move.P = game.Promotion
 				//append move to back end storage for retrieval from database later
 				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
-				
+
 				for _, name := range Verify.AllTables[game.ID].observe.Names {
-					if _, ok := Active.Clients[name]; ok{
+					if _, ok := Active.Clients[name]; ok {
 						if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
 							log.Println("error sending chess move to", name)
 						}
-					}else{ //remove spectator if they are no longer viewing game
+					} else if name != t.Name { //remove spectator if they are no longer viewing game
 						Verify.AllTables[game.ID].observe.Lock()
 						Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
 						Verify.AllTables[game.ID].observe.Unlock()
-					}	
-				}					
+					}
+				}
 
 			case "chat_private":
 
@@ -189,36 +197,48 @@ func (c *Connection) ChessConnect() {
 					start = time.Now()
 					counter = 0
 				}
+
 				gameID, exist := getGameID(t.Name)
+
+				// spectators should not be able to send chat messages
+				if t.Name != All.Games[gameID].WhitePlayer && t.Name != All.Games[gameID].BlackPlayer {
+					log.Println(t.Name, " tried to send a chat message while spectating")
+					return
+				}
+
 				if exist {
 					for _, name := range Verify.AllTables[gameID].observe.Names {
-						if _, ok := Active.Clients[name]; ok{
+						if _, ok := Active.Clients[name]; ok {
 							if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
 								// we could not send the message to a peer
 								log.Println("Could not send message to ", name, err.Error())
 							}
+						} else if name != t.Name { //remove spectator if they are no longer viewing game
+							Verify.AllTables[gameID].observe.Lock()
+							Verify.AllTables[gameID].observe.Names = removeViewer(name, gameID)
+							Verify.AllTables[gameID].observe.Unlock()
 						}
 					}
-				// if game does not exist but user is still in chess room allow 
-				// private chat only between the two chess players	
-				}else if isPlayerInChess(t.Name) { 
+					// if game does not exist but user is still in chess room allow
+					// private chat only between the two chess players
+				} else if isPlayerInChess(t.Name) {
 					//checking if other player has disconnected from the websocket
 					if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
-	
+
 						//sending message to target person
 						if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
 							// we could not send the message to a peer
 							log.Println("Could not send message to ", PrivateChat[t.Name], err.Error())
 						}
 					}
-	
+
 					//sending message to self
 					if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
 						// we could not send the message to a peer
 						log.Println("Could not send message to ", t.Name, err.Error())
 					}
 				}
-					
+
 			case "chess_game":
 
 				//if game match was not accepted then player name will not be stored in PrivateChat from match_accept
@@ -231,9 +251,6 @@ func (c *Connection) ChessConnect() {
 					if game.WhitePlayer == t.Name || game.BlackPlayer == t.Name {
 						game.Type = "chess_game"
 
-						//storing the golang data structure as a string to be sent to front end
-						//result, _ := json.Marshal(game)
-
 						//send to self the game info
 						websocket.JSON.Send(c.websocket, &game)
 					}
@@ -243,19 +260,34 @@ func (c *Connection) ChessConnect() {
 
 				var game GameMove
 
-				json.Unmarshal(message, &game)
+				err := json.Unmarshal(message, &game)
+				if err != nil {
+					log.Println("Failed to unmarshal", err)
+				}
 				//can only abort game before move 2
 				if len(All.Games[game.ID].GameMoves) > 2 {
 					log.Println("You can only abort before move 2")
 					break
 				}
 
-				//closing web socket on front end for self and opponent
-				websocket.Message.Send(Active.Clients[t.Name], reply)
-
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
+				// spectators should not be able to abort game
+				if t.Name != All.Games[game.ID].WhitePlayer && t.Name != All.Games[game.ID].BlackPlayer {
+					log.Println(t.Name, " tried to abort game while spectating")
+					return
 				}
+
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if _, ok := Active.Clients[name]; ok {
+						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+							log.Println("error sending abort message", err)
+						}
+					} else if name != t.Name { //remove spectator if they are no longer viewing game
+						Verify.AllTables[game.ID].observe.Lock()
+						Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
+						Verify.AllTables[game.ID].observe.Unlock()
+					}
+				}
+
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
 
@@ -275,41 +307,35 @@ func (c *Connection) ChessConnect() {
 				}
 				if isSpectate.Spectate == "Yes" {
 					All.Games[isSpectate.ID].Spectate = true
-				}else{
+				} else {
 					All.Games[isSpectate.ID].Spectate = false
 				}
 
 			case "spectate_game":
 				var spectate SpectateGame
-				
+
 				if err := json.Unmarshal(message, &spectate); err != nil {
 					fmt.Println("Just receieved a message I couldn't decode:")
 					fmt.Println(string(message))
 					fmt.Println("gameroom.go spectate_game 1", err.Error())
 					break
 				}
-				
-//				defer func(name string, id int16){
-//					Verify.AllTables[id].observe.Lock()
-//					Verify.AllTables[id].observe.Names = removeViewer(name, id)
-//					Verify.AllTables[id].observe.Unlock()
-//				}(t.Name, spectate.ID)
-				
+
 				// search table of games for the ID in spectate and return the data back
 				// to the spectator
-				if _, ok := Verify.AllTables[spectate.ID]; ok {	
+				if _, ok := Verify.AllTables[spectate.ID]; ok {
 					// only send data to spectator if spectator mode is turned on
 					if All.Games[spectate.ID].Spectate {
 						// register spectator to observers list
-						Verify.AllTables[spectate.ID].observe.Names = append(Verify.AllTables[spectate.ID].observe.Names, t.Name)					
+						Verify.AllTables[spectate.ID].observe.Names = append(Verify.AllTables[spectate.ID].observe.Names, t.Name)
 						// send data to all spectator
 						err := websocket.JSON.Send(Active.Clients[t.Name], All.Games[spectate.ID])
-						if err != nil{
+						if err != nil {
 							log.Println(err)
-						}						
-					}				
-									
-				}else{
+						}
+					}
+
+				} else {
 					log.Println(t.Name, " tried viewing a game that doesn't exist.")
 				}
 
@@ -317,7 +343,17 @@ func (c *Connection) ChessConnect() {
 
 				var game GameMove
 
-				json.Unmarshal(message, &game)
+				err := json.Unmarshal(message, &game)
+				if err != nil {
+					log.Println("error unmarshalling data", err)
+					return
+				}
+
+				// spectators should not be able to offer draw while spectating
+				if t.Name != All.Games[game.ID].WhitePlayer && t.Name != All.Games[game.ID].BlackPlayer {
+					log.Println(t.Name, " tried to offer draw while spectating")
+					return
+				}
 				All.Games[game.ID].PendingDraw = true
 
 				//offering draw to opponent if he is still connected
@@ -329,8 +365,15 @@ func (c *Connection) ChessConnect() {
 
 				var game GameMove
 
-				json.Unmarshal(message, &game)
-
+				err := json.Unmarshal(message, &game)
+				if err != nil {
+					log.Println("error in unmarshalling data")
+				}
+				// spectators should not be able to accept draw while spectating
+				if t.Name != All.Games[game.ID].WhitePlayer && t.Name != All.Games[game.ID].BlackPlayer {
+					log.Println(t.Name, " tried to accept draw while spectating")
+					return
+				}
 				//if a draw was not offered then break out
 				if All.Games[game.ID].PendingDraw == false {
 					break
