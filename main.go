@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/dchest/captcha"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jonpchin/GoChess/gostuff"
-	"golang.org/x/net/websocket"
 	"html/template"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/dchest/captcha"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jonpchin/GoChess/gostuff"
+	"golang.org/x/net/websocket"
 )
 
 func main() {
