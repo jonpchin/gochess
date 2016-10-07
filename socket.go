@@ -2,8 +2,9 @@ package gostuff
 
 import (
 	"fmt"
-	"golang.org/x/net/websocket"
 	"sync"
+
+	"golang.org/x/net/websocket"
 )
 
 //used to identify who the socket connection is
@@ -133,7 +134,6 @@ func broadCast(user string) {
 	on.Name = user
 	for _, cs := range Chat.Lobby {
 		if err := websocket.JSON.Send(cs, on); err != nil {
-
 			// we could not send the message to a peer
 			fmt.Println("broadcast error ", err)
 		}
@@ -223,20 +223,20 @@ func removePendingMatches(name string) {
 func removeViewer(name string, id int16) []string {
 
 	var remainingViewers []string
-	
-    for _, value := range Verify.AllTables[id].observe.Names {
-        if name != value {
-            remainingViewers = append(remainingViewers, value)
-        }
-    }
-    return remainingViewers
+
+	for _, value := range Verify.AllTables[id].observe.Names {
+		if name != value {
+			remainingViewers = append(remainingViewers, value)
+		}
+	}
+	return remainingViewers
 }
 
 //gets the game ID that a player is currently playing
 //the bool indicates whether the player is currently playing a game
-func getGameID(name string) (int16, bool){
+func getGameID(name string) (int16, bool) {
 	for key, value := range All.Games {
-		if name == value.WhitePlayer  || name == value.BlackPlayer {
+		if name == value.WhitePlayer || name == value.BlackPlayer {
 			return key, true
 		}
 	}

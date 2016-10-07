@@ -34,9 +34,7 @@ func (c *Connection) ChessConnect() {
 		var t Online
 		message := []byte(reply)
 		if err := json.Unmarshal(message, &t); err != nil {
-			fmt.Println("Just receieved a message I couldn't decode:")
-			fmt.Println(string(reply))
-			fmt.Println("gameroom.go 1 ChessConnect 1 ", err.Error())
+			log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 			break
 		}
 		if c.username == t.Name {
@@ -48,9 +46,7 @@ func (c *Connection) ChessConnect() {
 
 				err := json.Unmarshal(message, &game)
 				if err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(message))
-					fmt.Println("gameroom.go 1 ChessConnect 2 ", err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
 
@@ -252,7 +248,9 @@ func (c *Connection) ChessConnect() {
 						game.Type = "chess_game"
 
 						//send to self the game info
-						websocket.JSON.Send(c.websocket, &game)
+						if err := websocket.JSON.Send(c.websocket, &game); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 
@@ -300,9 +298,7 @@ func (c *Connection) ChessConnect() {
 
 				err := json.Unmarshal(message, &isSpectate)
 				if err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(message))
-					fmt.Println("gameroom.go ChessConnect updateSpectate ", err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
 				if isSpectate.Spectate == "Yes" {
@@ -315,9 +311,7 @@ func (c *Connection) ChessConnect() {
 				var spectate SpectateGame
 
 				if err := json.Unmarshal(message, &spectate); err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(message))
-					fmt.Println("gameroom.go spectate_game 1", err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
 
@@ -358,7 +352,9 @@ func (c *Connection) ChessConnect() {
 
 				//offering draw to opponent if he is still connected
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
+					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
+						log.Println(err)
+					}
 				}
 
 			case "accept_draw":
@@ -389,7 +385,9 @@ func (c *Connection) ChessConnect() {
 				websocket.Message.Send(Active.Clients[t.Name], reply)
 
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
+					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
+						log.Println(err)
+					}
 				}
 
 				//rate.go
@@ -404,9 +402,7 @@ func (c *Connection) ChessConnect() {
 				var result float64
 
 				if err := json.Unmarshal(message, &game); err != nil {
-					log.Println("Just receieved a message I couldn't decode:")
-					log.Println(string(message))
-					log.Println("Connection.go error 11 Exact error: " + err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
 
@@ -450,11 +446,11 @@ func (c *Connection) ChessConnect() {
 
 				//notifying players game is over
 				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
-					fmt.Println("error gameover 1 gameroom.go error is ", err)
+					log.Println(err)
 				}
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
 					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						fmt.Println("gameroom.go gameover 2 error is ", err)
+						log.Println(err)
 					}
 				}
 
@@ -468,7 +464,9 @@ func (c *Connection) ChessConnect() {
 			case "resign":
 
 				var game GameMove
-				json.Unmarshal(message, &game)
+				if err := json.Unmarshal(message, &game); err != nil {
+					log.Println(err)
+				}
 				var result float64
 
 				if t.Name == All.Games[game.ID].WhitePlayer {
@@ -491,9 +489,13 @@ func (c *Connection) ChessConnect() {
 
 				//letting both players know that a resignation occured
 				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
+					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
+						log.Println(err)
+					}
 				}
-				websocket.Message.Send(Active.Clients[t.Name], reply)
+				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
+					log.Println(err)
+				}
 
 				//rate.go
 				if All.Games[game.ID].Rated == "Yes" {
@@ -505,9 +507,7 @@ func (c *Connection) ChessConnect() {
 
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(message))
-					fmt.Println("Exact error: " + err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
 				//check length of name to make sure its 3-12 characters long, prevent hack abuse
@@ -557,7 +557,7 @@ func (c *Connection) ChessConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Active.Clients[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -583,7 +583,7 @@ func (c *Connection) ChessConnect() {
 					t.Type = "rematch"
 					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", match.Opponent, err)
 					}
 				}
 
@@ -592,9 +592,7 @@ func (c *Connection) ChessConnect() {
 				var match SeekMatch
 				var game ChessGame
 				if err := json.Unmarshal(message, &match); err != nil {
-					log.Println("Just receieved a message I couldn't decode:")
-					log.Println(string(message))
-					log.Println(err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
 				//isPlayerInGame function is located in socket.go
@@ -695,10 +693,10 @@ func (c *Connection) ChessConnect() {
 
 				//starting game for both players
 				if err := websocket.Message.Send(Active.Clients[game.WhitePlayer], string(startGame)); err != nil {
-					fmt.Println("error accept_rematch 1 is ", err)
+					log.Println(err)
 				}
 				if err := websocket.Message.Send(Active.Clients[game.BlackPlayer], string(startGame)); err != nil {
-					fmt.Println("error accept_rematch 2 is ", err)
+					log.Println(err)
 				}
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game

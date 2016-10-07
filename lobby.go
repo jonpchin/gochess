@@ -32,9 +32,7 @@ func (c *Connection) LobbyConnect() {
 		var t Online
 		message := []byte(reply)
 		if err := json.Unmarshal(message, &t); err != nil {
-			fmt.Println("Just receieved a message I couldn't decode:")
-			fmt.Println(string(reply))
-			fmt.Println("lobby.go 1 Reader 1 ", err.Error())
+			log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 			break
 		}
 
@@ -60,10 +58,10 @@ func (c *Connection) LobbyConnect() {
 					counter = 0
 				}
 				go func() {
-					for _, cs := range Chat.Lobby {
+					for name, cs := range Chat.Lobby {
 						if err := websocket.Message.Send(cs, reply); err != nil {
 							// we could not send the message to a peer
-							fmt.Println("lobby.go error 2 Could not send message to ", c.clientIP, err.Error())
+							log.Println("Could not send message to ", name, err.Error())
 						}
 					}
 				}()
@@ -81,7 +79,9 @@ func (c *Connection) LobbyConnect() {
 
 				for key, _ := range Chat.Lobby {
 					player.Name = key
-					websocket.JSON.Send(c.websocket, player)
+					if err := websocket.JSON.Send(c.websocket, player); err != nil {
+						log.Println(err)
+					}
 				}
 
 			case "match_seek":
@@ -100,9 +100,7 @@ func (c *Connection) LobbyConnect() {
 
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(reply))
-					fmt.Println("Exact error: " + err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 					break
 				}
 
@@ -167,10 +165,10 @@ func (c *Connection) LobbyConnect() {
 				Pending.Matches[start] = &match
 
 				go func() {
-					for _, cs := range Chat.Lobby {
+					for name, cs := range Chat.Lobby {
 						if err := websocket.JSON.Send(cs, &match); err != nil {
 							// we could not send the message to a peer
-							fmt.Println("lobby.go error 9 Could not send message to ", c.clientIP, err.Error())
+							log.Println("Could not send message to ", name, err)
 						}
 					}
 				}()
@@ -178,9 +176,7 @@ func (c *Connection) LobbyConnect() {
 
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
-					fmt.Println("Just receieved a message I couldn't decode in lobby.go cancel_match:")
-					fmt.Println(string(reply))
-					fmt.Println("Exact error: " + err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 					break
 				}
 
@@ -205,9 +201,7 @@ func (c *Connection) LobbyConnect() {
 				var match SeekMatch
 				var game ChessGame
 				if err := json.Unmarshal(message, &match); err != nil {
-					log.Println("Just receieved a message I couldn't decode:")
-					log.Println(string(reply))
-					log.Println(err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 					break
 				}
 
@@ -218,7 +212,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break
 				}
@@ -334,7 +328,7 @@ func (c *Connection) LobbyConnect() {
 
 				for _, cs := range Chat.Lobby {
 					if err := websocket.JSON.Send(cs, &acceptmatch); err != nil {
-						fmt.Println("lobby.go error 12 error is ", err)
+						log.Println(err)
 					}
 				}
 
@@ -345,9 +339,7 @@ func (c *Connection) LobbyConnect() {
 
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
-					fmt.Println("Just receieved a message I couldn't decode:")
-					fmt.Println(string(reply))
-					fmt.Println("Exact error: " + err.Error())
+					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 					break
 				}
 				//check if player already has a game started, if there is a game in progress alert player
@@ -357,7 +349,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break
 				}
@@ -379,7 +371,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "absent"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
+						fmt.Println("Could not send message to ", t.Name, err)
 					}
 					break
 				}
@@ -425,7 +417,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("match lobby.go Could not send message to ", t.Name, c.clientIP, err.Error())
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -450,7 +442,7 @@ func (c *Connection) LobbyConnect() {
 						if name == match.Opponent || name == match.Name { //send to self and opponent
 							if err := websocket.JSON.Send(Chat.Lobby[name], &match); err != nil {
 								// we could not send the message to a peer
-								log.Println("Could not send message to ", name, c.clientIP, err.Error())
+								log.Println("Could not send message to ", name, err)
 							}
 						}
 					}
