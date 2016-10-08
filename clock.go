@@ -3,12 +3,13 @@ package gostuff
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/websocket"
 	"time"
+
+	"golang.org/x/net/websocket"
 )
 
 //starting white's clock first, this goroutine will keep track of both players clock for this game
-func setClocks(gameID int16, name string) {
+func setClocks(gameID int, name string) {
 
 	var result float64
 	go func() {
@@ -100,7 +101,7 @@ func setClocks(gameID int16, name string) {
 }
 
 //returns the remaining time of players's clock
-func StartClock(gameID int16, minutes int, seconds int, milliseconds int, color string) (int, int, int) {
+func StartClock(gameID int, minutes int, seconds int, milliseconds int, color string) (int, int, int) {
 
 	timerChan := time.NewTicker(time.Millisecond).C
 

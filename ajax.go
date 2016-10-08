@@ -2,10 +2,12 @@ package gostuff
 
 import (
 	"fmt"
-	"github.com/dchest/captcha"
-	"golang.org/x/net/websocket"
 	"html/template"
 	"net/http"
+	"strconv"
+
+	"github.com/dchest/captcha"
+	"golang.org/x/net/websocket"
 )
 
 func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
@@ -14,23 +16,26 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 }
 
 //displays player data when mouse hovers over
-func GetPlayerData(w http.ResponseWriter, r *http.Request) { 
+func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	username, err := r.Cookie("username")
 	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
 		return
 	}
-	
+
 	sessionID, err := r.Cookie("sessionID")
-	if err != nil{
+	if err != nil {
 		return
 	}
-	
+
 	if SessionManager[username.Value] != sessionID.Value {
 		return
 	}
 
+	// the name of the player being looked up by the AJAX call
+	lookupName := template.HTMLEscapeString(r.FormValue("user"))
+
 	//getting player raating
-	ratingError, bulletRating, blitzRating, standardRating := GetRating(username.Value)
+	ratingError, bulletRating, blitzRating, standardRating := GetRating(lookupName)
 	if ratingError != "" {
 		w.Write([]byte("Service is down."))
 		return
@@ -43,13 +48,19 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	//checking if the player is a game
 	status := ""
 	icon := "ready"
+	url := ""
+	endUrl := "" //closing the href link
 	//second username is nil as it only checks one name
-	if isPlayerInGame(username.Value, "") == true {
-		status = "vs. " + PrivateChat[username.Value]
+	if isPlayerInGame(lookupName, "") {
+		status = "vs. " + PrivateChat[lookupName]
 		icon = "playing"
+		id, _ := getGameID(lookupName)
+		url = "<a href=/chess/memberChess?spectate&id=" + strconv.Itoa(id) + ">"
+		endUrl = "</a>"
 	}
 
-	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" + username.Value + " " + status +
+	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" +
+		url + lookupName + " " + status + endUrl +
 		"<br><img src='../img/icons/bullet.png' alt='bullet'>" + bullet +
 		"<img src='../img/icons/blitz.png' alt='blitz'>" + blitz +
 		"<img src='../img/icons/standard.png' alt='standard'>" + standard
@@ -62,12 +73,12 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 	if err != nil || len(user.Value) < 3 || len(user.Value) > 12 {
 		return
 	}
-	
+
 	sessionID, err := r.Cookie("sessionID")
-	if err != nil{
+	if err != nil {
 		return
 	}
-	
+
 	if SessionManager[user.Value] != sessionID.Value {
 		return
 	}

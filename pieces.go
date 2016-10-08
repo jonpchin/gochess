@@ -12,7 +12,7 @@ func knightMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8) 
 	return false
 }
 
-func bishopMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int16) bool {
+func bishopMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -54,7 +54,7 @@ func bishopMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, 
 }
 
 //combination of bishop and rook
-func queenMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int16) bool {
+func queenMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
 
 	//check diagonals using bishop moves
 	if targetRow < sourceRow && targetCol < sourceCol && sourceRow-targetRow == sourceCol-targetCol { //left up
@@ -122,7 +122,7 @@ func queenMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, g
 	return true
 }
 
-func rookMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int16) bool {
+func rookMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
 
 	if sourceRow < targetRow && sourceCol == targetCol { //up
 		for i := sourceRow + 1; i < targetRow; i++ {
@@ -162,7 +162,7 @@ func rookMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, ga
 }
 
 //if king moves two spaces to right as white it checks for kingside castle, three spaces to the left as white checks for white queen castle
-func kingMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int16) bool {
+func kingMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
 
 	if sourceRow == targetRow && (sourceCol-targetCol == 1 || sourceCol-targetCol == -1) { //left or right
 		return true //make sure king doesn't walk into check, have a function which checks a color if it can attack that square

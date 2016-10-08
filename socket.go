@@ -29,7 +29,7 @@ type SeekMatch struct {
 	Opponent    string
 	Rating      int16  //player own rating
 	GameType    string //bullet, blitz, standard
-	MatchID     int16
+	MatchID     int
 	TimeControl int
 	MinRating   int16
 	MaxRating   int16
@@ -220,7 +220,7 @@ func removePendingMatches(name string) {
 }
 
 //remove player from the table that they were viewing when they leave the chess room
-func removeViewer(name string, id int16) []string {
+func removeViewer(name string, id int) []string {
 
 	var remainingViewers []string
 
@@ -234,7 +234,7 @@ func removeViewer(name string, id int16) []string {
 
 //gets the game ID that a player is currently playing
 //the bool indicates whether the player is currently playing a game
-func getGameID(name string) (int16, bool) {
+func getGameID(name string) (int, bool) {
 	for key, value := range All.Games {
 		if name == value.WhitePlayer || name == value.BlackPlayer {
 			return key, true

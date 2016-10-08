@@ -4,7 +4,7 @@ import "fmt"
 
 //runs through the entire ChessBoard array and searches for black pieces and brute all their possible moves
 //to see if it can capture the white king in one move
-func isWhiteInCheck(gameID int16) bool {
+func isWhiteInCheck(gameID int) bool {
 	result := canBlackKillSquare(Verify.AllTables[gameID].whiteKingX, Verify.AllTables[gameID].whiteKingY, gameID)
 	if result == true { //then white's king is in check
 		return true
@@ -12,7 +12,7 @@ func isWhiteInCheck(gameID int16) bool {
 	return false
 }
 
-func isBlackInCheck(gameID int16) bool {
+func isBlackInCheck(gameID int) bool {
 	result := canWhiteKillSquare(Verify.AllTables[gameID].blackKingX, Verify.AllTables[gameID].blackKingY, gameID)
 
 	if result == true { //then black's king is in check
@@ -22,7 +22,7 @@ func isBlackInCheck(gameID int16) bool {
 }
 
 //checks to see if white is in checkmate by bruteforcing all possible white moves and seeing if white is still in check
-func isWhiteInMate(gameID int16) bool {
+func isWhiteInMate(gameID int) bool {
 
 	if isWhiteInCheck(gameID) == false {
 		return false
@@ -88,7 +88,7 @@ func isWhiteInMate(gameID int16) bool {
 	return true
 }
 
-func isBlackInMate(gameID int16) bool {
+func isBlackInMate(gameID int) bool {
 	if isBlackInCheck(gameID) == false {
 		return false
 	}
@@ -148,7 +148,7 @@ func isBlackInMate(gameID int16) bool {
 	return true
 }
 
-func isWhiteStaleMate(gameID int16) bool {
+func isWhiteStaleMate(gameID int) bool {
 	if isWhiteInCheck(gameID) == true || isWhiteInMate(gameID) == true {
 		return false
 	}
@@ -202,7 +202,7 @@ func isWhiteStaleMate(gameID int16) bool {
 	return true
 }
 
-func isBlackStaleMate(gameID int16) bool {
+func isBlackStaleMate(gameID int) bool {
 	if isBlackInCheck(gameID) == true || isBlackInMate(gameID) == true {
 		return false
 	}
@@ -257,7 +257,7 @@ func isBlackStaleMate(gameID int16) bool {
 }
 
 //checks if no material for mating, KvK, K+B vs K, K+B vs K+B, K+N vs K, K+N vs K+N.
-func noMaterial(gameID int16) bool {
+func noMaterial(gameID int) bool {
 
 	//used to store piece count pawn=0 knight=1 bishop=2 rook=3 queen=4 king=5
 	var white [6]int
@@ -336,7 +336,7 @@ func noMaterial(gameID int16) bool {
 }
 
 //checks if three reptition rule which leads to a draw. returns false if no three repetition is found
-func threeRep(gameID int16) bool {
+func threeRep(gameID int) bool {
 
 	var eightSrc string
 	var eightTar string
@@ -389,7 +389,7 @@ func threeRep(gameID int16) bool {
 }
 
 //checks if fifty moves have been made without a pawn push or capture
-func fiftyMoves(gameID int16) bool {
+func fiftyMoves(gameID int) bool {
 	var thisMove int
 	thisMove = (len(All.Games[gameID].GameMoves) + 1) / 2
 	//no capture within 50 moves
@@ -403,7 +403,7 @@ func fiftyMoves(gameID int16) bool {
 }
 
 //checks if a square is attacked by white in one turn, used to identify check and checkmates
-func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int16) bool {
+func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int) bool {
 	var i int8
 	var j int8
 
@@ -444,7 +444,7 @@ func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int16) bool {
 					}
 
 				default:
-					//					fmt.Println("Invalid piece type")
+					//fmt.Println("Invalid piece type")
 				}
 			}
 		}
@@ -453,7 +453,7 @@ func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int16) bool {
 	return false
 }
 
-func canBlackKillSquare(targetRow int8, targetCol int8, gameID int16) bool {
+func canBlackKillSquare(targetRow int8, targetCol int8, gameID int) bool {
 	var i int8
 	var j int8
 
@@ -493,7 +493,7 @@ func canBlackKillSquare(targetRow int8, targetCol int8, gameID int16) bool {
 						return true
 					}
 				default:
-					//					fmt.Println("Invalid piece type")
+					//fmt.Println("Invalid piece type")
 				}
 			}
 		}

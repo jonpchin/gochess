@@ -2,7 +2,7 @@ package gostuff
 
 // import "fmt"
 //makes all possible black pawn moves to check for stalemate
-func blackPawnStaleMate(x int8, y int8, gameID int16) bool {
+func blackPawnStaleMate(x int8, y int8, gameID int) bool {
 
 	if x == 1 { //then pawn can move two squares
 		if Verify.AllTables[gameID].ChessBoard[x+2][y] == "-" { //make sure square is not blocked
@@ -83,7 +83,7 @@ func blackPawnStaleMate(x int8, y int8, gameID int16) bool {
 	//returns true if all possible move of THIS pawn lead to white king still being in check
 	return true
 }
-func whitePawnStaleMate(x int8, y int8, gameID int16) bool { //x is row y is col
+func whitePawnStaleMate(x int8, y int8, gameID int) bool { //x is row y is col
 
 	if x == 6 { //then pawn can move two squares
 		if Verify.AllTables[gameID].ChessBoard[x-2][y] == "-" { //make sure square is not blocked
@@ -168,7 +168,7 @@ func whitePawnStaleMate(x int8, y int8, gameID int16) bool { //x is row y is col
 }
 
 //brute forces all possible knight moves for white
-func whiteKnightStaleMate(x int8, y int8, gameID int16) bool {
+func whiteKnightStaleMate(x int8, y int8, gameID int) bool {
 
 	//starting at top left going clockwise
 	if x-2 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-2][y-1])[0:1] != "w" {
@@ -262,7 +262,7 @@ func whiteKnightStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackKnightStaleMate(x int8, y int8, gameID int16) bool {
+func blackKnightStaleMate(x int8, y int8, gameID int) bool {
 	if x-2 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-2][y-1])[0:1] != "b" { //starting at top left going clockwise
 
 		capturedPiece := makeMove(x, y, x-2, y-1, "bN", gameID)
@@ -354,7 +354,7 @@ func blackKnightStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteBishopStaleMate(x int8, y int8, gameID int16) bool { //moves all possible moves with this one wB
+func whiteBishopStaleMate(x int8, y int8, gameID int) bool { //moves all possible moves with this one wB
 
 	var i int8
 	var j int8
@@ -430,7 +430,7 @@ func whiteBishopStaleMate(x int8, y int8, gameID int16) bool { //moves all possi
 	return true
 }
 
-func blackBishopStaleMate(x int8, y int8, gameID int16) bool {
+func blackBishopStaleMate(x int8, y int8, gameID int) bool {
 	var i int8
 	var j int8
 	for i, j = x-1, y-1; i >= 0 && j >= 0; i, j = i-1, j-1 { //left upper
@@ -505,7 +505,7 @@ func blackBishopStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteRookStaleMate(x int8, y int8, gameID int16) bool {
+func whiteRookStaleMate(x int8, y int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -580,7 +580,7 @@ func whiteRookStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackRookStaleMate(x int8, y int8, gameID int16) bool {
+func blackRookStaleMate(x int8, y int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -655,7 +655,7 @@ func blackRookStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
+func whiteQueenStaleMate(x int8, y int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -802,7 +802,7 @@ func whiteQueenStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
+func blackQueenStaleMate(x int8, y int8, gameID int) bool {
 	var i int8
 	var j int8
 
@@ -948,7 +948,7 @@ func blackQueenStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
+func whiteKingStaleMate(x int8, y int8, gameID int) bool {
 	//starting from top left corner
 	if x-1 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-1])[0:1] != "w" { //top left
 
@@ -1113,7 +1113,7 @@ func whiteKingStaleMate(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackKingStaleMate(x int8, y int8, gameID int16) bool {
+func blackKingStaleMate(x int8, y int8, gameID int) bool {
 	//starting from top left corner
 	if x-1 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-1])[0:1] != "b" { //top left
 

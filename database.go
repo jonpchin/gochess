@@ -7,10 +7,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"os"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 //stores information about players games extracted from database when player clicks there profile
@@ -420,7 +421,7 @@ func fetchSavedGame(id string, user string) bool {
 	game.BlackMilli = 0
 	game.PendingDraw = false
 
-	var start int16 = 0
+	var start int = 0
 	for {
 		if _, ok := All.Games[start]; ok {
 			start++

@@ -7,7 +7,7 @@ import (
 //stores chess game information
 type ChessGame struct {
 	Type         string
-	ID           int16
+	ID           int
 	WhitePlayer  string
 	BlackPlayer  string
 	WhiteRating  int16
@@ -31,7 +31,7 @@ type ChessGame struct {
 //source and destination of piece moves
 type GameMove struct {
 	Type      string
-	ID        int16
+	ID        int
 	Source    string
 	Target    string
 	Promotion string
@@ -51,9 +51,9 @@ type ClockMove struct {
 
 // used to unmarshall game ID that is being observed by player(Name)
 type SpectateGame struct {
-	Type string
-	ID   int16 `json:"ID,string"`
-	Name string
+	Type     string
+	ID       int `json:"ID,string"`
+	Name     string
 	Spectate string
 }
 
@@ -72,12 +72,12 @@ type Nrating struct {
 
 type Fin struct { //used to hold the result when a player is mated
 	Type   string
-	ID     int16
+	ID     int
 	Status string
 }
 
-// contains an array of names observing the table
-type Observers struct{
+// contains an array of player names observing the table
+type Observers struct {
 	sync.RWMutex
 	Names []string
 }
@@ -96,7 +96,7 @@ type Table struct {
 	wkMoved bool //if king moved or not
 	bkMoved bool
 
-	wkrMoved bool
+	wkrMoved bool //white king rook
 	wqrMoved bool
 	bkrMoved bool
 	bqrMoved bool
@@ -125,34 +125,34 @@ type Table struct {
 	gameOver     chan bool
 	Connection   chan bool
 
-	moveCount int    //keeps track of how many moves are made (moveCount+1) /2 to get move number
-	promotion string //keeps track of the piece that is being promoted too
-	observe Observers // list of user names who are observing this table
+	moveCount int       //keeps track of how many moves are made (moveCount+1) /2 to get move number
+	promotion string    //keeps track of the piece that is being promoted too
+	observe   Observers // list of user names who are observing this table
 }
 
 //active and running games on the server
 var All = struct {
 	sync.RWMutex
-	Games map[int16]*ChessGame
-}{Games: make(map[int16]*ChessGame)}
+	Games map[int]*ChessGame
+}{Games: make(map[int]*ChessGame)}
 
 //pending matches in the lobby waiting for someone to accept
 var Pending = struct {
 	sync.RWMutex
-	Matches map[int16]*SeekMatch
-}{Matches: make(map[int16]*SeekMatch)}
+	Matches map[int]*SeekMatch
+}{Matches: make(map[int]*SeekMatch)}
 
 //used to verify each move on the board
 var Verify = struct {
 	sync.RWMutex
-	AllTables map[int16]*Table
-}{AllTables: make(map[int16]*Table)}
+	AllTables map[int]*Table
+}{AllTables: make(map[int]*Table)}
 
 //used for quick access to identify two people who are private chatting and playing a game against each other
 var PrivateChat = make(map[string]string)
 
 //intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
-func initGame(gameID int16, name string, fighter string) {
+func initGame(gameID int, name string, fighter string) {
 
 	//setting up back end move verification
 	var table Table
@@ -209,7 +209,7 @@ func initGame(gameID int16, name string, fighter string) {
 	Verify.AllTables[gameID].moveCount = 0
 
 	Verify.AllTables[gameID].promotion = "q" //default to queen promotion
-	
+
 	// the players playing the game are also observers
 	Verify.AllTables[gameID].observe.Names = append(Verify.AllTables[gameID].observe.Names, name)
 	Verify.AllTables[gameID].observe.Names = append(Verify.AllTables[gameID].observe.Names, fighter)

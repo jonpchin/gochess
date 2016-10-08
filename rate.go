@@ -3,8 +3,9 @@ package gostuff
 
 import (
 	"fmt"
-	"golang.org/x/net/websocket"
 	"math"
+
+	"golang.org/x/net/websocket"
 )
 
 //fetches player's new rating by passing both player's rating and their deviation and game result and returns their rating and deviation
@@ -30,7 +31,7 @@ func RoundPlus(f float64, places int) float64 {
 //	fmt.Println(RoundPlus(123.558, 2))
 
 //computes the rating for one player and the other player and updates the database and notifies both players, result can be white, black or draw
-func ComputeRating(name string, gameID int16, gameType string, result float64) {
+func ComputeRating(name string, gameID int, gameType string, result float64) {
 
 	var bullet, blitz, standard, bulletRD, blitzRD, standardRD float64
 	var oBullet, oBlitz, oStandard, oBulletRD, oBlitzRD, oStandardRD float64

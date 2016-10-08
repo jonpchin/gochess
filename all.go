@@ -3,7 +3,7 @@ package gostuff
 // import "fmt"
 //makes all possible black pawn moves and checks whether or not the target king is still in check
 //x and y is source of piece/pawn
-func blackPawn(x int8, y int8, gameID int16) bool {
+func blackPawn(x int8, y int8, gameID int) bool {
 
 	if x == 1 { //then pawn can move two squares
 		if Verify.AllTables[gameID].ChessBoard[x+2][y] == "-" { //make sure square is not blocked
@@ -67,7 +67,7 @@ func blackPawn(x int8, y int8, gameID int16) bool {
 	//returns true if all possible move of THIS pawn lead to white king still being in check
 	return true
 }
-func whitePawn(x int8, y int8, gameID int16) bool { //x is row y is col
+func whitePawn(x int8, y int8, gameID int) bool { //x is row y is col
 
 	if x == 6 { //then pawn can move two squares
 		if Verify.AllTables[gameID].ChessBoard[x-2][y] == "-" { //make sure square is not blocked
@@ -138,7 +138,7 @@ func whitePawn(x int8, y int8, gameID int16) bool { //x is row y is col
 }
 
 //brute forces all possible knight moves for white
-func whiteKnight(x int8, y int8, gameID int16) bool {
+func whiteKnight(x int8, y int8, gameID int) bool {
 
 	//starting at top left going clockwise
 	if x-2 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-2][y-1])[0:1] != "w" {
@@ -216,7 +216,7 @@ func whiteKnight(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackKnight(x int8, y int8, gameID int16) bool {
+func blackKnight(x int8, y int8, gameID int) bool {
 	if x-2 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-2][y-1])[0:1] != "b" { //starting at top left going clockwise
 
 		capturedPiece := makeMove(x, y, x-2, y-1, "bN", gameID)
@@ -292,7 +292,7 @@ func blackKnight(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteBishop(x int8, y int8, gameID int16) bool { //moves all possible moves with this one wB
+func whiteBishop(x int8, y int8, gameID int) bool { //moves all possible moves with this one wB
 
 	var i int8
 	var j int8
@@ -362,7 +362,7 @@ func whiteBishop(x int8, y int8, gameID int16) bool { //moves all possible moves
 	return true
 }
 
-func blackBishop(x int8, y int8, gameID int16) bool {
+func blackBishop(x int8, y int8, gameID int) bool {
 	var i int8
 	var j int8
 	for i, j = x-1, y-1; i >= 0 && j >= 0; i, j = i-1, j-1 { //left upper
@@ -430,7 +430,7 @@ func blackBishop(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteRook(x int8, y int8, gameID int16) bool {
+func whiteRook(x int8, y int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -497,7 +497,7 @@ func whiteRook(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackRook(x int8, y int8, gameID int16) bool {
+func blackRook(x int8, y int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -564,7 +564,7 @@ func blackRook(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteQueen(x int8, y int8, gameID int16) bool {
+func whiteQueen(x int8, y int8, gameID int) bool {
 
 	var i int8
 	var j int8
@@ -695,7 +695,7 @@ func whiteQueen(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackQueen(x int8, y int8, gameID int16) bool {
+func blackQueen(x int8, y int8, gameID int) bool {
 	var i int8
 	var j int8
 
@@ -833,7 +833,7 @@ func blackQueen(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func whiteKing(x int8, y int8, gameID int16) bool {
+func whiteKing(x int8, y int8, gameID int) bool {
 	//starting from top left corner
 	if x-1 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-1])[0:1] != "w" { //top left
 
@@ -983,7 +983,7 @@ func whiteKing(x int8, y int8, gameID int16) bool {
 	return true
 }
 
-func blackKing(x int8, y int8, gameID int16) bool {
+func blackKing(x int8, y int8, gameID int) bool {
 	//starting from top left corner
 	if x-1 >= 0 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x-1][y-1])[0:1] != "b" { //top left
 
