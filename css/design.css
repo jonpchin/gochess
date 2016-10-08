@@ -194,6 +194,7 @@ footer {
      -khtml-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
+            user-select: none;
 }
 
 /* white square */
@@ -235,7 +236,7 @@ footer {
 }
 .onoffswitch {
     position: relative; width: 90px;
-    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none; user-select: none;
 }
 .onoffswitch-checkbox {
     display: none;

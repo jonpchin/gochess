@@ -196,7 +196,7 @@ window.onload = function() {
 			    var move = game.move({
 				    from: json.Source,
 				    to: json.Target,
-				    promotion: json.Promotion // NOTE: always promote to a queen for example simplicity
+				    promotion: json.Promotion
 			    });
 			
 			    // illegal move
@@ -300,11 +300,11 @@ window.onload = function() {
 				isRatedRematch = json.Rated;
 				
 				//if the game moves are not null then restore the moves back
-				if(json.GameMoves != null){
+				if(json.GameMoves !== null){
 					//disables abort button
 					document.getElementById("abortButton").disabled = true;
 					
-					var length = json.GameMoves.length				
+					var length = json.GameMoves.length;				
 					
 					for(var i=0 ; i<length; i++){
 						
@@ -313,8 +313,7 @@ window.onload = function() {
 						    to: json.GameMoves[i].T,
 						    promotion: json.GameMoves[i].P // NOTE: always promote to a queen for example simplicity
 					     });
-					
-			
+
 					    updateStatus();
 						
 						board.move(json.GameMoves[i].S + "-" + json.GameMoves[i].T);
@@ -393,48 +392,44 @@ window.onload = function() {
 					}				
 				}
 				break;
-
+			case "spectate_game":
+				document.getElementById('textbox').innerHTML += (timeStamp() + " " + 
+					json.Name + " is now spectating this game." + '\n');
+				break;
 			case "offer_draw":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +" offers you a draw." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Name +" offers you a draw." + '\n');
 				document.getElementById("drawButton").value= "Accept Draw";
 				break;
 			
 			case "accept_draw":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " Game drawn by mututal agreement." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " Game drawn by mututal agreement." + '\n');
 				//prvents players from moving pieces now that game is over
 				gameOver();
 				break;
 				
 			case "draw_game":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " Game is a draw." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " Game is a draw." + '\n');
 				//prvents players from moving pieces now that game is over
 				gameOver();
 				break;
 				
 			case "cancel_draw":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " Draw offer declined." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " Draw offer declined." + '\n');
 				document.getElementById("drawButton").disabled = false; 
 				document.getElementById("drawButton").value= "Offer Draw";
 				break;
 			
 			case "resign":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " " + json.Name + " resigned." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Name + " resigned." + '\n');
 				gameOver();
 				break;
 				
 			case "leave":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " " + json.Text + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Text + '\n');
 				break;
 				
 			case "abort_game":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +" has aborted the game. "+ '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Name +" has aborted the game. "+ '\n');
 				gameOver();
 				break;
 			
@@ -469,14 +464,12 @@ window.onload = function() {
 				break;
 				
 			case "rematch":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " Your opponent offers you a rematch." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " Your opponent offers you a rematch." + '\n');
 				document.getElementById('rematchButton').value = "Accept Rematch";
 				break;
 				
 			case "match_three":
-				var datetime = timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " Your can only have a max of three pending matches." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " Your can only have a max of three pending matches." + '\n');
 				break;
 				
 			case "massMessage":
@@ -494,13 +487,15 @@ window.onload = function() {
 					gameSound.play();
 				}
 				break;
+
 			default:
 				console.log("Unknown API type json.Type is " + json.Type);
 		}
     }
 	
 	document.getElementById('sendMessage').onclick = function(){
-	    var msg = document.getElementById('message').value;
+	    
+		var msg = document.getElementById('message').value;
 		
 		var message = {
 			Type: "chat_private",
@@ -527,7 +522,7 @@ window.onload = function() {
 	//allows player to quit the game before move two, this button is also used to accept draws
 	document.getElementById('drawButton').onclick = function(){
 		
-		if (document.getElementById("drawButton").value == "Accept Draw"){
+		if (document.getElementById("drawButton").value === "Accept Draw"){
 			var message = {
 				Type: "accept_draw",
 				Name: user,
@@ -543,9 +538,8 @@ window.onload = function() {
 			}
 		    sock.send(JSON.stringify(message));
 		}
-			
-		var datetime = timeStamp();
-		document.getElementById('textbox').innerHTML += (datetime + " You offer your opponent a draw." + '\n');
+		
+		document.getElementById('textbox').innerHTML += (timeStamp() + " You offer your opponent a draw." + '\n');
 		document.getElementById("drawButton").disabled = true; 		
 	}
 
@@ -709,7 +703,6 @@ function detectMobile(){ //tries to detect if user is using a mobile device
 	
 	var screenWidth = screen.width;	
 	if(screenWidth <= 900){
-
 		console.log("mobile device detected...adjusting board size and layout");
 		document.getElementById("chatleft").style.display = "none";
 		document.getElementById("notation").style.display = "none";	

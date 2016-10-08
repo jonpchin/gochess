@@ -44,8 +44,7 @@ window.onload = function() {
     }
 	
     sock.onclose = function(e) {
-		var datetime =  timeStamp();
-		document.getElementById('textbox').innerHTML += (datetime + " " + "Connection lost. Please refresh to reconnect." + '\n');
+		document.getElementById('textbox').innerHTML += (timeStamp() + " " + "Connection lost. Please refresh to reconnect." + '\n');
 	}
 	
     sock.onmessage = function(e) {
@@ -58,7 +57,7 @@ window.onload = function() {
 			var table = document.getElementById("online");
 			
 			for (var i = 0; i<table.rows.length; i++) {
-				if(table.rows[i].row.cells[0].innerHTML === json.Name){
+				if(table.rows[i].cells[0].innerHTML === json.Name){
 					show=false;
 					break;
 				} 
@@ -71,8 +70,7 @@ window.onload = function() {
 			}
 					
 			if(toggleChat !== "false"){
-				var datetime =  timeStamp();
-				document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +": " + json.Text + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Name +": " + json.Text + '\n');
 				//scrolls chat to the bottom when it goes below the chat window
 				document.getElementById("textbox").scrollTop = document.getElementById("textbox").scrollHeight;
 			}
@@ -90,16 +88,12 @@ window.onload = function() {
 					}
 				}
 				else{
-					
 					$('#seekmatch').html(function() {
-						
 						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
 					});
 				}
-				
 			}
 			//rejecting matches that do not fit the user criteria
-			
 			else if(json.GameType === "bullet" && (bullet < json.MinRating || bullet > json.MaxRating)){
 					return;
 			}	
@@ -109,36 +103,30 @@ window.onload = function() {
 			else if (json.GameType === "standard" && (standard < json.MinRating || standard > json.MaxRati)){
 					return;		
 			}
-			
 			else{
 				
 				if(json.Opponent !== ""){ //then its a private match
 					
 					$('#seekmatch').html(function() {
 	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
-					});
-					
+					});	
 				}
 				else{
 					$('#seekmatch').html(function() {
    						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
 					});
 				}
-	
 			}
 		}
 		else if(json.Type === "fetch_players"){
-			
 			$('#online').html(function() {
 					return  $(this).html() + '<tr><td onclick="reviewProfile(\''+ json.Name +'\')" onmouseover="getPlayerInfo(\'' + json.Name + '\');">' + json.Name +  '</td></tr>';
 			});
-			
 		}
 		else if(json.Type === "broadcast"){
 			var table = document.getElementById("online");
-			var rows;
 			for (var i = 0; i<table.rows.length; i++) {
-				row=table.rows[i];
+				var row = table.rows[i];
 				if(row.cells[0].innerHTML === json.Name){
 					table.deleteRow(i);
 					console.log(json.Name + " has left the lobby.");
@@ -146,9 +134,7 @@ window.onload = function() {
 				} 
 			}
 		}
-		else if(json.Type === "accept_match"){
-//			console.log("accepting row")
-				
+		else if(json.Type === "accept_match"){	
 			$(".NameID"+json.Name).remove();
 			$(".NameID"+json.TargetPlayer).remove();
 			if(json.Name === user || json.TargetPlayer === user){
@@ -158,9 +144,7 @@ window.onload = function() {
 		}
 		else if(json.Type === "private_match"){
 			if(json.Name === user){
-				
 				$('#seekmatch').html(function() {
-					
 					return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Your-Match" + '</td></tr>';
 				});
 			}
@@ -174,8 +158,6 @@ window.onload = function() {
 			}
 		}
 		else if(json.Type === "cancel_match"){
-//			console.log("deleting row")
-//			console.log("MatchID is " + json.MatchID)
 			$("#MatchID"+json.MatchID).remove();
 		}
 		else if (json.Type === "alert"){
@@ -185,17 +167,13 @@ window.onload = function() {
 			alert("You are only allowed to have a max of three pending seeks at one time.");
 		}
 		else if(json.Type === "absent"){
-			var datetime =  timeStamp();
-			document.getElementById('textbox').innerHTML += (datetime + " That player is not logged in."  + '\n');
+			document.getElementById('textbox').innerHTML += (timeStamp() + " That player is not logged in."  + '\n');
 		}
 		else if(json.Type === "chess_game"){
-
 			window.location = "/chess/memberChess";
 		}
 		else if(json.Type === "massMessage"){
-			
-			var datetime = timeStamp();
-			document.getElementById('textbox').innerHTML += (datetime + " " + json.Text + '\n');
+			document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Text + '\n');
 			sock.close();
 			document.getElementById("sendButton").disabled = true;
 			document.getElementById("sendSeek").disabled = true;
@@ -205,13 +183,12 @@ window.onload = function() {
 			console.log("Unknown API type");	
 		}
     }
-	document.getElementById('sendButton').onclick = function(){
-	    var msg = document.getElementById('message').value;
+	document.getElementById('sendButton').onclick = function(){	
 		
 		var message = {
 			Type: "chat_all",
 			Name: user,
-			Text: msg
+			Text: document.getElementById('message').value
 		}
 	    sock.send(JSON.stringify(message));
 		document.getElementById('message').value = "";
