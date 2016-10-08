@@ -1,6 +1,6 @@
 if (!window.WebSocket){
-	console.log("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Edge");
-	$('#checkwebsocket').html("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
+	$('#checkwebsocket').html("Your browser doesn't support websockets." +
+		"Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
 var wsuri = "wss://localhost:443/chess";
 var sock; 
@@ -35,7 +35,6 @@ var blackClock = new Tock({
 			$('#toptime').val(blackClock.msToTime(blackClock.lap()));	
 		}
     }
- 
 });
 //getting user preferences
 var toggleSound = getCookie("sound");
@@ -152,9 +151,6 @@ window.onload = function() {
 		if(typeof token.spectate !== "undefined"){
 
 				// spectators should not be able to do anything but watch the game
-				document.getElementById("abortButton").disabled = true;
-				document.getElementById("drawButton").disabled = true;
-				document.getElementById("resignButton").disabled = true;
 				document.getElementById("message").disabled = true;
 				document.getElementById("sendMessage").disabled = true;
 				document.getElementById("rematchButton").disabled = true;
@@ -282,9 +278,6 @@ window.onload = function() {
 				break;
 				
 			case "chess_game":
-				document.getElementById("abortButton").disabled = false;
-				document.getElementById("drawButton").disabled = false;
-				document.getElementById("resignButton").disabled = false;
 
 				//storing matchID in global variable used in sending moves for verification
 				matchID = json.ID;
@@ -310,9 +303,7 @@ window.onload = function() {
 				
 				//if the game moves are not null then restore the moves back
 				if(json.GameMoves !== null){
-					//disables abort button
-					document.getElementById("abortButton").disabled = true;
-					
+
 					var length = json.GameMoves.length;				
 					
 					for(var i=0 ; i<length; i++){
@@ -341,11 +332,7 @@ window.onload = function() {
 					//reset game position to brand new game, used for rematch
 					board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 					board.orientation('white');
-					game.reset();		
-					
-					document.getElementById("abortButton").disabled = false;
-					document.getElementById("drawButton").disabled = false;
-					document.getElementById("resignButton").disabled = false;		
+					game.reset();								
 				}
 				
 				//formating time for clock 
@@ -355,6 +342,13 @@ window.onload = function() {
 				json.BlackMinutes = json.BlackMinutes < 10 ? "0" + json.BlackMinutes : json.BlackMinutes;
 				json.BlackSeconds = json.BlackSeconds < 10 ? "0" + json.BlackSeconds : json.BlackSeconds;
 				
+				if(typeof token.spectate !== "undefined"){
+					user = json.WhitePlayer; // default to showing white for spectator		
+				}else{
+					document.getElementById("drawButton").disabled = false;
+					document.getElementById("resignButton").disabled = false;
+				}
+
 				if (user === json.WhitePlayer){
 														
 					document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + 

@@ -1,6 +1,6 @@
 if (!window.WebSocket){
-	console.log("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Edge");
-	$('#checkwebsocket').html("Your browser doesn't support websockets. Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
+	$('#checkwebsocket').html("Your browser doesn't support websockets." + 
+		"Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
 var wsuri = "wss://localhost:443/server";
 var sock = new WebSocket(wsuri);
