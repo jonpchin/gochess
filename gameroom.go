@@ -284,10 +284,6 @@ func (c *Connection) ChessConnect() {
 						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
 							log.Println("error sending abort message", err)
 						}
-					} else if name != t.Name { //remove spectator if they are no longer viewing game
-						Verify.AllTables[game.ID].observe.Lock()
-						Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
-						Verify.AllTables[game.ID].observe.Unlock()
 					}
 				}
 
@@ -327,13 +323,23 @@ func (c *Connection) ChessConnect() {
 					// only send data to spectator if spectator mode is turned on
 					if All.Games[spectate.ID].Spectate {
 						// register spectator to observers list
+						Verify.AllTables[spectate.ID].observe.Lock()
 						Verify.AllTables[spectate.ID].observe.Names = append(Verify.AllTables[spectate.ID].observe.Names, t.Name)
-						// send data to all spectator
+						Verify.AllTables[spectate.ID].observe.Unlock()
+						// send data to spectator
 						if err := websocket.JSON.Send(Active.Clients[t.Name], All.Games[spectate.ID]); err != nil {
 							log.Println(err)
 						}
-					}
 
+						//send a message to everyone saying spectator has entered room
+						for _, name := range Verify.AllTables[spectate.ID].observe.Names {
+							if _, ok := Active.Clients[name]; ok {
+								if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+									log.Println("error sending abort message", err)
+								}
+							}
+						}
+					}
 				} else {
 					log.Println(t.Name, " tried viewing a game that doesn't exist.")
 				}
@@ -623,10 +629,9 @@ func (c *Connection) ChessConnect() {
 
 				//seting up the game info such as white/black player, time control, etc
 				rand.Seed(time.Now().UnixNano())
-				randomNum := rand.Intn(2)
 
 				//randomly selects both players to be white or black
-				if randomNum == 0 {
+				if rand.Intn(2) == 0 {
 					game.WhitePlayer = match.Name
 					if game.GameType == "bullet" {
 						game.WhiteRating = bullet
