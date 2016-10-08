@@ -44,7 +44,8 @@ window.onload = function() {
     }
 	
     sock.onclose = function(e) {
-		document.getElementById('textbox').innerHTML += (timeStamp() + " " + "Connection lost. Please refresh to reconnect." + '\n');
+		document.getElementById('textbox').innerHTML += (timeStamp() + " " +
+			"Connection lost. Please refresh to reconnect." + '\n');
 	}
 	
     sock.onmessage = function(e) {
@@ -65,7 +66,8 @@ window.onload = function() {
 		
 			if(show === true && json.Name !== user){
 				$('#online').html(function() { //when a player chats or connects they will update online players list for everyone
-					return  $(this).html() +'<tr><td  onclick="reviewProfile(\''+ json.Name +'\');">' + json.Name + '</td></tr>';
+					return  $(this).html() +'<tr><td  onclick="reviewProfile(\''+ json.Name +'\');">' +
+						 json.Name + '</td></tr>';
 				});
 			}
 					
@@ -81,7 +83,10 @@ window.onload = function() {
 				if(json.Opponent !== ""){ //then its a private match
 					$('#seekmatch').html(function() {
 					
-						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Opponent + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +
+							json.MatchID + ' class=NameID' + json.Opponent + '><td>' + json.Name +  '</td><td>' + 
+							json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
+							json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
 					});
 					if(toggleSound !== "false"){
 						challenge.play();//plays sound to notify player they got a private match sent to them
@@ -89,7 +94,11 @@ window.onload = function() {
 				}
 				else{
 					$('#seekmatch').html(function() {
-						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
+						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +
+							json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' +
+							json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' +
+							json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + 
+							'</td></tr>';
 					});
 				}
 			}
@@ -108,19 +117,28 @@ window.onload = function() {
 				if(json.Opponent !== ""){ //then its a private match
 					
 					$('#seekmatch').html(function() {
-	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +
+						   json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + 
+						   json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
+						   json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
 					});	
 				}
 				else{
 					$('#seekmatch').html(function() {
-   						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + '</td></tr>';
+   						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +
+						   json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + 
+						   json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
+						   json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + 
+						   '</td></tr>';
 					});
 				}
 			}
 		}
 		else if(json.Type === "fetch_players"){
 			$('#online').html(function() {
-					return  $(this).html() + '<tr><td onclick="reviewProfile(\''+ json.Name +'\')" onmouseover="getPlayerInfo(\'' + json.Name + '\');">' + json.Name +  '</td></tr>';
+					return  $(this).html() + '<tr><td onclick="reviewProfile(\''+ json.Name +
+						'\')" onmouseover="getPlayerInfo(\'' + json.Name + '\');">' + json.Name + 
+						 '</td></tr>';
 			});
 		}
 		else if(json.Type === "broadcast"){
@@ -145,12 +163,21 @@ window.onload = function() {
 		else if(json.Type === "private_match"){
 			if(json.Name === user){
 				$('#seekmatch').html(function() {
-					return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Your-Match" + '</td></tr>';
+					return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + 
+						');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' +
+						 json.Opponent +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + 
+						 '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + 
+						 '</td><td>' + "Your-Match" + '</td></tr>';
 				});
 			}
 			else{
 				$('#seekmatch').html(function() {
-   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + 
+					   ');" id=MatchID' +json.MatchID + ' class=NameID' + json.Name + 
+					   '><td>' + json.Name +  '</td><td>' + json.Rating + '</td><td>' + 
+					   json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
+					   json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + 
+					   '</td></tr>';
 				});
 				if(toggleSound !== "false"){
 					challenge.play();//plays sound to notify player they got a private match sent to them
@@ -227,12 +254,14 @@ window.onload = function() {
 		
 		if(length < 3 || length > 12){ //checking if name meets length requirements
 			var datetime =  timeStamp();
-			document.getElementById('textbox').innerHTML += (datetime + " " + "Please enter a username with 3-12 characters." + '\n');
+			document.getElementById('textbox').innerHTML += (datetime + " " + 
+				"Please enter a username with 3-12 characters." + '\n');
 			return;
 		}
 		if(opponent === user){ //you can't send private matches to yourself!
 			var datetime =  timeStamp();
-			document.getElementById('textbox').innerHTML += (datetime + " " + "You can't match yourself!" + '\n');
+			document.getElementById('textbox').innerHTML += (datetime + " " + 
+				"You can't match yourself!" + '\n');
 			return;
 		}
 

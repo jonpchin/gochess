@@ -70,7 +70,8 @@ window.onload = function() {
 		else{ //game is a draw
 			gameResult = "1/2-1/2";
 		}
-		game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', WhiteSide, 'Black', BlackSide, 'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
+		game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', WhiteSide, 'Black', BlackSide, 
+			'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
 		var pgn = game.pgn();
 		var fileName = WhiteSide + "vs" + BlackSide + ".pgn";
 		download(pgn, fileName, "application/x-chess-pgn");
@@ -103,8 +104,10 @@ window.onload = function() {
 			
 		document.getElementById("bottomtime").value = timeGet + ":00"; //setting up name and time of player when they are going over game
 		document.getElementById("toptime").value =	timeGet + ":00";
-		document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + whiteName + "'>" + whiteName + "</a>(" + whiteR +")";
-		document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + blackName  + "'>" + blackName + "</a>(" + blackR +")";			
+		document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + whiteName + "'>" +
+			 whiteName + "</a>(" + whiteR +")";
+		document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + blackName  + "'>" +
+			 blackName + "</a>(" + blackR +")";			
 
 		var review = JSON.parse(reviewMoves);
 		var length = 0;
@@ -184,7 +187,8 @@ window.onload = function() {
 		var datetime =  + currentdate.getHours() + ":"  
              			+ currentdate.getMinutes() + ":" 
              			+ currentdate.getSeconds();
-		document.getElementById('textbox').innerHTML += (datetime + " " + "Connection lost. Please refresh to reconnect if you are in a game." + '\n');
+		document.getElementById('textbox').innerHTML += (datetime + " " +
+			 "Connection lost. Please refresh to reconnect if you are in a game." + '\n');
 	}
 
     sock.onmessage = function(e) {
@@ -243,21 +247,25 @@ window.onload = function() {
 			case "sync_clock":
 				if(user === WhiteSide){
 					if(json.UpdateWhite){
-						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli;
+						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + 
+							json.WhiteSeconds + "." + json.WhiteMilli;
 					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli);
 					}
 					else{
-						document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli;	
+						document.getElementById("toptime").value = json.BlackMinutes + ":" + 
+						json.BlackSeconds + "." + json.BlackMilli;	
 					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
 					}
 				}
 				else if(user === BlackSide){
 					if(json.UpdateWhite){
-						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli;
+						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds + "." +
+							json.WhiteMilli;
 					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds  + "." + json.WhiteMilli);
 					}
 					else{
-						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli;
+						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds + "." + 
+							json.BlackMilli;
 					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
 					}			
 				}	
@@ -266,7 +274,8 @@ window.onload = function() {
 			case "chat_private":
 				if(toggleChat !== "false"){
 					var datetime = timeStamp();
-					document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +": " + json.Text + '\n');
+					document.getElementById('textbox').innerHTML += (datetime + " " + json.Name +": " + 
+						json.Text + '\n');
 					//scrolls chat to the bottom when it goes below the chat window
 					document.getElementById("textbox").scrollTop = document.getElementById("textbox").scrollHeight;
 				}
@@ -348,14 +357,18 @@ window.onload = function() {
 				
 				if (user === json.WhitePlayer){
 														
-					document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
-					document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";			
+					document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + 
+						"'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
+					document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + 
+						"'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";			
 				}
 				else{
 					//flips board white on top black on bottom
 					$('#flipOrientationBtn').click();
-					document.getElementById("bottom").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";
-					document.getElementById("top").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
+					document.getElementById("bottom").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + 
+						json.BlackPlayer + "</a>(" + json.BlackRating +")";
+					document.getElementById("top").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + 
+						json.WhitePlayer + "</a>(" + json.WhiteRating +")";
 				}
 				
 				if(json.Status === "White"){
@@ -457,9 +470,11 @@ window.onload = function() {
 			case "rating":
 				var datetime = timeStamp();
 				if(user === WhiteSide){
-					document.getElementById('textbox').innerHTML += (datetime + " Your new rating is " + json.WhiteRating + '\n');
+					document.getElementById('textbox').innerHTML += (datetime + " Your new rating is " + 
+						json.WhiteRating + '\n');
 				}else{
-					document.getElementById('textbox').innerHTML += (datetime + " Your new rating is " + json.BlackRating + '\n');
+					document.getElementById('textbox').innerHTML += (datetime + " Your new rating is " + 
+						json.BlackRating + '\n');
 				}
 				break;
 				
@@ -469,7 +484,8 @@ window.onload = function() {
 				break;
 				
 			case "match_three":
-				document.getElementById('textbox').innerHTML += (timeStamp() + " Your can only have a max of three pending matches." + '\n');
+				document.getElementById('textbox').innerHTML += (timeStamp() + 
+					" Your can only have a max of three pending matches." + '\n');
 				break;
 				
 			case "massMessage":
