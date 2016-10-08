@@ -56,11 +56,9 @@ window.onload = function() {
 			
 			var show = true;
 			var table = document.getElementById("online");
-			var row;
+			
 			for (var i = 0; i<table.rows.length; i++) {
-				row=table.rows[i];
-		
-				if(row.cells[0].innerHTML === json.Name){
+				if(table.rows[i].row.cells[0].innerHTML === json.Name){
 					show=false;
 					break;
 				} 
@@ -319,11 +317,13 @@ function getCookie(cname) { //gets cookies value
     return "";
 }
 
-function getPlayerInfo(name){ //returns all three ratings of players and if there are in a game
+function getPlayerInfo(lookUpName){ //returns all three ratings of players and if there are in a game
 	$('#playerData').html('<img src="../img/ajax/loading.gif" />');
     $.ajax({
   		url: 'getPlayerData',
    		type: 'post',
+		dataType: 'html',
+   		data : { 'user': lookUpName},
    		success : function(data) {			
       		$('#playerData').html(data);	
    		}	

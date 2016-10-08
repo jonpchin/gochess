@@ -3,7 +3,7 @@ package gostuff
 // import "fmt"
 
 //checks if white pawn move is legal, returns true if legal and false if iillegal
-func whitePawnMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int16) bool {
+func whitePawnMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
 	//moving pawn two squares, pawn should be moving on same file
 	if sourceRow-targetRow == 2 && sourceCol == targetCol {
 
@@ -58,7 +58,7 @@ func whitePawnMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int
 	return true
 }
 
-func blackPawnMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int16) bool {
+func blackPawnMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
 	//moving pawn two squares, pawn should be moving on same file
 	if targetRow-sourceRow == 2 && sourceCol == targetCol {
 
@@ -116,14 +116,14 @@ func blackPawnMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int
 }
 
 //enPassent expires for the color if they don't make a move
-func passExpireWhite(gameID int16) {
+func passExpireWhite(gameID int) {
 	//setting all the values in the map
 	for index, _ := range Verify.AllTables[gameID].whitePass {
 		Verify.AllTables[gameID].whitePass[index] = false
 	}
 }
 
-func passExpireBlack(gameID int16) {
+func passExpireBlack(gameID int) {
 	//setting all the values to false
 	for index, _ := range Verify.AllTables[gameID].blackPass {
 		Verify.AllTables[gameID].blackPass[index] = false

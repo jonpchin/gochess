@@ -56,8 +56,11 @@ func (c *Connection) ChessConnect() {
 					break
 				}
 
+				var white = All.Games[game.ID].WhitePlayer
+				var black = All.Games[game.ID].BlackPlayer
+
 				// spectators should not be able to make moves for the two chess players
-				if t.Name != All.Games[game.ID].WhitePlayer && t.Name != All.Games[game.ID].BlackPlayer {
+				if t.Name != white && t.Name != black {
 					fmt.Println(t.Name, "tried to cheat by making a move as a spectator")
 					break
 				}
@@ -104,15 +107,13 @@ func (c *Connection) ChessConnect() {
 						clock.BlackMilli = All.Games[game.ID].BlackMilli
 						clock.UpdateWhite = false
 
-						//don't send clock if player dropped conection
+						// sync clock with players only, not spectators
 						if _, ok := Active.Clients[t.Name]; ok {
 							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
 								log.Println("error sending clock")
 							}
 						}
-
 						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
-
 							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
 								log.Println("error sending clock")
 							}
@@ -137,17 +138,14 @@ func (c *Connection) ChessConnect() {
 						clock.WhiteMilli = All.Games[game.ID].WhiteMilli
 						clock.UpdateWhite = true
 
-						for _, name := range Verify.AllTables[game.ID].observe.Names {
-							if _, ok := Active.Clients[name]; ok {
-								if err := websocket.JSON.Send(Active.Clients[name], &clock); err != nil {
-									log.Println("error sending clock to", name)
-								}
-								// do not remove self from spectator
-							} else if name != t.Name {
-								//remove spectator if they are not viewing game
-								Verify.AllTables[game.ID].observe.Lock()
-								Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
-								Verify.AllTables[game.ID].observe.Unlock()
+						if _, ok := Active.Clients[t.Name]; ok {
+							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
+								log.Println("error sending clock")
+							}
+						}
+						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
+							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
+								log.Println("error sending clock")
 							}
 						}
 					}()
@@ -168,7 +166,7 @@ func (c *Connection) ChessConnect() {
 						if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
 							log.Println("error sending chess move to", name)
 						}
-					} else if name != t.Name { //remove spectator if they are no longer viewing game
+					} else if name != white && name != black { //remove spectator if they are no longer viewing game
 						Verify.AllTables[game.ID].observe.Lock()
 						Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
 						Verify.AllTables[game.ID].observe.Unlock()
@@ -196,10 +194,17 @@ func (c *Connection) ChessConnect() {
 
 				gameID, exist := getGameID(t.Name)
 
-				// spectators should not be able to send chat messages
-				if t.Name != All.Games[gameID].WhitePlayer && t.Name != All.Games[gameID].BlackPlayer {
+				// prevent invalid map access which can cause race conditions
+				if _, ok := All.Games[gameID]; !ok {
+					// spectators should not be able to send chat messages
+					break
+				}
+				var white = All.Games[gameID].WhitePlayer
+				var black = All.Games[gameID].BlackPlayer
+
+				if t.Name != white && t.Name != black {
 					log.Println(t.Name, " tried to send a chat message while spectating")
-					return
+					break
 				}
 
 				if exist {
@@ -209,7 +214,8 @@ func (c *Connection) ChessConnect() {
 								// we could not send the message to a peer
 								log.Println("Could not send message to ", name, err.Error())
 							}
-						} else if name != t.Name { //remove spectator if they are no longer viewing game
+						} else if name != white && name != black {
+							//remove spectator if they are no longer viewing game
 							Verify.AllTables[gameID].observe.Lock()
 							Verify.AllTables[gameID].observe.Names = removeViewer(name, gameID)
 							Verify.AllTables[gameID].observe.Unlock()
@@ -258,8 +264,7 @@ func (c *Connection) ChessConnect() {
 
 				var game GameMove
 
-				err := json.Unmarshal(message, &game)
-				if err != nil {
+				if err := json.Unmarshal(message, &game); err != nil {
 					log.Println("Failed to unmarshal", err)
 				}
 				//can only abort game before move 2
@@ -294,20 +299,21 @@ func (c *Connection) ChessConnect() {
 
 			case "update_spectate":
 
-				var isSpectate SpectateGame
+				var spectate SpectateGame
 
-				err := json.Unmarshal(message, &isSpectate)
+				err := json.Unmarshal(message, &spectate)
 				if err != nil {
 					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
-				if isSpectate.Spectate == "Yes" {
-					All.Games[isSpectate.ID].Spectate = true
+				if spectate.Spectate == "Yes" {
+					All.Games[spectate.ID].Spectate = true
 				} else {
-					All.Games[isSpectate.ID].Spectate = false
+					All.Games[spectate.ID].Spectate = false
 				}
 
 			case "spectate_game":
+
 				var spectate SpectateGame
 
 				if err := json.Unmarshal(message, &spectate); err != nil {
@@ -323,8 +329,7 @@ func (c *Connection) ChessConnect() {
 						// register spectator to observers list
 						Verify.AllTables[spectate.ID].observe.Names = append(Verify.AllTables[spectate.ID].observe.Names, t.Name)
 						// send data to all spectator
-						err := websocket.JSON.Send(Active.Clients[t.Name], All.Games[spectate.ID])
-						if err != nil {
+						if err := websocket.JSON.Send(Active.Clients[t.Name], All.Games[spectate.ID]); err != nil {
 							log.Println(err)
 						}
 					}
@@ -337,8 +342,7 @@ func (c *Connection) ChessConnect() {
 
 				var game GameMove
 
-				err := json.Unmarshal(message, &game)
-				if err != nil {
+				if err := json.Unmarshal(message, &game); err != nil {
 					log.Println("error unmarshalling data", err)
 					return
 				}
@@ -361,10 +365,15 @@ func (c *Connection) ChessConnect() {
 
 				var game GameMove
 
-				err := json.Unmarshal(message, &game)
-				if err != nil {
+				if err := json.Unmarshal(message, &game); err != nil {
 					log.Println("error in unmarshalling data")
 				}
+
+				//make sure key exist in map before accessing it
+				if _, ok := All.Games[game.ID]; !ok {
+					break
+				}
+
 				// spectators should not be able to accept draw while spectating
 				if t.Name != All.Games[game.ID].WhitePlayer && t.Name != All.Games[game.ID].BlackPlayer {
 					log.Println(t.Name, " tried to accept draw while spectating")
@@ -381,12 +390,11 @@ func (c *Connection) ChessConnect() {
 				//2 means the game is a draw and stored as an int in the database
 				All.Games[game.ID].Result = 2
 
-				//closing web socket on front end for self and opponent
-				websocket.Message.Send(Active.Clients[t.Name], reply)
-
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						log.Println(err)
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if _, ok := Active.Clients[name]; ok {
+						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 
@@ -398,8 +406,8 @@ func (c *Connection) ChessConnect() {
 				wrapUpGame(game.ID)
 
 			case "game_over":
+
 				var game Fin
-				var result float64
 
 				if err := json.Unmarshal(message, &game); err != nil {
 					log.Println("Just receieved a message I couldn't decode:", string(message), err)
@@ -409,16 +417,20 @@ func (c *Connection) ChessConnect() {
 				var checkMate bool
 				var mater string
 				var mated string
+
 				if game.Status == "White" {
 					checkMate = isWhiteInMate(game.ID)
 					mater = All.Games[game.ID].BlackPlayer
 					mated = All.Games[game.ID].WhitePlayer
+
 				} else if game.Status == "Black" {
 					mater = All.Games[game.ID].WhitePlayer
 					mated = All.Games[game.ID].BlackPlayer
 					checkMate = isBlackInMate(game.ID)
-				} else {
+
+				} else { //this should never happen, if it does most likely caused by tampering or its a bug
 					fmt.Println("Invalid game status for checking mate.")
+					break
 				}
 				//gets length of all the moves in the game
 				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
@@ -430,27 +442,26 @@ func (c *Connection) ChessConnect() {
 					break
 				}
 
+				var result float64
+
 				if game.Status == "White" { //then white was checkmated
 					All.Games[game.ID].Status = "White is checkmated"
 					result = 0
 
-				} else if game.Status == "Black" {
+				} else { // then its black that was checkmated
 					All.Games[game.ID].Status = "Black is checkmated"
 					result = 1.0
-
-				} else {
-					fmt.Println("Invalid color checkmate")
 				}
+
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
 
-				//notifying players game is over
-				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
-					log.Println(err)
-				}
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						log.Println(err)
+				//notifying both players and spectators game is over
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if _, ok := Active.Clients[name]; ok {
+						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 
@@ -487,14 +498,13 @@ func (c *Connection) ChessConnect() {
 				Verify.AllTables[game.ID].Connection <- true
 				Verify.AllTables[game.ID].gameOver <- true
 
-				//letting both players know that a resignation occured
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						log.Println(err)
+				//letting both players and spectators know that a resignation occured
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if _, ok := Active.Clients[name]; ok {
+						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+							log.Println(err)
+						}
 					}
-				}
-				if err := websocket.Message.Send(Active.Clients[t.Name], reply); err != nil {
-					log.Println(err)
 				}
 
 				//rate.go
@@ -564,7 +574,7 @@ func (c *Connection) ChessConnect() {
 					c.totalMatches++
 				}
 
-				var start int16 = 0
+				var start int = 0
 				for {
 					if _, ok := Pending.Matches[start]; ok {
 						start++
@@ -578,8 +588,6 @@ func (c *Connection) ChessConnect() {
 				Pending.Matches[start] = &match
 
 				if _, ok := PrivateChat[match.Opponent]; ok {
-					log.Println("Player already has a game. ")
-
 					t.Type = "rematch"
 					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &t); err != nil {
 						// we could not send the message to a peer
@@ -653,8 +661,6 @@ func (c *Connection) ChessConnect() {
 				//no moves yet so nill/null
 				game.GameMoves = nil
 				game.TimeControl = Pending.Matches[match.MatchID].TimeControl
-
-				//for simplicity we will only allow minutes
 				game.WhiteMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.WhiteSeconds = 0
 				game.WhiteMilli = 0
@@ -664,20 +670,20 @@ func (c *Connection) ChessConnect() {
 				game.PendingDraw = false
 				game.Rated = Pending.Matches[match.MatchID].Rated
 
-				var start int16 = 0
+				var start int = 0
 				for {
 					if _, ok := All.Games[start]; ok {
 						start++
+
 					} else {
 						break
 					}
 				}
-				//value := fmt.Sprintf("%d", start)
+
 				game.ID = start
 				//used in backend to keep track of all pending games waiting for a player to accept
 				All.Games[start] = &game
 
-				//number, _ := strconv.ParseInt(match.MatchID, 10, 0)
 				//no longer need all the pending matches as game will be started
 				for key, value := range Pending.Matches {
 					//deletes all pending matches for either players
@@ -689,23 +695,24 @@ func (c *Connection) ChessConnect() {
 				//intitalizes all the variables of the game
 				initGame(game.ID, game.WhitePlayer, game.BlackPlayer)
 
-				startGame, _ := json.Marshal(game)
-
-				//starting game for both players
-				if err := websocket.Message.Send(Active.Clients[game.WhitePlayer], string(startGame)); err != nil {
-					log.Println(err)
-				}
-				if err := websocket.Message.Send(Active.Clients[game.BlackPlayer], string(startGame)); err != nil {
-					log.Println(err)
+				//starting game for both players, this does NOT include spectators
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if _, ok := Active.Clients[name]; ok {
+						if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
+							log.Println(err)
+						}
+					}
 				}
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game
 				go setClocks(game.ID, t.Name)
 
 			case "draw_game":
-				var game GameMove
 
-				json.Unmarshal(message, &game)
+				var game GameMove
+				if err := json.Unmarshal(message, &game); err != nil {
+					log.Println(err)
+				}
 
 				//checking to see if the side whose turn it is to move is in stalemate
 				if Verify.AllTables[game.ID].whiteTurn == true {
@@ -736,11 +743,14 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//closing web socket on front end for self and opponent
-				websocket.Message.Send(Active.Clients[t.Name], reply)
-
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply)
+				for _, name := range Verify.AllTables[game.ID].observe.Names {
+					if _, ok := Active.Clients[name]; ok {
+						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+							log.Println(err)
+						}
+					}
 				}
+
 				wrapUpGame(game.ID)
 
 			default:
@@ -754,7 +764,7 @@ func (c *Connection) ChessConnect() {
 }
 
 // Cleanup function to store game in database and delete from memory
-func wrapUpGame(id int16) {
+func wrapUpGame(id int) {
 
 	//now store game in MySQL database
 	allMoves, err := json.Marshal(All.Games[id].GameMoves)

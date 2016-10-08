@@ -61,26 +61,49 @@ func (c *Connection) LobbyConnect() {
 					for name, cs := range Chat.Lobby {
 						if err := websocket.Message.Send(cs, reply); err != nil {
 							// we could not send the message to a peer
-							log.Println("Could not send message to ", name, err.Error())
+							log.Println("Could not send message to ", name, err)
 						}
 					}
 				}()
 			case "fetch_matches":
 				//send in array instead of sending individual
 				for _, value := range Pending.Matches {
-					websocket.JSON.Send(c.websocket, &value)
+					if err := websocket.JSON.Send(c.websocket, &value); err != nil {
+						log.Println(err)
+					}
 				}
 
 			case "fetch_players":
+
 				//send in array instead of sending individual
 				var player Online
-
 				player.Type = "fetch_players"
+				var uniquePlayers []string
 
+				// show all players in the lobby and those that are playing a game
 				for key, _ := range Chat.Lobby {
 					player.Name = key
+					uniquePlayers = append(uniquePlayers, player.Name)
 					if err := websocket.JSON.Send(c.websocket, player); err != nil {
 						log.Println(err)
+					}
+				}
+				for key, _ := range Active.Clients {
+
+					player.Name = key
+					found := false
+
+					// this will prevent duplicates if player is in lobby and chess room at the same time
+					for _, name := range uniquePlayers {
+						if player.Name == name {
+							found = true
+							break
+						}
+					}
+					if found == false {
+						if err := websocket.JSON.Send(c.websocket, player); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 
@@ -91,7 +114,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						log.Println("Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break //notify user that only three matches pending max are allowed
 				} else {
@@ -110,7 +133,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("lobby.go error 7 Could not send message to ", c.clientIP, err.Error())
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break
 				}
@@ -151,7 +174,7 @@ func (c *Connection) LobbyConnect() {
 					match.GameType = "standard"
 				}
 
-				var start int16 = 0
+				var start int = 0
 				for {
 					if _, ok := Pending.Matches[start]; ok {
 						start++
@@ -291,7 +314,7 @@ func (c *Connection) LobbyConnect() {
 				game.Rated = Pending.Matches[match.MatchID].Rated
 				game.Spectate = false
 
-				var start int16 = 0
+				var start int = 0
 				for {
 					if _, ok := All.Games[start]; ok {
 						start++
@@ -299,12 +322,11 @@ func (c *Connection) LobbyConnect() {
 						break
 					}
 				}
-				//value := fmt.Sprintf("%d", start)
+
 				game.ID = start
 				//used in backend to keep track of all pending games waiting for a player to accept
 				All.Games[start] = &game
 
-				//number, _ := strconv.ParseInt(match.MatchID, 10, 0)
 				//no longer need all the pending matches as game will be started
 				for key, value := range Pending.Matches {
 					//deletes all pending matches for either players
@@ -371,7 +393,7 @@ func (c *Connection) LobbyConnect() {
 					t.Type = "absent"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
 						// we could not send the message to a peer
-						fmt.Println("Could not send message to ", t.Name, err)
+						log.Println("Could not send message to ", t.Name, err)
 					}
 					break
 				}
@@ -424,7 +446,7 @@ func (c *Connection) LobbyConnect() {
 					c.totalMatches++
 				}
 
-				var start int16 = 0
+				var start int = 0
 				for {
 					if _, ok := Pending.Matches[start]; ok {
 						start++
@@ -449,7 +471,7 @@ func (c *Connection) LobbyConnect() {
 				}()
 
 			default:
-				fmt.Println("I'm not familiar with type " + t.Type)
+				log.Println("I'm not familiar with type ", t.Type, " sent by ", t.Name)
 			}
 		} else {
 			log.Printf("IP %s Invalid websocket authentication in lobby.\n", c.clientIP)

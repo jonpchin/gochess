@@ -145,26 +145,32 @@ window.onload = function() {
 
     sock.onopen = function() {
 
-		document.getElementById('textbox').innerHTML = "";
-		var message = {
-			Type: "chat_private",
-			Name: user,
-			Text: "has joined the chess room."
-		}
-	    sock.send(JSON.stringify(message));
-
 		// If a game is being spectated then do not load chess_game
 		if(typeof token.spectate !== "undefined"){
-			// since game is attempting to be spectated disable
-			// appropriate game controls and piece movement
-				
+
+				// spectators should not be able to do anything but watch the game
+				document.getElementById("abortButton").disabled = true;
+				document.getElementById("drawButton").disabled = true;
+				document.getElementById("resignButton").disabled = true;
+				document.getElementById("message").disabled = true;
+				document.getElementById("sendMessage").disabled = true;
+				document.getElementById("rematchButton").disabled = true;
+
 			var message = {
 				Type:  "spectate_game",
 				Name:  user,
-				ID:    token.id.toString()
+				ID:    token.id
 			}
 			sock.send(JSON.stringify(message));
 		}else{
+			document.getElementById('textbox').innerHTML = "";
+			var message = {
+				Type: "chat_private",
+				Name: user,
+				Text: "has joined the chess room."
+			}
+			sock.send(JSON.stringify(message));
+			
 			var chess_game = {
 				Type: "chess_game",
 				Name: user
@@ -270,7 +276,12 @@ window.onload = function() {
 				document.getElementById("abortButton").disabled = false;
 				document.getElementById("drawButton").disabled = false;
 				document.getElementById("resignButton").disabled = false;
-				
+
+				//storing matchID in global variable used in sending moves for verification
+				matchID = json.ID;
+				WhiteSide = json.WhitePlayer;
+				BlackSide = json.BlackPlayer;
+
 				// if spectate is turned off then other people cannot view this game
 				var spectateResult = "No";
 				if(toggleSpectate !== "false"){
@@ -279,15 +290,10 @@ window.onload = function() {
 				var spectateMessage = {
 					Type: "update_spectate",
 					Name: user,
-					ID: matchID,
+					ID: matchID.toString(),
 					Spectate: spectateResult
 				}
 				sock.send(JSON.stringify(spectateMessage));	
-
-				//storing matchID in global variable used in sending moves for verification
-				matchID = json.ID;
-				WhiteSide = json.WhitePlayer;
-				BlackSide = json.BlackPlayer;
 
 				//if its move zero store time control so it can be used in rematch
 				timeGet = json.TimeControl;
