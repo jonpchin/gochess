@@ -7,14 +7,15 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"github.com/dchest/captcha"
-	_ "github.com/go-sql-driver/mysql"
-	"golang.org/x/crypto/scrypt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/dchest/captcha"
+	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/scrypt"
 )
 
 // global SessionManager["username"] = sessionID
@@ -26,7 +27,6 @@ type Person struct {
 	Bullet   int16
 	Blitz    int16
 	Standard int16
-	//email   string
 }
 
 //process user input when signing in
@@ -85,8 +85,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		//checking if password entered by user matches encrypted key
 		if pass != key {
-			browser := r.UserAgent()
-			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
+			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 
 			if captcha == 1 {
 				w.Write([]byte("<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' />  You entered password incorrectly too many times. Now you need to enter captcha."))
@@ -215,9 +214,9 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				return
 			}
-			date := time.Now()
+
 			token = RandomString()
-			_, err = stmt.Exec(userName, token, email, date)
+			_, err = stmt.Exec(userName, token, email, time.Now())
 			if err != nil {
 				log.Println(err)
 				return
@@ -389,6 +388,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			}
 
 			date := time.Now()
+
 			res, err := stmt.Exec(userName, key, email, date, date, r.RemoteAddr, "NO", 0)
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 30"))

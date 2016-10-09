@@ -6,9 +6,10 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"gopkg.in/gomail.v2"
 	"log"
 	"os"
+
+	"gopkg.in/gomail.v2"
 )
 
 //returns true if sucessful sent email
@@ -24,9 +25,7 @@ func Sendmail(target string, token string, name string) {
 		"<br><br>Have fun!<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 
-	answer := mailConfig()
-
-	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", answer)
+	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", mailConfig())
 
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println("error in Sendmail mail.go ", err)
@@ -35,6 +34,7 @@ func Sendmail(target string, token string, name string) {
 
 //this function is used to send player the activation token when five incorrect login attempts are made
 func SendAttempt(target string, token string, name string, ip string) {
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
 	m.SetHeader("To", target)
@@ -45,9 +45,7 @@ func SendAttempt(target string, token string, name string, ip string) {
 		"<br><br>Please reactivate your account.<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 
-	answer := mailConfig()
-
-	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", answer)
+	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", mailConfig())
 
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println("error in SendAttempt mail.go ", err)
@@ -56,6 +54,7 @@ func SendAttempt(target string, token string, name string, ip string) {
 
 //sends email to user of a token to reset his password
 func SendForgot(target string, token string) {
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
 	m.SetHeader("To", target)
@@ -65,9 +64,7 @@ func SendForgot(target string, token string) {
 		"<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 
-	answer := mailConfig()
-
-	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", answer)
+	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", mailConfig())
 
 	if err := d.DialAndSend(m); err != nil {
 		fmt.Println("error in SendForgot mail.go ", err)
@@ -93,7 +90,6 @@ func mailConfig() string {
 	//decode
 	ans, _ := hex.DecodeString(pass)
 	result, _ := base64.StdEncoding.DecodeString(string(ans))
-	answer := string(result)
 
-	return answer
+	return string(result)
 }

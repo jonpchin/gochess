@@ -112,10 +112,8 @@ window.onload = function() {
 			else if (json.GameType === "standard" && (standard < json.MinRating || standard > json.MaxRati)){
 					return;		
 			}
-			else{
-				
+			else{	
 				if(json.Opponent !== ""){ //then its a private match
-					
 					$('#seekmatch').html(function() {
 	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +
 						   json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + 
@@ -144,8 +142,7 @@ window.onload = function() {
 		else if(json.Type === "broadcast"){
 			var table = document.getElementById("online");
 			for (var i = 0; i<table.rows.length; i++) {
-				var row = table.rows[i];
-				if(row.cells[0].innerHTML === json.Name){
+				if(table.rows[i].cells[0].innerHTML === json.Name){
 					table.deleteRow(i);
 					console.log(json.Name + " has left the lobby.");
 					break;

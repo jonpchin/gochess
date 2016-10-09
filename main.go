@@ -274,7 +274,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "private, max-age=86400")
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var all []gostuff.GoGame
 				var ratErr string
 				var bulletRating, blitzRating, standardRating, bulletRD, blitzRD, standardRD float64
@@ -304,8 +304,19 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 				bulletR := gostuff.RoundPlus(bulletRD, 2)
 				blitzR := gostuff.RoundPlus(blitzRD, 2)
 				standardR := gostuff.RoundPlus(standardRD, 2)
+				gameID, exist := gostuff.GetGameID(inputName)
+				opponent := ""
 
-				p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR, Games: all}
+				// if a player is not playing a game use -1 for the gameID
+				if exist == false {
+					gameID = -1
+				} else {
+					opponent = gostuff.PrivateChat[inputName]
+				}
+
+				p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
+					BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
+					Games: all, GameID: gameID, Opponent: opponent}
 
 				if err := playerProfile.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)

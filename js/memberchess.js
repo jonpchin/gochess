@@ -456,7 +456,7 @@ window.onload = function() {
 					document.getElementById('textbox').innerHTML += (datetime + " Black is in checkmate. White won!"+ '\n');
 				}
 				else{
-					console.log("Invalid game status line 243");
+					console.log("Invalid game status");
 				}
 				gameOver();
 				break;
@@ -504,13 +504,11 @@ window.onload = function() {
     }
 	
 	document.getElementById('sendMessage').onclick = function(){
-	    
-		var msg = document.getElementById('message').value;
-		
+
 		var message = {
 			Type: "chat_private",
 			Name: user,
-			Text: msg
+			Text: document.getElementById('message').value
 		}
 	    sock.send(JSON.stringify(message));
 		//clears input box so next message can be typed without having to clear
@@ -621,7 +619,6 @@ $('#goBack').on('click', function() {
 	if(moveCounter > 0){
 		
 		moveCounter--;
-		
 	}
 	//make a global array and iterate backwards through the global array when going back
 	board.position(totalFEN[moveCounter]);
@@ -639,8 +636,7 @@ document.getElementById('goEnd').onclick = function(){
 
 //offers player a rematch or accepts it if the other player offers
 document.getElementById('rematchButton').onclick = function(){
-	
-	var value = document.getElementById('rematchButton').value;
+
 	//the opponent
 	var fighter;
 	
@@ -651,7 +647,7 @@ document.getElementById('rematchButton').onclick = function(){
 		fighter = WhiteSide;
 	}
 	
-	if(value === "Rematch"){
+	if(document.getElementById('rematchButton').value === "Rematch"){
 		var message = {
 			Type: "rematch",
 			Name: user,	
@@ -659,9 +655,7 @@ document.getElementById('rematchButton').onclick = function(){
 			Rated: isRatedRematch,
 			TimeControl: timeGet
 		}
-		var datetime = timeStamp();
-		document.getElementById('textbox').innerHTML += (datetime + " You offer your opponent a rematch." + '\n');
-		    
+		document.getElementById('textbox').innerHTML += (timeStamp() + " You offer your opponent a rematch." + '\n');  
 	}
 	else{ //else value === "Accept Rematch"
 		var message = {
@@ -671,7 +665,6 @@ document.getElementById('rematchButton').onclick = function(){
 			TimeControl: timeGet
 		}
 		document.getElementById('rematchButton').value = "Rematch";
-
 	}
 	//hiding button after click to prevent rematch abuse
 	$('#rematchButton').hide();
