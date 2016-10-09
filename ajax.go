@@ -54,7 +54,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	if isPlayerInGame(lookupName, "") {
 		status = "vs. " + PrivateChat[lookupName]
 		icon = "playing"
-		id, _ := getGameID(lookupName)
+		id, _ := GetGameID(lookupName)
 		url = "<a href=/chess/memberChess?spectate&id=" + strconv.Itoa(id) + ">"
 		endUrl = "</a>"
 	}

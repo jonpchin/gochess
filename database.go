@@ -25,6 +25,8 @@ type ProfileGames struct {
 	BlitzRD    float64
 	StandardRD float64
 	Games      []GoGame
+	GameID     int
+	Opponent   string
 }
 
 //an individual game
@@ -438,9 +440,8 @@ func fetchSavedGame(id string, user string) bool {
 	initGame(game.ID, white, black)
 
 	var result bool
-	total := len(game.GameMoves)
 
-	for i := 0; i < total; i++ {
+	for i := 0; i < len(game.GameMoves); i++ {
 		result = chessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.GameMoves[i].P, game.ID)
 		if result == false {
 			log.Println("something went wrong in move validation in fetchSavedGame of saved game id ", game.ID)

@@ -2,14 +2,15 @@ package gostuff
 
 import (
 	"encoding/hex"
-	"github.com/dchest/captcha"
-	_ "github.com/go-sql-driver/mysql"
-	"golang.org/x/crypto/scrypt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/dchest/captcha"
+	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/crypto/scrypt"
 )
 
 //checks database to see if username and token is correct and then updates the new password
@@ -156,8 +157,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userName).Scan(&tokenInDB)
 		if err2 != nil || tokenInDB != token {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination"))
-			browser := r.UserAgent()
-			log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
+			log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 		//setting verify to yes and deleting row from activate table as well as captcha to zero to signfy user unlocked account
@@ -249,8 +249,7 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		}
 		if match != email {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong email/username combination."))
-			browser := r.UserAgent()
-			log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
+			log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 
@@ -272,8 +271,8 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-		date := time.Now()
-		res, err := stmt.Exec(userName, token, date)
+
+		res, err := stmt.Exec(userName, token, time.Now())
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Report to admin Error 21"))
 			log.Println(err)

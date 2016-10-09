@@ -192,7 +192,7 @@ func (c *Connection) ChessConnect() {
 					counter = 0
 				}
 
-				gameID, exist := getGameID(t.Name)
+				gameID, exist := GetGameID(t.Name)
 
 				// prevent invalid map access which can cause race conditions
 				if _, ok := All.Games[gameID]; !ok {

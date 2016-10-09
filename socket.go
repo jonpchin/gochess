@@ -234,7 +234,7 @@ func removeViewer(name string, id int) []string {
 
 //gets the game ID that a player is currently playing
 //the bool indicates whether the player is currently playing a game
-func getGameID(name string) (int, bool) {
+func GetGameID(name string) (int, bool) {
 	for key, value := range All.Games {
 		if name == value.WhitePlayer || name == value.BlackPlayer {
 			return key, true
