@@ -14,6 +14,10 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+var (
+	domain = "localhost"
+)
+
 func main() {
 
 	http.HandleFunc("/", mainPage)
@@ -53,6 +57,28 @@ func main() {
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
+
+	//domain name used for testing
+	var development = "localhost"
+	//domain name used for production environment
+	var production = "goplaychess.com"
+	//path to JS files that need to have the domain name replaced
+	var lobbyFile = "./js/lobby.js"
+	var memberChessFile = "./js/memberchess.js"
+
+	//parse console arguments to determine OS environment to use localhost or goplaychess.com
+	//default is localhost if no argument is passed
+	if len(os.Args) > 1 {
+		domain = os.Args[1]
+		//production environment
+		gostuff.ReplaceString(development, production, lobbyFile)
+		gostuff.ReplaceString(development, production, memberChessFile)
+
+	} else {
+		//if reached here then the server is expected to be running in development environment
+		gostuff.ReplaceString(production, development, lobbyFile)
+		gostuff.ReplaceString(production, development, memberChessFile)
+	}
 
 	go func() {
 		//setting up database, the directory location of database backups is passed in
@@ -430,5 +456,5 @@ func robot(w http.ResponseWriter, r *http.Request) {
 }
 
 func redir(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://localhost"+r.RequestURI, http.StatusMovedPermanently)
+	http.Redirect(w, r, "https://"+domain+r.RequestURI, http.StatusMovedPermanently)
 }

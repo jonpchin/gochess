@@ -2,7 +2,7 @@ if (!window.WebSocket){
 	$('#checkwebsocket').html("Your browser doesn't support websockets." + 
 		"Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
-var wsuri = "wss://localhost:443/server";
+var wsuri = "wss://localhost:443/chess";
 var sock = new WebSocket(wsuri);
 $(window).on('beforeunload', function(){
 	sock.close();
