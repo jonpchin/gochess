@@ -3,6 +3,6 @@ language: go
 go:
   - 1.7.1
 
-sudo: required  
+os: ubuntu
   
 script: go test ./gostuff
