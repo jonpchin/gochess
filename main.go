@@ -65,6 +65,9 @@ func main() {
 	//path to JS files that need to have the domain name replaced
 	var lobbyFile = "./js/lobby.js"
 	var memberChessFile = "./js/memberchess.js"
+	var goMail = "./gostuff/mail.go"
+	var certPath = "secret/device.crt"
+	var keyPath = "secret/device.key"
 
 	//parse console arguments to determine OS environment to use localhost or goplaychess.com
 	//default is localhost if no argument is passed
@@ -73,11 +76,15 @@ func main() {
 		//production environment
 		gostuff.ReplaceString(development, production, lobbyFile)
 		gostuff.ReplaceString(development, production, memberChessFile)
+		gostuff.ReplaceString(development, production, goMail)
+		certPath = "secret/combine.crt"
+		keyPath = "secret/go.key"
 
 	} else {
 		//if reached here then the server is expected to be running in development environment
 		gostuff.ReplaceString(production, development, lobbyFile)
 		gostuff.ReplaceString(production, development, memberChessFile)
+		gostuff.ReplaceString(production, development, goMail)
 	}
 
 	go func() {
@@ -112,7 +119,7 @@ func main() {
 	}()
 
 	go func() {
-		if err := http.ListenAndServeTLS(":443", "secret/device.crt", "secret/device.key", nil); err != nil {
+		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
 		}
 	}()
