@@ -213,7 +213,7 @@ window.onload = function() {
 				}			
 	
 				//disables abort button
-				if($('#abortButton').is(':disabled') === false && totalFEN.length >= 1){
+				if($('#abortButton').is(':disabled') === false && totalFEN.length >= 2){
 					document.getElementById("abortButton").disabled = true; 
 				}
 				
@@ -331,6 +331,11 @@ window.onload = function() {
 				}
 				// now go to the last move
 				$('#goEnd').click();
+
+				// enable abort button if less then 3 moves
+				if(totalFEN.length <= 2){
+					document.getElementById("abortButton").disabled = false; 
+				}
 				
 				//formating time for clock 
 				json.WhiteMinutes = json.WhiteMinutes < 10 ? "0" + json.WhiteMinutes : json.WhiteMinutes;
