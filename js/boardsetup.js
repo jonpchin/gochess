@@ -7,8 +7,8 @@ pgnEl = $('#pgn');
 
 //used to store whether or not the game is over due to resignation or mututal draw agreement
 var chessGameOver;
-//stores the moves of all the games, use length of moves to determine if abort button should be disabled
-var moves = [];
+//global array of FEN strings, used when pressing back button
+var totalFEN = [];
 //used to store what move the game is on, their will be double moves in total one for black and one for white
 var moveCounter = 0;
 var user; 
@@ -102,7 +102,7 @@ var onDrop = function(source, target, piece) {
 
   
 	//used to store players own move, moves array is stored in memberchess.js
-	moves.push([source, target])
+	totalFEN.push(game.fen());
  	moveCounter++;
 	//starting player's clock on move 1
   
@@ -119,9 +119,7 @@ var onDrop = function(source, target, piece) {
 // update the board position after the piece snap 
 // for castling, en passant, pawn promotion
 var onSnapEnd = function() {
-	if(reviewGame === false){
-		board.position(game.fen());
-	}
+	board.position(game.fen());
 };
 
 var updateStatus = function() {
@@ -193,7 +191,6 @@ document.getElementById('goStart').onclick = function(){
 	
 	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 	moveCounter = 0;
-		
 }
 
 function getCookie(cname) { //gets cookies value

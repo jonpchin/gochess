@@ -8,9 +8,6 @@ var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
 var gameSound = new Audio('../sound/startgame.mp3');
 
-//global array of FEN strings, used when pressing back button
-var totalFEN = [];
-
 var whiteClock = new Tock({
 	countdown: true,
 	interval: 1000,
@@ -71,13 +68,16 @@ window.onload = function() {
 		}
 		game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', WhiteSide, 'Black', BlackSide, 
 			'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
-		var pgn = game.pgn();
-		var fileName = WhiteSide + "vs" + BlackSide + ".pgn";
-		download(pgn, fileName, "application/x-chess-pgn");
+
+		// second parameter is file name
+		download(game.pgn(), WhiteSide + "vs" + BlackSide + ".pgn", "application/x-chess-pgn");
 	}	
 	
 	user = document.getElementById('user').value;
 	
+	//always push the default starting position
+	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
 	var token = parseUrl();
 	var reviewMoves = token.moves;
 	
@@ -113,8 +113,6 @@ window.onload = function() {
 		if(review !== null){
 			length = review.length;
 		}
-		//always push the default starting position
-		totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
 		for(var i=0; i<length; i++){
 			
@@ -125,16 +123,11 @@ window.onload = function() {
 		    });	
 
 		    updateStatus();
-			
-			board.move(review[i].S + "-" + review[i].T);
-			moves.push([ review[i].S, review[i].T ]);
-			//pushing on next FEN string
-			var fenString = game.fen();
-			totalFEN.push(fenString);
-
+			totalFEN.push(game.fen());
 			moveCounter++;
 		}
-		onSnapEnd();
+		// after all FEN strings are pushed then go to the last move
+		$('#goEnd').click();
 		return; //prevents game from loading if game is being reviewed	
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
@@ -192,6 +185,7 @@ window.onload = function() {
 
 		switch (json.Type) {
 			case "send_move":
+			
 				// see if the move is legal
 			    var move = game.move({
 				    from: json.Source,
@@ -207,18 +201,22 @@ window.onload = function() {
 			    updateStatus();
 				
 				//adding moves to array so player can go forward and backward through chess game
-				moves.push([json.Source, json.Target])
+				var fen = game.fen();
+				totalFEN.push(fen);
+
+				board.position(fen);
+				moveCounter++;
+
 				//if draw button is Accept draw then make it say offer draw
 				if (document.getElementById("drawButton").value === "Accept Draw"){
 					document.getElementById("drawButton").value= "Offer Draw";
 				}			
 	
 				//disables abort button
-				if($('#abortButton').is(':disabled') === false && moves.length >= 1){
+				if($('#abortButton').is(':disabled') === false && totalFEN.length >= 1){
 					document.getElementById("abortButton").disabled = true; 
 				}
-				board.move(json.Source + "-" + json.Target);
-				moveCounter++;
+				
 				//make the premove that was stored if its stored
 				if(preMoveYes){
 					var result = onDrop(srcPreMove, targetPreMove)
@@ -226,13 +224,13 @@ window.onload = function() {
 						//return
 					}
 					else{
-						board.move(srcPreMove + "-" + targetPreMove);	
+						// this game.fen() is different then the one stored in fen variable
+						board.position(game.fen());	
 					}
 					preMoveYes = false;
 					removeHighlights('color');		
 				}
 					
-				onSnapEnd();
 				whiteClock.pause();
 	            blackClock.pause();
 				if(toggleSound !== "false"){
@@ -315,12 +313,9 @@ window.onload = function() {
 					     });
 
 					    updateStatus();
-						
-						board.move(json.GameMoves[i].S + "-" + json.GameMoves[i].T);
-						moves.push([ json.GameMoves[i].S, json.GameMoves[i].T ]);
+						totalFEN.push(game.fen());
 						moveCounter++;
 					}
-					onSnapEnd(); //used to update castling and en passent positions
 				}
 				else{
 					if(toggleSound !== "false"){
@@ -334,6 +329,8 @@ window.onload = function() {
 					board.orientation('white');
 					game.reset();								
 				}
+				// now go to the last move
+				$('#goEnd').click();
 				
 				//formating time for clock 
 				json.WhiteMinutes = json.WhiteMinutes < 10 ? "0" + json.WhiteMinutes : json.WhiteMinutes;
@@ -608,7 +605,7 @@ function sendMove(src, dest, pawnPromotion){
 //go forward one move
 document.getElementById('goForward').onclick = function(){
 
-	if(moveCounter < moves.length){	
+	if(moveCounter < totalFEN.length){	
 		moveCounter++;
 	}
 	//make a global array and iterate forwards through the global array when going forward
@@ -627,11 +624,10 @@ $('#goBack').on('click', function() {
 //move forward to last move
 document.getElementById('goEnd').onclick = function(){
 
-	for(var i=moveCounter; i<moves.length; i++){
-
-		board.move(moves[i][0] + "-" + moves[i][1]);
+	for(var i=moveCounter; i<totalFEN.length; i++){
+		board.position(totalFEN[i]);
 	}
-	moveCounter = moves.length;	
+	moveCounter = totalFEN.length;
 } 
 
 //offers player a rematch or accepts it if the other player offers

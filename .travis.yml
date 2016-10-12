@@ -2,7 +2,5 @@ language: go
 
 go:
   - 1.7.1
-
-os: ubuntu
   
 script: go test ./gostuff
