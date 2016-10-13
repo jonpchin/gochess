@@ -2,7 +2,7 @@ var board,
 game = new Chess(),
 boardEl = $('#board'),
 statusEl = $('#status'),
-fenEl = $('#fen'),
+// fenEl = $('#fen'), FEN string is currently not being used
 pgnEl = $('#pgn');
 
 //used to store whether or not the game is over due to resignation or mututal draw agreement
@@ -152,9 +152,9 @@ var updateStatus = function() {
 	      status += ', ' + moveColor + ' is in check';
 	    }
 	}
-	
+
 	statusEl.html(status);
-	fenEl.html(game.fen());
+//	fenEl.html(game.fen()); FEN string is currently not being used
 	pgnEl.html(game.pgn());
 };
 //removes premove coor
