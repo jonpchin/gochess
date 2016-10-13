@@ -121,13 +121,13 @@ window.onload = function() {
 			    to: review[i].T,
 			    promotion: review[i].P
 		    });	
-
-		    updateStatus();
+    
 			totalFEN.push(game.fen());
 			moveCounter++;
 		}
 		// after all FEN strings are pushed then go to the last move
 		$('#goEnd').click();
+		updateStatus();
 		return; //prevents game from loading if game is being reviewed	
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
@@ -309,13 +309,14 @@ window.onload = function() {
 						var move = game.move({
 						    from: json.GameMoves[i].S,
 						    to: json.GameMoves[i].T,
-						    promotion: json.GameMoves[i].P // NOTE: always promote to a queen for example simplicity
+						    promotion: json.GameMoves[i].P
 					     });
 
-					    updateStatus();
+					    
 						totalFEN.push(game.fen());
 						moveCounter++;
 					}
+					updateStatus();
 				}
 				else{
 					if(toggleSound !== "false"){
@@ -623,8 +624,7 @@ $('#goBack').on('click', function() {
 		moveCounter--;
 	}
 	//make a global array and iterate backwards through the global array when going back
-	board.position(totalFEN[moveCounter]);
-	
+	board.position(totalFEN[moveCounter]);	
 });
 //move forward to last move
 document.getElementById('goEnd').onclick = function(){

@@ -152,13 +152,10 @@ var updateStatus = function() {
 	      status += ', ' + moveColor + ' is in check';
 	    }
 	}
-
-	statusEl.html(status);
-	if(reviewGame === false){
-		fenEl.html(game.fen());
-		pgnEl.html(game.pgn());
-	}
 	
+	statusEl.html(status);
+	fenEl.html(game.fen());
+	pgnEl.html(game.pgn());
 };
 //removes premove coor
 var removeHighlights = function(color) {
