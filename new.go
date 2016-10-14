@@ -128,7 +128,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		if err != nil {
-			log.Println("new.go ProcessLogin 4 ", err)
+			log.Println(err)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Error in captcha section 3"))
 			return
 		}
@@ -155,11 +155,8 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("<script>window.location = '/memberHome'</script>"))
 
 	} else if !captcha.VerifyString(capID, capSol) {
-
 		w.Write([]byte("<script>document.getElementById('captchaSolution').value = '';</script><img src='img/ajax/not-available.png' /> Wrong captcha solution! Please try again."))
-
 	} else {
-
 		//check if database connection is open
 		if db.Ping() != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Error 24"))
@@ -244,9 +241,8 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if pass != key {
-			browser := r.UserAgent()
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
-			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
+			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
@@ -273,7 +269,6 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			if err2 != nil {
 				log.Println(err2)
 			} else {
-
 				go func(email, tokenInDB, userName string) {
 					Sendmail(email, tokenInDB, userName)
 				}(email, tokenInDB, userName)
@@ -431,7 +426,6 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 34"))
 				log.Println(err)
 				return
-
 			}
 
 			res, err = stmt.Exec(userName, "1500", "1500", "1500", "350.0", "350.0", "350.0")
