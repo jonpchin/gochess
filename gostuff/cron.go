@@ -2,9 +2,10 @@ package gostuff
 
 import (
 	"fmt"
-	"github.com/robfig/cron"
 	"log"
 	"os"
+
+	"github.com/robfig/cron"
 )
 
 func StartCron() {
@@ -85,7 +86,6 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 //remove games older then 30 days to clean up profile page, activated only on server startup
 func RemoveOldGames(days string) {
 
-	//DELETE FROM games WHERE date < NOW() - INTERVAL 100 DAY;
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)

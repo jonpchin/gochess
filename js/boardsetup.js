@@ -2,13 +2,15 @@ var board,
 game = new Chess(),
 boardEl = $('#board'),
 statusEl = $('#status'),
-// fenEl = $('#fen'), FEN string is currently not being used
+// fenEl = $('#fen'), FEN string is not being used
 pgnEl = $('#pgn');
 
 //used to store whether or not the game is over due to resignation or mututal draw agreement
 var chessGameOver;
-//global array of FEN strings, used when pressing back button
+//global array of FEN strings, PGN, and statuus used when reviewing game
 var totalFEN = [];
+var totalPGN = [];
+var totalStatus = []
 //used to store what move the game is on, their will be double moves in total one for black and one for white
 var moveCounter = 0;
 var user; 
@@ -103,12 +105,14 @@ var onDrop = function(source, target, piece) {
   
 	//used to store players own move, moves array is stored in memberchess.js
 	totalFEN.push(game.fen());
+	var pgn = game.pgn();
+	totalPGN.push(pgn);
+	var gameStatus = updateStatus();
+	totalStatus.push(gameStatus);
  	moveCounter++;
-	//starting player's clock on move 1
   
 	sendMove(source, target, pawnPromotion);
-	
-	updateStatus();	
+	setStatusAndPGN(gameStatus, pgn)
 	
 	if(skipPromotion){
 		board.position(game.fen());
@@ -122,6 +126,7 @@ var onSnapEnd = function() {
 	board.position(game.fen());
 };
 
+// returns status of current game
 var updateStatus = function() {
 	var status = '';
 	
@@ -135,8 +140,7 @@ var updateStatus = function() {
 		status = 'Game over, ' + moveColor + ' is in checkmate.';
 		if(WhiteSide === user){ // prevents game over duplication being sent to server
 			finishGame(moveColor); //function call located in memberchess.js
-		}
-	
+		}	
 	}
 	else if (game.in_draw() === true) { // draw, todo: need to message server when this is triggered
 		status = 'Game over, drawn position';
@@ -152,11 +156,15 @@ var updateStatus = function() {
 	      status += ', ' + moveColor + ' is in check';
 	    }
 	}
-
-	statusEl.html(status);
-//	fenEl.html(game.fen()); FEN string is currently not being used
-	pgnEl.html(game.pgn());
+	return status;
 };
+
+var setStatusAndPGN = function(status, pgn){
+	statusEl.html(status);
+	//	fenEl.html(game.fen()); FEN string is not being used
+	pgnEl.html(pgn);
+}
+
 //removes premove coor
 var removeHighlights = function(color) {
   boardEl.find('.square-55d63')
@@ -180,7 +188,8 @@ var cfg = {
 
 board = ChessBoard('board', cfg);
 
-updateStatus();
+// defaults the status of the game and pgn
+setStatusAndPGN("White to move", "")
 
 $('#flipOrientationBtn').on('click', board.flip);
 
@@ -188,6 +197,7 @@ document.getElementById('goStart').onclick = function(){
 	
 	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 	moveCounter = 0;
+	setStatusAndPGN("White to move", "")
 }
 
 function getCookie(cname) { //gets cookies value

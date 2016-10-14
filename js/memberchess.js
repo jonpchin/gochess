@@ -77,6 +77,8 @@ window.onload = function() {
 	
 	//always push the default starting position
 	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	totalStatus.push("White to move");
+	totalPGN.push("");
 
 	var token = parseUrl();
 	var reviewMoves = token.moves;
@@ -123,11 +125,12 @@ window.onload = function() {
 		    });	
     
 			totalFEN.push(game.fen());
-			moveCounter++;
+			totalPGN.push(game.pgn());
+			totalStatus.push(updateStatus());
+//			moveCounter++;
 		}
 		// after all FEN strings are pushed then go to the last move
-		$('#goEnd').click();
-		updateStatus();
+//		$('#goEnd').click();
 		return; //prevents game from loading if game is being reviewed	
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
@@ -154,6 +157,7 @@ window.onload = function() {
 				ID:    token.id
 			}
 			sock.send(JSON.stringify(message));
+
 		}else{
 			document.getElementById('textbox').innerHTML = "";
 			var message = {
@@ -198,11 +202,15 @@ window.onload = function() {
 					return;
 				}
 	
-			    updateStatus();
+			    var gameStatus = updateStatus();
 				
 				//adding moves to array so player can go forward and backward through chess game
 				var fen = game.fen();
+				var pgn = game.pgn();
 				totalFEN.push(fen);
+				totalPGN.push(pgn);
+				totalStatus.push(gameStatus);
+				setStatusAndPGN(gameStatus, pgn);
 
 				board.position(fen);
 				moveCounter++;
@@ -225,7 +233,15 @@ window.onload = function() {
 					}
 					else{
 						// this game.fen() is different then the one stored in fen variable
-						board.position(game.fen());	
+						var fenPreMove = game.fen();
+						var pgnPreMove = game.pgn();
+						var preGameStatus = updateStatus();
+						
+						board.position(fenPreMove);	
+						totalFEN.push(fenPreMove);
+						totalPGN.push(pgnPreMove);
+						totalStatus.push(preGameStatus);
+						setStatusAndPGN(preGameStatus, pgnPreMove);
 					}
 					preMoveYes = false;
 					removeHighlights('color');		
@@ -277,8 +293,6 @@ window.onload = function() {
 				
 			case "chess_game":
 
-				//storing matchID in global variable used in sending moves for verification
-				matchID = json.ID;
 				WhiteSide = json.WhitePlayer;
 				BlackSide = json.BlackPlayer;
 
@@ -290,7 +304,7 @@ window.onload = function() {
 				var spectateMessage = {
 					Type: "update_spectate",
 					Name: user,
-					ID: matchID.toString(),
+					ID: json.ID.toString(),
 					Spectate: spectateResult
 				}
 				sock.send(JSON.stringify(spectateMessage));	
@@ -312,11 +326,14 @@ window.onload = function() {
 						    promotion: json.GameMoves[i].P
 					     });
 
-					    
 						totalFEN.push(game.fen());
+						totalPGN.push(game.pgn());
+						totalStatus.push(updateStatus());
 						moveCounter++;
 					}
-					updateStatus();
+					if(length-1 >= 0){
+						setStatusAndPGN(totalStatus[length-1], totalPGN[length-1]);
+					}
 				}
 				else{
 					if(toggleSound !== "false"){
@@ -616,7 +633,7 @@ document.getElementById('goForward').onclick = function(){
 	}
 	//make a global array and iterate forwards through the global array when going forward
 	board.position(totalFEN[moveCounter]);	
-	
+	setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
 } 
 $('#goBack').on('click', function() {
 	if(moveCounter > 0){
@@ -625,6 +642,7 @@ $('#goBack').on('click', function() {
 	}
 	//make a global array and iterate backwards through the global array when going back
 	board.position(totalFEN[moveCounter]);	
+	setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
 });
 //move forward to last move
 document.getElementById('goEnd').onclick = function(){
@@ -633,6 +651,9 @@ document.getElementById('goEnd').onclick = function(){
 		board.position(totalFEN[i]);
 	}
 	moveCounter = totalFEN.length;
+	if(moveCounter>=0){
+		setStatusAndPGN(totalStatus[moveCounter-1], totalPGN[moveCounter-1]);
+	}
 } 
 
 //offers player a rematch or accepts it if the other player offers
@@ -704,9 +725,8 @@ function gameOver(){
 }
 
 function detectMobile(){ //tries to detect if user is using a mobile device
-	
-	var screenWidth = screen.width;	
-	if(screenWidth <= 900){
+		
+	if(screen.width <= 900){
 		console.log("mobile device detected...adjusting board size and layout");
 		document.getElementById("chatleft").style.display = "none";
 		document.getElementById("notation").style.display = "none";	

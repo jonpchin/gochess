@@ -56,13 +56,12 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		err2 := db.QueryRow("SELECT token FROM forgot WHERE username=?", userName).Scan(&tokenInDB)
 		if err2 != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
-			log.Println("account.go processResetPass 1 ", err2)
+			log.Println(err2)
 			return
 		}
 		if tokenInDB != token {
-			browser := r.UserAgent()
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
-			log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, browser)
+			log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 
@@ -70,7 +69,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		stmt, err := db.Prepare("UPDATE userinfo SET password=? where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 3."))
-			log.Println("account.go processResetPass 2 ", err)
+			log.Println(err)
 			return
 		}
 
