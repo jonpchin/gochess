@@ -127,10 +127,7 @@ window.onload = function() {
 			totalFEN.push(game.fen());
 			totalPGN.push(game.pgn());
 			totalStatus.push(updateStatus());
-//			moveCounter++;
 		}
-		// after all FEN strings are pushed then go to the last move
-//		$('#goEnd').click();
 		return; //prevents game from loading if game is being reviewed	
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
@@ -334,6 +331,8 @@ window.onload = function() {
 					if(length-1 >= 0){
 						setStatusAndPGN(totalStatus[length-1], totalPGN[length-1]);
 					}
+					// now go to the last move
+					$('#goEnd').click();
 				}
 				else{
 					if(toggleSound !== "false"){
@@ -347,8 +346,6 @@ window.onload = function() {
 					board.orientation('white');
 					game.reset();								
 				}
-				// now go to the last move
-				$('#goEnd').click();
 
 				// enable abort button if less then 3 moves
 				if(totalFEN.length <= 2){

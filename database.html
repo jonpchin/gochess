@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"> 
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go Play Chess - Chess Room</title>
+<title>Go Play Chess - Database</title>
 <link href="../css/design.css" rel="stylesheet"/>
 <link rel='shortcut icon' href='../img/favicon.ico' type='image/x-icon'/>
 </head>
@@ -26,14 +26,11 @@
 
 <span id="playernames"><div id="topPlay"><span id="top">Black:</span> <input id="toptime" size="14"  value="10:00" readonly="true"> </div> <div id="bottomPlay">
 <span id="bottom">White:</span> <input id="bottomtime" size="14" value="10:00" readonly="true">  </div>
-<br><br><input type="button" id="rematchButton" value="Rematch" /></span>
+</span>
 
 <div id="content">
 <div id="board"></div>
 <input type="button" id="flipOrientationBtn" value="Flip" />
-&nbsp;&nbsp;<input type="button" id="abortButton" value="Abort" />
-&nbsp;&nbsp;<input type="button" id="drawButton" value="Offer Draw" />
-&nbsp;&nbsp;<input type="button" id="resignButton" value="Resign" />
 </div>
 
 <div id="notation">
@@ -47,17 +44,11 @@
 <p>PGN: <span id="pgn"></span><p>
 </div>
 
-<div id="myModal" class="modal">
-  <div class="modal-content">
-  </div>
-</div>
-
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="../js/jquery-2.1.4.min.js">\x3C/script>')</script>
 <script src="../js/chessboard.js"></script>
-<script src="../js/boardsetup.js"></script>
-<script src="../js/tock.js"></script>
+<script src="../js/dbsetup.js"></script>
 <script src="../js/download.js"></script>
-<script src="../js/memberchess.js"></script>
+<script src="../js/database.js"></script>
 </body>
 </html>
