@@ -167,7 +167,7 @@ var setStatusAndPGN = function(status, pgn){
 
 
 var cfg = {
-	draggable: setDrag,
+	draggable: false,
 	position: 'start',
 	onDragStart: onDragStart,
 	onDrop: onDrop,

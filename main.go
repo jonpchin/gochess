@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/server/lobby", lobby)
 	http.HandleFunc("/chess/memberChess", memberChess)
+	http.HandleFunc("/database", database)
 	http.HandleFunc("/profile", playerProfile)
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/help", help)
@@ -284,6 +285,28 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 				w.Header().Set("Cache-Control", "private, max-age=432000")
 				var memberHome = template.Must(template.ParseFiles("memberHome.html"))
+				p := gostuff.Person{User: username.Value}
+
+				if err := memberHome.Execute(w, &p); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
+				return
+			}
+		}
+	}
+	w.WriteHeader(404)
+	http.ServeFile(w, r, "404.html")
+}
+
+func database(w http.ResponseWriter, r *http.Request) {
+	username, err := r.Cookie("username")
+	if err == nil {
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+				w.Header().Set("Cache-Control", "private, max-age=432000")
+				var memberHome = template.Must(template.ParseFiles("database.html"))
 				p := gostuff.Person{User: username.Value}
 
 				if err := memberHome.Execute(w, &p); err != nil {

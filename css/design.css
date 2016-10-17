@@ -8,6 +8,24 @@
 	float:left;
 }
 
+table.database {
+	width: 42%;
+    height: 37%;
+	overflow:auto;
+	float:left;
+    border: 1px solid green;
+    border-collapse: collapse;
+}
+
+table.table2 {
+	width: 42%;
+    height: 37%;
+	overflow:auto;
+	float:left;
+    border: 1px solid green;
+    border-collapse: collapse;
+}
+
 table.table5, table.table6, table.table7, table.table8  {
 	width: 25%;
     height: 37%;

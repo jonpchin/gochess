@@ -10,6 +10,7 @@
 	<li><a href="/memberHome">Main</a></li>
 	<li><a href="/server/lobby">Lobby</a></li>
 	<li><a href="/chess/memberChess">Chess</a></li>
+	<li><a href="/database">Database</a></li>
 	<li><a href="/profile">Profile</a></li>
 	<li><a href="/settings">Settings</a></li>
 	<li><a href="/highscores">Scores</a></li>
@@ -20,8 +21,11 @@
 <script src="../js/chess.js"></script>
 <h1><span id="checkwebsocket"></span></h1>
 <div id="chatleft">
-<textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea>
-<p><input id="message" type="text" maxlength="68" size="20" value="hello"><button id="sendMessage">Send Message</button></p>
+<table class="database" id="grandmaster">
+	<tr>
+	<th>ID</th><th>Players</th>
+	</tr>
+</table>
 </div>
 
 <span id="playernames"><div id="topPlay"><span id="top">Black:</span> <input id="toptime" size="14"  value="10:00" readonly="true"> </div> <div id="bottomPlay">
