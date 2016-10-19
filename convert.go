@@ -24,6 +24,12 @@ type ConvertChessGame struct {
 	Moves     []Move
 }
 
+type NamesAndID struct {
+	ID    int
+	White string
+	Black string
+}
+
 type GrandMasterGame struct {
 	ID        int
 	Event     string
@@ -121,9 +127,9 @@ func storeGrandMaster(game *ConvertChessGame, allMoves []byte) {
 
 }
 
-// fetches games from database with the param being the range of the ID inclusive
+// fetches names of players and ID of games from database with the param being the range of the ID inclusive
 // returns JSON string of all games in range and true if successful
-func fetchGamesInRange(start int, last int) (string, bool) {
+func fetchPlayersInRange(start int, last int) (string, bool) {
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
@@ -135,7 +141,48 @@ func fetchGamesInRange(start int, last int) (string, bool) {
 	}
 
 	//looking up players rating
-	rows, err := db.Query("SELECT * FROM grandmaster WHERE id >= ? AND id <= ?", start, last)
+	rows, err := db.Query("SELECT id, white, black FROM grandmaster WHERE id >= ? AND id <= ?", start, last)
+	if err != nil {
+		log.Println(err)
+		return "", false
+	}
+
+	defer rows.Close()
+	var all NamesAndID
+	var storage []NamesAndID
+
+	for rows.Next() {
+
+		err = rows.Scan(&all.ID, &all.White, &all.Black)
+
+		if err != nil {
+			log.Println(err)
+			return "", false
+		}
+		storage = append(storage, all)
+	}
+	allNamesAndID, err := json.Marshal(storage)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return string(allNamesAndID), true
+}
+
+// fetches all data of a chess game by the ID
+func fetchGameByID(id int) (string, bool) {
+	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problems.Close()
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
+
+	//check if database connection is open
+	if db.Ping() != nil {
+		log.Println("DATABASE DOWN!")
+		return "", false
+	}
+
+	//looking up players rating
+	rows, err := db.Query("SELECT * FROM grandmaster WHERE id=?", id)
 	if err != nil {
 		log.Println(err)
 		return "", false
