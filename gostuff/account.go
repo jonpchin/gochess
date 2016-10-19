@@ -61,7 +61,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		}
 		if tokenInDB != token {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
-			log.Printf("FAILED password RESET IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 
@@ -248,7 +248,7 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		}
 		if match != email {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong email/username combination."))
-			log.Printf("FAILED SEND password RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 
