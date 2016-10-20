@@ -1,9 +1,12 @@
 package gostuff
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/dchest/captcha"
@@ -121,4 +124,131 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Invalid user ajax.go ResumeGame 1")
 	}
 	w.Write([]byte("false"))
+}
+
+// fetches names of players and ID of games from database with the param being the range of the ID inclusive
+// returns JSON string of all games in range, returning blank string means there was an error
+func FetchPlayersInRange(w http.ResponseWriter, r *http.Request) {
+
+	username, err := r.Cookie("username")
+	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
+		return
+	}
+
+	sessionID, err := r.Cookie("sessionID")
+	if err != nil {
+		return
+	}
+
+	if SessionManager[username.Value] != sessionID.Value {
+		return
+	}
+
+	// the name of the player being looked up by the AJAX call
+	start := template.HTMLEscapeString(r.FormValue("start"))
+	last := template.HTMLEscapeString(r.FormValue("last"))
+
+	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problems.Close()
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
+
+	//check if database connection is open
+	if db.Ping() != nil {
+		log.Println("DATABASE DOWN!")
+		w.Write([]byte(""))
+		return
+	}
+
+	//looking up players rating
+	rows, err := db.Query("SELECT id, white, black FROM grandmaster WHERE id >= ? AND id <= ?", start, last)
+	if err != nil {
+		log.Println(err)
+		w.Write([]byte(""))
+		return
+	}
+
+	defer rows.Close()
+	var all NamesAndID
+	var storage []NamesAndID
+
+	for rows.Next() {
+
+		err = rows.Scan(&all.ID, &all.White, &all.Black)
+
+		if err != nil {
+			log.Println(err)
+			w.Write([]byte(""))
+			return
+		}
+		storage = append(storage, all)
+	}
+	allNamesAndID, err := json.Marshal(storage)
+	if err != nil {
+		log.Println(err)
+	}
+
+	w.Write([]byte(string(allNamesAndID)))
+}
+
+// fetches all data of a chess game by the ID
+func FetchGameByID(w http.ResponseWriter, r *http.Request) {
+	username, err := r.Cookie("username")
+	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
+		return
+	}
+
+	sessionID, err := r.Cookie("sessionID")
+	if err != nil {
+		return
+	}
+
+	if SessionManager[username.Value] != sessionID.Value {
+		return
+	}
+
+	id := template.HTMLEscapeString(r.FormValue("gameID"))
+
+	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problems.Close()
+	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
+
+	//check if database connection is open
+	if db.Ping() != nil {
+		log.Println("DATABASE DOWN!")
+		w.Write([]byte(""))
+		return
+	}
+
+	//looking up players rating
+	rows, err := db.Query("SELECT * FROM grandmaster WHERE id=?", id)
+	if err != nil {
+		log.Println(err)
+		w.Write([]byte(""))
+		return
+	}
+
+	defer rows.Close()
+	var all GrandMasterGame
+	var storage []GrandMasterGame
+
+	for rows.Next() {
+
+		err = rows.Scan(&all.ID, &all.Event, &all.Site, &all.Date, &all.Round, &all.White,
+			&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,
+			&all.ECO, &all.Moves, &all.EventDate)
+
+		if err != nil {
+			log.Println(err)
+			w.Write([]byte(""))
+			return
+		}
+		storage = append(storage, all)
+	}
+	allGames, err := json.Marshal(storage)
+	if err != nil {
+		log.Println(err)
+		w.Write([]byte(""))
+		return
+	}
+	w.Write([]byte(string(allGames)))
 }
