@@ -219,32 +219,21 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var all GrandMasterGame
+
 	//looking up players rating
-	rows, err := db.Query("SELECT * FROM grandmaster WHERE id=?", id)
+	err = db.QueryRow("SELECT * FROM grandmaster WHERE id=?", id).Scan(&all.ID, &all.Event, &all.Site,
+		&all.Date, &all.Round, &all.White,
+		&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,
+		&all.ECO, &all.Moves, &all.EventDate)
+
 	if err != nil {
 		log.Println(err)
 		w.Write([]byte(""))
 		return
 	}
 
-	defer rows.Close()
-	var all GrandMasterGame
-	var storage []GrandMasterGame
-
-	for rows.Next() {
-
-		err = rows.Scan(&all.ID, &all.Event, &all.Site, &all.Date, &all.Round, &all.White,
-			&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,
-			&all.ECO, &all.Moves, &all.EventDate)
-
-		if err != nil {
-			log.Println(err)
-			w.Write([]byte(""))
-			return
-		}
-		storage = append(storage, all)
-	}
-	allGames, err := json.Marshal(storage)
+	allGames, err := json.Marshal(all)
 	if err != nil {
 		log.Println(err)
 		w.Write([]byte(""))
