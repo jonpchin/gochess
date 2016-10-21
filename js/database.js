@@ -1,12 +1,5 @@
- var matchID;
-var moveSound = new Audio('../sound/chessmove.mp3');
-var gameSound = new Audio('../sound/startgame.mp3');
-
-//getting user preferences
-var toggleSound = getCookie("sound");
-
-var whiteRating;
-var blackRating;
+var WhiteELO;
+var BlackELO;
 //timeGet is a global variable and is not located here
 var gameDate;
 var gameResult;
@@ -23,7 +16,7 @@ document.getElementById('exportPGN').onclick = function(){
         gameResult = "1/2-1/2";
     }
     game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', WhiteSide, 'Black', BlackSide, 
-        'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
+        'Result', gameResult, 'WhiteELO', WhiteELO, 'BlackElo', BlackELO, 'TimeControl', timeGet);
 
     // second parameter is file name
     download(game.pgn(), WhiteSide + "vs" + BlackSide + ".pgn", "application/x-chess-pgn");
@@ -49,102 +42,54 @@ function loadDatabase(){
     });
 }
 
-function loadGame(){
+function getGame(gameID){
     $.ajax({
-        url: 'load_game',
+        url: 'fetchgameID',
         type: 'post',
         dataType: 'html',
-        data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
+        data : { 'gameID': gameID},
         success : function(data) {			
-            $('#submit-result').html(data);	
+           //console.log(data);
+            loadGame(data);
         }	
     });
+}
 
-    WhiteSide = json.WhitePlayer;
-    BlackSide = json.BlackPlayer;
-    
-    //if the game moves are not null then restore the moves back
-    if(json.GameMoves !== null){
+getGame(3);
 
-        var length = json.GameMoves.length;				
+// loads game based on the JSON string in data that is passed in
+function loadGame(gameData){
+   
+    var json = JSON.parse(gameData);
+    var moves = JSON.parse(json.Moves);
+
+    if(moves !== null){
+
+        document.getElementById("bottom").innerHTML = "W: " + json.White + "(" +
+            json.WhiteElo + ")" ;
+        document.getElementById("top").innerHTML = "B: " + json.Black  + "(" +
+            json.BlackElo +")";
+            
+        whiteELO = json.WhiteElo;
+        blackELO = json.BlackElo;
+
+        var length = moves.length;				
         
         for(var i=0 ; i<length; i++){
-            
             var move = game.move({
-                from: json.GameMoves[i].S,
-                to: json.GameMoves[i].T,
-                promotion: json.GameMoves[i].P
-                });
+                from: moves[i].S,
+                to: moves[i].T,
+                promotion: moves[i].P
+            });
 
             totalFEN.push(game.fen());
             totalPGN.push(game.pgn());
             totalStatus.push(updateStatus());
-            moveCounter++;
         }
         if(length-1 >= 0){
             setStatusAndPGN(totalStatus[length-1], totalPGN[length-1]);
         }
-    }
-    else{
-        if(toggleSound !== "false"){
-            //play sound when game starts
-            gameSound.play();
-        }
-        chessGameOver = false; 		
-        
-        //reset game position to brand new game, used for rematch
-        board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
-        board.orientation('white');
-        game.reset();								
-    }
-    
-    //formating time for clock 
-    json.WhiteMinutes = json.WhiteMinutes < 10 ? "0" + json.WhiteMinutes : json.WhiteMinutes;
-    json.WhiteSeconds = json.WhiteSeconds < 10 ? "0" + json.WhiteSeconds : json.WhiteSeconds;
-    
-    json.BlackMinutes = json.BlackMinutes < 10 ? "0" + json.BlackMinutes : json.BlackMinutes;
-    json.BlackSeconds = json.BlackSeconds < 10 ? "0" + json.BlackSeconds : json.BlackSeconds;
-
-    if (user === json.WhitePlayer){
-                                            
-        document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + 
-            "'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
-        document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + 
-            "'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";			
-    }
-    else{
-        //flips board white on top black on bottom
-        $('#flipOrientationBtn').click();
-        document.getElementById("bottom").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + 
-            json.BlackPlayer + "</a>(" + json.BlackRating +")";
-        document.getElementById("top").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + 
-            json.WhitePlayer + "</a>(" + json.WhiteRating +")";
-    }
-    
-    if(json.Status === "White"){
-        if(user === json.WhitePlayer){
-            document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-            document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds;
-        }
-        else{
-            document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-            document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
-        }		
-    }
-    //else if (json.Status === "Black)
-    else {
-        if(user === json.WhitePlayer){
-            document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds;
-            blackClock.start($('#toptime').val());
-            document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-
-        }
-        else{
-            document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
-            blackClock.start($('#bottomtime').val());
-            document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-        }				
-    }
+    }		
 }
 
 function searchGame(){
