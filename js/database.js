@@ -1,17 +1,5 @@
 user = document.getElementById('user').value;
 
-function loadDatabase(){
-     $.ajax({
-        url: 'load_database',
-        type: 'post',
-        dataType: 'html',
-        data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
-        success : function(data) {			
-            $('#submit-result').html(data);	
-        }	
-    });
-}
-
 function getGame(gameID){
     $.ajax({
         url: 'fetchgameID',
@@ -19,20 +7,26 @@ function getGame(gameID){
         dataType: 'html',
         data : { 'gameID': gameID},
         success : function(data) {			
-           //console.log(data);
-            loadGame(data);
+            // error messages will be less then 100 characters, games always more then 100 characters
+            if(data.length <= 100){
+                document.getElementById('textbox').innerHTML += (timeStamp() + " " +
+			        data + "\n");
+            }else{
+                loadGame(data);
+            } 
         }	
     });
 }
 
-getGame(3);
+getGame(1);
 
 // loads game based on the JSON string in data that is passed in
 function loadGame(gameData){
    
     var json = JSON.parse(gameData);
     var moves = JSON.parse(json.Moves);
-
+    document.getElementById('textbox').innerHTML += (timeStamp() + " " +
+			"Game ID " +  json.ID + " has loaded.\n");
     if(moves !== null){
         //action listener for exporting game to PGN file
         document.getElementById('exportPGN').onclick = function(){
@@ -54,6 +48,12 @@ function loadGame(gameData){
         document.getElementById("eco").innerHTML = json.ECO;
         document.getElementById("result").innerHTML = json.Result;
 
+        //resetting array as its a brand new game
+        totalFEN = [];
+        totalStatus = [];
+        totalPGN = [];
+        $('#goStart').click();
+        game.reset();
         //always push the default starting position
         totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         totalStatus.push("White to move");
@@ -78,21 +78,9 @@ function loadGame(gameData){
     }		
 }
 
-function searchGame(){
-    $.ajax({
-        url: 'search_game',
-        type: 'post',
-        dataType: 'html',
-        data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
-        success : function(data) {			
-            $('#submit-result').html(data);	
-        }	
-    });
-}
-
 //go forward one move
 document.getElementById('goForward').onclick = function(){
-
+    console.log(moveCounter);
 	if(moveCounter < totalFEN.length){	
 		moveCounter++;
 	}
@@ -119,13 +107,11 @@ document.getElementById('goEnd').onclick = function(){
 	if(moveCounter>=0){
 		setStatusAndPGN(totalStatus[moveCounter-1], totalPGN[moveCounter-1]);
 	}
+}
+
+document.getElementById('searchGameButton').onclick = function(){
+    getGame(document.getElementById('searchID').value);
 } 
-	
-$('#message').keypress(function(event) {
-    if (event.which === 13) {
-	   $('#sendMessage').click();	
-    }
-});
 
 //validates input in seach box is a number that was entered
 function isNumber(evt){
@@ -141,3 +127,17 @@ function isNumber(evt){
 	}   
     return true;
 }
+
+function timeStamp(){ //returns timestamp
+	var currentdate = new Date(); 
+	var datetime =  + currentdate.getHours() + ":"  
+            		+ currentdate.getMinutes() + ":" 
+            		+ currentdate.getSeconds();
+	return datetime;
+}
+
+$('#searchID').keypress(function(event) {
+    if (event.which === 13) {  
+	   $('#searchGameButton').click();	
+    }
+});

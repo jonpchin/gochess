@@ -105,6 +105,7 @@ func main() {
 			gostuff.RemoveOldForgot(days)
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
+			gostuff.UpdateTotalGrandmasterGames()
 			//gostuff.ExportDatabase()
 		}
 

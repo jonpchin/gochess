@@ -21,14 +21,9 @@
 <script src="../js/chess.js"></script>
 <h1><span id="checkwebsocket"></span></h1>
 <div id="chatleft">
+<textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea>
 <p><input id="searchID" type="text" onkeypress='return isNumber(event)' 
- maxlength="8" size="8" value="1"><button id="searchButon">Search</button></p>
-<table class="database" id="grandmaster">
-	<tr>
-	<th>ID</th><th>Players</th>
-	</tr>
-</table>
-
+ maxlength="8" size="8" value="1"><button id="searchGameButton">Search</button></p>
 </div>
 
 <span id="playernames"><div id="topPlay"><span id="top">Black:</span> <input id="toptime" size="14"  value="10:00" readonly="true"> </div> <div id="bottomPlay">
@@ -46,8 +41,8 @@
 &nbsp;&nbsp;<input type="button" id="goForward" value="->" />
 &nbsp;&nbsp;<input type="button" id="goEnd" value=">>" />
 &nbsp;&nbsp;<input type="button" id="exportPGN" value="Export PGN" />
-
-<br><br>ID: <span id="gameID"></span><br>
+<br><br>
+ID: <span id="gameID"></span><br>
 Event: <span id="event"></span><br>
 Site: <span id="site"></span><br>
 ECO: <span id="eco"></span><br>

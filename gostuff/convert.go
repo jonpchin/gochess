@@ -8,6 +8,10 @@ import (
 	"gopkg.in/freeeve/pgn.v1"
 )
 
+var (
+	TotalGrandmasterGames = 0
+)
+
 type ConvertChessGame struct {
 	Event     string
 	Site      string
@@ -124,4 +128,15 @@ func storeGrandMaster(game *ConvertChessGame, allMoves []byte) {
 		return
 	}
 
+}
+
+func UpdateTotalGrandmasterGames() {
+	var total = 1
+	err := db.QueryRow("SELECT `AUTO_INCREMENT` FROM information_schema.TABLES WHERE TABLE_NAME = 'grandmaster'").Scan(&total)
+	if err != nil {
+		fmt.Println("UpdateTotalGrandmasterGames() convert.go", err)
+		return
+	}
+	//setting global total
+	TotalGrandmasterGames = total
 }
