@@ -194,15 +194,18 @@ func FetchPlayersInRange(w http.ResponseWriter, r *http.Request) {
 func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 	username, err := r.Cookie("username")
 	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
+		w.Write([]byte("Wrong authentication"))
 		return
 	}
 
 	sessionID, err := r.Cookie("sessionID")
 	if err != nil {
+		w.Write([]byte("Wrong authentication"))
 		return
 	}
 
 	if SessionManager[username.Value] != sessionID.Value {
+		w.Write([]byte("Wrong authentication"))
 		return
 	}
 
@@ -212,10 +215,21 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 	defer problems.Close()
 	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
+	num, err := strconv.Atoi(id)
+	if err != nil {
+		w.Write([]byte("Not a valid number. Please enter only digits."))
+		return
+	}
+	if num > TotalGrandmasterGames-1 || num <= 0 {
+		w.Write([]byte("Please search a game ID between 1 and " + strconv.Itoa(TotalGrandmasterGames-1)))
+		log.Println("There is not that many games in the grandmaster database")
+		return
+	}
+
 	//check if database connection is open
 	if db.Ping() != nil {
 		log.Println("DATABASE DOWN!")
-		w.Write([]byte(""))
+		w.Write([]byte("The database is offline"))
 		return
 	}
 
@@ -229,14 +243,14 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(err)
-		w.Write([]byte(""))
+		w.Write([]byte("Error in processing request"))
 		return
 	}
 
 	allGames, err := json.Marshal(all)
 	if err != nil {
 		log.Println(err)
-		w.Write([]byte(""))
+		w.Write([]byte("Unable to serialize data"))
 		return
 	}
 	w.Write([]byte(string(allGames)))
