@@ -1,34 +1,4 @@
-var WhiteELO;
-var BlackELO;
-//timeGet is a global variable and is not located here
-var gameDate;
-var gameResult;
-
-//action listener for exporting game to PGN file
-document.getElementById('exportPGN').onclick = function(){
-    if(gameResult === "0"){ //black won
-        gameResult = "0-1";
-    }
-    else if(gameResult === "1"){ //white won
-        gameResult = "1-0";
-    }
-    else{ //game is a draw
-        gameResult = "1/2-1/2";
-    }
-    game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', WhiteSide, 'Black', BlackSide, 
-        'Result', gameResult, 'WhiteELO', WhiteELO, 'BlackElo', BlackELO, 'TimeControl', timeGet);
-
-    // second parameter is file name
-    download(game.pgn(), WhiteSide + "vs" + BlackSide + ".pgn", "application/x-chess-pgn");
-}	
-
 user = document.getElementById('user').value;
-
-//always push the default starting position
-totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-totalStatus.push("White to move");
-totalPGN.push("");
-
 
 function loadDatabase(){
      $.ajax({
@@ -64,14 +34,30 @@ function loadGame(gameData){
     var moves = JSON.parse(json.Moves);
 
     if(moves !== null){
+        //action listener for exporting game to PGN file
+        document.getElementById('exportPGN').onclick = function(){
+            game.header('Site', json.Site, 'Event', json.Event, 'Date', json.Date, 'White',
+                json.White, 'Black', json.Black, 'Result', json.Result, 'WhiteELO',
+                json.WhiteElo, 'BlackElo', json.BlackElo);
+
+            // second parameter is file name
+            download(game.pgn(), json.White + "vs" + json.Black + ".pgn", "application/x-chess-pgn");
+        }	
 
         document.getElementById("bottom").innerHTML = "W: " + json.White + "(" +
             json.WhiteElo + ")" ;
         document.getElementById("top").innerHTML = "B: " + json.Black  + "(" +
             json.BlackElo +")";
-            
-        whiteELO = json.WhiteElo;
-        blackELO = json.BlackElo;
+        document.getElementById("gameID").innerHTML = json.ID;
+        document.getElementById("event").innerHTML = json.Event;
+        document.getElementById("site").innerHTML = json.Site;
+        document.getElementById("eco").innerHTML = json.ECO;
+        document.getElementById("result").innerHTML = json.Result;
+
+        //always push the default starting position
+        totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        totalStatus.push("White to move");
+        totalPGN.push("");
 
         var length = moves.length;				
         
@@ -141,11 +127,17 @@ $('#message').keypress(function(event) {
     }
 });
 
-//returns timestamp
-function timeStamp(){
-	var currentdate = new Date(); 
-	var datetime =  + currentdate.getHours() + ":"  
-              			+ currentdate.getMinutes() + ":" 
-              			+ currentdate.getSeconds();
-	return datetime;
+//validates input in seach box is a number that was entered
+function isNumber(evt){
+    
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    
+	// Allow backspace, left and right arrow keys
+	if(charCode === 8 || charCode === 37 || charCode === 39){
+		return true;
+	}
+    if (charCode < 48 || charCode > 58){
+		return false;
+	}   
+    return true;
 }
