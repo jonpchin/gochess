@@ -85,6 +85,5 @@ func importTemplateDatabase() bool {
 			return false
 		}
 	}
-
 	return true
 }

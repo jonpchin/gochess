@@ -3,10 +3,11 @@ package gostuff
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/websocket"
 	"log"
 	"os"
 	"time"
+
+	"golang.org/x/net/websocket"
 )
 
 //this function gets executed on ctrl-c
@@ -67,6 +68,7 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, rated=?," +
 		" whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?," +
 		" whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
+	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
 		return

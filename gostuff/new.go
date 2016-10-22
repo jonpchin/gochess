@@ -95,6 +95,8 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
+			defer stmt.Close()
+
 			if err != nil {
 				log.Println(err)
 				return
@@ -127,6 +129,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
+		defer stmt.Close()
 		if err != nil {
 			log.Println(err)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Error in captcha section 3"))
@@ -193,6 +196,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 			//increment captcha counter
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
+			defer stmt.Close()
 			if err != nil {
 				log.Println(err)
 				return
@@ -246,6 +250,8 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
+			defer stmt.Close()
+
 			if err != nil {
 				log.Println(err)
 			}
@@ -278,6 +284,8 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
+		defer stmt.Close()
+
 		if err != nil {
 			log.Println(err)
 		}
@@ -376,6 +384,8 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 			//inserting into database
 			stmt, err := db.Prepare("INSERT userinfo SET username=?, password=?, email=?, date=?, time=?, host=?, verify=?, captcha=?")
+			defer stmt.Close()
+
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 29"))
 				log.Println(err)

@@ -91,6 +91,7 @@ func main() {
 	}
 
 	go func() {
+
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./../backup")
 
@@ -127,8 +128,8 @@ func main() {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
 		}
 	}()
+	//	gostuff.ConvertAllPGN()
 	fmt.Println("Web server is now running.")
-	//gostuff.ConvertPGN()
 
 	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {
 		fmt.Printf("ListenAndServe error: %v\n", err)
