@@ -11,7 +11,7 @@ import (
 func StartCron() {
 	c := cron.New()
 	c.AddFunc("@daily", updateRD)
-	c.AddFunc("@weekly", ExportDatabase)
+	//	c.AddFunc("@weekly", ExportDatabase)
 	c.AddFunc("@hourly", UpdateHighScore)
 	c.Start()
 }
@@ -29,6 +29,7 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 	}
 
 	stmt, err := db.Prepare("update rating set bulletRD=bulletRD+1 where bulletRD < 250")
+	defer stmt.Close()
 
 	if err != nil {
 		log.Println(err)
@@ -65,6 +66,7 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 	log.Printf("%d rows were updated in blitz ratingRD table.\n", affect)
 
 	stmt, err = db.Prepare("update rating set standardRD=standardRD+1 where standardRD < 250")
+	defer stmt.Close()
 
 	if err != nil {
 		log.Println(err)
@@ -97,7 +99,7 @@ func RemoveOldGames(days string) {
 	}
 
 	stmt, err := db.Prepare("DELETE FROM games WHERE date < NOW() - INTERVAL " + days + " DAY")
-
+	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
 		return
@@ -128,6 +130,7 @@ func RemoveOldActivate(days string) {
 	}
 
 	stmt, err := db.Prepare("DELETE FROM activate WHERE expire < NOW() - INTERVAL " + days + " DAY")
+	defer stmt.Close()
 
 	if err != nil {
 		log.Println(err)
@@ -160,6 +163,7 @@ func RemoveOldForgot(days string) {
 	}
 
 	stmt, err := db.Prepare("DELETE FROM forgot WHERE expire < NOW() - INTERVAL " + days + " DAY")
+	defer stmt.Close()
 
 	if err != nil {
 		log.Println(err)

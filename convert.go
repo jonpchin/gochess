@@ -49,9 +49,27 @@ type GrandMasterGame struct {
 	Moves     string
 }
 
+func ConvertAllPGN() {
+	convertPGN("games/KingBase2016-03-A00-A39.pgn")
+	convertPGN("games/KingBase2016-03-A40-A79.pgn")
+	convertPGN("games/KingBase2016-03-A80-A99.pgn")
+	convertPGN("games/KingBase2016-03-B00-B19.pgn")
+	convertPGN("games/KingBase2016-03-B20-B49.pgn")
+	convertPGN("games/KingBase2016-03-B50-B99.pgn")
+	convertPGN("games/KingBase2016-03-C00-C19.pgn")
+	convertPGN("games/KingBase2016-03-C20-C59.pgn")
+	convertPGN("games/KingBase2016-03-C60-C99.pgn")
+	convertPGN("games/KingBase2016-03-D00-D29.pgn")
+	convertPGN("games/KingBase2016-03-D30-D69.pgn")
+	convertPGN("games/KingBase2016-03-D70-D99.pgn")
+	convertPGN("games/KingBase2016-03-E00-E19.pgn")
+	convertPGN("games/KingBase2016-03-E20-E59.pgn")
+	convertPGN("games/KingBase2016-03-E60-E99.pgn")
+}
+
 //converts text file pgn and prints it out
-func ConvertPGN() {
-	f, err := os.Open("games/KingBase2016-03-A80-A99.pgn")
+func convertPGN(file string) {
+	f, err := os.Open(file)
 	if err != nil {
 		fmt.Println("error is convert.go convertPGN 1", err)
 	}
@@ -127,6 +145,7 @@ func storeGrandMaster(game *ConvertChessGame, allMoves []byte) {
 		fmt.Println("convert.go storeGrandMaster 2", err)
 		return
 	}
+	stmt.Close()
 
 }
 
