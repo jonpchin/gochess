@@ -1,3 +1,6 @@
+// used to display empty board on settings page
+var board = ChessBoard('board');
+
 function getCookie(cname) { //gets cookies value
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -24,6 +27,7 @@ function setupCookies() {
 	var toggleSpectate = getCookie("spectate");
 	var togglePromote = getCookie("promote");
 	var pieceTheme = getCookie("pieceTheme");
+	var boardColor = getCookie("boardColor");
 
     if (toggleSound.value === "") { //if no cookie exist then set it to true
         setCookie("sound", "true", 30);
@@ -71,6 +75,23 @@ function setupCookies() {
 	else if(pieceTheme === "alpha"){
 		document.getElementById("alpha").checked = true;
 	}
+
+	switch(boardColor){
+		case "blueColor":
+			document.getElementById('blueColor').checked = true;
+			break;
+		case "greenColor":
+			document.getElementById('greenColor').checked = true;
+			break;
+		case "greyColor":
+			document.getElementById('greyColor').checked = true;
+			break;
+		case "pinkColor":
+			document.getElementById("pinkColor").checked = true;
+			break;
+		default:
+			setCookie("boardColor", "defaultColor", 30); //set default board color
+	}	
 }
 
 //setCookie("Age", 14, 3)
@@ -127,4 +148,55 @@ document.getElementById('uscf').onclick = function(){
 
 document.getElementById('alpha').onclick = function(){
 	setCookie("pieceTheme", "alpha", 30);	
+}
+
+// default dark: #b58863 light: #f0d9b5
+// green dark: #008000  light: #90EE90
+// blue dark: #4682B4 light: #B0E0E6
+// grey dark: #696969 light: #D3D3D3
+// pink dark: #FF69B4  light: #FFC0CB
+
+document.getElementById('defaultColor').onclick = function(){
+	setCookie("boardColor", "defaultColor", 30);
+	$('.black-3c85d').css({"background-color":"#b58863"});
+	$('.black-3c85d').css({"color":"#f0d9b5"});
+	
+	$('.white-1e1d7').css({"background-color":"#f0d9b5"});
+	$('.white-1e1d7').css({"color":"#b58863"});
+}
+
+document.getElementById('blueColor').onclick = function(){
+	setCookie("boardColor", "blueColor", 30);
+	$('.black-3c85d').css({"background-color":"#4682B4"});
+	$('.black-3c85d').css({"color":"#B0E0E6"});
+	
+	$('.white-1e1d7').css({"background-color":"#B0E0E6"});
+	$('.white-1e1d7').css({"color":"#4682B4"});
+}
+
+document.getElementById('greenColor').onclick = function(){
+	setCookie("boardColor", "greenColor", 30);
+	$('.black-3c85d').css({"background-color":"#008000"});
+	$('.black-3c85d').css({"color":"#90EE90"});
+	
+	$('.white-1e1d7').css({"background-color":"#90EE90"});
+	$('.white-1e1d7').css({"color":"#008000"});
+}
+
+document.getElementById('greyColor').onclick = function(){
+	setCookie("boardColor", "greyColor", 30);
+	$('.black-3c85d').css({"background-color":"#696969"});
+	$('.black-3c85d').css({"color":"#D3D3D3"});
+	
+	$('.white-1e1d7').css({"background-color":"#D3D3D3"});
+	$('.white-1e1d7').css({"color":"#696969"});
+}
+
+document.getElementById('pinkColor').onclick = function(){
+	setCookie("boardColor", "pinkColor", 30);
+	$('.black-3c85d').css({"background-color":"#FF69B4"});
+	$('.black-3c85d').css({"color":"#FFC0CB"});
+	
+	$('.white-1e1d7').css({"background-color":"#FFC0CB"});
+	$('.white-1e1d7').css({"color":"#FF69B4"});
 }

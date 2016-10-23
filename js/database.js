@@ -1,5 +1,3 @@
-user = document.getElementById('user').value;
-
 function getGame(gameID){
     $.ajax({
         url: 'fetchgameID',
@@ -36,7 +34,7 @@ function loadGame(gameData){
                 json.WhiteElo, 'BlackElo', json.BlackElo);
 
             // second parameter is file name
-            download(game.pgn(), json.White + "vs" + json.Black + ".pgn", "application/x-chess-pgn");
+            download(game.pgn(), json.White + " vs. " + json.Black + ".pgn", "application/x-chess-pgn");
         }	
 
         document.getElementById("bottom").innerHTML = "W: " + json.White + "(" +
@@ -155,3 +153,6 @@ $('#searchID').keypress(function(event) {
 	   $('#searchGameButton').click();	
     }
 });
+
+// used to set the board background color
+//$('.white-1e1d7').css({"background-color":"#7CFC00"});

@@ -70,7 +70,7 @@ window.onload = function() {
 			'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
 
 		// second parameter is file name
-		download(game.pgn(), WhiteSide + "vs" + BlackSide + ".pgn", "application/x-chess-pgn");
+		download(game.pgn(), WhiteSide + " vs. " + BlackSide + ".pgn", "application/x-chess-pgn");
 	}	
 	
 	user = document.getElementById('user').value;
