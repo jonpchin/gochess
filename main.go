@@ -107,7 +107,7 @@ func main() {
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
 			gostuff.UpdateTotalGrandmasterGames()
-			//gostuff.ExportDatabase()
+			// gostuff.ExportDatabase()
 		}
 
 		//gostuff.SpawnProcess()

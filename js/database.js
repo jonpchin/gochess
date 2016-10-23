@@ -10,10 +10,11 @@ function getGame(gameID){
             // error messages will be less then 100 characters, games always more then 100 characters
             if(data.length <= 100){
                 document.getElementById('textbox').innerHTML += (timeStamp() + " " +
-			        data + "\n");
+			        data + "\n"); 
             }else{
                 loadGame(data);
             } 
+            document.getElementById("textbox").scrollTop = document.getElementById("textbox").scrollHeight;
         }	
     });
 }
@@ -80,7 +81,6 @@ function loadGame(gameData){
 
 //go forward one move
 document.getElementById('goForward').onclick = function(){
-    console.log(moveCounter);
 	if(moveCounter < totalFEN.length){	
 		moveCounter++;
 	}
@@ -111,6 +111,20 @@ document.getElementById('goEnd').onclick = function(){
 
 document.getElementById('searchGameButton').onclick = function(){
     getGame(document.getElementById('searchID').value);
+} 
+
+document.getElementById('goForwardGame').onclick = function(){
+    var value = parseInt(document.getElementById('searchID').value) + 1
+    document.getElementById('searchID').value = value;
+    getGame(value);
+} 
+
+document.getElementById('goBackGame').onclick = function(){
+    var value = parseInt(document.getElementById('searchID').value) - 1;
+    if(value > 0){
+        document.getElementById('searchID').value = value;
+        getGame(value);
+    }
 } 
 
 //validates input in seach box is a number that was entered
