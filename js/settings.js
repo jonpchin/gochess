@@ -79,18 +79,23 @@ function setupCookies() {
 	switch(boardColor){
 		case "blueColor":
 			document.getElementById('blueColor').checked = true;
+			 setBlueColor();
 			break;
 		case "greenColor":
 			document.getElementById('greenColor').checked = true;
+			setGreenColor();
 			break;
 		case "greyColor":
 			document.getElementById('greyColor').checked = true;
+			setGreyColor();
 			break;
 		case "pinkColor":
 			document.getElementById("pinkColor").checked = true;
+			setPinkColor();
 			break;
 		default:
 			setCookie("boardColor", "defaultColor", 30); //set default board color
+			setDefaultColor();
 	}	
 }
 
@@ -155,9 +160,7 @@ document.getElementById('alpha').onclick = function(){
 // blue dark: #4682B4 light: #B0E0E6
 // grey dark: #696969 light: #D3D3D3
 // pink dark: #FF69B4  light: #FFC0CB
-
-document.getElementById('defaultColor').onclick = function(){
-	setCookie("boardColor", "defaultColor", 30);
+function setDefaultColor(){
 	$('.black-3c85d').css({"background-color":"#b58863"});
 	$('.black-3c85d').css({"color":"#f0d9b5"});
 	
@@ -165,8 +168,7 @@ document.getElementById('defaultColor').onclick = function(){
 	$('.white-1e1d7').css({"color":"#b58863"});
 }
 
-document.getElementById('blueColor').onclick = function(){
-	setCookie("boardColor", "blueColor", 30);
+function setBlueColor(){
 	$('.black-3c85d').css({"background-color":"#4682B4"});
 	$('.black-3c85d').css({"color":"#B0E0E6"});
 	
@@ -174,8 +176,7 @@ document.getElementById('blueColor').onclick = function(){
 	$('.white-1e1d7').css({"color":"#4682B4"});
 }
 
-document.getElementById('greenColor').onclick = function(){
-	setCookie("boardColor", "greenColor", 30);
+function setGreenColor(){
 	$('.black-3c85d').css({"background-color":"#008000"});
 	$('.black-3c85d').css({"color":"#90EE90"});
 	
@@ -183,8 +184,7 @@ document.getElementById('greenColor').onclick = function(){
 	$('.white-1e1d7').css({"color":"#008000"});
 }
 
-document.getElementById('greyColor').onclick = function(){
-	setCookie("boardColor", "greyColor", 30);
+function setGreyColor(){
 	$('.black-3c85d').css({"background-color":"#696969"});
 	$('.black-3c85d').css({"color":"#D3D3D3"});
 	
@@ -192,11 +192,35 @@ document.getElementById('greyColor').onclick = function(){
 	$('.white-1e1d7').css({"color":"#696969"});
 }
 
-document.getElementById('pinkColor').onclick = function(){
-	setCookie("boardColor", "pinkColor", 30);
+function setPinkColor(){
 	$('.black-3c85d').css({"background-color":"#FF69B4"});
 	$('.black-3c85d').css({"color":"#FFC0CB"});
 	
 	$('.white-1e1d7').css({"background-color":"#FFC0CB"});
 	$('.white-1e1d7').css({"color":"#FF69B4"});
+}
+
+document.getElementById('defaultColor').onclick = function(){
+	setCookie("boardColor", "defaultColor", 30);
+	setDefaultColor();
+}
+
+document.getElementById('blueColor').onclick = function(){
+	setCookie("boardColor", "blueColor", 30);
+	setBlueColor();
+}
+
+document.getElementById('greenColor').onclick = function(){
+	setCookie("boardColor", "greenColor", 30);
+	setGreenColor();
+}
+
+document.getElementById('greyColor').onclick = function(){
+	setCookie("boardColor", "greyColor", 30);
+	setGreyColor();
+}
+
+document.getElementById('pinkColor').onclick = function(){
+	setCookie("boardColor", "pinkColor", 30);
+	setPinkColor();
 }
