@@ -222,7 +222,6 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 	}
 	if num > TotalGrandmasterGames-1 || num <= 0 {
 		w.Write([]byte("Please search a game ID between 1 and " + strconv.Itoa(TotalGrandmasterGames-1)))
-		log.Println("There is not that many games in the grandmaster database")
 		return
 	}
 
