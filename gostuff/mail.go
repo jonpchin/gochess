@@ -1,4 +1,3 @@
-// mail.go
 package gostuff
 
 import (
@@ -80,7 +79,7 @@ func mailConfig() string {
 	readFile, err := os.Open("secret/mailpass.txt")
 	defer readFile.Close()
 	if err != nil {
-		fmt.Println("mailconfig mail.go ", err)
+		log.Println("mailconfig mail.go ", err)
 	}
 
 	scanner := bufio.NewScanner(readFile)

@@ -93,7 +93,7 @@ func main() {
 	go func() {
 
 		//setting up database, the directory location of database backups is passed in
-		proceed := gostuff.DbSetup("./../backup")
+		proceed := gostuff.DbSetup("./backup")
 
 		//setting up cron job
 		gostuff.StartCron()
@@ -107,7 +107,7 @@ func main() {
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
 			gostuff.UpdateTotalGrandmasterGames()
-			// gostuff.ExportDatabase()
+			//gostuff.ExportDatabase()
 		}
 
 		//gostuff.SpawnProcess()
