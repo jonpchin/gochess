@@ -79,39 +79,38 @@ func DbSetup(backup string) bool {
 
 	if db.Ping() != nil {
 		fmt.Println("Database ping failed. Please check if the database server is running.")
+		fmt.Println("database.go Dbsetup 6 MySQL is down!!!")
+		return false
+	}
 
-		var result string
-		//checking if database exist
-		db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
-		if result == "" {
-			fmt.Println("database.go DbSetup 3 Database", database, "does not exist")
-			fmt.Println("Please wait while database is imported...")
+	var result string
 
-			result := importDatabase()
+	//checking if database exist
+	db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
+	if result == "" {
+		fmt.Println("database.go DbSetup 3 Database", database, "does not exist")
+		fmt.Println("Please wait while database is imported...")
+
+		result := importDatabase()
+		if result == false {
+			result = importTemplateDatabase()
 			if result == false {
-				result = importTemplateDatabase()
-				if result == false {
-					fmt.Println("database.go Dbsetup FAILED to import both databases!")
-					return false
-				} else {
-					fmt.Println("Template database sucessfully imported!")
-				}
+				fmt.Println("database.go Dbsetup FAILED to import both databases!")
+				return false
 			} else {
-				fmt.Println("GoChess database sucessfully imported!")
+				fmt.Println("Template database sucessfully imported!")
 			}
-			// Opening up database again to see if newly imported database can connect
-			db, err = sql.Open("mysql", dbString)
-			if err != nil {
-				fmt.Println("Error opening new Database DBSetup 4", err)
-				return false
-			}
-			if db.Ping() != nil {
-				fmt.Println("database.go Dbsetup 5 MySQL is down!!!")
-				return false
-			}
-
 		} else {
-			fmt.Println("database.go Dbsetup 6 MySQL is down!!!")
+			fmt.Println("GoChess database sucessfully imported!")
+		}
+		// Opening up database again to see if newly imported database can connect
+		db, err = sql.Open("mysql", dbString)
+		if err != nil {
+			fmt.Println("Error opening new Database DBSetup 4", err)
+			return false
+		}
+		if db.Ping() != nil {
+			fmt.Println("database.go Dbsetup 5 MySQL is down!!!")
 			return false
 		}
 	}
