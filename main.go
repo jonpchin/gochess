@@ -107,6 +107,7 @@ func main() {
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
 			gostuff.UpdateTotalGrandmasterGames()
+			gostuff.ResizeImages()
 			//gostuff.ExportDatabase()
 		}
 
