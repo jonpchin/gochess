@@ -72,26 +72,35 @@ func ReplaceString(target, desired, source string) bool {
 
 // check if images need to be resized, if they do then resize them
 func ResizeImages() {
-	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer problems.Close()
-	log.SetOutput(problems)
 
 	// TODO: Read these values from a JSON file to avoid having to recompile every time these values
 	// are modified
 	var gopherPath = "./img/gophers/gopher.png"
-	var expectedGopherWidth = 800
-	var expectedGopherHeight = 409
+	var gamePath = "./img/screenshots/game.png"
+	var gameTargetPath = "./img/screenshots/gameResize.png"
+	var lobbyPath = "./img/screenshots/lobby.png"
+	var lobbyTargetPath = "./img/screenshots/lobbyResize.png"
+	resizeImage(gopherPath, gopherPath, 800, 409)
+	resizeImage(gamePath, gameTargetPath, 600, 337)
+	resizeImage(lobbyPath, lobbyTargetPath, 600, 337)
+}
 
-	gopherImage, err := imaging.Open(gopherPath)
+// resizes image by passing in path to image, the path to the image, width and height
+func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight int) {
+	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problems.Close()
+	log.SetOutput(problems)
+
+	image, err := imaging.Open(path)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	gopherWidth, gopherHeight := getImageDimensions(gopherPath)
-	if gopherWidth != expectedGopherWidth || gopherHeight != expectedGopherHeight {
-		resizedGopher := imaging.Resize(gopherImage, expectedGopherWidth, expectedGopherHeight, imaging.Lanczos)
-		err := imaging.Save(resizedGopher, "./img/gophers/gopher.png")
+	width, height := getImageDimensions(path)
+	if width != desiredWidth || height != desiredHeight {
+		resizedImage := imaging.Resize(image, desiredWidth, desiredHeight, imaging.Lanczos)
+		err := imaging.Save(resizedImage, targetPath)
 		if err != nil {
 			log.Println(err)
 			return
