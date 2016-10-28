@@ -80,12 +80,22 @@ func ResizeImages() {
 	var gameTargetPath = "./img/screenshots/gameResize.png"
 	var lobbyPath = "./img/screenshots/lobby.png"
 	var lobbyTargetPath = "./img/screenshots/lobbyResize.png"
+	var profilePath = "./img/screenshots/profile.png"
+	var profileTargetPath = "./img/screenshots/profileResize.png"
+	var settingsPath = "./img/screenshots/settings.png"
+	var settingsTargetPath = "./img/screenshots/settingsResize.png"
+	var screenShotWidth = 600
+	var screenShotHeight = 337
+
 	resizeImage(gopherPath, gopherPath, 800, 409)
-	resizeImage(gamePath, gameTargetPath, 600, 337)
-	resizeImage(lobbyPath, lobbyTargetPath, 600, 337)
+	resizeImage(gamePath, gameTargetPath, screenShotWidth, screenShotHeight)
+	resizeImage(lobbyPath, lobbyTargetPath, screenShotWidth, screenShotHeight)
+	resizeImage(profilePath, profileTargetPath, screenShotWidth, screenShotHeight)
+	resizeImage(settingsPath, settingsTargetPath, screenShotWidth, screenShotHeight)
 }
 
-// resizes image by passing in path to image, the path to the image, width and height
+// resizes image by passing in path to image, the path to the image, the desired width and desired height
+// of the target image
 func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight int) {
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -96,8 +106,17 @@ func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight
 		log.Println(err)
 		return
 	}
+	// we want to get the sized of the shrunken image to compare with the desired measurements
+	var width int
+	var height int
+	// if target image does not exist use the image that hasn't been resized
+	_, err = imaging.Open(targetPath)
+	if err != nil {
+		width, height = getImageDimensions(path)
+	} else {
+		width, height = getImageDimensions(targetPath)
+	}
 
-	width, height := getImageDimensions(path)
 	if width != desiredWidth || height != desiredHeight {
 		resizedImage := imaging.Resize(image, desiredWidth, desiredHeight, imaging.Lanczos)
 		err := imaging.Save(resizedImage, targetPath)
