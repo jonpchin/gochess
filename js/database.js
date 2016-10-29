@@ -1,3 +1,8 @@
+// global object which stores opening ECO, opening names and their moves
+var allOpenings;
+
+var openingDropDown = document.getElementById('openingDropDown');
+
 function getGame(gameID){
     $.ajax({
         url: 'fetchgameID',
@@ -18,6 +23,40 @@ function getGame(gameID){
 }
 
 getGame(1);
+// Fills opening drop down with ECO and opening name
+setupOpening();
+
+function setupOpening(){
+    console.log("entering openings");
+
+    $.getJSON('/data/openings.json', function(data) {         
+       
+        // setting global variable with the opening object
+        allOpenings = data;
+
+        for (var key in data) {
+            // skip loop if the property is from prototype
+            if (!data.hasOwnProperty(key)){
+                continue;
+            }
+
+            var option = document.createElement('option');
+            option.value = option.text = key + ": " + data[key].name;
+            openingDropDown.add(option);
+/*
+            var obj = data[key];
+            for (var prop in obj) {
+                // skip loop if the property is from prototype
+                if(!obj.hasOwnProperty(prop)) {
+                    continue;
+                }
+                // your code
+                console.log(prop + " = " + obj[prop]);
+            }
+*/
+        }
+    });
+}
 
 // loads game based on the JSON string in data that is passed in
 function loadGame(gameData){
@@ -153,6 +192,3 @@ $('#searchID').keypress(function(event) {
 	   $('#searchGameButton').click();	
     }
 });
-
-// used to set the board background color
-//$('.white-1e1d7').css({"background-color":"#7CFC00"});

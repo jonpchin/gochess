@@ -56,6 +56,7 @@ func main() {
 	http.Handle("/css/", http.FileServer(http.Dir("")))
 	http.Handle("/img/", http.FileServer(http.Dir("")))
 	http.Handle("/js/", http.FileServer(http.Dir("")))
+	http.Handle("/data/", http.FileServer(http.Dir("")))
 	http.Handle("/sound/", http.FileServer(http.Dir("")))
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
