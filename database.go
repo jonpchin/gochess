@@ -80,7 +80,7 @@ func DbSetup(backup string) bool {
 		return false
 	}
 
-	//checking if database exists if not then import database
+	//if database ping fails here that means connection is alive but database is missing
 	if db.Ping() != nil {
 		fmt.Println("Database", database, "does not exist")
 		fmt.Println("Please wait while database is imported...")
@@ -99,7 +99,7 @@ func DbSetup(backup string) bool {
 		}
 		// Pinging database again to see if newly database exists
 		if db.Ping() != nil {
-			fmt.Println("database.go Dbsetup 5 ", database, " is still missing after imports!!!")
+			fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
 			return false
 		}
 	}
@@ -149,7 +149,7 @@ func checkDBConnection() bool {
 
 	var testDB *sql.DB
 	testDB, err = sql.Open("mysql", dbString)
-	//	db.SetMaxIdleConns(20)
+
 	if err != nil {
 		fmt.Println("Error opening Database checkDBConnection 2", err)
 		return false
