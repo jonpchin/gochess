@@ -67,7 +67,10 @@ func DbSetup(backup string) bool {
 			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
 		}
 	}
-
+	// make sure MySQL connection is alive before proceeding
+	if checkDBConnection() == false {
+		return false
+	}
 	dbString, database := ReadFile()
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
@@ -77,18 +80,9 @@ func DbSetup(backup string) bool {
 		return false
 	}
 
+	//checking if database exists if not then import database
 	if db.Ping() != nil {
-		fmt.Println("Database ping failed. Please check if the database server is running.")
-		fmt.Println("database.go Dbsetup 6 MySQL is down!!!")
-		return false
-	}
-
-	var result string
-
-	//checking if database exist
-	db.QueryRow("SHOW DATABASES LIKE '" + database + "'").Scan(&result)
-	if result == "" {
-		fmt.Println("database.go DbSetup 3 Database", database, "does not exist")
+		fmt.Println("Database", database, "does not exist")
 		fmt.Println("Please wait while database is imported...")
 
 		result := importDatabase()
@@ -98,23 +92,74 @@ func DbSetup(backup string) bool {
 				fmt.Println("database.go Dbsetup FAILED to import both databases!")
 				return false
 			} else {
-				fmt.Println("Template database sucessfully imported!")
+				fmt.Println("Empty template database sucessfully imported!")
 			}
 		} else {
-			fmt.Println("GoChess database sucessfully imported!")
+			fmt.Println(database, "database sucessfully imported!")
 		}
-		// Opening up database again to see if newly imported database can connect
-		db, err = sql.Open("mysql", dbString)
-		if err != nil {
-			fmt.Println("Error opening new Database DBSetup 4", err)
-			return false
-		}
+		// Pinging database again to see if newly database exists
 		if db.Ping() != nil {
-			fmt.Println("database.go Dbsetup 5 MySQL is down!!!")
+			fmt.Println("database.go Dbsetup 5 ", database, " is still missing after imports!!!")
 			return false
 		}
 	}
 	fmt.Println("MySQL is now connected.")
+	return true
+}
+
+// checks if database connection is open, returns true if MySQL is running
+func checkDBConnection() bool {
+
+	config, err := os.Open("secret/checkdb.txt")
+	defer config.Close()
+	if err != nil {
+		fmt.Println("database.go checkDBConnection 1", err)
+	}
+
+	scanner := bufio.NewScanner(config)
+	//creating new string to append database info
+	dbString := ""
+	scanner.Scan()
+	//user
+	dbData := scanner.Text()
+	dbString = dbString + dbData + ":"
+
+	//pass
+	scanner.Scan()
+	dbData = scanner.Text()
+	//decode
+	ans, _ := hex.DecodeString(dbData)
+
+	result, _ := base64.StdEncoding.DecodeString(string(ans))
+	answer := string(result)
+
+	dbString = dbString + answer + "@tcp("
+	//host
+	scanner.Scan()
+	dbData = scanner.Text()
+	dbString = dbString + dbData + ":"
+	//port
+	scanner.Scan()
+	dbData = scanner.Text()
+	dbString = dbString + dbData + ")/"
+	//database name
+	scanner.Scan()
+	dbData = scanner.Text()
+	dbString = dbString + dbData
+
+	var testDB *sql.DB
+	testDB, err = sql.Open("mysql", dbString)
+	//	db.SetMaxIdleConns(20)
+	if err != nil {
+		fmt.Println("Error opening Database checkDBConnection 2", err)
+		return false
+	}
+
+	if testDB.Ping() != nil {
+		fmt.Println("Database ping failed. Please check if the database server is running.")
+		fmt.Println("database.go checkDBConnection 3 MySQL is down!!!")
+		return false
+	}
 	return true
 }
 
