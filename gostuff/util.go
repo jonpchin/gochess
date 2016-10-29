@@ -110,11 +110,16 @@ func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight
 	var width int
 	var height int
 	// if target image does not exist use the image that hasn't been resized
-	_, err = imaging.Open(targetPath)
+	exists, err := isDirOrFileExists(targetPath)
 	if err != nil {
-		width, height = getImageDimensions(path)
-	} else {
+		log.Println(err)
+	}
+	if exists {
 		width, height = getImageDimensions(targetPath)
+	} else {
+		//renames the extension PNG to png
+		os.Rename(path, path)
+		width, height = getImageDimensions(path)
 	}
 
 	if width != desiredWidth || height != desiredHeight {
