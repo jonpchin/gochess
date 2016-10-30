@@ -23,12 +23,30 @@ function getGame(gameID){
 }
 
 getGame(1);
+
+function getGameByECO(ECO){
+    $.ajax({
+        url: 'fetchgameByECO',
+        type: 'post',
+        dataType: 'html',
+        data : { 'ECO':ECO},
+        success : function(data) {			
+            // error messages will be less then 100 characters, games always more then 100 characters
+            if(data.length <= 100){
+                document.getElementById('textbox').innerHTML += (timeStamp() + " " +
+			        data + "\n"); 
+            }else{
+                loadGame(data);
+            } 
+            document.getElementById("textbox").scrollTop = document.getElementById("textbox").scrollHeight;
+        }	
+    });
+}
 // Fills opening drop down with ECO and opening name
 setupOpening();
 
 function setupOpening(){
-    console.log("entering openings");
-
+    
     $.getJSON('/data/openings.json', function(data) {         
        
         // setting global variable with the opening object
@@ -41,7 +59,8 @@ function setupOpening(){
             }
 
             var option = document.createElement('option');
-            option.value = option.text = key + ": " + data[key].name;
+            option.text = key + ": " + data[key].name;
+            option.value = key;
             openingDropDown.add(option);
 /*
             var obj = data[key];
@@ -75,6 +94,8 @@ function loadGame(gameData){
             // second parameter is file name
             download(game.pgn(), json.White + " vs. " + json.Black + ".pgn", "application/x-chess-pgn");
         }	
+        // updates the ID in the Search ID input box
+        document.getElementById('searchID').value = json.ID;
 
         document.getElementById("bottom").innerHTML = "W: " + json.White + "(" +
             json.WhiteElo + ")" ;
@@ -148,18 +169,20 @@ document.getElementById('goEnd').onclick = function(){
 
 document.getElementById('searchGameButton').onclick = function(){
     getGame(document.getElementById('searchID').value);
-} 
+}
+
+document.getElementById('searchOpeningButton').onclick = function(){
+    getGameByECO(document.getElementById('openingDropDown').value);
+}  
 
 document.getElementById('goForwardGame').onclick = function(){
     var value = parseInt(document.getElementById('searchID').value) + 1
-    document.getElementById('searchID').value = value;
     getGame(value);
 } 
 
 document.getElementById('goBackGame').onclick = function(){
     var value = parseInt(document.getElementById('searchID').value) - 1;
     if(value > 0){
-        document.getElementById('searchID').value = value;
         getGame(value);
     }
 } 

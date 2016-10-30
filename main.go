@@ -48,8 +48,8 @@ func main() {
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
 	http.HandleFunc("/resumeGame", gostuff.ResumeGame)
-	http.HandleFunc("/fetchplayers", gostuff.FetchPlayersInRange)
 	http.HandleFunc("/fetchgameID", gostuff.FetchGameByID)
+	http.HandleFunc("/fetchgameByECO", gostuff.FetchGameByECO)
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 
