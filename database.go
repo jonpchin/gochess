@@ -273,6 +273,7 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	//setting verify to yes and deleting row from activate table
 	stmt, err := db.Prepare("UPDATE rating SET " + gameType + "=?," + gameType +
 		"RD=?" + " where username=?")
+	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
 		return
@@ -331,6 +332,7 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, rated=?, " +
 		"whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, " +
 		"result=?, status=?, date=?, time=?")
+	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
 		return
@@ -504,6 +506,7 @@ func fetchSavedGame(id string, user string) bool {
 
 	//delete saved game from database now that its in memory
 	stmt, err := db.Prepare("DELETE FROM saved where id=?")
+	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
 		return false
@@ -514,7 +517,6 @@ func fetchSavedGame(id string, user string) bool {
 		log.Println(err)
 		return false
 	}
-	stmt.Close()
 	affect, err := res.RowsAffected()
 	if err != nil {
 		log.Println(err)
