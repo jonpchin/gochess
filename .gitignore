@@ -8,3 +8,5 @@ games/
 /debug
 /config
 /backup
+/data
+/privateData

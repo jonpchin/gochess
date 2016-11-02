@@ -154,6 +154,7 @@ func checkDBConnection() bool {
 		fmt.Println("Error opening Database checkDBConnection 2", err)
 		return false
 	}
+	defer testDB.Close()
 
 	if testDB.Ping() != nil {
 		fmt.Println("Database ping failed. Please check if the database server is running.")
