@@ -1,5 +1,6 @@
 // global object which stores opening ECO, opening names and their moves
 var allOpenings;
+var ECOIndex = 0;
 
 var openingDropDown = document.getElementById('openingDropDown');
 
@@ -24,12 +25,12 @@ function getGame(gameID){
 
 getGame(1);
 
-function getGameByECO(ECO){
+function getGameByECO(ECO, localECOIndex){
     $.ajax({
         url: 'fetchgameByECO',
         type: 'post',
         dataType: 'html',
-        data : { 'ECO':ECO},
+        data : { 'ECO':ECO, 'ECOIndex': localECOIndex},
         success : function(data) {			
             // error messages will be less then 100 characters, games always more then 100 characters
             if(data.length <= 100){
@@ -169,11 +170,27 @@ document.getElementById('goEnd').onclick = function(){
 
 document.getElementById('searchGameButton').onclick = function(){
     getGame(document.getElementById('searchID').value);
+    ECOIndex = 0;
 }
 
 document.getElementById('searchOpeningButton').onclick = function(){
-    getGameByECO(document.getElementById('openingDropDown').value);
-}  
+    getGameByECO(document.getElementById('openingDropDown').value, 0);
+    ECOIndex = 0;
+}
+
+document.getElementById('previousOpeningButton').onclick = function(){
+    if(ECOIndex-1 >= 0){
+        ECOIndex--;
+        getGameByECO(document.getElementById('openingDropDown').value, ECOIndex);
+    }
+}
+
+document.getElementById('nextOpeningButton').onclick = function(){
+    if(ECOIndex+1 < 100){
+        ECOIndex++;
+        getGameByECO(document.getElementById('openingDropDown').value, ECOIndex);
+    }
+}
 
 document.getElementById('goForwardGame').onclick = function(){
     var value = parseInt(document.getElementById('searchID').value) + 1

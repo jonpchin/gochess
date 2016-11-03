@@ -210,6 +210,19 @@ func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
 	}
 
 	eco := template.HTMLEscapeString(r.FormValue("ECO"))
+	ecoIndex := template.HTMLEscapeString(r.FormValue("ECOIndex"))
+
+	// for now do not allow players to scroll past 100th game in a specific opening
+	ecoValue, err := strconv.Atoi(ecoIndex)
+	if err != nil {
+		w.Write([]byte("An invalid game index was searched"))
+		log.Println("Invalid ecoIndex")
+	}
+	if ecoValue < 0 || ecoValue > 100 {
+		log.Println("ecoIndex is out of bounds")
+		w.Write([]byte("Search index out of bounds"))
+		return
+	}
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -225,7 +238,7 @@ func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
 	var all GrandMasterGame
 
 	//looking up players rating
-	err = db.QueryRow("select * from grandmaster where `ECO`=? LIMIT 1", eco).Scan(&all.ID, &all.Event, &all.Site,
+	err = db.QueryRow("select * from grandmaster where `ECO`=? ORDER BY ID LIMIT ?, 1", eco, ecoValue).Scan(&all.ID, &all.Event, &all.Site,
 		&all.Date, &all.Round, &all.White,
 		&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,
 		&all.ECO, &all.Moves, &all.EventDate)
