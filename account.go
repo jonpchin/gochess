@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -29,6 +30,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		token := template.HTMLEscapeString(r.FormValue("token"))
 		password := template.HTMLEscapeString(r.FormValue("pass"))
 		confirm := template.HTMLEscapeString(r.FormValue("confirm"))
+		ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
 
 		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 		defer problems.Close()
@@ -61,7 +63,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		}
 		if tokenInDB != token {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
-			log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 
@@ -139,6 +141,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 	} else {
 		username := template.HTMLEscapeString(r.FormValue("user"))
 		token := template.HTMLEscapeString(r.FormValue("token"))
+		ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
 
 		problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 		defer problems.Close()
@@ -156,7 +159,7 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 		err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", username).Scan(&tokenInDB)
 		if err2 != nil || tokenInDB != token {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination"))
-			log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 		//setting verify to yes and deleting row from activate table as well as captcha to zero to signfy user unlocked account
@@ -222,6 +225,8 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
+
 	if !captcha.VerifyString(r.FormValue("captchaId"), r.FormValue("captchaSolution")) {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong captcha solution! Please try again."))
 
@@ -248,7 +253,7 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		}
 		if match != email {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong email/username combination."))
-			log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
 			return
 		}
 
