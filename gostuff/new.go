@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -46,6 +47,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 	capID := template.HTMLEscapeString(r.FormValue("captchaId"))
 	capSol := template.HTMLEscapeString(r.FormValue("captchaSolution"))
+	ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
 
 	if capSol == "" { //then assume user was not displayed captcha
 
@@ -85,7 +87,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		//checking if password entered by user matches encrypted key
 		if pass != key {
-			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
 
 			if captcha == 1 {
 				w.Write([]byte("<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' />  You entered password incorrectly too many times. Now you need to enter captcha."))
@@ -225,7 +227,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//sends email to user with the token activation
 			go func(email, token, userName, address string) {
 				SendAttempt(email, token, userName, address)
-			}(email, token, userName, r.RemoteAddr)
+			}(email, token, userName, ipAddress)
 			return
 
 		} else if captcha > 5 { //tell user on the front end that this account has too many login attempts, resends activation token
@@ -240,13 +242,13 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			//sends email again to user with the token activation
 			go func(email, token, userName, address string) {
 				SendAttempt(email, token, userName, address)
-			}(email, token, userName, r.RemoteAddr)
+			}(email, token, userName, ipAddress)
 
 			return
 		}
 		if pass != key {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
-			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", r.RemoteAddr, r.Method, r.URL.Path, r.UserAgent())
+			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
 
 			//add 1 to captcha if password was incorrect
 			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
@@ -330,6 +332,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 		passWord := template.HTMLEscapeString(r.FormValue("pass"))
 		confirm := template.HTMLEscapeString(r.FormValue("confirm"))
 		email := template.HTMLEscapeString(r.FormValue("email"))
+		ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
 
 		if len(userName) < 3 || len(userName) > 12 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please choose a username between 3 and 12 characters long."))
@@ -365,7 +368,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 			if checkName != sql.ErrNoRows {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> Username already exist. Please choose another username"))
-				log.Printf("Prevented host %s from choosing duplicate username %s\n", r.RemoteAddr, userName)
+				log.Printf("Prevented host %s from choosing duplicate username %s\n", ipAddress, userName)
 				return
 
 			}
@@ -394,20 +397,14 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 			date := time.Now()
 
-			res, err := stmt.Exec(userName, key, email, date, date, r.RemoteAddr, "NO", 0)
+			_, err = stmt.Exec(userName, key, email, date, date, ipAddress, "NO", 0)
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 30"))
 				log.Println(err)
 				return
 			}
 
-			id, err := res.LastInsertId()
-			if err != nil {
-				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 31"))
-				log.Println(err)
-				return
-			}
-			log.Printf("Account %s and id %d was created in userinfo table.\n", userName, id)
+			log.Printf("Account %s was created in userinfo table.\n", userName)
 
 			token := RandomString()
 
@@ -419,7 +416,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			res, err = stmt.Exec(userName, token, email, date)
+			_, err = stmt.Exec(userName, token, email, date)
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 33"))
 				log.Println(err)
@@ -438,7 +435,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			res, err = stmt.Exec(userName, "1500", "1500", "1500", "350.0", "350.0", "350.0")
+			_, err = stmt.Exec(userName, "1500", "1500", "1500", "350.0", "350.0", "350.0")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 35"))
 				log.Println(err)
@@ -456,10 +453,10 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 		if len(userName) < 3 || len(userName) > 12 {
 			return
 		}
-
+		ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
 		//check if database connection is open
 		if db.Ping() != nil {
-			fmt.Printf("ERROR 2 PINGING DB IP: %s \n", r.RemoteAddr)
+			fmt.Printf("ERROR 2 PINGING DB IP: %s \n", ipAddress)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please come back later."))
 			return
 		}
@@ -472,7 +469,7 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(" <img src='img/ajax/available.png' /> Username available"))
 			fmt.Printf("Username %s is available.\n", userName)
 		case checkName != nil:
-			fmt.Printf("ERROR 3 CHECKNAME IP is %s\n", r.RemoteAddr)
+			fmt.Printf("ERROR 3 CHECKNAME IP is %s\n", ipAddress)
 		default:
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Username taken"))
 		}

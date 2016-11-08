@@ -63,17 +63,6 @@ function setupOpening(){
             option.text = key + ": " + data[key].name;
             option.value = key;
             openingDropDown.add(option);
-/*
-            var obj = data[key];
-            for (var prop in obj) {
-                // skip loop if the property is from prototype
-                if(!obj.hasOwnProperty(prop)) {
-                    continue;
-                }
-                // your code
-                console.log(prop + " = " + obj[prop]);
-            }
-*/
         }
     });
 }
