@@ -17,14 +17,14 @@ func canBlackCastleKing(gameID int) bool {
 }
 
 func canWhiteCastleQueen(gameID int) bool {
-	if Verify.AllTables[gameID].wkMoved == false && Verify.AllTables[gameID].wqrMoved == false && canBlackKillSquare(7, 3, gameID) == false && canBlackKillSquare(7, 2, gameID) == false && canBlackKillSquare(7, 1, gameID) == false {
+	if Verify.AllTables[gameID].wkMoved == false && Verify.AllTables[gameID].wqrMoved == false && canBlackKillSquare(7, 3, gameID) == false && canBlackKillSquare(7, 2, gameID) == false {
 		return true
 	}
 	return false
 }
 
 func canBlackCastleQueen(gameID int) bool {
-	if Verify.AllTables[gameID].bkMoved == false && Verify.AllTables[gameID].bqrMoved == false && canWhiteKillSquare(0, 3, gameID) == false && canWhiteKillSquare(0, 2, gameID) == false && canWhiteKillSquare(0, 1, gameID) == false {
+	if Verify.AllTables[gameID].bkMoved == false && Verify.AllTables[gameID].bqrMoved == false && canWhiteKillSquare(0, 3, gameID) == false && canWhiteKillSquare(0, 2, gameID) == false {
 		return true
 	}
 	return false
