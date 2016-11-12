@@ -2,6 +2,7 @@ package gostuff
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -41,6 +42,11 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		return false
 	}
 
+	// make sure Verify.AllTables is inititalized before proceeding
+	if _, ok := Verify.AllTables[gameID]; !ok {
+		fmt.Println("Please call initGame() function before proceeding")
+		return false
+	}
 	//identifying the piece that was selected
 	piece := Verify.AllTables[gameID].ChessBoard[newSourceRow][newSourceCol]
 
@@ -125,7 +131,23 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 
 	}
 	if promotion != "" {
-		Verify.AllTables[gameID].promotion = promotion
+		// if promotion is in ASII such as 113 is q then perform ascii conversion
+		convertedPromote, err := strconv.Atoi(promotion)
+		if err != nil {
+			fmt.Println("verify promotion conversion", err)
+		}
+		switch convertedPromote {
+		case 113:
+			Verify.AllTables[gameID].promotion = "q"
+		case 114:
+			Verify.AllTables[gameID].promotion = "r"
+		case 110:
+			Verify.AllTables[gameID].promotion = "n"
+		case 98:
+			Verify.AllTables[gameID].promotion = "b"
+		default:
+			Verify.AllTables[gameID].promotion = promotion
+		}
 	}
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
 

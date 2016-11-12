@@ -159,3 +159,45 @@ func UpdateTotalGrandmasterGames() {
 	//setting global total
 	TotalGrandmasterGames = total
 }
+
+// cycles through the total number of grandmater games in database passed in parameter
+// and verifies if the chessVerify function produces any legal moves deemed illegal
+func VerifyGrandmasterGames(total int) bool {
+	//check if database connection is open
+	if db.Ping() != nil {
+		fmt.Println("verifyGrandmasterGames DATABASE DOWN!")
+		return false
+	}
+
+	var allMoves string
+	var gameID = 1
+	for i := 1; i < total; i++ {
+
+		err := db.QueryRow("SELECT moves FROM grandmaster WHERE id=?", i).Scan(&allMoves)
+
+		if err != nil {
+			fmt.Println("verifyGrandmasterGames 1", err)
+			return false
+		}
+
+		var move []Move
+		if err := json.Unmarshal([]byte(allMoves), &move); err != nil {
+			fmt.Println("Just receieved a message I couldn't decode:", allMoves, err)
+			break
+		}
+		var legal bool
+		gameID = i
+		initGame(gameID, "", "")
+		for j := 0; j < len(move); j++ {
+			legal = chessVerify(move[j].S, move[j].T, move[j].P, gameID)
+			totalMoves := (j / 2) + 1
+			// The people notating game ID 8035 seems to have made a mistake and notated an illegal move
+			if legal == false && gameID != 8035 {
+				fmt.Println("Illegal move on turn ", totalMoves, move[j].S, " to ", move[j].T, "at game ID", i)
+				return false
+			}
+		}
+	}
+	return true
+
+}

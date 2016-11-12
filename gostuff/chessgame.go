@@ -169,8 +169,6 @@ func initGame(gameID int, name string, fighter string) {
 	Verify.AllTables[gameID] = &table
 
 	for i := 0; i < 8; i++ {
-		Verify.AllTables[gameID].whitePawns[i] = false
-		Verify.AllTables[gameID].blackPawns[i] = false
 		Verify.AllTables[gameID].whitePass[i] = false
 		Verify.AllTables[gameID].blackPass[i] = false
 	}

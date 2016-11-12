@@ -170,7 +170,6 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 
 	var all GrandMasterGame
 
-	//looking up players rating
 	err = db.QueryRow("SELECT * FROM grandmaster WHERE id=?", id).Scan(&all.ID, &all.Event, &all.Site,
 		&all.Date, &all.Round, &all.White,
 		&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,

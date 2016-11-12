@@ -74,15 +74,15 @@ func TestKnght(t *testing.T) {
 
 	legal = chessVerify("g1", "e2", "", gameID)
 	if legal == true {
-		t.Error("knight_test.go 1 test white self capture failed")
+		t.Error("white knight capturing ally piece was deemed legal")
 	}
 	legal = chessVerify("g1", "f3", "", gameID)
 	if legal == false {
-		t.Error("knight_test.go 2")
+		t.Error("legal white knight move deemed illegal")
 	}
 	legal = chessVerify("g8", "h6", "", gameID)
 	if legal == false {
-		t.Error("knight_test.go 3")
+		t.Error("legal black knight move deemed illegal")
 	}
 	legal = chessVerify("f3", "g4", "", gameID)
 	if legal == true {
@@ -114,62 +114,134 @@ func TestBishop(t *testing.T) {
 
 	legal = chessVerify("f1", "b5", "", gameID)
 	if legal == true {
-		t.Error("bishop_test.go 1")
+		t.Error("bishop cannot move over ally pawn")
 	}
 	legal = chessVerify("e2", "e3", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 2")
+		t.Error("legal white pawn move deemed illegal")
 	}
 	legal = chessVerify("a7", "a6", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 2")
+		t.Error("legal black pawn move deemed illegal")
 	}
 	legal = chessVerify("f1", "b5", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 3")
+		t.Error("legal white bishop move deemed illegal")
 	}
 	legal = chessVerify("g7", "g6", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 4")
+		t.Error("legal black pawn move deemed illegal")
 	}
 	legal = chessVerify("b5", "d7", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 5")
+		t.Error("legal white bishop capture deemed illegal")
 	}
 	legal = chessVerify("c8", "d7", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 6")
+		t.Error("legal black biship capture deemed illegal")
 	}
 	legal = chessVerify("b2", "b4", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 7")
+		t.Error("legal white pawn move deemed illegal")
 	}
 	legal = chessVerify("f8", "g7", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 8")
+		t.Error("legal black bishop move deemed illegal")
 	}
 	legal = chessVerify("c1", "a3", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 9")
+		t.Error("legal white bishop move deemed illegal")
 	}
 	legal = chessVerify("g7", "h8", "", gameID)
 	if legal == true {
-		t.Error("bishop_test.go 10")
+		t.Error("black bishop is not allowed to capture ally piece")
 	}
 	legal = chessVerify("a3", "a4", "", gameID)
 	if legal == true {
-		t.Error("bishop_test.go 11")
+		t.Error("white pawn cannot jump over ally piece")
 	}
 	legal = chessVerify("a3", "b4", "", gameID)
 	if legal == true {
-		t.Error("bishop_test.go 12")
+		t.Error("white pawn cannot move there")
 	}
 	legal = chessVerify("g7", "a1", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 13")
+		t.Error("legal black bishop capture deemed illegal")
 	}
 	legal = chessVerify("a3", "c5", "", gameID)
 	if legal == false {
-		t.Error("bishop_test.go 14")
+		t.Error("legal white bishop move deemed illegal")
 	}
+}
+
+func TestRook(t *testing.T) {
+	var legal bool
+	const gameID = 0
+	initGame(gameID, "", "")
+
+	legal = chessVerify("a2", "a4", "", gameID)
+	if legal == false {
+		t.Error("TestRook 1")
+	}
+	legal = chessVerify("h8", "h3", "", gameID)
+	if legal == true {
+		t.Error("TestRook 2")
+	}
+	legal = chessVerify("h7", "h5", "", gameID)
+	if legal == false {
+		t.Error("TestRook 3")
+	}
+	legal = chessVerify("a1", "a4", "", gameID)
+	if legal == true {
+		t.Error("TestRook 4")
+	}
+	legal = chessVerify("a1", "a3", "", gameID)
+	if legal == false {
+		t.Error("TestRook 5")
+	}
+	legal = chessVerify("h8", "c3", "", gameID)
+	if legal == true {
+		t.Error("TestRook 6")
+	}
+	legal = chessVerify("h8", "h6", "", gameID)
+	if legal == false {
+		t.Error("TestRook 7")
+	}
+	legal = chessVerify("a3", "b4", "", gameID)
+	if legal == true {
+		t.Error("TestRook 8")
+	}
+	legal = chessVerify("a3", "e3", "", gameID)
+	if legal == false {
+		t.Error("TestRook 9")
+	}
+	legal = chessVerify("a7", "a6", "", gameID)
+	if legal == false {
+		t.Error("TestRook 10")
+	}
+	legal = chessVerify("e3", "e7", "", gameID)
+	if legal == false {
+		t.Error("TestRook 11")
+	}
+	legal = chessVerify("h6", "f6", "", gameID)
+	if legal == true {
+		t.Error("TestRook 12")
+	}
+	legal = chessVerify("d8", "e7", "", gameID)
+	if legal == false {
+		t.Error("TestRook 13")
+	}
+	legal = chessVerify("a4", "a5", "", gameID)
+	if legal == false {
+		t.Error("TestRook 14")
+	}
+	legal = chessVerify("h6", "a6", "", gameID)
+	if legal == true {
+		t.Error("TestRook 15")
+	}
+	legal = chessVerify("h6", "b6", "", gameID)
+	if legal == false {
+		t.Error("TestRook 16")
+	}
+
 }

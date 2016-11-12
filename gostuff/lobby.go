@@ -182,7 +182,7 @@ func (c *Connection) LobbyConnect() {
 						break
 					}
 				}
-				//value := fmt.Sprintf("%d", start)
+
 				match.MatchID = start
 				//used in backend to keep track of all pending games waiting for a player to accept
 				Pending.Matches[start] = &match

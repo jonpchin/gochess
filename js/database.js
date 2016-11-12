@@ -111,6 +111,25 @@ function loadGame(gameData){
         var length = moves.length;				
         
         for(var i=0 ; i<length; i++){
+            // If promotion check to see if ASCII conversion needs to take place
+            if (moves[i].P !== ""){
+                switch(parseInt(moves[i].P)){
+                    case 113:
+                        moves[i].P = "q";
+                        break;
+                    case 114:
+                        moves[i].P = "r";
+                        break;
+                    case 110:
+                        moves[i].P = "n";
+                        break;
+                    case 98:
+                        moves[i].P = "b";
+                        break;
+                    default:
+                        // then no conversion is needed
+                }
+            }
             var move = game.move({
                 from: moves[i].S,
                 to: moves[i].T,
