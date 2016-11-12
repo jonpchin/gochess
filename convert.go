@@ -170,10 +170,9 @@ func VerifyGrandmasterGames(total int) bool {
 	}
 
 	var allMoves string
-	var gameID = 1
-	for i := 1; i < total; i++ {
+	for gameID := 1; gameID < total; gameID++ {
 
-		err := db.QueryRow("SELECT moves FROM grandmaster WHERE id=?", i).Scan(&allMoves)
+		err := db.QueryRow("SELECT moves FROM grandmaster WHERE id=?", gameID).Scan(&allMoves)
 
 		if err != nil {
 			fmt.Println("verifyGrandmasterGames 1", err)
@@ -186,14 +185,14 @@ func VerifyGrandmasterGames(total int) bool {
 			break
 		}
 		var legal bool
-		gameID = i
+
 		initGame(gameID, "", "")
 		for j := 0; j < len(move); j++ {
 			legal = chessVerify(move[j].S, move[j].T, move[j].P, gameID)
 			totalMoves := (j / 2) + 1
 			// The people notating game ID 8035 seems to have made a mistake and notated an illegal move
 			if legal == false && gameID != 8035 {
-				fmt.Println("Illegal move on turn ", totalMoves, move[j].S, " to ", move[j].T, "at game ID", i)
+				fmt.Println("Illegal move on turn ", totalMoves, move[j].S, " to ", move[j].T, "at game ID", gameID)
 				return false
 			}
 		}
