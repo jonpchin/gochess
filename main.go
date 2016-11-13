@@ -108,7 +108,7 @@ func main() {
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
 			gostuff.UpdateTotalGrandmasterGames()
-			gostuff.ResizeImages()
+			//gostuff.ResizeImages()
 			//pass := gostuff.VerifyGrandmasterGames(100000)
 			//if pass == true {
 			//	fmt.Println("All games are accurate!")

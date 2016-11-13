@@ -174,27 +174,46 @@ func (c *Connection) LobbyConnect() {
 					match.GameType = "standard"
 				}
 
-				var start int = 0
-				for {
-					if _, ok := Pending.Matches[start]; ok {
-						start++
-					} else {
-						break
+				// if a seek matches an existing one do not post another seek
+				var proceed = true
+
+				// If this seek matches an already existing seek in pending matches then start the seek right away
+				// only verify if target's criteria matches seeker's crieria as startPendingMatch checks if
+				// the seeker's criteria matches the target's criteria
+				for matchID, targetMatch := range Pending.Matches {
+					if match.TimeControl == targetMatch.TimeControl &&
+						targetMatch.Rating >= match.MinRating && targetMatch.Rating <= match.MaxRating &&
+						match.Rated == targetMatch.Rated &&
+						match.Name != targetMatch.Name { // a player should not be able to play himself
+
+						proceed = startPendingMatch(match.Name, matchID)
 					}
 				}
 
-				match.MatchID = start
-				//used in backend to keep track of all pending games waiting for a player to accept
-				Pending.Matches[start] = &match
-
-				go func() {
-					for name, cs := range Chat.Lobby {
-						if err := websocket.JSON.Send(cs, &match); err != nil {
-							// we could not send the message to a peer
-							log.Println("Could not send message to ", name, err)
+				if proceed {
+					var start int = 0
+					for {
+						if _, ok := Pending.Matches[start]; ok {
+							start++
+						} else {
+							break
 						}
 					}
-				}()
+
+					match.MatchID = start
+					//used in backend to keep track of all pending games waiting for a player to accept
+					Pending.Matches[start] = &match
+
+					go func() {
+						for name, cs := range Chat.Lobby {
+							if err := websocket.JSON.Send(cs, &match); err != nil {
+								// we could not send the message to a peer
+								log.Println("Could not send message to ", name, err)
+							}
+						}
+					}()
+				}
+
 			case "cancel_match":
 
 				var match SeekMatch
@@ -222,7 +241,6 @@ func (c *Connection) LobbyConnect() {
 			case "accept_match":
 
 				var match SeekMatch
-				var game ChessGame
 				if err := json.Unmarshal(message, &match); err != nil {
 					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 					break
@@ -240,122 +258,7 @@ func (c *Connection) LobbyConnect() {
 					break
 				}
 
-				//checking to make sure both player's rating is in range, used as a backend rating check
-				errMessage, bullet, blitz, standard := GetRating(match.Name)
-				if errMessage != "" {
-					fmt.Println("Cannot get rating connection.go accept_match")
-					break
-				}
-
-				if Pending.Matches[match.MatchID].Opponent == "" { //only use this case for public matches
-					if Pending.Matches[match.MatchID].GameType == "bullet" && (bullet < Pending.Matches[match.MatchID].MinRating || bullet > Pending.Matches[match.MatchID].MaxRating) {
-						fmt.Println("Bullet Rating not in range.")
-						break
-					} else if Pending.Matches[match.MatchID].GameType == "blitz" && (blitz < Pending.Matches[match.MatchID].MinRating || blitz > Pending.Matches[match.MatchID].MaxRating) {
-						fmt.Println("Blitz Rating not in range.")
-						break
-					} else if Pending.Matches[match.MatchID].GameType == "standard" && (standard < Pending.Matches[match.MatchID].MinRating || standard > Pending.Matches[match.MatchID].MaxRating) {
-						fmt.Println("Standard Rating not in range.")
-						break
-					}
-				}
-
-				//bullet, blitz or standard game type
-				game.GameType = Pending.Matches[match.MatchID].GameType
-
-				//seting up the game info such as white/black player, time control, etc
-				rand.Seed(time.Now().UnixNano())
-
-				//randomly selects both players to be white or black
-				if rand.Intn(2) == 0 {
-					game.WhitePlayer = match.Name
-					if game.GameType == "bullet" {
-						game.WhiteRating = bullet
-
-					} else if game.GameType == "blitz" {
-						game.WhiteRating = blitz
-
-					} else {
-						game.WhiteRating = standard
-					}
-
-					game.BlackRating = Pending.Matches[match.MatchID].Rating
-					game.BlackPlayer = Pending.Matches[match.MatchID].Name
-
-				} else {
-					game.WhitePlayer = Pending.Matches[match.MatchID].Name
-					if game.GameType == "bullet" {
-						game.BlackRating = bullet
-
-					} else if game.GameType == "blitz" {
-						game.BlackRating = blitz
-					} else {
-						game.BlackRating = standard
-					}
-
-					game.WhiteRating = Pending.Matches[match.MatchID].Rating
-					game.BlackPlayer = match.Name
-				}
-				//White for white to move or Black for black to move, white won, black won, stalemate or draw.
-				game.Status = "White"
-
-				//no moves yet so nill/null
-				game.GameMoves = nil
-
-				game.TimeControl = Pending.Matches[match.MatchID].TimeControl
-				//for simplicity we will only allow minutes
-				game.WhiteMinutes = Pending.Matches[match.MatchID].TimeControl
-				game.WhiteSeconds = 0
-				game.WhiteMilli = 0
-				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
-				game.BlackSeconds = 0
-				game.BlackMilli = 0
-				game.PendingDraw = false
-				game.Rated = Pending.Matches[match.MatchID].Rated
-				game.Spectate = false
-
-				var start int = 0
-				for {
-					if _, ok := All.Games[start]; ok {
-						start++
-					} else {
-						break
-					}
-				}
-
-				game.ID = start
-				//used in backend to keep track of all pending games waiting for a player to accept
-				All.Games[start] = &game
-
-				//no longer need all the pending matches as game will be started
-				for key, value := range Pending.Matches {
-					//deletes all pending matches for either players
-					if value.Name == game.WhitePlayer || value.Name == game.BlackPlayer {
-						delete(Pending.Matches, key)
-					}
-				}
-
-				//sending to front end for url redirection
-				var acceptmatch AcceptMatch
-				acceptmatch.Type = "accept_match"
-				acceptmatch.Name = game.WhitePlayer
-				acceptmatch.TargetPlayer = game.BlackPlayer
-
-				//setting up the private chat between two players and send move connection
-				PrivateChat[acceptmatch.Name] = acceptmatch.TargetPlayer
-				PrivateChat[acceptmatch.TargetPlayer] = acceptmatch.Name
-
-				//intitalizes all the variables of the game
-				initGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
-
-				for _, cs := range Chat.Lobby {
-					if err := websocket.JSON.Send(cs, &acceptmatch); err != nil {
-						log.Println(err)
-					}
-				}
-
-				//starting white's clock first, this goroutine will keep track of both players clock for this game
-				go setClocks(game.ID, t.Name)
+				startPendingMatch(match.Name, match.MatchID)
 
 			case "private_match":
 
@@ -478,4 +381,134 @@ func (c *Connection) LobbyConnect() {
 			return
 		}
 	}
+}
+
+// if a pending match is accepted start game for both players that are waiting
+// seekerName is name of seeker and matchID is the ID that belongs to player
+// waiting in pending matches
+// if a match cannot be started then return true to indicate proceeding with setting up a new seek
+func startPendingMatch(seekerName string, matchID int) bool {
+
+	var game ChessGame
+
+	//checking to make sure player's rating is in range, used as a backend rating check
+	errMessage, bullet, blitz, standard := GetRating(seekerName)
+	if errMessage != "" {
+		fmt.Println("Cannot get rating connection.go accept_match")
+		return true
+	}
+
+	if Pending.Matches[matchID].Opponent == "" { //only use this case for public matches
+		if Pending.Matches[matchID].GameType == "bullet" && (bullet < Pending.Matches[matchID].MinRating || bullet > Pending.Matches[matchID].MaxRating) {
+			//fmt.Println("Bullet Rating not in range.")
+			return true
+		} else if Pending.Matches[matchID].GameType == "blitz" && (blitz < Pending.Matches[matchID].MinRating || blitz > Pending.Matches[matchID].MaxRating) {
+			//fmt.Println("Blitz Rating not in range.")
+			return true
+		} else if Pending.Matches[matchID].GameType == "standard" && (standard < Pending.Matches[matchID].MinRating || standard > Pending.Matches[matchID].MaxRating) {
+			//fmt.Println("Standard Rating not in range.")
+			return true
+		}
+	}
+
+	//bullet, blitz or standard game type
+	game.GameType = Pending.Matches[matchID].GameType
+
+	//seting up the game info such as white/black player, time control, etc
+	rand.Seed(time.Now().UnixNano())
+
+	//randomly selects both players to be white or black
+	if rand.Intn(2) == 0 {
+		game.WhitePlayer = seekerName
+		if game.GameType == "bullet" {
+			game.WhiteRating = bullet
+
+		} else if game.GameType == "blitz" {
+			game.WhiteRating = blitz
+
+		} else {
+			game.WhiteRating = standard
+		}
+
+		game.BlackRating = Pending.Matches[matchID].Rating
+		game.BlackPlayer = Pending.Matches[matchID].Name
+
+	} else {
+		game.WhitePlayer = Pending.Matches[matchID].Name
+		if game.GameType == "bullet" {
+			game.BlackRating = bullet
+
+		} else if game.GameType == "blitz" {
+			game.BlackRating = blitz
+		} else {
+			game.BlackRating = standard
+		}
+
+		game.WhiteRating = Pending.Matches[matchID].Rating
+		game.BlackPlayer = seekerName
+	}
+	//White for white to move or Black for black to move, white won, black won, stalemate or draw.
+	game.Status = "White"
+
+	//no moves yet so nill/null
+	game.GameMoves = nil
+
+	game.TimeControl = Pending.Matches[matchID].TimeControl
+	//for simplicity we will only allow minutes
+	game.WhiteMinutes = Pending.Matches[matchID].TimeControl
+	game.WhiteSeconds = 0
+	game.WhiteMilli = 0
+	game.BlackMinutes = Pending.Matches[matchID].TimeControl
+	game.BlackSeconds = 0
+	game.BlackMilli = 0
+	game.PendingDraw = false
+	game.Rated = Pending.Matches[matchID].Rated
+	game.Spectate = false
+
+	var start int = 0
+	for {
+		if _, ok := All.Games[start]; ok {
+			start++
+		} else {
+			break
+		}
+	}
+
+	game.ID = start
+	//used in backend to keep track of all pending games waiting for a player to accept
+	All.Games[start] = &game
+
+	//no longer need all the pending matches as game will be started
+	for key, value := range Pending.Matches {
+		//deletes all pending matches for either players
+		if value.Name == game.WhitePlayer || value.Name == game.BlackPlayer {
+			delete(Pending.Matches, key)
+		}
+	}
+
+	//sending to front end for url redirection
+	var acceptmatch AcceptMatch
+	acceptmatch.Type = "accept_match"
+	acceptmatch.Name = game.WhitePlayer
+	acceptmatch.TargetPlayer = game.BlackPlayer
+
+	//setting up the private chat between two players and send move connection
+	PrivateChat[acceptmatch.Name] = acceptmatch.TargetPlayer
+	PrivateChat[acceptmatch.TargetPlayer] = acceptmatch.Name
+
+	//intitalizes all the variables of the game
+	initGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
+
+	for _, cs := range Chat.Lobby {
+		if err := websocket.JSON.Send(cs, &acceptmatch); err != nil {
+			log.Println(err)
+		}
+	}
+
+	//starting white's clock first, this goroutine will keep track of both players clock for this game
+	// the name of person passed in does not matter as long as its one of the two players
+	go setClocks(game.ID, game.WhitePlayer)
+
+	// a match was sucessfully started so do not proceed in sending a new seek
+	return false
 }
