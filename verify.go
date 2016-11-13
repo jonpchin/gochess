@@ -129,6 +129,9 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		return false
 
 	}
+	// Do NOT MOVE, this allows selected promotion piece to be updated in the back end
+	Verify.AllTables[gameID].promotion = promotion
+
 	// this promotion check is only used when checking with grand master games
 	/*
 		if promotion != "" {
@@ -147,15 +150,10 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 			case 98:
 				Verify.AllTables[gameID].promotion = "b"
 			default:
-				Verify.AllTables[gameID].promotion = promotion
+				// then do nothing as promotion piece is already set
 			}
 		}
 	*/
-	// setting the global promotion piece used in makeMove
-	if promotion != "" {
-		Verify.AllTables[gameID].promotion = promotion
-	}
-
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
 
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
