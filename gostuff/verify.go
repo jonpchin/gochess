@@ -151,6 +151,11 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 			}
 		}
 	*/
+	// setting the global promotion piece used in makeMove
+	if promotion != "" {
+		Verify.AllTables[gameID].promotion = promotion
+	}
+
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
 
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
