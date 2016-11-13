@@ -2,7 +2,6 @@ package gostuff
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -130,25 +129,28 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		return false
 
 	}
-	if promotion != "" {
-		// if promotion is in ASII such as 113 is q then perform ascii conversion
-		convertedPromote, err := strconv.Atoi(promotion)
-		if err != nil {
-			fmt.Println("verify promotion conversion", err)
+	// this promotion check is only used when checking with grand master games
+	/*
+		if promotion != "" {
+			// if promotion is in ASII such as 113 is q then perform ascii conversion
+			convertedPromote, err := strconv.Atoi(promotion)
+			if err != nil {
+				fmt.Println("verify promotion conversion", err)
+			}
+			switch convertedPromote {
+			case 113:
+				Verify.AllTables[gameID].promotion = "q"
+			case 114:
+				Verify.AllTables[gameID].promotion = "r"
+			case 110:
+				Verify.AllTables[gameID].promotion = "n"
+			case 98:
+				Verify.AllTables[gameID].promotion = "b"
+			default:
+				Verify.AllTables[gameID].promotion = promotion
+			}
 		}
-		switch convertedPromote {
-		case 113:
-			Verify.AllTables[gameID].promotion = "q"
-		case 114:
-			Verify.AllTables[gameID].promotion = "r"
-		case 110:
-			Verify.AllTables[gameID].promotion = "n"
-		case 98:
-			Verify.AllTables[gameID].promotion = "b"
-		default:
-			Verify.AllTables[gameID].promotion = promotion
-		}
-	}
+	*/
 	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
 
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
