@@ -8,8 +8,6 @@
 12/10/2015 - Start date of project.<br><br>
 5/31/2016 This project is officially open source. - All commit history has been cleared as some of the git history contained sensitive data. 
 <br>
-There are missing folders as some sensitive data has been removed.
-<br>
 
 Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jonathan Chin
 <br><b>Features:</b><br>
