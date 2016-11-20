@@ -80,15 +80,16 @@ func main() {
 		//production environment
 		gostuff.ReplaceString(development, production, lobbyFile)
 		gostuff.ReplaceString(development, production, memberChessFile)
-		gostuff.ReplaceString(development, production, goMail)
-		certPath = "secret/combine.crt"
-		keyPath = "secret/go.key"
+		// Replacing string in go files is not effective as the replacement takes place during run time and now compile time
+		//gostuff.ReplaceString(development, production, goMail)
+		certPath = "secret/device.crt"
+		keyPath = "secret/device.key"
 
 	} else {
 		//if reached here then the server is expected to be running in development environment
 		gostuff.ReplaceString(production, development, lobbyFile)
 		gostuff.ReplaceString(production, development, memberChessFile)
-		gostuff.ReplaceString(production, development, goMail)
+		//gostuff.ReplaceString(production, development, goMail)
 	}
 
 	go func() {
