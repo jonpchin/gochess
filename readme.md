@@ -30,4 +30,5 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>1. Configure Twitter bot.</p>
 <p>2. Sound on when king is in put in check in a game.</p>
 <p>3. Chess TV where live games are randomly broadcasted.</p>
+<p>4. Add country flag to all players names.</p>
 <br>
