@@ -69,7 +69,7 @@ func main() {
 	//path to JS files that need to have the domain name replaced
 	var lobbyFile = "./js/lobby.js"
 	var memberChessFile = "./js/memberchess.js"
-	var goMail = "./gostuff/mail.go"
+	//var goMail = "./gostuff/mail.go"
 	var certPath = "secret/device.crt"
 	var keyPath = "secret/device.key"
 
