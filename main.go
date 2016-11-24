@@ -43,6 +43,7 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
+	http.HandleFunc("/getLocation", gostuff.GetLocation)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
