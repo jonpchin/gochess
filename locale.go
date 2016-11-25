@@ -28,7 +28,7 @@ type IPLocation struct {
 func GetLocation(w http.ResponseWriter, r *http.Request) string {
 
 	ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
-	fmt.Println(ipAddress)
+	//fmt.Println(ipAddress)
 	response, err := http.Get("http://freegeoip.net/json/" + ipAddress)
 	if err != nil {
 		fmt.Println("error in get language", err)
@@ -63,5 +63,4 @@ func getLocale(w http.ResponseWriter, r *http.Request) {
 	// We ignore the error: the default language will be selected for t == nil.
 	tag, _, _ := matcher.Match(t...)
 	fmt.Println(tag)
-
 }
