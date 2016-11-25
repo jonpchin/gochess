@@ -43,7 +43,7 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
-	http.HandleFunc("/getLocation", gostuff.GetLocation)
+	//http.HandleFunc("/getLocation", gostuff.GetLocation)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -183,8 +183,10 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	d := struct {
 		CaptchaId string
+		Flag      string
 	}{
 		captcha.New(),
+		gostuff.GetLocation(w, r),
 	}
 	if err := register.Execute(w, &d); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
