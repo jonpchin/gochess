@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"strings"
 
 	"golang.org/x/text/language"
 )
@@ -23,24 +25,15 @@ type IPLocation struct {
 	Metro_code   int
 }
 
-func GetLocation(w http.ResponseWriter, r *http.Request) {
+func GetLocation(w http.ResponseWriter, r *http.Request) string {
 
-	var matcher = language.NewMatcher([]language.Tag{
-		language.BritishEnglish,
-		language.Norwegian,
-		language.German,
-		language.English,
-	})
-
-	t, _, _ := language.ParseAcceptLanguage(r.Header.Get("Accept-Language"))
-	// We ignore the error: the default language will be selected for t == nil.
-	tag, _, _ := matcher.Match(t...)
-	fmt.Println(tag)
-
-	response, err := http.Get("http://freegeoip.net/json/97.101.132.89")
+	ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
+	fmt.Println(ipAddress)
+	response, err := http.Get("http://freegeoip.net/json/" + ipAddress)
 	if err != nil {
 		fmt.Println("error in get language", err)
-		return
+		// default to globe
+		return "globe"
 	}
 	htmlData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -55,5 +48,20 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(htmlData, &ipLocation); err != nil {
 		fmt.Println("Just receieved a message I couldn't decode:", string(htmlData), err)
 	}
-	fmt.Println(ipLocation.Latitude)
+	return strings.ToLower(ipLocation.Country_code)
+}
+
+func getLocale(w http.ResponseWriter, r *http.Request) {
+	var matcher = language.NewMatcher([]language.Tag{
+		language.BritishEnglish,
+		language.Norwegian,
+		language.German,
+		language.English,
+	})
+
+	t, _, _ := language.ParseAcceptLanguage(r.Header.Get("Accept-Language"))
+	// We ignore the error: the default language will be selected for t == nil.
+	tag, _, _ := matcher.Match(t...)
+	fmt.Println(tag)
+
 }
