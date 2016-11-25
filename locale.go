@@ -25,22 +25,25 @@ type IPLocation struct {
 	Metro_code   int
 }
 
-func GetLocation(w http.ResponseWriter, r *http.Request) string {
+func GetCountry(w http.ResponseWriter, r *http.Request) {
 
 	ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
 	//fmt.Println(ipAddress)
 	response, err := http.Get("http://freegeoip.net/json/" + ipAddress)
+	defer response.Body.Close()
 	if err != nil {
 		fmt.Println("error in get language", err)
 		// default to globe
-		return "globe"
+		w.Write([]byte("globe"))
+		return
 	}
 	htmlData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println(err)
+		w.Write([]byte("globe"))
+		return
 	}
 
-	defer response.Body.Close()
 	//fmt.Println(string(htmlData))
 
 	var ipLocation IPLocation
@@ -48,7 +51,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) string {
 	if err := json.Unmarshal(htmlData, &ipLocation); err != nil {
 		fmt.Println("Just receieved a message I couldn't decode:", string(htmlData), err)
 	}
-	return strings.ToLower(ipLocation.Country_code)
+	w.Write([]byte(strings.ToLower(ipLocation.Country_code)))
 }
 
 func getLocale(w http.ResponseWriter, r *http.Request) {
