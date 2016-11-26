@@ -93,38 +93,11 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			}
 
-			//add 1 to captcha if password was incorrect
-			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
-			defer stmt.Close()
-
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			captcha = captcha + 1
-
-			_, err = stmt.Exec(captcha, username)
-			if err != nil {
-				log.Println(err)
-			}
+			addOneToCaptcha(username, captcha)
 			return
 		}
 		if verify != "YES" {
-			var tokenInDB string
-			var email string
-
-			log.Printf("%s needs to activate his account before logging in.\n", username)
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. An email has been sent again containing your activation code."))
-
-			//checking if token matches the one entered by user
-			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", username).Scan(&tokenInDB, &email)
-			if err2 != nil {
-				log.Println(err2)
-			} else {
-				go func(email, tokenInDB, username string) {
-					Sendmail(email, tokenInDB, username)
-				}(email, tokenInDB, username)
-			}
+			needToActivate(w, username)
 			return
 		}
 		// update captcha to zero since login was a sucess
@@ -143,27 +116,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		expiration := time.Now().Add(3 * 24 * time.Hour)
-		cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}
-		http.SetCookie(w, &cookie)
-
-		//generating random session ID to be stored in the backend
-		sessionID := RandomString()
-
-		cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
-		http.SetCookie(w, &cookie)
-
-		country := getCountry(username)
-		// handles case for players who did have null in the country column
-		if country == "" {
-			country = setCountry(username, ipAddress)
-		}
-		cookie = http.Cookie{Name: "country", Value: country, Secure: true, HttpOnly: true, Expires: expiration}
-		http.SetCookie(w, &cookie)
-
-		SessionManager[username] = sessionID
-
-		w.Write([]byte("<script>window.location = '/memberHome'</script>"))
+		enterInside(w, username, ipAddress)
 
 	} else if !captcha.VerifyString(capID, capSol) {
 		w.Write([]byte("<script>document.getElementById('captchaSolution').value = '';</script><img src='img/ajax/not-available.png' /> Wrong captcha solution! Please try again."))
@@ -202,23 +155,10 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		if captcha == 5 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> This account has been deactivated becaue too many incorrect login attempts were made. An email has been sent to you on instructions on reactivating your account."))
 
-			//increment captcha counter
-			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
-			defer stmt.Close()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			captcha = captcha + 1
-
-			_, err = stmt.Exec(captcha, username)
-			if err != nil {
-				log.Println(err)
-				return
-			}
+			addOneToCaptcha(username, captcha)
 
 			//create activation token in database and send user notifying them that their was five incorrect login attempts
-			stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
+			stmt, err := db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 			if err != nil {
 				log.Println(err)
 				return
@@ -256,37 +196,11 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
 
-			//add 1 to captcha if password was incorrect
-			stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
-			defer stmt.Close()
-
-			if err != nil {
-				log.Println(err)
-			}
-			captcha = captcha + 1
-
-			_, err = stmt.Exec(captcha, username)
-			if err != nil {
-				log.Println(err)
-			}
+			addOneToCaptcha(username, captcha)
 			return
 		}
 		if verify != "YES" {
-			var tokenInDB string
-			var email string
-
-			log.Printf("%s needs to activate his account before logging in.\n", username)
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. An email has been sent again containing your activation code."))
-
-			//checking if token matches the one entered by user
-			err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", username).Scan(&tokenInDB, &email)
-			if err2 != nil {
-				log.Println(err2)
-			} else {
-				go func(email, tokenInDB, username string) {
-					Sendmail(email, tokenInDB, username)
-				}(email, tokenInDB, username)
-			}
+			needToActivate(w, username)
 			return
 		}
 
@@ -302,20 +216,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}
-
-		expiration := time.Now().Add(3 * 24 * time.Hour)
-		cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}
-		http.SetCookie(w, &cookie)
-
-		//generating random session ID to be stored in the backend
-		sessionID := RandomString()
-
-		cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
-		http.SetCookie(w, &cookie)
-
-		SessionManager[username] = sessionID
-
-		w.Write([]byte("<script>window.location = '/memberHome'</script>"))
+		enterInside(w, username, ipAddress)
 	}
 }
 
@@ -331,4 +232,66 @@ func RandomString() string {
 
 	token := base64.URLEncoding.EncodeToString(rb)
 	return token
+}
+
+// after successfully identifying credentials, setup session and cookies
+func enterInside(w http.ResponseWriter, username string, ipAddress string) {
+	expiration := time.Now().Add(3 * 24 * time.Hour)
+	cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	//generating random session ID to be stored in the backend
+	sessionID := RandomString()
+
+	cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	country := getCountry(username)
+	// handles case for players who did have null in the country column
+	if country == "" {
+		country = setCountry(username, ipAddress)
+	}
+	cookie = http.Cookie{Name: "country", Value: country, Secure: true, HttpOnly: true, Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	SessionManager[username] = sessionID
+
+	w.Write([]byte("<script>window.location = '/memberHome'</script>"))
+}
+
+// sends an email again to reactivate an inactivated account
+func needToActivate(w http.ResponseWriter, username string) {
+	var tokenInDB string
+	var email string
+
+	log.Printf("%s needs to activate his account before logging in.\n", username)
+	w.Write([]byte("<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. An email has been sent again containing your activation code."))
+
+	//checking if token matches the one entered by user
+	err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", username).Scan(&tokenInDB, &email)
+	if err2 != nil {
+		log.Println(err2)
+	} else {
+		go func(email, tokenInDB, username string) {
+			Sendmail(email, tokenInDB, username)
+		}(email, tokenInDB, username)
+	}
+}
+
+//add 1 to captcha if password was incorrect
+func addOneToCaptcha(username string, captcha int) {
+
+	stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
+	defer stmt.Close()
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	captcha = captcha + 1
+
+	_, err = stmt.Exec(captcha, username)
+	if err != nil {
+		log.Println(err)
+	}
 }
