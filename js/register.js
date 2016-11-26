@@ -159,6 +159,7 @@ $('#captchaSolution').keypress(function(event) {
     }
 });
 
+/* 
 function loadFlag(){
 	$.ajax({
   		url: 'getCountry',
@@ -170,3 +171,5 @@ function loadFlag(){
 }
 // Load country flag on page load
 loadFlag();
+
+*/

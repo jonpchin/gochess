@@ -1,10 +1,12 @@
 package gostuff
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -254,4 +256,36 @@ func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(string(game)))
+}
+
+func CheckUserName(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		username := template.HTMLEscapeString(r.FormValue("username"))
+
+		//making sure username fits length requirement
+		if len(username) < 3 || len(username) > 12 {
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Choose a name between 3 to 12 characters."))
+			return
+		}
+		ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
+		//check if database connection is open
+		if db.Ping() != nil {
+			fmt.Printf("ERROR 2 PINGING DB IP: %s \n", ipAddress)
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please come back later."))
+			return
+		}
+
+		var name string
+		//checking if name exists
+		checkName := db.QueryRow("SELECT username FROM userinfo WHERE username=?", username).Scan(&name)
+		switch {
+		case checkName == sql.ErrNoRows:
+			w.Write([]byte(" <img src='img/ajax/available.png' /> Username available"))
+			fmt.Printf("Username %s is available.\n", username)
+		case checkName != nil:
+			fmt.Printf("ERROR 3 CHECKNAME IP is %s\n", ipAddress)
+		default:
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Username taken"))
+		}
+	}
 }

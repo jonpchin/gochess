@@ -43,7 +43,6 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
-	http.HandleFunc("/getCountry", gostuff.GetCountry)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -63,14 +62,6 @@ func main() {
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
 
-	//domain name used for testing
-	var development = "localhost"
-	//domain name used for production environment
-	var production = "goplaychess.com"
-	//path to JS files that need to have the domain name replaced
-	var lobbyFile = "./js/lobby.js"
-	var memberChessFile = "./js/memberchess.js"
-	//var goMail = "./gostuff/mail.go"
 	var certPath = "secret/device.crt"
 	var keyPath = "secret/device.key"
 
@@ -78,19 +69,8 @@ func main() {
 	//default is localhost if no argument is passed
 	if len(os.Args) > 1 {
 		domain = os.Args[1]
-		//production environment
-		gostuff.ReplaceString(development, production, lobbyFile)
-		gostuff.ReplaceString(development, production, memberChessFile)
-		// Replacing string in go files is not effective as the replacement takes place during run time and now compile time
-		//gostuff.ReplaceString(development, production, goMail)
 		certPath = "secret/device.crt"
 		keyPath = "secret/device.key"
-
-	} else {
-		//if reached here then the server is expected to be running in development environment
-		gostuff.ReplaceString(production, development, lobbyFile)
-		gostuff.ReplaceString(production, development, memberChessFile)
-		//gostuff.ReplaceString(production, development, goMail)
 	}
 
 	go func() {
