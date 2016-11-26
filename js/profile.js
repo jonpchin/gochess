@@ -6,3 +6,21 @@ function reviewGame(moves, white, black, whiteRating, blackRating, time, result,
 function reviewProfile(user){
 	window.location = "profile?name=" + user; 
 }
+
+function getCookie(cname) { //gets cookies value
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+// gets country flag stored in cookie and updates the img source
+function setFlag(){
+	var countryFlag = getCookie("country");
+	document.getElementById('countryFlag').src = "img/flags/" + countryFlag + ".png"
+}
+setFlag();

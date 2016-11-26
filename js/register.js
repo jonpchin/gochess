@@ -158,18 +158,3 @@ $('#captchaSolution').keypress(function(event) {
 	   $('#register').click();
     }
 });
-
-/* 
-function loadFlag(){
-	$.ajax({
-  		url: 'getCountry',
-   		type: 'post',
-   		success : function(data) {			
-			document.getElementById('countryFlag').src = "img/flags/" + data + ".png"
-   		},
-	});
-}
-// Load country flag on page load
-loadFlag();
-
-*/

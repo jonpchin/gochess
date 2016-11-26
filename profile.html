@@ -21,6 +21,7 @@
 RD is rating deviation. If a rating is under 80 RD it is considered accurate. The more games played the lower the RD. 
 If a player becomes inactive RD will rise over time. Result Key: Black won=0, White won=1, Draw=2</p>
 <p><a href="/saved?user={{.User}}">View adjourned games</a><p>
+<p>Country<img id="countryFlag" src="img/flags/globe.png"  alt="Country flag"></p>
 {{ if ge .GameID 0 }}
 	<p><img src="../img/icons/playing.png" alt="Playing Game">
 	<a href="/chess/memberChess?spectate&id={{.GameID}}">{{.User}} vs. {{.Opponent}}</a><p>
