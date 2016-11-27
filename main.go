@@ -221,7 +221,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "private, max-age=86400")
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var lobby = template.Must(template.ParseFiles("lobby.html"))
 				var bulletRating, blitzRating, standardRating int16
 				var errMessage string
@@ -427,7 +427,7 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "private, max-age=3600")
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var highscores = template.Must(template.ParseFiles("highscore.html"))
 
 				var p gostuff.ScoreBoard
@@ -452,7 +452,7 @@ func saved(w http.ResponseWriter, r *http.Request) {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "private, max-age=86400")
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var all []gostuff.GoGame
 
 				name := r.URL.Query().Get("user")

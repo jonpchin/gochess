@@ -91,6 +91,8 @@ window.onload = function() {
 		var blackName = token.black;
 		var whiteR = token.whiteRating;
 		var blackR = token.blackRating;
+		var countryWhite = token.countryWhite;
+		var countryBlack = token.countryBlack;
 		
 		//no var needed here as its referencing a var timeGet earlier on
 		timeGet = token.time;
@@ -105,10 +107,12 @@ window.onload = function() {
 			
 		document.getElementById("bottomtime").value = timeGet + ":00"; //setting up name and time of player when they are going over game
 		document.getElementById("toptime").value =	timeGet + ":00";
-		document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + whiteName + "'>" +
-			 whiteName + "</a>(" + whiteR +")";
-		document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + blackName  + "'>" +
-			 blackName + "</a>(" + blackR +")";			
+		document.getElementById("bottom").innerHTML = "W: <img src='../img/flags/" + 
+			countryWhite + ".png'><a href='/profile?name=" + whiteName + "'>" +
+			whiteName + "</a>(" + whiteR +")";
+		document.getElementById("top").innerHTML = "B: <img src='../img/flags/" + 
+			countryBlack + ".png'><a href='/profile?name=" + blackName  + "'>" +
+			blackName + "</a>(" + blackR +")";			
 
 		var review = JSON.parse(reviewMoves);
 		var length = 0;
@@ -368,21 +372,21 @@ window.onload = function() {
 
 				if (user === json.WhitePlayer){
 														
-					document.getElementById("bottom").innerHTML = "W: <img src='img/flags/" + 
-						json.WhiteCountry + ".png'><a href='/profile?name=" + json.WhitePlayer + 
+					document.getElementById("bottom").innerHTML = "W: <img src='../img/flags/" + 
+						json.CountryWhite + ".png'><a href='/profile?name=" + json.WhitePlayer + 
 						"'>" + json.WhitePlayer + "</a>"  +	json.WhiteRating +")";
-					document.getElementById("top").innerHTML = "B: <img src='img/flags/" + 
-						json.BlackCountry + ".png'><a href='/profile?name=" + json.BlackPlayer  + 
+					document.getElementById("top").innerHTML = "B: <img src='../img/flags/" + 
+						json.CountryBlack + ".png'><a href='/profile?name=" + json.BlackPlayer  + 
 						"'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";		
 				}
 				else{
 					//flips board white on top black on bottom
 					$('#flipOrientationBtn').click();
-					document.getElementById("bottom").innerHTML = "B: <img src='img/flags/" + 
-						json.BlackCountry + ".png'><a href='/profile?name=" + json.BlackPlayer  + "'>" + 
+					document.getElementById("bottom").innerHTML = "B: <img src='../img/flags/" + 
+						json.CountryBlack + ".png'><a href='/profile?name=" + json.BlackPlayer  + "'>" + 
 						json.BlackPlayer + "</a>(" + json.BlackRating +")";
-					document.getElementById("top").innerHTML = "W: <img src='img/flags/" + 
-						json.WhiteCountry + ".png'><a href='/profile?name=" + json.WhitePlayer + "'>" + 
+					document.getElementById("top").innerHTML = "W: <img src='../img/flags/" + 
+						json.CountryWhite + ".png'><a href='/profile?name=" + json.WhitePlayer + "'>" + 
 						json.WhitePlayer + "</a>(" + json.WhiteRating +")";
 				}
 				

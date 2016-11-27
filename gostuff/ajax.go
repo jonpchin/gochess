@@ -69,7 +69,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" +
-		url + lookupName + "<src='img/flags/'" + countryFlag +
+		url + lookupName + "<img src='../img/flags/" + countryFlag +
 		".png'>" + " " + status + endUrl +
 		"<br><img src='../img/icons/bullet.png' alt='bullet'>" + bullet +
 		"<img src='../img/icons/blitz.png' alt='blitz'>" + blitz +

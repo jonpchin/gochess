@@ -67,7 +67,8 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 
 	stmt, err := db.Prepare("INSERT saved SET white=?, black=?, gametype=?, rated=?," +
 		" whiterating=?, blackrating=?, blackminutes=?, blackseconds=?, whiteminutes=?," +
-		" whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?")
+		" whiteseconds=?, timecontrol=?, moves=?, totalmoves=?, status=?, date=?, time=?," +
+		" countrywhite=?, countryblack=?")
 	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
@@ -77,7 +78,7 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated,
 		game.WhiteRating, game.BlackRating, game.BlackMinutes, game.BlackSeconds,
 		game.WhiteMinutes, game.WhiteSeconds, game.TimeControl, moves, totalMoves,
-		game.Status, date, date)
+		game.Status, date, date, game.CountryWhite, game.CountryBlack)
 	if err != nil {
 		log.Println(err)
 		return
