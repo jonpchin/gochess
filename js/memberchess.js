@@ -368,17 +368,21 @@ window.onload = function() {
 
 				if (user === json.WhitePlayer){
 														
-					document.getElementById("bottom").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + 
-						"'>" + json.WhitePlayer + "</a>(" + json.WhiteRating +")";
-					document.getElementById("top").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + 
-						"'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";			
+					document.getElementById("bottom").innerHTML = "W: <img src='img/flags/" + 
+						json.WhiteCountry + ".png'><a href='/profile?name=" + json.WhitePlayer + 
+						"'>" + json.WhitePlayer + "</a>"  +	json.WhiteRating +")";
+					document.getElementById("top").innerHTML = "B: <img src='img/flags/" + 
+						json.BlackCountry + ".png'><a href='/profile?name=" + json.BlackPlayer  + 
+						"'>" + json.BlackPlayer + "</a>(" + json.BlackRating +")";		
 				}
 				else{
 					//flips board white on top black on bottom
 					$('#flipOrientationBtn').click();
-					document.getElementById("bottom").innerHTML = "B: <a href='/profile?name=" + json.BlackPlayer  + "'>" + 
+					document.getElementById("bottom").innerHTML = "B: <img src='img/flags/" + 
+						json.BlackCountry + ".png'><a href='/profile?name=" + json.BlackPlayer  + "'>" + 
 						json.BlackPlayer + "</a>(" + json.BlackRating +")";
-					document.getElementById("top").innerHTML = "W: <a href='/profile?name=" + json.WhitePlayer + "'>" + 
+					document.getElementById("top").innerHTML = "W: <img src='img/flags/" + 
+						json.WhiteCountry + ".png'><a href='/profile?name=" + json.WhitePlayer + "'>" + 
 						json.WhitePlayer + "</a>(" + json.WhiteRating +")";
 				}
 				

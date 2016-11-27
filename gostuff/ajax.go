@@ -55,9 +55,13 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	icon := "ready"
 	url := ""
 	endUrl := "" //closing the href link
+	countryFlag := getCountry(lookupName)
+	enemyFlag := getCountry(PrivateChat[lookupName])
+
 	//second username is nil as it only checks one name
 	if isPlayerInGame(lookupName, "") {
-		status = "vs. " + PrivateChat[lookupName]
+		status = "vs. " + PrivateChat[lookupName] + "<src='img/flags/'" +
+			enemyFlag + ".png>"
 		icon = "playing"
 		id, _ := GetGameID(lookupName)
 		url = "<a href=/chess/memberChess?spectate&id=" + strconv.Itoa(id) + ">"
@@ -65,7 +69,8 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" +
-		url + lookupName + " " + status + endUrl +
+		url + lookupName + "<src='img/flags/'" + countryFlag +
+		".png'>" + " " + status + endUrl +
 		"<br><img src='../img/icons/bullet.png' alt='bullet'>" + bullet +
 		"<img src='../img/icons/blitz.png' alt='blitz'>" + blitz +
 		"<img src='../img/icons/standard.png' alt='standard'>" + standard

@@ -464,6 +464,8 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	game.PendingDraw = false
 	game.Rated = Pending.Matches[matchID].Rated
 	game.Spectate = false
+	game.CountryWhite = getCountry(game.WhitePlayer)
+	game.CountryBlack = getCountry(game.BlackPlayer)
 
 	var start int = 0
 	for {

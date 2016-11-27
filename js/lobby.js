@@ -19,6 +19,7 @@ window.onload = function() {
 	var challenge = new Audio('../sound/challenge.mp3');
 	var toggleSound = getCookie("sound");
 	var toggleChat = getCookie("chat");
+	var countryFlag = getCookie("country");
 	
     sock.onopen = function() {
 		
@@ -66,8 +67,9 @@ window.onload = function() {
 		
 			if(show === true && json.Name !== user){
 				$('#online').html(function() { //when a player chats or connects they will update online players list for everyone
-					return  $(this).html() +'<tr><td  onclick="reviewProfile(\''+ json.Name +'\');">' +
-						 json.Name + '</td></tr>';
+						 return  $(this).html() + '<tr><td onclick="reviewProfile(\''+ json.Name +
+						'\')" onmouseover="getPlayerInfo(\'' + json.Name + '\');">' + json.Name + 
+						 '</td></tr>';
 				});
 			}
 					

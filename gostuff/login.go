@@ -251,7 +251,8 @@ func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 	if country == "" {
 		country = setCountry(username, ipAddress)
 	}
-	cookie = http.Cookie{Name: "country", Value: country, Secure: true, HttpOnly: true, Expires: expiration}
+	// country cookie can be modified by JS
+	cookie = http.Cookie{Name: "country", Value: country, Secure: false, HttpOnly: false, Expires: expiration}
 	http.SetCookie(w, &cookie)
 
 	SessionManager[username] = sessionID

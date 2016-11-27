@@ -26,6 +26,8 @@ type ChessGame struct {
 	PendingDraw  bool   //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
 	Spectate     bool
+	CountryWhite string
+	CountryBlack string
 }
 
 //source and destination of piece moves
