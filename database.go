@@ -49,6 +49,8 @@ type GoGame struct {
 	Date         string
 	Time         string
 	Rated        string
+	CountryWhite string
+	CountryBlack string
 }
 
 var db *sql.DB
@@ -331,7 +333,7 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	//preparing token activation
 	stmt, err := db.Prepare("INSERT games SET white=?, black=?, gametype=?, rated=?, " +
 		"whiterating=?, blackrating=?, timecontrol=?, moves=?, totalmoves=?, " +
-		"result=?, status=?, date=?, time=?")
+		"result=?, status=?, date=?, time=?, countrywhite=?, countryblack=?")
 	defer stmt.Close()
 	if err != nil {
 		log.Println(err)
@@ -340,7 +342,7 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	date := time.Now()
 	res, err := stmt.Exec(game.WhitePlayer, game.BlackPlayer, game.GameType, game.Rated,
 		game.WhiteRating, game.BlackRating, game.TimeControl, moves, totalMoves,
-		game.Result, game.Status, date, date)
+		game.Result, game.Status, date, date, game.CountryWhite, game.CountryBlack)
 	if err != nil {
 		log.Println(err)
 		return
@@ -372,9 +374,8 @@ func GetGames(name string) (storage []GoGame) {
 
 		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated,
 			&all.WhiteRating, &all.BlackRating, &all.TimeControl, &all.Moves,
-			&all.Total, &all.Result, &all.Status, &all.Date, &all.Time)
+			&all.Total, &all.Result, &all.Status, &all.Date, &all.Time, &all.CountryWhite, &all.CountryBlack)
 		if err != nil {
-
 			log.Println(err)
 		}
 		storage = append(storage, all)
@@ -400,7 +401,7 @@ func GetSaved(name string) (storage []GoGame) {
 		err = rows.Scan(&all.ID, &all.White, &all.Black, &all.GameType, &all.Rated,
 			&all.WhiteRating, &all.BlackRating, &all.BlackMinutes, &all.BlackSeconds,
 			&all.WhiteMinutes, &all.WhiteSeconds, &all.TimeControl, &all.Moves, &all.Total,
-			&all.Status, &all.Date, &all.Time)
+			&all.Status, &all.Date, &all.Time, &all.CountryWhite, &all.CountryBlack)
 		if err != nil {
 			log.Println(err)
 		}
@@ -409,7 +410,7 @@ func GetSaved(name string) (storage []GoGame) {
 	return storage
 }
 
-//fetches saved game from database
+//fetches saved/adjourned game from database
 func fetchSavedGame(id string, user string) bool {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -430,13 +431,15 @@ func fetchSavedGame(id string, user string) bool {
 	var moves string
 	var totalmoves int
 	var status string
+	var countrywhite string
+	var countryblack string
 
 	err = db.QueryRow("SELECT white, black, gametype, rated, whiterating, "+
 		"blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, "+
-		"timecontrol, moves, totalmoves, status FROM saved WHERE id=?", id).Scan(&white,
+		"timecontrol, moves, totalmoves, status, countrywhite, countryblack FROM saved WHERE id=?", id).Scan(&white,
 		&black, &gametype, &rated, &whiterating, &blackrating, &blackminutes,
 		&blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves,
-		&totalmoves, &status)
+		&totalmoves, &status, &countrywhite, &countryblack)
 	if err != nil {
 		log.Println(err)
 	}
@@ -469,6 +472,8 @@ func fetchSavedGame(id string, user string) bool {
 	game.BlackSeconds = blackseconds
 	game.BlackMilli = 0
 	game.PendingDraw = false
+	game.CountryWhite = countrywhite
+	game.CountryBlack = countryblack
 
 	var start int = 0
 	for {
