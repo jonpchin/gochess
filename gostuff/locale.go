@@ -73,7 +73,7 @@ func getCountry(username string) string {
 	var country = "globe"
 
 	err := db.QueryRow("SELECT country from userinfo WHERE username=?", username).Scan(&country)
-	if err != nil || country == "" { // then country is nil or ::1 in database
+	if err != nil { // then country is nil
 		return ""
 	}
 	return country

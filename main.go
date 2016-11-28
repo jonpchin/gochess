@@ -95,7 +95,7 @@ func main() {
 			//if pass == true {
 			//	fmt.Println("All games are accurate!")
 			//}
-			//gostuff.ExportDatabase()
+			gostuff.ExportDatabase()
 		}
 
 		//gostuff.SpawnProcess()
