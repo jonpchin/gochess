@@ -78,10 +78,12 @@ func main() {
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")
 
-		//setting up cron job
-		gostuff.StartCron()
 		//removes games older then 30 days from database
 		if proceed == true {
+
+			//setting up cron job
+			gostuff.StartCron()
+
 			// Number of days used to remove old games, forgot and activate tokens
 			days := "30"
 			gostuff.RemoveOldGames(days)
