@@ -195,7 +195,6 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 			}
 			break
 		}
-
 	}
 
 	return false
