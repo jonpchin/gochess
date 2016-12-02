@@ -39,7 +39,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	// the name of the player being looked up by the AJAX call
 	lookupName := template.HTMLEscapeString(r.FormValue("user"))
 
-	//getting player raating
+	//getting player rating
 	ratingError, bulletRating, blitzRating, standardRating := GetRating(lookupName)
 	if ratingError != "" {
 		w.Write([]byte("Service is down."))
@@ -52,24 +52,29 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 
 	//checking if the player is a game
 	status := ""
-	icon := "ready"
+	icon := ""
 	url := ""
 	endUrl := "" //closing the href link
 	countryFlag := getCountry(lookupName)
 	enemyFlag := getCountry(PrivateChat[lookupName])
+	if countryFlag == "" {
+		countryFlag = "globe"
+	}
+	if enemyFlag == "" {
+		enemyFlag = "globe"
+	}
 
 	//second username is nil as it only checks one name
 	if isPlayerInGame(lookupName, "") {
 		status = "vs. " + PrivateChat[lookupName] + "<src='img/flags/'" +
 			enemyFlag + ".png>"
-		icon = "playing"
+		icon = "<img src='../img/icons/playing.png' alt='status'>"
 		id, _ := GetGameID(lookupName)
 		url = "<a href=/chess/memberChess?spectate&id=" + strconv.Itoa(id) + ">"
 		endUrl = "</a>"
 	}
 
-	var result = "<img src='../img/icons/" + icon + ".png' alt='status'>" +
-		url + lookupName + "<img src='../img/flags/" + countryFlag +
+	var result = icon + url + lookupName + "<img src='../img/flags/" + countryFlag +
 		".png'>" + " " + status + endUrl +
 		"<br><img src='../img/icons/bullet.png' alt='bullet'>" + bullet +
 		"<img src='../img/icons/blitz.png' alt='blitz'>" + blitz +

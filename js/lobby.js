@@ -19,7 +19,6 @@ window.onload = function() {
 	var challenge = new Audio('../sound/challenge.mp3');
 	var toggleSound = getCookie("sound");
 	var toggleChat = getCookie("chat");
-	var countryFlag = getCookie("country");
 	
     sock.onopen = function() {
 		

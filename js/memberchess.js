@@ -104,7 +104,7 @@ window.onload = function() {
 		BlackSide = blackName;
 		whiteRating = whiteR;
 		blackRating = blackR;
-			
+
 		document.getElementById("bottomtime").value = timeGet + ":00"; //setting up name and time of player when they are going over game
 		document.getElementById("toptime").value =	timeGet + ":00";
 		document.getElementById("bottom").innerHTML = "W: <img src='../img/flags/" + 

@@ -35,26 +35,26 @@ func setCountry(username string, ipAddress string) string {
 	defer response.Body.Close()
 	if err != nil {
 		fmt.Println("error in get language 1", err)
-		return country
+		return "globe"
 	}
 	htmlData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("error in get language 2", err)
-		return country
+		return "globe"
 	}
 
 	var ipLocation IPLocation
 
 	if err := json.Unmarshal(htmlData, &ipLocation); err != nil {
 		fmt.Println("error in get language 3", string(htmlData), err)
-		return country
+		return "globe"
 	}
 
 	stmt, err := db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
 	defer stmt.Close()
 	if err != nil {
 		log.Println("error in get language 4", err)
-		return country
+		return "globe"
 	}
 	country = strings.ToLower(ipLocation.Country_code)
 	_, err = stmt.Exec(country, username)
@@ -74,7 +74,7 @@ func getCountry(username string) string {
 
 	err := db.QueryRow("SELECT country from userinfo WHERE username=?", username).Scan(&country)
 	if err != nil { // then country is nil
-		return ""
+		return "globe"
 	}
 	return country
 }

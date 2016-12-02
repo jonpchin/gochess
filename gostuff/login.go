@@ -247,10 +247,7 @@ func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 	http.SetCookie(w, &cookie)
 
 	country := getCountry(username)
-	// handles case for players who did have null in the country column
-	if country == "" {
-		country = setCountry(username, ipAddress)
-	}
+
 	// country cookie can be modified by JS
 	cookie = http.Cookie{Name: "country", Value: country, Secure: false, HttpOnly: false, Expires: expiration}
 	http.SetCookie(w, &cookie)
