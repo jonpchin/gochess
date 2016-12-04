@@ -198,5 +198,4 @@ func VerifyGrandmasterGames(total int) bool {
 		}
 	}
 	return true
-
 }

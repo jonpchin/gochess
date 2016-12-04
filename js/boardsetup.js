@@ -107,11 +107,15 @@ var onDrop = function(source, target, piece) {
 	totalFEN.push(game.fen());
 	var pgn = game.pgn();
 	totalPGN.push(pgn);
-	var gameStatus = updateStatus();
+	
 	totalStatus.push(gameStatus);
  	moveCounter++;
   
 	sendMove(source, target, pawnPromotion);
+	//VERY IMPORTANT: updateStatus() must come after sendMove() or checkmate signal 
+	// will be sent before the move which will cause a race bug in the chess verify
+	var gameStatus = updateStatus();
+
 	setStatusAndPGN(gameStatus, pgn)
 	
 	if(skipPromotion){

@@ -124,6 +124,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 				return true
 			}
 		} else { //encountered a piece on the diagonal
+
 			if i == targetRow && j == targetCol { //the piece could be our actual target
 				return true
 			}

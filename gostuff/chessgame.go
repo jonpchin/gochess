@@ -1,11 +1,6 @@
 package gostuff
 
-import (
-	"fmt"
-	"sync"
-
-	"github.com/malbrecht/chess"
-)
+import "sync"
 
 //stores chess game information
 type ChessGame struct {
@@ -89,8 +84,6 @@ type Observers struct {
 
 //used to verify players games
 type Table struct {
-	board *chess.Board
-
 	ChessBoard [][]string
 
 	whitePawns [8]bool //stores array of booleans indicating whether or not the pawns have made their first move yet
@@ -161,11 +154,6 @@ var PrivateChat = make(map[string]string)
 //intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
 func initGame(gameID int, name string, fighter string) {
 
-	board, err := chess.ParseFen("")
-	if err != nil {
-		fmt.Println("lobby parseFen error 1")
-	}
-
 	//setting up back end move verification
 	var table Table
 	table.ChessBoard = [][]string{
@@ -179,8 +167,6 @@ func initGame(gameID int, name string, fighter string) {
 		[]string{"wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"},
 	}
 	Verify.AllTables[gameID] = &table
-
-	Verify.AllTables[gameID].board = board
 
 	for i := 0; i < 8; i++ {
 		Verify.AllTables[gameID].whitePass[i] = false

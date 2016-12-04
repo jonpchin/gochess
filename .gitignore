@@ -6,6 +6,7 @@ games/
 /main.exe
 /.vscode
 /debug
+/debug~
 /config
 /backup
 /data

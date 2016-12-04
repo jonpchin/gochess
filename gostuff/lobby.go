@@ -499,8 +499,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	PrivateChat[acceptmatch.TargetPlayer] = acceptmatch.Name
 
 	//intitalizes all the variables of the game
-
-	//initGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
+	initGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
 
 	for _, cs := range Chat.Lobby {
 		if err := websocket.JSON.Send(cs, &acceptmatch); err != nil {
