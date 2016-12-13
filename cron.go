@@ -36,7 +36,7 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 		return
 	}
 
-	_, err := stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
