@@ -85,7 +85,7 @@ func main() {
 			gostuff.StartCron()
 
 			// Number of days used to remove old games, forgot and activate tokens
-			days := "30"
+			days := "180"
 			gostuff.RemoveOldGames(days)
 			gostuff.RemoveOldActivate(days)
 			gostuff.RemoveOldForgot(days)
