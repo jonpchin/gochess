@@ -16,6 +16,7 @@ import (
 
 var (
 	domain = "localhost"
+	days   = "180" // Number of days used to remove old games, forgot and activate tokens
 )
 
 func main() {
@@ -84,8 +85,6 @@ func main() {
 			//setting up cron job
 			gostuff.StartCron()
 
-			// Number of days used to remove old games, forgot and activate tokens
-			days := "180"
 			gostuff.RemoveOldGames(days)
 			gostuff.RemoveOldActivate(days)
 			gostuff.RemoveOldForgot(days)
@@ -366,7 +365,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 				p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
 					BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
-					Games: all, GameID: gameID, Opponent: opponent}
+					Games: all, GameID: gameID, Opponent: opponent, Days: days}
 
 				if err := playerProfile.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -462,7 +461,7 @@ func saved(w http.ResponseWriter, r *http.Request) {
 
 				var saved = template.Must(template.ParseFiles("saved.html"))
 
-				p := gostuff.ProfileGames{User: name, Games: all}
+				p := gostuff.ProfileGames{User: name, Games: all, Days: days}
 
 				if err := saved.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -29,7 +29,7 @@ If a player becomes inactive RD will rise over time. Result Key: Black won=0, Wh
 
 {{ $length := len .Games }} 
 {{ if eq $length 0 }}
-    <center>No active games within the past 30 days have been found.</center>
+    <center>No active games within the past {{.Days}} days have been found.</center>
 {{else}}
 	<table class="table1">
 		<tr>

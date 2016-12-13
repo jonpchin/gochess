@@ -21,7 +21,7 @@
 room not playing a chess game to resume an adjourned game.</p>
 {{ $length := len .Games }} 
 {{ if eq $length 0 }}
-    <center>No adjourned games within the past 30 days have been found.</center>
+    <center>No adjourned games within the past {{.Days}} days have been found.</center>
 {{else}}
 	<table class="table4">
 		<tr>

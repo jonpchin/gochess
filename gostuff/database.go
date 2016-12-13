@@ -27,6 +27,7 @@ type ProfileGames struct {
 	Games      []GoGame
 	GameID     int
 	Opponent   string
+	Days       string
 }
 
 //an individual game
