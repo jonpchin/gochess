@@ -16,7 +16,10 @@ import (
 
 var (
 	domain = "localhost"
-	days   = "180" // Number of days used to remove old games, forgot and activate tokens
+)
+
+const (
+	days = "180" // Number of days used to remove old games, forgot and activate tokens
 )
 
 func main() {
