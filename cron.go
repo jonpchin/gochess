@@ -36,16 +36,11 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 		return
 	}
 
-	res, err := stmt.Exec()
+	_, err := stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	affect, err := res.RowsAffected()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%d rows were updated in bullet ratingRD table.\n", affect)
 
 	stmt, err = db.Prepare("update rating set blitzRD=blitzRD+1 where blitzRD < 250")
 
@@ -54,16 +49,11 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 		return
 	}
 
-	res, err = stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	affect, err = res.RowsAffected()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%d rows were updated in blitz ratingRD table.\n", affect)
 
 	stmt, err = db.Prepare("update rating set standardRD=standardRD+1 where standardRD < 250")
 	defer stmt.Close()
@@ -73,16 +63,11 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 		return
 	}
 
-	res, err = stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	affect, err = res.RowsAffected()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%d rows were updated in standard ratingRD table.\n", affect)
 }
 
 //remove games older then 30 days to clean up profile page, activated only on server startup

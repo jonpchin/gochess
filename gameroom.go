@@ -589,7 +589,7 @@ func (c *Connection) ChessConnect() {
 						break
 					}
 				}
-				//value := fmt.Sprintf("%d", start)
+
 				match.MatchID = start
 				//used in backend to keep track of all pending seeks waiting for a player to accept
 				Pending.Matches[start] = &match
