@@ -15,8 +15,8 @@ type RatingDate struct {
 	Rating   string
 }
 
-// fetches rating history, unmarshals it, adds a new game, then marshals data and then store it back in the database
-// returns true if sucessfully updates rating history with no errors
+// fetches rating history, unmarshals it, adds a new rating history, then marshals data and then
+// store it back in the database returns true if sucessfully updates rating history with no errors
 func updateRatingHistory(name string, gameType string, rating string, dateTime string) bool {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -31,8 +31,8 @@ func updateRatingHistory(name string, gameType string, rating string, dateTime s
 
 	var ratingHistory string
 
-	// getting player's game history
-	err := db.QueryRow("SELECT ? FROM gamehistory WHERE username=?", name).Scan(&ratingHistory)
+	// getting player's rating history
+	err := db.QueryRow("SELECT ? FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
 
 	if err != nil {
 		log.Println(err)
@@ -48,20 +48,20 @@ func updateRatingHistory(name string, gameType string, rating string, dateTime s
 		return false
 	}
 
-	var gameInfo RatingDate
-	gameInfo.DateTime = dateTime
-	gameInfo.Rating = rating
-	ratingHistoryMemory = append(ratingHistoryMemory, gameInfo)
+	var ratingInfo RatingDate
+	ratingInfo.DateTime = dateTime
+	ratingInfo.Rating = rating
+	ratingHistoryMemory = append(ratingHistoryMemory, ratingInfo)
 
 	// need to marshall memory model before storing in database
 	updatedRatingHistory, err := json.Marshal(ratingHistoryMemory)
 	if err != nil {
-		fmt.Println("updateGameHistory problem marshalling ", err)
+		fmt.Println("updateRatingHistory problem marshalling ", err)
 		return false
 	}
 
 	//store in database
-	stmt, err := db.Prepare("INSERT gamehistory SET ?=? WHERE username=?")
+	stmt, err := db.Prepare("INSERT ratinghistory SET ?=? WHERE username=?")
 	if err != nil {
 		log.Println(err)
 		return false
