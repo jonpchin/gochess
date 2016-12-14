@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -17,7 +18,7 @@ type RatingDate struct {
 
 // fetches rating history, unmarshals it, adds a new rating history, then marshals data and then
 // store it back in the database returns true if sucessfully updates rating history with no errors
-func updateRatingHistory(name string, gameType string, rating string, dateTime string) bool {
+func updateRatingHistory(name string, gameType string, rating string) bool {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -49,7 +50,7 @@ func updateRatingHistory(name string, gameType string, rating string, dateTime s
 	}
 
 	var ratingInfo RatingDate
-	ratingInfo.DateTime = dateTime
+	ratingInfo.DateTime = time.Now().String()
 	ratingInfo.Rating = rating
 	ratingHistoryMemory = append(ratingHistoryMemory, ratingInfo)
 
