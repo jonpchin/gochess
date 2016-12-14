@@ -1174,7 +1174,6 @@ func blackKingStaleMate(x int8, y int8, gameID int) bool {
 
 			return false
 		}
-
 	}
 
 	if y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x][y-1])[0:1] != "b" { //middle left
@@ -1195,7 +1194,6 @@ func blackKingStaleMate(x int8, y int8, gameID int) bool {
 
 			return false
 		}
-
 	}
 
 	if y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x][y+1])[0:1] != "b" { //middle right
@@ -1216,7 +1214,6 @@ func blackKingStaleMate(x int8, y int8, gameID int) bool {
 
 			return false
 		}
-
 	}
 
 	if x+1 <= 7 && y-1 >= 0 && (Verify.AllTables[gameID].ChessBoard[x+1][y-1])[0:1] != "b" { //bottom left
@@ -1237,7 +1234,6 @@ func blackKingStaleMate(x int8, y int8, gameID int) bool {
 
 			return false
 		}
-
 	}
 
 	if x+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y])[0:1] != "b" { //bottom middle
@@ -1257,7 +1253,6 @@ func blackKingStaleMate(x int8, y int8, gameID int) bool {
 			undoMove(x, y, x+1, y, "bK", capturedPiece, gameID)
 			return false
 		}
-
 	}
 
 	if x+1 <= 7 && y+1 <= 7 && (Verify.AllTables[gameID].ChessBoard[x+1][y+1])[0:1] != "b" { //bottom right
@@ -1277,8 +1272,6 @@ func blackKingStaleMate(x int8, y int8, gameID int) bool {
 			undoMove(x, y, x+1, y+1, "bK", capturedPiece, gameID)
 			return false
 		}
-
 	}
-
 	return true
 }

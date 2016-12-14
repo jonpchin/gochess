@@ -27,6 +27,10 @@ func ExportDatabase() {
 			fmt.Println("Error in exporting database, please check logs")
 		}
 	}
+}
+
+// zips up exported database
+func CompressDatabase() {
 	result := compress("./backup/gochess.zip", []string{"./backup/gochess.sql"})
 	if result == true {
 		fmt.Println("Exported database file succesfully compressed!")

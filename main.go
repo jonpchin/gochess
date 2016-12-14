@@ -100,6 +100,7 @@ func main() {
 			//	fmt.Println("All games are accurate!")
 			//}
 			//gostuff.ExportDatabase()
+			//gostuff.CompressDatabase()
 		}
 
 		//gostuff.SpawnProcess()
