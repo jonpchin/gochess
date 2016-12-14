@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-
-	"golang.org/x/text/language"
 )
 
 type IPLocation struct {
@@ -77,18 +75,4 @@ func getCountry(username string) string {
 		return "globe"
 	}
 	return country
-}
-
-func getLocale(w http.ResponseWriter, r *http.Request) {
-	var matcher = language.NewMatcher([]language.Tag{
-		language.BritishEnglish,
-		language.Norwegian,
-		language.German,
-		language.English,
-	})
-
-	t, _, _ := language.ParseAcceptLanguage(r.Header.Get("Accept-Language"))
-	// We ignore the error: the default language will be selected for t == nil.
-	tag, _, _ := matcher.Match(t...)
-	fmt.Println(tag)
 }

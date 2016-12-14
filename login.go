@@ -204,7 +204,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		enterInside(w, username, ipAddress)
-		
+
 		// update captcha to zero since login was a sucess
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		defer stmt.Close()
