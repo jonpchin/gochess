@@ -1,6 +1,7 @@
 package gostuff
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,12 +14,12 @@ import (
 // contains the date-time of the rating
 type RatingDate struct {
 	DateTime string
-	Rating   string
+	Rating   float64
 }
 
 // fetches rating history, unmarshals it, adds a new rating history, then marshals data and then
 // store it back in the database returns true if sucessfully updates rating history with no errors
-func updateRatingHistory(name string, gameType string, rating string) bool {
+func updateRatingHistory(name string, gameType string, rating float64) bool {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -31,11 +32,12 @@ func updateRatingHistory(name string, gameType string, rating string) bool {
 	}
 
 	var ratingHistory string
-
+	flag := true
 	// getting player's rating history
-	err := db.QueryRow("SELECT ? FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
-
-	if err != nil {
+	err := db.QueryRow("SELECT ? FROM ratinghistory WHERE username=?", gameType, name).Scan(&ratingHistory)
+	if err == sql.ErrNoRows { // this will occur if there is no rating history
+		flag = false
+	} else if err != nil {
 		log.Println(err)
 		return false
 	}
@@ -43,12 +45,15 @@ func updateRatingHistory(name string, gameType string, rating string) bool {
 	// used to append current game rating history into rating history memory
 	var ratingHistoryMemory []RatingDate
 
-	//unmarshall JSON string into ratingHistoryMemory which is a memory model
-	if err := json.Unmarshal([]byte(ratingHistory), &ratingHistoryMemory); err != nil {
-		fmt.Println("Just receieved a message I couldn't decode:", ratingHistory, err)
-		return false
-	}
+	if flag { // when there is no rating history do not need to unmarshal data from database as there is none
 
+		//unmarshall JSON string into ratingHistoryMemory which is a memory model
+		if err := json.Unmarshal([]byte(ratingHistory), &ratingHistoryMemory); err != nil {
+			fmt.Println("Just receieved a message I couldn't decode:", ratingHistory, err)
+			return false
+		}
+	}
+	// TODO: Need to add a corner case if user is not in history table
 	var ratingInfo RatingDate
 	ratingInfo.DateTime = time.Now().String()
 	ratingInfo.Rating = rating
@@ -61,14 +66,15 @@ func updateRatingHistory(name string, gameType string, rating string) bool {
 		return false
 	}
 
+	// TODO: Increase security by not concat this sql query
 	//store in database
-	stmt, err := db.Prepare("INSERT ratinghistory SET ?=? WHERE username=?")
+	stmt, err := db.Prepare("UPDATE ratinghistory SET " + gameType + "=? WHERE username=?")
 	if err != nil {
 		log.Println(err)
 		return false
 	}
 
-	_, err = stmt.Exec(gameType, updatedRatingHistory, name)
+	_, err = stmt.Exec(string(updatedRatingHistory), name)
 	if err != nil {
 		log.Println(err)
 		return false

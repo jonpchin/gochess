@@ -53,23 +53,32 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 
 		whiteRating, whiteRD = grabRating(bullet, bulletRD, oBullet, oBulletRD, result)
 		blackRating, blackRD = grabRating(oBullet, oBulletRD, bullet, bulletRD, 1.0-result)
-		//updates database with players new rating and RD
 
+		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating("bullet", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, "bullet", whiteRating)
+			updateRatingHistory(PrivateChat[name], "bullet", blackRating)
 		} else {
 			updateRating("bullet", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], "bullet", whiteRating)
+			updateRatingHistory(name, "bullet", blackRating)
 		}
 
 	} else if gameType == "blitz" {
 
 		whiteRating, whiteRD = grabRating(blitz, blitzRD, oBlitz, oBlitzRD, result)
 		blackRating, blackRD = grabRating(oBlitz, oBlitzRD, blitz, blitzRD, 1.0-result)
-		//updates database with players new rating and RD
+
+		//updates both players rating
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating("blitz", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, "blitz", whiteRating)
+			updateRatingHistory(PrivateChat[name], "blitz", blackRating)
 		} else {
 			updateRating("blitz", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], "blitz", whiteRating)
+			updateRatingHistory(name, "blitz", blackRating)
 		}
 
 	} else if gameType == "standard" {
@@ -79,8 +88,12 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating("standard", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, "standard", whiteRating)
+			updateRatingHistory(PrivateChat[name], "standard", blackRating)
 		} else {
 			updateRating("standard", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], "standard", whiteRating)
+			updateRatingHistory(name, "standard", blackRating)
 		}
 	} else {
 		fmt.Println("Not a valid game type")
