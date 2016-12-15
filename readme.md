@@ -19,12 +19,12 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>6. Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)</p>
 <p>7. Cron jobs</p>
 <p>8. Logging(partially shown on GitHub)</p>
-<p>9. Graceful shutdown</p>
-<p>10.  Automated deployment of web server to production environment(not shown on GitHub)</p>
-<p>11. Highscore board</p>
+<p>9. Graceful shutdown and recovery of active games</p>
+<p>10. Automated deployment of web server to production environment(not shown on GitHub)</p>
+<p>11. Highscore board containing top bullet, blitz and standard ratings.</p>
 <p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
 <p>13. Database of over 1.8 million chess games which can be viewed by players.</p>
-<p>14. Player profiles.</p>
+<p>14. Player profiles to view rating and past games.</p>
 <p>15. Player's name now has the country flag where their IP originates from when they register</p>
 <br>
 <p><b>To Do List:</b></p>
