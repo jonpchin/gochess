@@ -142,6 +142,21 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				return
 			}
+
+			// add player to rating history table
+			stmt, err = db.Prepare("INSERT ratinghistory SET username=?")
+			if err != nil {
+				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 36"))
+				log.Println(err)
+				return
+			}
+
+			_, err = stmt.Exec(username)
+			if err != nil {
+				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 37"))
+				log.Println(err)
+				return
+			}
 			// updates players country in database when they register for the first time
 			setCountry(username, ipAddress)
 		}
