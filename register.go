@@ -157,8 +157,21 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 				return
 			}
-			// updates players country in database when they register for the first time
-			setCountry(username, ipAddress)
+
+			if r.Host == "localhost" { // handle corner case for localhost testing
+				stmt, err = db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
+				if err != nil {
+					log.Println(err)
+				}
+
+				_, err = stmt.Exec("globe", username)
+				if err != nil {
+					log.Println(err)
+				}
+			} else {
+				// updates players country in database when they register for the first time
+				setCountry(username, ipAddress)
+			}
 		}
 	}
 }
