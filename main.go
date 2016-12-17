@@ -135,11 +135,13 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "404.html")
 		return
 	}
+
 	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "index.html")
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	var login = template.Must(template.ParseFiles("login.html"))
 
@@ -257,7 +259,7 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "private, max-age=86400")
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var memberChess = template.Must(template.ParseFiles("memberchess.html"))
 				p := gostuff.Person{User: username.Value}
 
@@ -415,7 +417,7 @@ func settings(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				w.Header().Set("Cache-Control", "private, max-age=86400")
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				http.ServeFile(w, r, "settings.html")
 				return
 			}
