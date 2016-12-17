@@ -34,11 +34,14 @@ func updateRatingHistory(name string, gameType string, rating float64) bool {
 	var ratingHistory string
 	flag := true
 	// getting player's rating history
-	err := db.QueryRow("SELECT ? FROM ratinghistory WHERE username=?", gameType, name).Scan(&ratingHistory)
-	if err == sql.ErrNoRows { // this will occur if there is no rating history
+	err := db.QueryRow("SELECT "+gameType+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
+	if err == sql.ErrNoRows { // this will occur if there is no name exist
+		log.Println("No name found in ratinghistory for ", name)
+		return false
+	} else if ratingHistory == "" { // Then there is no history so insert instead of update
 		flag = false
 	} else if err != nil {
-		log.Println(err)
+		log.Println("problem in getting ratingHistory", err)
 		return false
 	}
 
@@ -49,13 +52,13 @@ func updateRatingHistory(name string, gameType string, rating float64) bool {
 
 		//unmarshall JSON string into ratingHistoryMemory which is a memory model
 		if err := json.Unmarshal([]byte(ratingHistory), &ratingHistoryMemory); err != nil {
-			fmt.Println("Just receieved a message I couldn't decode:", ratingHistory, err)
+			fmt.Println("Just receieved a message I couldn't decode:", ratingHistory, "test", err)
 			return false
 		}
 	}
 	// TODO: Need to add a corner case if user is not in history table
 	var ratingInfo RatingDate
-	ratingInfo.DateTime = time.Now().String()
+	ratingInfo.DateTime = time.Now().Format("20060102150405")
 	ratingInfo.Rating = rating
 	ratingHistoryMemory = append(ratingHistoryMemory, ratingInfo)
 
@@ -66,8 +69,6 @@ func updateRatingHistory(name string, gameType string, rating float64) bool {
 		return false
 	}
 
-	// TODO: Increase security by not concat this sql query
-	//store in database
 	stmt, err := db.Prepare("UPDATE ratinghistory SET " + gameType + "=? WHERE username=?")
 	if err != nil {
 		log.Println(err)

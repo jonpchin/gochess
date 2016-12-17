@@ -96,7 +96,7 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 			updateRatingHistory(name, "standard", blackRating)
 		}
 	} else {
-		fmt.Println("Not a valid game type")
+		fmt.Println("Not a valid game type rate.go 1")
 	}
 
 	var r Nrating
@@ -111,5 +111,4 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 	if _, ok := Active.Clients[PrivateChat[name]]; ok { // send data if other guy is still connected
 		websocket.JSON.Send(Active.Clients[PrivateChat[name]], &r)
 	}
-
 }
