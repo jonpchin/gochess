@@ -19,7 +19,7 @@ type RatingDate struct {
 
 // fetches rating history, unmarshals it, adds a new rating history, then marshals data and then
 // store it back in the database returns true if sucessfully updates rating history with no errors
-func updateRatingHistory(name string, gameType string, rating float64) bool {
+func updateRatingHistory(name string, gametype string, rating float64) bool {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -34,17 +34,17 @@ func updateRatingHistory(name string, gameType string, rating float64) bool {
 	var ratingHistory string
 	flag := true
 
-	// TODO: Replace SQL string concatention, gameType is already filtered to only bullet
+	// TODO: Replace SQL string concatention, gametype is already filtered to only bullet
 	// blitz or standard but still should attempt to avoid SQL injection,
 	// parameterized SQL statements put quotations and gametype can't have quotations to work properly
-	err := db.QueryRow("SELECT "+gameType+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
+	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
 		log.Println("No name found in ratinghistory for ", name)
 		return false
 	} else if ratingHistory == "" { // Then there is no history so insert instead of update
 		flag = false
 	} else if err != nil {
-		log.Println("problem in getting ratingHistory", err)
+		log.Println(err)
 		return false
 	}
 
@@ -72,7 +72,7 @@ func updateRatingHistory(name string, gameType string, rating float64) bool {
 		return false
 	}
 
-	stmt, err := db.Prepare("UPDATE ratinghistory SET " + gameType + "=? WHERE username=?")
+	stmt, err := db.Prepare("UPDATE ratinghistory SET " + gametype + "=? WHERE username=?")
 	if err != nil {
 		log.Println(err)
 		return false

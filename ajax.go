@@ -22,17 +22,9 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 
 //displays player data when mouse hovers over
 func GetPlayerData(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
-		return
-	}
 
-	sessionID, err := r.Cookie("sessionID")
-	if err != nil {
-		return
-	}
-
-	if SessionManager[username.Value] != sessionID.Value {
+	valid := validateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -84,22 +76,17 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResumeGame(w http.ResponseWriter, r *http.Request) {
-	user, err := r.Cookie("username")
-	if err != nil || len(user.Value) < 3 || len(user.Value) > 12 {
+
+	valid := validateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
-	sessionID, err := r.Cookie("sessionID")
-	if err != nil {
-		return
-	}
-
-	if SessionManager[user.Value] != sessionID.Value {
-		return
-	}
 	id := template.HTMLEscapeString(r.FormValue("id"))
 	white := template.HTMLEscapeString(r.FormValue("white"))
 	black := template.HTMLEscapeString(r.FormValue("black"))
+
+	user, _ := r.Cookie("username")
 
 	var chat ChatInfo
 	chat.Type = "chess_game"
@@ -140,20 +127,9 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 
 // fetches all data of a chess game by the ID
 func FetchGameByID(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
-		w.Write([]byte("Wrong authentication"))
-		return
-	}
 
-	sessionID, err := r.Cookie("sessionID")
-	if err != nil {
-		w.Write([]byte("Wrong authentication"))
-		return
-	}
-
-	if SessionManager[username.Value] != sessionID.Value {
-		w.Write([]byte("Wrong authentication"))
+	valid := validateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -203,20 +179,8 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
-		w.Write([]byte("Wrong authentication"))
-		return
-	}
-
-	sessionID, err := r.Cookie("sessionID")
-	if err != nil {
-		w.Write([]byte("Wrong authentication"))
-		return
-	}
-
-	if SessionManager[username.Value] != sessionID.Value {
-		w.Write([]byte("Wrong authentication"))
+	valid := validateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -298,4 +262,70 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Username taken"))
 		}
 	}
+}
+
+// fetches players rating bullet history from database
+func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
+	valid := validateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	user, _ := r.Cookie("username")
+	bullet, isHistory := getRatingHistory(user.Value, "bullet")
+	if isHistory {
+		w.Write([]byte(bullet))
+	} else {
+		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+	}
+}
+
+// fetches players rating blitz history from database
+func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
+	valid := validateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	user, _ := r.Cookie("username")
+	blitz, isHistory := getRatingHistory(user.Value, "blitz")
+	if isHistory {
+		w.Write([]byte(blitz))
+	} else {
+		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+	}
+}
+
+// fetches players rating blitz history from database
+func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
+	valid := validateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	user, _ := r.Cookie("username")
+	standard, isHistory := getRatingHistory(user.Value, "standard")
+	if isHistory {
+		w.Write([]byte(standard))
+	} else {
+		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+	}
+}
+
+// returns true if user is an registered user that is logged in
+func validateCredentials(w http.ResponseWriter, r *http.Request) bool {
+	username, err := r.Cookie("username")
+	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
+		w.Write([]byte("Could not authenticate user"))
+		return false
+	}
+
+	sessionID, err := r.Cookie("sessionID")
+	if err != nil {
+		w.Write([]byte("Could not authenticate user"))
+		return false
+	}
+
+	if SessionManager[username.Value] != sessionID.Value {
+		w.Write([]byte("Could not authenticate user"))
+		return false
+	}
+	return true
 }
