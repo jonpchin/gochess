@@ -96,6 +96,7 @@ func ResizeImages() {
 
 // resizes image by passing in path to image, the path to the image, the desired width and desired height
 // of the target image
+// TODO: Have images be deleted if target path already exists
 func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight int) {
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -130,6 +131,7 @@ func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight
 			return
 		}
 	}
+	fmt.Println("Images sucessfully resized")
 }
 
 // pass in file path to image, returns width and heigh of image

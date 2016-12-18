@@ -54,6 +54,9 @@ func main() {
 	http.HandleFunc("/resumeGame", gostuff.ResumeGame)
 	http.HandleFunc("/fetchgameID", gostuff.FetchGameByID)
 	http.HandleFunc("/fetchgameByECO", gostuff.FetchGameByECO)
+	http.HandleFunc("/fetchBulletHistory", gostuff.FetchBulletHistory)
+	http.HandleFunc("/fetchBlitzHistory", gostuff.FetchBlitzHistory)
+	http.HandleFunc("/fetchStandardHistory", gostuff.FetchStandardHistory)
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 

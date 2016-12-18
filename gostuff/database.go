@@ -531,3 +531,22 @@ func fetchSavedGame(id string, user string) bool {
 	log.Printf("%d row was deleted from the saved table by user %s\n", affect, user)
 	return true
 }
+
+// gets rating history of player based on type, returns JSON string of ratings with their date time
+// returns false if there was an error
+func getRatingHistory(name string, gametype string) (string, bool) {
+
+	var ratingHistory string
+
+	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
+	if err == sql.ErrNoRows { // this will occur if there is no name exist
+		log.Println("No name found in ratinghistory for ", name)
+		return "", false
+	} else if ratingHistory == "" { // Then there is no history but there is a name
+		return "", false
+	} else if err != nil { //
+		log.Println(err)
+		return "", false
+	}
+	return ratingHistory, true
+}

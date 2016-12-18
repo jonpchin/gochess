@@ -25,7 +25,9 @@ Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jona
 <p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
 <p>13. Database of over 1.8 million chess games which can be viewed by players.</p>
 <p>14. Player profiles to view rating and past games.</p>
-<p>15. Player's name now has the country flag where their IP originates from when they register</p>
+<p>15. Player's name has the country flag where their IP originates from when they register</p>
+<p>16. Players can view on going chess games in real time as spectators</p>
+<p>17. Lobby and game room chat.</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Configure Twitter bot.</p>

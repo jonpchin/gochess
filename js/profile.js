@@ -26,3 +26,36 @@ function setFlag(){
 	document.getElementById('countryFlag').src = "img/flags/" + countryFlag + ".png"
 }
 setFlag();
+
+function setupRatingChart(){
+    $.ajax({
+  		url: 'fetchBulletHistory',
+   		type: 'post',
+   		dataType: 'html',
+   		success : function(data) {			
+      		console.log("Bullet rating history is: ");
+            console.log(data);
+   		}	
+    });
+
+    $.ajax({
+  		url: 'fetchBlitzHistory',
+   		type: 'post',
+   		dataType: 'html',
+   		success : function(data) {			
+      		console.log("Blitz rating history is: ");
+            console.log(data);
+   		}	
+    });
+
+    $.ajax({
+  		url: 'fetchStandardHistory',
+   		type: 'post',
+   		dataType: 'html',
+   		success : function(data) {			
+      		console.log("Standard rating history is: ");
+            console.log(data);
+   		}	
+    });
+}
+setupRatingChart();
