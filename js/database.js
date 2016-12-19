@@ -1,5 +1,4 @@
 // global object which stores opening ECO, opening names and their moves
-var allOpenings;
 var ECOIndex = 0;
 
 var openingDropDown = document.getElementById('openingDropDown');
@@ -49,10 +48,6 @@ setupOpening();
 function setupOpening(){
     
     $.getJSON('/data/openings.json', function(data) {         
-       
-        // setting global variable with the opening object
-        allOpenings = data;
-
         for (var key in data) {
             // skip loop if the property is from prototype
             if (!data.hasOwnProperty(key)){

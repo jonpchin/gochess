@@ -71,7 +71,6 @@ func UpdateHighScore() {
 		//fmt.Printf("name is %s rating is %d\n", score.Bullet[i].Name, score.Bullet[i].Rating)
 		score.Bullet[i].Index = i + 1
 		i++
-
 	}
 	i = 0
 
@@ -85,14 +84,11 @@ func UpdateHighScore() {
 	}
 
 	for rows.Next() {
-
 		if err := rows.Scan(&score.Blitz[i].Name, &score.Blitz[i].Rating); err != nil {
 			log.Println(err)
 		}
-
 		score.Blitz[i].Index = i + 1
 		i++
-
 	}
 	i = 0
 
@@ -106,14 +102,11 @@ func UpdateHighScore() {
 	}
 
 	for rows.Next() {
-
 		if err := rows.Scan(&score.Standard[i].Name, &score.Standard[i].Rating); err != nil {
 			log.Println(err)
 		}
-
 		score.Standard[i].Index = i + 1
 		i++
-
 	}
 	i = 0
 
@@ -127,14 +120,11 @@ func UpdateHighScore() {
 	}
 
 	for rows.Next() {
-
 		if err := rows.Scan(&score.Recent[i].Name, &score.Recent[i].Date); err != nil {
 			log.Println(err)
 		}
-
 		score.Recent[i].Index = i + 1
 		i++
-
 	}
 	//secure mutex lock before modifying global leaderboard in memory
 	LeaderBoard.Lock()
