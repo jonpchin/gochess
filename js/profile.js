@@ -35,10 +35,7 @@ function getBulletHistory(){
    		type: 'post',
    		dataType: 'html',
    		success : function(data) {			
-      		console.log("Bullet rating history is: ");
-			if(data !== ""){
-				console.log(data);		
-			}
+			//console.log(data);		
    		}	
     });
 }
@@ -49,10 +46,7 @@ function getBlitzHistory(){
    		type: 'post',
    		dataType: 'html',
    		success : function(data) {			
-      		console.log("Blitz rating history is: ");
-            if(data !== ""){
-				console.log(data);	
-			}
+			//console.log(data);	
    		}	
     });
 }
@@ -63,10 +57,7 @@ function getStandardHistory(){
    		type: 'post',
    		dataType: 'html',
    		success : function(data) {			
-      		console.log("Standard rating history is: ");
-            if(data !== ""){
-				console.log(data);		
-			}
+			//console.log(data);		
    		}	
     });
 }
@@ -88,10 +79,16 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 		var bulletHistory = JSON.parse(bullet[0]);	
 
 		for(var i=0; i<bulletHistory.length; ++i){
-			console.log("Date: ")
-			console.log(bulletHistory[i].DateTime);
-			console.log("Rating: ")
-			console.log(bulletHistory[i].Rating);
+			var oneGame = [];
+			var dateString = bulletHistory[i].DateTime;
+			var year = dateString.substring(0, 4);
+			var month = dateString.substring(4, 6);
+			var day = dateString.substring(6, 8);
+			var hour = dateString.substring(8, 10);
+			var minute = dateString.substring(10, 12);
+			var second = dateString.substring(12, 14);
+			oneGame.push(new Date(year, month-1, day, hour, minute, second), bulletHistory[i].Rating);
+			ratingHistory.push(oneGame);
 		}
 	}
 	
@@ -100,13 +97,22 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 		console.log("Blitz is");
 		console.log(blitz[0]);
 		var blitzHistory = JSON.parse(blitz[0]);	
-		console.log(blitzHistory);
 
 		for(var i=0; i<blitzHistory.length; ++i){
-			console.log("Date: ")
-			console.log(blitzHistory[i].DateTime);
-			console.log("Rating: ")
-			console.log(blitzHistory[i].Rating);
+			var oneGame = [];
+
+			var dateString = blitzHistory[i].DateTime;
+			var year = dateString.substring(0, 4);	
+			var month = dateString.substring(4, 6);
+			var day = dateString.substring(6, 8);
+			var hour = dateString.substring(8, 10);		
+			var minute = dateString.substring(10, 12);
+			var second = dateString.substring(12, 14);
+
+			var testDate = new Date(year, month-1, day, hour, minute, second);
+			console.log(testDate);
+			oneGame.push(testDate, blitzHistory[i].Rating);
+			ratingHistory.push(oneGame);
 		}
 	}
 	if(standard[0] !== ""){
@@ -116,55 +122,56 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 		var standardHistory = JSON.parse(standard[0]);
 
 		for(var i=0; i<standardHistory.length; ++i){
-			console.log("Date: ")
-			console.log(standardHistory[i].DateTime);
-			console.log("Rating: ")
-			console.log(standardHistory[i].Rating);
+			var oneGame = [];
+			var dateString = standardHistory[i].DateTime;
+			var year = dateString.substring(0, 4);
+			var month = dateString.substring(4, 6);
+			var day = dateString.substring(6, 8);
+			var hour = dateString.substring(8, 10);
+			var minute = dateString.substring(10, 12);
+			var second = dateString.substring(12, 14);
+			oneGame.push(new Date(year, month-1, day, hour, minute, second), standardHistory[i].Rating);
+			ratingHistory.push(oneGame);
 		}
 	}
-	/* 
+	
 	google.charts.load('current', {'packages':['line']});
-    google.charts.setOnLoadCallback(drawChart);
+    google.charts.setOnLoadCallback(function() { drawChart(ratingHistory) });
 
-    function drawChart() {
+	function drawChart(ratingHistory) {
 
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Day');
-      data.addColumn('number', 'Bullet');
-      data.addColumn('number', 'Blitz');
-      data.addColumn('number', 'Standard');
+		var data = new google.visualization.DataTable();
+		
 
-      data.addRows([
-        [1,  37.8, 80.8, 41.8],
-        [2,  30.9, 69.5, 32.4],
-        [3,  25.4,   57, 25.7],
-        [4,  11.7, 18.8, 10.5],
-        [5,  11.9, 17.6, 10.4],
-        [6,   8.8, 13.6,  7.7],
-        [7,   7.6, 12.3,  9.6],
-        [8,  12.3, 29.2, 10.6],
-        [9,  16.9, 42.9, 14.8],
-        [10, 12.8, 30.9, 11.6],
-        [11,  5.3,  7.9,  4.7],
-        [12,  6.6,  8.4,  5.2],
-        [13,  4.8,  6.3,  3.6],
-        [14,  4.2,  6.2,  3.4]
-      ]);
+		data.addColumn('date', 'Day');
+		//data.addColumn('number', 'Bullet');
+		data.addColumn('number', 'Blitz');
+		//data.addColumn('number', 'Standard');
 
-      var options = {
-        chart: {
-          title: 'Box Office Earnings in First Two Weeks of Opening',
-          subtitle: 'in millions of dollars (USD)'
-        },
-        width: 900,
-        height: 500
-      };
+		data.addRows(ratingHistory);
 
-      var chart = new google.charts.Line(document.getElementById('linechart_material'));
+		var formatter = new google.visualization.NumberFormat({
+			formatType: 'long'
+		});
+		formatter.format(data, 1); // Apply formatter to second column
 
-      chart.draw(data, options);
+		var formatter_medium = new google.visualization.DateFormat({formatType: 'long'});
+		formatter_medium.format(data, 0);
+
+		var options = {
+			chart: {
+				title: 'Rating History',
+        	},
+			vAxis: { Title: 'Rating' },
+			hAxis: { Title: 'Day'},
+        	width: 900,
+        	height: 500
+		};
+
+		var chart = new google.charts.Line(document.getElementById('googleLinechart'));
+
+		chart.draw(data, options);
     }
-	*/
 });
 
 // parses JSON rating history string and returns 
