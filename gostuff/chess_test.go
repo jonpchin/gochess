@@ -1,8 +1,6 @@
 package gostuff
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestPawn(t *testing.T) {
 
@@ -243,5 +241,4 @@ func TestRook(t *testing.T) {
 	if legal == false {
 		t.Error("TestRook 16")
 	}
-
 }

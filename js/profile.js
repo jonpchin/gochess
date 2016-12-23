@@ -73,9 +73,6 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 	var ratingHistory = [];
 	
 	if (bullet[0] !== ""){
-
-		console.log("Bullet is");
-		console.log(bullet[0]);
 		var bulletHistory = JSON.parse(bullet[0]);	
 
 		for(var i=0; i<bulletHistory.length; ++i){
@@ -87,20 +84,21 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 			var hour = dateString.substring(8, 10);
 			var minute = dateString.substring(10, 12);
 			var second = dateString.substring(12, 14);
-			oneGame.push(new Date(year, month-1, day, hour, minute, second), bulletHistory[i].Rating);
+			
+			// 00 is Jan, 01 is Feb, 02 is March so month needs to be subtracted by 1 for zero indexing
+			oneGame.push(new Date(year, month-1, day, hour, minute, second), bulletHistory[i].Rating, null, null);
 			ratingHistory.push(oneGame);
 		}
 	}
 	
 	if(blitz[0] !== ""){
 
-		console.log("Blitz is");
-		console.log(blitz[0]);
+		//console.log("Blitz is");
+		//console.log(blitz[0]);
 		var blitzHistory = JSON.parse(blitz[0]);	
 
-		for(var i=0; i<blitzHistory.length; ++i){
+		for(var i=0; i<blitzHistory.length; ++i){		
 			var oneGame = [];
-
 			var dateString = blitzHistory[i].DateTime;
 			var year = dateString.substring(0, 4);	
 			var month = dateString.substring(4, 6);
@@ -109,16 +107,12 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 			var minute = dateString.substring(10, 12);
 			var second = dateString.substring(12, 14);
 
-			var testDate = new Date(year, month-1, day, hour, minute, second);
-			console.log(testDate);
-			oneGame.push(testDate, blitzHistory[i].Rating);
+			oneGame.push(new Date(year, month-1, day, hour, minute, second), null, blitzHistory[i].Rating, null);
 			ratingHistory.push(oneGame);
 		}
 	}
 	if(standard[0] !== ""){
 
-		console.log("Standard is");
-		console.log(standard[0]);
 		var standardHistory = JSON.parse(standard[0]);
 
 		for(var i=0; i<standardHistory.length; ++i){
@@ -130,7 +124,7 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 			var hour = dateString.substring(8, 10);
 			var minute = dateString.substring(10, 12);
 			var second = dateString.substring(12, 14);
-			oneGame.push(new Date(year, month-1, day, hour, minute, second), standardHistory[i].Rating);
+			oneGame.push(new Date(year, month-1, day, hour, minute, second),null, null, standardHistory[i].Rating);
 			ratingHistory.push(oneGame);
 		}
 	}
@@ -141,12 +135,11 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
 	function drawChart(ratingHistory) {
 
 		var data = new google.visualization.DataTable();
-		
 
 		data.addColumn('date', 'Day');
-		//data.addColumn('number', 'Bullet');
+		data.addColumn('number', 'Bullet');
 		data.addColumn('number', 'Blitz');
-		//data.addColumn('number', 'Standard');
+		data.addColumn('number', 'Standard');
 
 		data.addRows(ratingHistory);
 
@@ -164,12 +157,11 @@ $.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(functio
         	},
 			vAxis: { Title: 'Rating' },
 			hAxis: { Title: 'Day'},
-        	width: 900,
-        	height: 500
+        	width: 1050,
+        	height: 300
 		};
 
 		var chart = new google.charts.Line(document.getElementById('googleLinechart'));
-
 		chart.draw(data, options);
     }
 });
