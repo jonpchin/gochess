@@ -270,8 +270,8 @@ func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
 	if valid == false {
 		return
 	}
-	user, _ := r.Cookie("username")
-	bullet, isHistory := getRatingHistory(user.Value, "bullet")
+	user := template.HTMLEscapeString(r.FormValue("user"))
+	bullet, isHistory := getRatingHistory(user, "bullet")
 	if isHistory {
 		w.Write([]byte(bullet))
 	} else {
@@ -285,8 +285,8 @@ func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 	if valid == false {
 		return
 	}
-	user, _ := r.Cookie("username")
-	blitz, isHistory := getRatingHistory(user.Value, "blitz")
+	user := template.HTMLEscapeString(r.FormValue("user"))
+	blitz, isHistory := getRatingHistory(user, "blitz")
 	if isHistory {
 		w.Write([]byte(blitz))
 	} else {
@@ -300,8 +300,8 @@ func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 	if valid == false {
 		return
 	}
-	user, _ := r.Cookie("username")
-	standard, isHistory := getRatingHistory(user.Value, "standard")
+	user := template.HTMLEscapeString(r.FormValue("user"))
+	standard, isHistory := getRatingHistory(user, "standard")
 	if isHistory {
 		w.Write([]byte(standard))
 	} else {
