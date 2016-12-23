@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -106,7 +107,7 @@ func DbSetup(backup string) bool {
 			return false
 		}
 	}
-	fmt.Println("MySQL is now connected.")
+	fmt.Println(color.GreenString("MySQL is now connected."))
 	return true
 }
 
@@ -160,8 +161,7 @@ func checkDBConnection() bool {
 	defer testDB.Close()
 
 	if testDB.Ping() != nil {
-		fmt.Println("Database ping failed. Please check if the database server is running.")
-		fmt.Println("database.go checkDBConnection 3 MySQL is down!!!")
+		fmt.Println(color.RedString("Database ping failed. Please check if the database server is running."))
 		return false
 	}
 	return true
