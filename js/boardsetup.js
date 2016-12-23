@@ -102,7 +102,6 @@ var onDrop = function(source, target, piece) {
   	// illegal move
 	if (move === null) return 'snapback';
 
-  
 	//used to store players own move, moves array is stored in memberchess.js
 	totalFEN.push(game.fen());
 	var pgn = game.pgn();
@@ -198,7 +197,6 @@ setStatusAndPGN("White to move", "")
 $('#flipOrientationBtn').on('click', board.flip);
 
 document.getElementById('goStart').onclick = function(){
-	
 	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 	moveCounter = 0;
 	setStatusAndPGN("White to move", "")
@@ -283,13 +281,13 @@ function showPawnPromotionPopup(source, target, color){
 }
 
 function parseUrl() { //fetches all variables in url and returns them in a json struct
-  var query = location.search.substr(1);
-  var result = {};
-  query.split("&").forEach(function(part) {
-    var item = part.split("=");
-    result[item[0]] = decodeURIComponent(item[1]);
-  });
-  return result;
+	var query = location.search.substr(1);
+	var result = {};
+	query.split("&").forEach(function(part) {
+    	var item = part.split("=");
+    	result[item[0]] = decodeURIComponent(item[1]);
+	});
+	return result;
 }
 
 function setBoardColor(){

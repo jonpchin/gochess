@@ -18,6 +18,7 @@
 	</ul>
 </div> 
 {{.User}} <img id="countryFlag" src="img/flags/globe.png"  alt="Country flag">
+<input type="hidden" id="user" value="{{.User}}" />
 <div id="googleLinechart"></div>
 {{ if ge .GameID 0 }}
 	<p><img src="../img/icons/playing.png" alt="Playing Game">

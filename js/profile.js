@@ -27,157 +27,167 @@ function setFlag(){
 }
 setFlag();
 
-function getBulletHistory(){
+function getBulletHistory(lookupName){
 	// NOTE: This function must return the value 
     // from calling the $.ajax() method.
 	return $.ajax({
   		url: 'fetchBulletHistory',
    		type: 'post',
    		dataType: 'html',
+		data : {'user': lookupName},
    		success : function(data) {			
 			//console.log(data);		
    		}	
     });
 }
 
-function getBlitzHistory(){
+function getBlitzHistory(lookupName){
 	return $.ajax({
   		url: 'fetchBlitzHistory',
    		type: 'post',
    		dataType: 'html',
+		data : {'user': lookupName},
    		success : function(data) {			
 			//console.log(data);	
    		}	
     });
 }
 
-function getStandardHistory(){
+function getStandardHistory(lookupName){
 	return $.ajax({
   		url: 'fetchStandardHistory',
    		type: 'post',
    		dataType: 'html',
+		data : {'user': lookupName},
    		success : function(data) {			
 			//console.log(data);		
    		}	
     });
 }
-getBulletHistory();
-getBlitzHistory();
-getStandardHistory();
-
-// the code here will be executed when all three ajax requests resolve.
-// bullet blitz, standard are lists of length 3 containing the response text,
-// status, and jqXHR object for each of the three ajax calls respectively.
-$.when(getBulletHistory(), getBlitzHistory(), getStandardHistory()).done(function(bullet, blitz, standard){
+function setupRatingChart(){
 	
-	var ratingHistory = [];
-	
-	if (bullet[0] !== ""){
-		var bulletHistory = JSON.parse(bullet[0]);	
+	var url = parseUrl();
+	var lookupName = url.name;
+	var name = lookupName;
+	if(typeof lookupName !== "undefined"){
+		// then do nothing here
+	}else{ // this means the player is looking at his/her own profile
+		name  = document.getElementById('user').value;
+	}
 
-		for(var i=0; i<bulletHistory.length; ++i){
-			var oneGame = [];
-			var dateString = bulletHistory[i].DateTime;
-			var year = dateString.substring(0, 4);
-			var month = dateString.substring(4, 6);
-			var day = dateString.substring(6, 8);
-			var hour = dateString.substring(8, 10);
-			var minute = dateString.substring(10, 12);
-			var second = dateString.substring(12, 14);
+	// the code here will be executed when all three ajax requests resolve.
+	// bullet blitz, standard are lists of length 3 containing the response text,
+	// status, and jqXHR object for each of the three ajax calls respectively.
+	$.when(getBulletHistory(name), getBlitzHistory(name), getStandardHistory(name)).done(function(bullet, blitz, standard){
+		
+		var ratingHistory = [];
+		var showChart = false;
+		if (bullet[0] !== ""){
+			showChart = true;
+			var bulletHistory = JSON.parse(bullet[0]);	
+
+			for(var i=0; i<bulletHistory.length; ++i){
+				var oneGame = [];
+				var dateString = bulletHistory[i].DateTime;
+				var year = dateString.substring(0, 4);
+				var month = dateString.substring(4, 6);
+				var day = dateString.substring(6, 8);
+				var hour = dateString.substring(8, 10);
+				var minute = dateString.substring(10, 12);
+				var second = dateString.substring(12, 14);
+				
+				// 00 is Jan, 01 is Feb, 02 is March so month needs to be subtracted by 1 for zero indexing
+				oneGame.push(new Date(year, month-1, day, hour, minute, second), bulletHistory[i].Rating, null, null);
+				ratingHistory.push(oneGame);
+			}
+		}
+		
+		if(blitz[0] !== ""){
+			showChart = true;
+			//console.log("Blitz is");
+			//console.log(blitz[0]);
+			var blitzHistory = JSON.parse(blitz[0]);	
+
+			for(var i=0; i<blitzHistory.length; ++i){		
+				var oneGame = [];
+				var dateString = blitzHistory[i].DateTime;
+				var year = dateString.substring(0, 4);	
+				var month = dateString.substring(4, 6);
+				var day = dateString.substring(6, 8);
+				var hour = dateString.substring(8, 10);		
+				var minute = dateString.substring(10, 12);
+				var second = dateString.substring(12, 14);
+
+				oneGame.push(new Date(year, month-1, day, hour, minute, second), null, blitzHistory[i].Rating, null);
+				ratingHistory.push(oneGame);
+			}
+		}
+		if(standard[0] !== ""){
+			showChart = true;
+			var standardHistory = JSON.parse(standard[0]);
+
+			for(var i=0; i<standardHistory.length; ++i){
+				var oneGame = [];
+				var dateString = standardHistory[i].DateTime;
+				var year = dateString.substring(0, 4);
+				var month = dateString.substring(4, 6);
+				var day = dateString.substring(6, 8);
+				var hour = dateString.substring(8, 10);
+				var minute = dateString.substring(10, 12);
+				var second = dateString.substring(12, 14);
+				oneGame.push(new Date(year, month-1, day, hour, minute, second),null, null, standardHistory[i].Rating);
+				ratingHistory.push(oneGame);
+			}
+		}
+		if(showChart){
 			
-			// 00 is Jan, 01 is Feb, 02 is March so month needs to be subtracted by 1 for zero indexing
-			oneGame.push(new Date(year, month-1, day, hour, minute, second), bulletHistory[i].Rating, null, null);
-			ratingHistory.push(oneGame);
+			google.charts.load('current', {'packages':['line']});
+			google.charts.setOnLoadCallback(function() { drawChart(ratingHistory) });
+
+			function drawChart(ratingHistory) {
+
+				var data = new google.visualization.DataTable();
+
+				data.addColumn('date', 'Day');
+				data.addColumn('number', 'Bullet');
+				data.addColumn('number', 'Blitz');
+				data.addColumn('number', 'Standard');
+
+				data.addRows(ratingHistory);
+
+				var formatter = new google.visualization.NumberFormat({
+					formatType: 'long'
+				});
+				formatter.format(data, 1); // Apply formatter to second column
+
+				var formatter_medium = new google.visualization.DateFormat({formatType: 'long'});
+				formatter_medium.format(data, 0);
+
+				var options = {
+					chart: {
+						title: 'Rating History',
+					},
+					vAxis: { Title: 'Rating' },
+					hAxis: { Title: 'Day'},
+					width: 1050,
+					height: 300
+				};
+				var chart = new google.charts.Line(document.getElementById('googleLinechart'));
+				chart.draw(data, options);
+			}
 		}
-	}
-	
-	if(blitz[0] !== ""){
+	});
+}
+setupRatingChart();
 
-		//console.log("Blitz is");
-		//console.log(blitz[0]);
-		var blitzHistory = JSON.parse(blitz[0]);	
 
-		for(var i=0; i<blitzHistory.length; ++i){		
-			var oneGame = [];
-			var dateString = blitzHistory[i].DateTime;
-			var year = dateString.substring(0, 4);	
-			var month = dateString.substring(4, 6);
-			var day = dateString.substring(6, 8);
-			var hour = dateString.substring(8, 10);		
-			var minute = dateString.substring(10, 12);
-			var second = dateString.substring(12, 14);
 
-			oneGame.push(new Date(year, month-1, day, hour, minute, second), null, blitzHistory[i].Rating, null);
-			ratingHistory.push(oneGame);
-		}
-	}
-	if(standard[0] !== ""){
-
-		var standardHistory = JSON.parse(standard[0]);
-
-		for(var i=0; i<standardHistory.length; ++i){
-			var oneGame = [];
-			var dateString = standardHistory[i].DateTime;
-			var year = dateString.substring(0, 4);
-			var month = dateString.substring(4, 6);
-			var day = dateString.substring(6, 8);
-			var hour = dateString.substring(8, 10);
-			var minute = dateString.substring(10, 12);
-			var second = dateString.substring(12, 14);
-			oneGame.push(new Date(year, month-1, day, hour, minute, second),null, null, standardHistory[i].Rating);
-			ratingHistory.push(oneGame);
-		}
-	}
-	
-	google.charts.load('current', {'packages':['line']});
-    google.charts.setOnLoadCallback(function() { drawChart(ratingHistory) });
-
-	function drawChart(ratingHistory) {
-
-		var data = new google.visualization.DataTable();
-
-		data.addColumn('date', 'Day');
-		data.addColumn('number', 'Bullet');
-		data.addColumn('number', 'Blitz');
-		data.addColumn('number', 'Standard');
-
-		data.addRows(ratingHistory);
-
-		var formatter = new google.visualization.NumberFormat({
-			formatType: 'long'
-		});
-		formatter.format(data, 1); // Apply formatter to second column
-
-		var formatter_medium = new google.visualization.DateFormat({formatType: 'long'});
-		formatter_medium.format(data, 0);
-
-		var options = {
-			chart: {
-				title: 'Rating History',
-        	},
-			vAxis: { Title: 'Rating' },
-			hAxis: { Title: 'Day'},
-        	width: 1050,
-        	height: 300
-		};
-
-		var chart = new google.charts.Line(document.getElementById('googleLinechart'));
-		chart.draw(data, options);
-    }
-});
-
-// parses JSON rating history string and returns 
-function parseRatingstring(ratingHistory){
-	var bulletHistory = JSON.parse(bullet);	
-	for (var key in data) {
-		// skip loop if the property is from prototype
-		if (!data.hasOwnProperty(key)){
-			continue;
-		}
-
-		var option = document.createElement('option');
-		option.text = key + ": " + data[key].name;
-		option.value = key;
-		openingDropDown.add(option);
-	}
+function parseUrl() { //fetches all variables in url and returns them in a json struct
+	var query = location.search.substr(1);
+	var result = {};
+	query.split("&").forEach(function(part) {
+    	var item = part.split("=");
+    	result[item[0]] = decodeURIComponent(item[1]);
+	});
+  return result;
 }

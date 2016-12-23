@@ -102,10 +102,10 @@ func main() {
 			//if pass == true {
 			//	fmt.Println("All games are accurate!")
 			//}
-			//gostuff.ExportDatabase()
+			// pass in true to export template(No grandmaster) without data in the tables
+			gostuff.ExportDatabase(false)
 			//gostuff.CompressDatabase()
 		}
-
 		//gostuff.SpawnProcess()
 
 		//setting up clean up function for graceful shutdown
