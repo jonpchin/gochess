@@ -12,14 +12,14 @@ import (
 )
 
 //returns true if sucessful sent email
-func Sendmail(target string, token string, name string) {
+func Sendmail(target string, token string, name string, url string) {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
 	m.SetHeader("To", target)
 	m.SetHeader("Subject", "Welcome to Go Play Chess!")
 	message := "Hello " + name + ",<br><br>Welcome to <b>Go Play Chess</b>! " +
-		"<a href='https://localhost/activate?user=" + name + "&token=" + token + "'>Please click here to activate your account.</a>" +
+		"<a href='https://" + url + "/activate?user=" + name + "&token=" + token + "'>Please click here to activate your account.</a>" +
 		" Your token is " + token +
 		"<br><br>Have fun!<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
@@ -32,7 +32,7 @@ func Sendmail(target string, token string, name string) {
 }
 
 //this function is used to send player the activation token when five incorrect login attempts are made
-func SendAttempt(target string, token string, name string, ip string) {
+func SendAttempt(target string, token string, name string, ip string, url string) {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
@@ -40,7 +40,7 @@ func SendAttempt(target string, token string, name string, ip string) {
 	m.SetHeader("Subject", "Go Play Chess Account Locked")
 	message := "Hello " + name + ",<br><br>Your account on <b>Go Play Chess</b> has been locked because " +
 		"there was at least five incorrect login attempts. The IP that tried to login your account was " + ip + "<br><br>Your reactivation token is " + token +
-		"<br><br><a href='https://localhost/activate?user=" + name + "&token=" + token + "'>Please click here to activate your account.</a>" +
+		"<br><br><a href='https://" + url + "/activate?user=" + name + "&token=" + token + "'>Please click here to activate your account.</a>" +
 		"<br><br>Please reactivate your account.<br><br>GoPlayChess"
 	m.SetBody("text/html", message)
 
@@ -52,13 +52,13 @@ func SendAttempt(target string, token string, name string, ip string) {
 }
 
 //sends email to user of a token to reset his password
-func SendForgot(target string, token string) {
+func SendForgot(target string, token string, url string) {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
 	m.SetHeader("To", target)
 	m.SetHeader("Subject", "Reset Password for Go Play Chess")
-	message := "<a href='https://localhost/resetpass?token=" + token + "'>Please click here to type your token code and reset your password.</a>" +
+	message := "<a href='https://" + url + "/resetpass?token=" + token + "'>Please click here to type your token code and reset your password.</a>" +
 		"Your token to reset your pass is : " + token +
 		"<br><br>GoPlayChess"
 	m.SetBody("text/html", message)

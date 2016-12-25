@@ -89,7 +89,6 @@ func EnterLobby(ws *websocket.Conn) {
 
 //websocket handler for gameroom
 func EnterChess(ws *websocket.Conn) {
-
 	defer ws.Close()
 	username, err := ws.Request().Cookie("username")
 	if err == nil {

@@ -70,7 +70,7 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 	}
 }
 
-//remove games older then 30 days to clean up profile page, activated only on server startup
+//remove games older then 180 days to clean up profile page, activated only on server startup
 func RemoveOldGames(days string) {
 
 	problems, err := os.OpenFile("logs/mainLog.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -90,16 +90,11 @@ func RemoveOldGames(days string) {
 		return
 	}
 
-	res, err := stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	affect, err := res.RowsAffected()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%d rows were deleted from games because they were older then "+days+" days.\n", affect)
 }
 
 // Remove old entries in activate table in database
@@ -122,16 +117,11 @@ func RemoveOldActivate(days string) {
 		return
 	}
 
-	res, err := stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	affect, err := res.RowsAffected()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%d rows were deleted from activate table because they were older then "+days+" days.\n", affect)
 }
 
 // Remove old entries in the forgot table in the database
@@ -155,14 +145,9 @@ func RemoveOldForgot(days string) {
 		return
 	}
 
-	res, err := stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	affect, err := res.RowsAffected()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Printf("%d rows were deleted from forgot table because they were older then "+days+" days.\n", affect)
 }

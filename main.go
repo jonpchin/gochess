@@ -14,10 +14,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-var (
-	domain = "localhost"
-)
-
 const (
 	days = "180" // Number of days used to remove old games, forgot and activate tokens
 )
@@ -75,17 +71,15 @@ func main() {
 	//parse console arguments to determine OS environment to use localhost or goplaychess.com
 	//default is localhost if no argument is passed
 	if len(os.Args) > 1 {
-		domain = os.Args[1]
 		certPath = "secret/device.crt"
 		keyPath = "secret/device.key"
 	}
 
 	go func() {
-
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")
 
-		//removes games older then 30 days from database
+		//removes games older then 180 days from database
 		if proceed == true {
 
 			//setting up cron job
@@ -488,5 +482,6 @@ func robot(w http.ResponseWriter, r *http.Request) {
 }
 
 func redir(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://"+domain+r.RequestURI, http.StatusMovedPermanently)
+	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+
 }

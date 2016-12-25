@@ -97,7 +97,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if verify != "YES" {
-			needToActivate(w, username)
+			needToActivate(w, r, username)
 			return
 		}
 		// update captcha to zero since login was a sucess
@@ -171,9 +171,9 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			//sends email to user with the token activation
-			go func(email, token, username, address string) {
-				SendAttempt(email, token, username, address)
-			}(email, token, username, ipAddress)
+			go func(email, token, username, address, url string) {
+				SendAttempt(email, token, username, address, url)
+			}(email, token, username, ipAddress, r.Host)
 			return
 
 		} else if captcha > 5 { //tell user on the front end that this account has too many login attempts, resends activation token
@@ -186,9 +186,9 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			}
 
 			//sends email again to user with the token activation
-			go func(email, token, username, address string) {
-				SendAttempt(email, token, username, address)
-			}(email, token, username, ipAddress)
+			go func(email, token, username, address, url string) {
+				SendAttempt(email, token, username, address, url)
+			}(email, token, username, ipAddress, r.Host)
 
 			return
 		}
@@ -200,7 +200,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if verify != "YES" {
-			needToActivate(w, username)
+			needToActivate(w, r, username)
 			return
 		}
 		enterInside(w, username, ipAddress)
@@ -258,7 +258,7 @@ func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 }
 
 // sends an email again to reactivate an inactivated account
-func needToActivate(w http.ResponseWriter, username string) {
+func needToActivate(w http.ResponseWriter, r *http.Request, username string) {
 	var tokenInDB string
 	var email string
 
@@ -270,9 +270,9 @@ func needToActivate(w http.ResponseWriter, username string) {
 	if err2 != nil {
 		log.Println(err2)
 	} else {
-		go func(email, tokenInDB, username string) {
-			Sendmail(email, tokenInDB, username)
-		}(email, tokenInDB, username)
+		go func(email, tokenInDB, username, url string) {
+			Sendmail(email, tokenInDB, username, url)
+		}(email, tokenInDB, username, r.Host)
 	}
 }
 

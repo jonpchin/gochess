@@ -756,7 +756,6 @@ func (c *Connection) ChessConnect() {
 						}
 					}
 				}
-
 				wrapUpGame(game.ID)
 
 			default:
