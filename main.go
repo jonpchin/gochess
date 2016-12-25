@@ -71,8 +71,8 @@ func main() {
 	//parse console arguments to determine OS environment to use localhost or goplaychess.com
 	//default is localhost if no argument is passed
 	if len(os.Args) > 1 {
-		certPath = "secret/device.crt"
-		keyPath = "secret/device.key"
+		certPath = "secret/combine.crt"
+		keyPath = "secret/go.key"
 	}
 
 	go func() {
