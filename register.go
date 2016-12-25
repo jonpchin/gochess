@@ -124,9 +124,9 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			//sends email to user
-			go func(email, token, username string) {
-				Sendmail(email, token, username)
-			}(email, token, username)
+			go func(email, token, username, url string) {
+				Sendmail(email, token, username, url)
+			}(email, token, username, r.Host)
 
 			//setting up player's rating
 			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, bulletRD=?, blitzRD=?, standardRD=?")

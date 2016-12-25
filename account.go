@@ -84,39 +84,31 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := stmt.Exec(key, username)
+		_, err = stmt.Exec(key, username)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 5."))
 			log.Println(err)
 			return
 		}
-		affect, err := res.RowsAffected()
+
+		// delete row from forgot table
+		stmt, err = db.Prepare("DELETE FROM forgot where username=?")
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 6."))
 			log.Println(err)
 			return
 		}
 
-		log.Printf("%d rows were affected by the the token activation check.\n", affect)
-
-		// delete row from forgot table
-		stmt, err = db.Prepare("DELETE FROM forgot where username=?")
+		res, err := stmt.Exec(username)
 		if err != nil {
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 7."))
-			log.Println(err)
-			return
-		}
-
-		res, err = stmt.Exec(username)
-		if err != nil {
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 8"))
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 7"))
 			log.Println(err)
 			return
 		}
 		stmt.Close()
-		affect, err = res.RowsAffected()
+		affect, err := res.RowsAffected()
 		if err != nil {
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 9."))
+			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 8."))
 			log.Println(err)
 			return
 		}
@@ -170,20 +162,12 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := stmt.Exec("YES", 0, username)
+		_, err = stmt.Exec("YES", 0, username)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 13."))
 			log.Println(err)
 			return
 		}
-		affect, err := res.RowsAffected()
-		if err != nil {
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 14."))
-			log.Println(err)
-			return
-		}
-
-		log.Printf("%s is now verified and %d row was updated.\n", username, affect)
 
 		//now user may login so we can redirect while token deletion proceeds in the background
 		message := "<script>window.location = 'login?user=" + username + "';</script>"
@@ -196,14 +180,14 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err = stmt.Exec(username)
+		res, err := stmt.Exec(username)
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 16."))
 			log.Println(err)
 			return
 		}
 		stmt.Close()
-		affect, err = res.RowsAffected()
+		affect, err := res.RowsAffected()
 		if err != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 17."))
 			log.Println(err)
@@ -264,7 +248,7 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 
 		if found != "" {
 			w.Write([]byte("<img src='img/ajax/available.png' /> Activation token resent to your email."))
-			SendForgot(email, found)
+			SendForgot(email, found, r.Host)
 			return
 		}
 
@@ -293,9 +277,9 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%d rows were affected by the the token activation check.\n", affect)
 
 		//sends pasword reset information to email of user
-		go func(email, token string) {
-			SendForgot(email, token)
-		}(email, token)
+		go func(email, token, url string) {
+			SendForgot(email, token, url)
+		}(email, token, r.Host)
 
 		w.Write([]byte("<img src='img/ajax/available.png' /> Your password reset information has been sent your email."))
 	}
