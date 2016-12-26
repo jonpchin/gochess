@@ -3,7 +3,6 @@ package gostuff
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -55,7 +54,7 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 
 		//unmarshall JSON string into ratingHistoryMemory which is a memory model
 		if err := json.Unmarshal([]byte(ratingHistory), &ratingHistoryMemory); err != nil {
-			fmt.Println("Just receieved a message I couldn't decode:", ratingHistory, "test", err)
+			log.Println("Just receieved a message I couldn't decode:", ratingHistory, "test", err)
 			return false
 		}
 	}
@@ -68,7 +67,7 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 	// need to marshall memory model before storing in database
 	updatedRatingHistory, err := json.Marshal(ratingHistoryMemory)
 	if err != nil {
-		fmt.Println("updateRatingHistory problem marshalling ", err)
+		log.Println("updateRatingHistory problem marshalling ", err)
 		return false
 	}
 
