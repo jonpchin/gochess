@@ -56,8 +56,6 @@ func updateRD() { //increase rating RD by one in database if its less then 250, 
 	}
 
 	stmt, err = db.Prepare("update rating set standardRD=standardRD+1 where standardRD < 250")
-	defer stmt.Close()
-
 	if err != nil {
 		log.Println(err)
 		return

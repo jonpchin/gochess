@@ -19,21 +19,19 @@ func Cleanup() {
 	message.Type = "massMessage"
 	message.Text = "ATTENTION: Web server is shutting down NOW for maintenance, brace for impact..."
 
-	go func() {
-		for _, value := range Active.Clients {
-			if err := websocket.JSON.Send(value, &message); err != nil {
-				// we could not send the message to a peer
-				fmt.Println("cleanup.go CleanUp() error 1  Could not send message to ", err)
-			}
+	for _, value := range Active.Clients {
+		if err := websocket.JSON.Send(value, &message); err != nil {
+			// we could not send the message to a peer
+			fmt.Println("cleanup.go CleanUp() error 1  Could not send message to ", err)
 		}
+	}
 
-		for _, value := range Chat.Lobby {
-			if err := websocket.JSON.Send(value, &message); err != nil {
-				// we could not send the message to a peer
-				fmt.Println("cleanup.go CleanUp() error 2  Could not send message to ", err)
-			}
+	for _, value := range Chat.Lobby {
+		if err := websocket.JSON.Send(value, &message); err != nil {
+			// we could not send the message to a peer
+			fmt.Println("cleanup.go CleanUp() error 2  Could not send message to ", err)
 		}
-	}()
+	}
 
 	for _, game := range All.Games {
 		//now store game in MySQL database
