@@ -43,13 +43,13 @@ type AcceptMatch struct {
 	TargetPlayer string
 }
 
-//number of active users connected to chess room socket
+//active users connected to chess room socket
 var Active = struct {
 	sync.RWMutex
 	Clients map[string]*websocket.Conn
 }{Clients: make(map[string]*websocket.Conn)}
 
-//number of active users connected to lobby socket
+//active users connected to lobby socket
 var Chat = struct {
 	sync.RWMutex
 	Lobby map[string]*websocket.Conn

@@ -180,8 +180,6 @@ function setupRatingChart(){
 }
 setupRatingChart();
 
-
-
 function parseUrl() { //fetches all variables in url and returns them in a json struct
 	var query = location.search.substr(1);
 	var result = {};

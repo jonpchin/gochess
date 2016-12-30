@@ -10,7 +10,7 @@ import (
 
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jonpchin/GoChess/gostuff"
+	"github.com/jonpchin/gochess/gostuff"
 	"golang.org/x/net/websocket"
 )
 
@@ -97,6 +97,7 @@ func main() {
 			//	fmt.Println("All games are accurate!")
 			//}
 			// pass in true to export template(No grandmaster) without data in the tables
+
 			gostuff.ExportDatabase(false)
 			//gostuff.CompressDatabase()
 		}
