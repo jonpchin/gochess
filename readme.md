@@ -9,7 +9,7 @@
 5/31/2016 This project is officially open source. - All commit history has been cleared as some of the git history contained sensitive data. 
 <br>
 
-Go Play Chess - Free Online Real time chess web server in Golang - Creator: Jonathan Chin
+Go Play Chess - Free Online Real time chess web server using websockets - Creator: Jonathan Chin
 <br><b>Features:</b><br>
 <p>1. User accounts</p>
 <p>2. Time controls</p>
