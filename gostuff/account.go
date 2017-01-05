@@ -49,7 +49,7 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 		//check if database connection is open
 		if db.Ping() != nil {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later."))
-			log.Println("account.go processResetPass 0 DATABASE DOWN!")
+			log.Println("DATABASE DOWN!")
 			return
 		}
 		var tokenInDB string

@@ -45,7 +45,6 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Password must be at between 5 to 32 characters long"))
 
 		} else if len(email) < 5 || len(email) > 30 {
-
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please choose an email between 5 and 30 characters long"))
 
 		} else {
