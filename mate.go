@@ -381,7 +381,9 @@ func threeRep(gameID int) bool {
 	oneSrc = All.Games[gameID].GameMoves[length-8].S
 	oneTar = All.Games[gameID].GameMoves[length-8].T
 
-	if eightSrc == fourSrc && eightTar == fourTar && sevenSrc == threeSrc && sevenTar == threeTar && sixSrc == twoSrc && sixTar == twoTar && fiveSrc == oneSrc && fiveTar == oneTar {
+	if eightSrc == fourSrc && eightTar == fourTar && sevenSrc == threeSrc &&
+		sevenTar == threeTar && sixSrc == twoSrc && sixTar == twoTar &&
+		fiveSrc == oneSrc && fiveTar == oneTar {
 		return true
 	}
 

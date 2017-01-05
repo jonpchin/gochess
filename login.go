@@ -92,7 +92,6 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			} else {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			}
-
 			addOneToCaptcha(username, captcha)
 			return
 		}
@@ -115,7 +114,6 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Error in captcha section 4"))
 			return
 		}
-
 		enterInside(w, username, ipAddress)
 
 	} else if !captcha.VerifyString(capID, capSol) {
@@ -189,13 +187,11 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			go func(email, token, username, address, url string) {
 				SendAttempt(email, token, username, address, url)
 			}(email, token, username, ipAddress, r.Host)
-
 			return
 		}
 		if pass != key {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/password combination."))
 			log.Printf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n", ipAddress, r.Method, r.URL.Path, r.UserAgent())
-
 			addOneToCaptcha(username, captcha)
 			return
 		}
@@ -242,16 +238,13 @@ func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 
 	//generating random session ID to be stored in the backend
 	sessionID := RandomString()
-
 	cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
 	http.SetCookie(w, &cookie)
-
 	country := getCountry(username)
 
 	// country cookie can be modified by JS
 	cookie = http.Cookie{Name: "country", Value: country, Secure: false, HttpOnly: false, Expires: expiration}
 	http.SetCookie(w, &cookie)
-
 	SessionManager[username] = sessionID
 
 	w.Write([]byte("<script>window.location = '/memberHome'</script>"))

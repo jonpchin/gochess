@@ -81,10 +81,10 @@ func saveGame(totalMoves int, allMoves []byte, game *ChessGame) {
 		log.Println(err)
 		return
 	}
-	id, err := res.LastInsertId()
+	rows, err := res.RowsAffected()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	log.Printf("Game ID %d has been updated in the saved table.\n", id)
+	log.Printf("In saved table %d row(s) were updated.\n", rows)
 }
