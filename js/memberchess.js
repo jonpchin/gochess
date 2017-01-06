@@ -294,6 +294,7 @@ window.onload = function() {
 				
 			case "chess_game":
 
+				matchID = json.ID;
 				WhiteSide = json.WhitePlayer;
 				BlackSide = json.BlackPlayer;
 
