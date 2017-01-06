@@ -121,7 +121,6 @@ func main() {
 	}()
 	//	gostuff.ConvertAllPGN()
 	fmt.Println("Web server is now running.")
-
 	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {
 		fmt.Printf("ListenAndServe error: %v\n", err)
 	}
