@@ -58,7 +58,7 @@ func main() {
 
 	http.Handle("/css/", http.FileServer(http.Dir("")))
 	http.Handle("/img/", http.FileServer(http.Dir("")))
-	http.Handle("/js/", http.FileServer(http.Dir("")))
+	http.Handle("/js/", cacheControl(http.FileServer(http.Dir(""))))
 	http.Handle("/data/", http.FileServer(http.Dir("")))
 	http.Handle("/sound/", http.FileServer(http.Dir("")))
 
@@ -132,8 +132,6 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "404.html")
 		return
 	}
-
-	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "index.html")
 }
 
@@ -484,4 +482,13 @@ func robot(w http.ResponseWriter, r *http.Request) {
 func redir(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 
+}
+
+// used to cache static assets for 24 hours
+func cacheControl(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// max age is the number of seconds to cache
+		w.Header().Set("Cache-Control", "private, max-age=86400")
+		h.ServeHTTP(w, r)
+	}
 }

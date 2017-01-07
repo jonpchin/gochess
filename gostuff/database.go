@@ -72,10 +72,10 @@ func DbSetup(backup string) bool {
 		}
 	}
 	// make sure MySQL connection is alive before proceeding
-	if checkDBConnection() == false {
+	if CheckDBConnection("secret/checkdb.txt") == false {
 		return false
 	}
-	dbString, database := ReadFile()
+	dbString, database := ReadFile("secret/config.txt")
 	//connecting to database
 	db, err = sql.Open("mysql", dbString)
 	//	db.SetMaxIdleConns(20)
@@ -112,9 +112,10 @@ func DbSetup(backup string) bool {
 }
 
 // checks if database connection is open, returns true if MySQL is running
-func checkDBConnection() bool {
+// the parameter path is where the text file is located
+func CheckDBConnection(path string) bool {
 
-	config, err := os.Open("secret/checkdb.txt")
+	config, err := os.Open(path)
 	defer config.Close()
 	if err != nil {
 		fmt.Println("database.go checkDBConnection 1", err)
@@ -167,8 +168,10 @@ func checkDBConnection() bool {
 	return true
 }
 
-func ReadFile() (string, string) {
-	config, err := os.Open("secret/config.txt")
+// the parameter path is where the text file is located containing the database connection info
+// if password is blank when encoded it will be blank when decoded
+func ReadFile(path string) (string, string) {
+	config, err := os.Open(path)
 	defer config.Close()
 	if err != nil {
 		log.Println("database.go ReadFile 1 ", err)

@@ -1,6 +1,11 @@
 language: go
 
 go:
-  - 1.7.1
+  - 1.7.4
+
+services:
+  - mysql
   
-script: go test ./gostuff
+script: 
+  - go test ./_unittests
+  - go test ./_travis
