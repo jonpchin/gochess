@@ -7,5 +7,5 @@ services:
   - mysql
   
 script: 
-  - go test ./_unittests
+  - go test ./gostuff
   - go test ./_travis

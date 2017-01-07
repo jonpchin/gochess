@@ -1,4 +1,4 @@
-package unittests
+package gostuff
 
 import (
 	"encoding/json"
