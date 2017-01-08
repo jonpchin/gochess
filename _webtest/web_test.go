@@ -99,7 +99,8 @@ func TestLoginDev(t *testing.T) {
 	if err := page2.Navigate("https://localhost/server/lobby"); err != nil {
 		t.Fatal("Failed to navigate lobby at localhost:", err)
 	}
-
+	// TODO: Need to handle case where sendSeek succeeds for one user and fails for the other user
+	// Either restart web server on each agouti test or cancel other seek when one seek fails
 	err = page2.FindByID("sendSeek").Click()
 	if err != nil {
 		t.Fatal("Couldn't submit:", err)
@@ -123,7 +124,11 @@ func TestLoginDev(t *testing.T) {
 		// now try to resign the game
 		err = page1.FindByID("resignButton").Click()
 		if err != nil {
-			t.Fatal("Couldn't resign:", err)
+			t.Fatal("Couldn't resign user1:", err)
+		}
+		err = page1.ConfirmPopup()
+		if err != nil {
+			t.Fatal("Couldn't confirm resign popup user1:", err)
 		}
 		// TODO: Check if game really ended and check if the other player really won
 		// Still need to test abort failure, abort sucess, draw, and checkmate
@@ -132,19 +137,24 @@ func TestLoginDev(t *testing.T) {
 		page2.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
 		page1.RunScript("sendMove('c7', 'c5');", map[string]interface{}{}, &jsResult)
 		page2.RunScript("sendMove('g1', 'f3');", map[string]interface{}{}, &jsResult)
+		page2.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
 		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
 			t.Error("board does not match user2")
 		}
-		err = page1.FindByID("resignButton").Click()
+		err = page2.FindByID("resignButton").Click()
 		if err != nil {
-			t.Fatal("Couldn't resign:", err)
+			t.Fatal("Couldn't resign user2:", err)
+		}
+		err = page2.ConfirmPopup()
+		if err != nil {
+			t.Fatal("Couldn't confirm resign popup user2:", err)
 		}
 	} else {
 		t.Error("No user matched as whitePlayer")
 	}
-
+	time.Sleep(time.Second)
 	if err := driver.Stop(); err != nil {
-		t.Fatal("Failed to close pages and stop WebDriver:", err)
+		t.Error("Failed to close pages and stop WebDriver:", err)
 	}
 }
 
