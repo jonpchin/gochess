@@ -27,5 +27,4 @@ func TestDbConnect(t *testing.T) {
 	if db.Ping() != nil {
 		t.Fatal("Can't ping MySQL")
 	}
-
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/sclevine/agouti"
 )
@@ -16,20 +17,20 @@ func TestLoginDev(t *testing.T) {
 	if err := driver.Start(); err != nil {
 		t.Fatal("Failed to start Chrome Driver:", err)
 	}
-	page, err := driver.NewPage(agouti.Browser("Chrome"))
+	page1, err := driver.NewPage(agouti.Browser("Chrome"))
 	if err != nil {
 		t.Fatal("Failed to open page:", err)
 	}
 
-	if err := page.Navigate("https://localhost:443"); err != nil {
-		t.Fatal("Failed to navigate:", err)
+	if err := page1.Navigate("https://localhost:443"); err != nil {
+		t.Fatal("Failed to navigate index at localhost:", err)
 	}
 
-	if err := page.Navigate("https://localhost/login"); err != nil {
-		t.Fatal("Failed to navigate:", err)
+	if err := page1.Navigate("https://localhost/login"); err != nil {
+		t.Fatal("Failed to navigate login at localhost:", err)
 	}
 
-	loginURL, err := page.URL()
+	loginURL, err := page1.URL()
 	if err != nil {
 		t.Fatal("Failed to get page URL:", err)
 	}
@@ -38,27 +39,116 @@ func TestLoginDev(t *testing.T) {
 	if loginURL != expectedLoginURL {
 		t.Fatal("Expected URL to be", expectedLoginURL, "but got", loginURL)
 	}
-	user := "can"
-	err = page.FindByID("user").Fill(user)
+	user1 := "can"
+	err = page1.FindByID("user").Fill(user1)
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
 	}
-	pass := readPass(user)
-	err = page.FindByID("password").Fill(pass)
+	pass := readPass(user1)
+	err = page1.FindByID("password").Fill(pass)
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
 	}
 
-	err = page.FindByID("login").Click()
+	err = page1.FindByID("login").Click()
 	if err != nil {
 		t.Fatal("Couldn't submit:", err)
 	}
 
-	//if err := driver.Stop(); err != nil {
-	//	t.Fatal("Failed to close pages and stop WebDriver:", err)
-	//}
+	time.Sleep(time.Second)
+	if err := page1.Navigate("https://localhost/server/lobby"); err != nil {
+		t.Fatal("Failed to navigate lobby at localhost:", err)
+	}
+
+	err = page1.FindByID("sendSeek").Click()
+	if err != nil {
+		t.Fatal("Couldn't submit:", err)
+	}
+
+	// start second browser
+	page2, err := driver.NewPage(agouti.Browser("Chrome"))
+	if err != nil {
+		t.Fatal("Failed to open page:", err)
+	}
+
+	if err := page2.Navigate("https://localhost:443"); err != nil {
+		t.Fatal("Failed to navigate index at localhost:", err)
+	}
+
+	if err := page2.Navigate("https://localhost/login"); err != nil {
+		t.Fatal("Failed to navigate login at localhost:", err)
+	}
+
+	user2 := "ben"
+	err = page2.FindByID("user").Fill(user2)
+	if err != nil {
+		t.Fatal("Couldn't fill login info:", err)
+	}
+	pass = readPass(user2)
+	err = page2.FindByID("password").Fill(pass)
+	if err != nil {
+		t.Fatal("Couldn't fill login info:", err)
+	}
+
+	err = page2.FindByID("login").Click()
+	if err != nil {
+		t.Fatal("Couldn't submit:", err)
+	}
+	time.Sleep(time.Second)
+
+	if err := page2.Navigate("https://localhost/server/lobby"); err != nil {
+		t.Fatal("Failed to navigate lobby at localhost:", err)
+	}
+
+	err = page2.FindByID("sendSeek").Click()
+	if err != nil {
+		t.Fatal("Couldn't submit:", err)
+	}
+
+	var whitePlayer string
+	page2.RunScript("return WhiteSide;", map[string]interface{}{}, &whitePlayer)
+	var jsResult string
+
+	if user1 == whitePlayer {
+		page1.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
+		page2.RunScript("sendMove('c7', 'c5');", map[string]interface{}{}, &jsResult)
+		page1.RunScript("sendMove('g1', 'f3');", map[string]interface{}{}, &jsResult)
+		page1.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
+
+		// check to make sure the position is what it should be
+		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
+			t.Error("board does not match user1")
+		}
+
+		// now try to resign the game
+		err = page1.FindByID("resignButton").Click()
+		if err != nil {
+			t.Fatal("Couldn't resign:", err)
+		}
+		// TODO: Check if game really ended and check if the other player really won
+		// Still need to test abort failure, abort sucess, draw, and checkmate
+
+	} else if user2 == whitePlayer {
+		page2.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
+		page1.RunScript("sendMove('c7', 'c5');", map[string]interface{}{}, &jsResult)
+		page2.RunScript("sendMove('g1', 'f3');", map[string]interface{}{}, &jsResult)
+		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
+			t.Error("board does not match user2")
+		}
+		err = page1.FindByID("resignButton").Click()
+		if err != nil {
+			t.Fatal("Couldn't resign:", err)
+		}
+	} else {
+		t.Error("No user matched as whitePlayer")
+	}
+
+	if err := driver.Stop(); err != nil {
+		t.Fatal("Failed to close pages and stop WebDriver:", err)
+	}
 }
 
+/*
 func TestLoginProduction(t *testing.T) {
 
 	driver := agouti.ChromeDriver()
@@ -71,11 +161,11 @@ func TestLoginProduction(t *testing.T) {
 	}
 
 	if err := page.Navigate("https://goplaychess.com:443"); err != nil {
-		t.Fatal("Failed to navigate:", err)
+		t.Fatal("Failed to navigate index:", err)
 	}
 
 	if err := page.Navigate("https://goplaychess.com/login"); err != nil {
-		t.Fatal("Failed to navigate:", err)
+		t.Fatal("Failed to navigate login:", err)
 	}
 
 	loginURL, err := page.URL()
@@ -103,11 +193,20 @@ func TestLoginProduction(t *testing.T) {
 		t.Fatal("Couldn't submit:", err)
 	}
 
+	if err := page.Navigate("https://goplaychess.com/server/lobby"); err != nil {
+		t.Fatal("Failed to navigate lobby:", err)
+	}
+
+	err = page.FindByID("sendSeek").Click()
+	if err != nil {
+		t.Fatal("Couldn't submit:", err)
+	}
+
 	//if err := driver.Stop(); err != nil {
 	//	t.Fatal("Failed to close pages and stop WebDriver:", err)
 	//}
 }
-
+*/
 // returns pass of user's account
 func readPass(user string) string {
 	config, err := os.Open("data/" + user + ".txt")

@@ -56,9 +56,9 @@ func main() {
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 
-	http.Handle("/css/", http.FileServer(http.Dir("")))
+	http.Handle("/css/", cacheControl(http.FileServer(http.Dir("")), "259200"))
 	http.Handle("/img/", http.FileServer(http.Dir("")))
-	http.Handle("/js/", cacheControl(http.FileServer(http.Dir(""))))
+	http.Handle("/js/", cacheControl(http.FileServer(http.Dir("")), "86400"))
 	http.Handle("/data/", http.FileServer(http.Dir("")))
 	http.Handle("/sound/", http.FileServer(http.Dir("")))
 
@@ -484,11 +484,11 @@ func redir(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// used to cache static assets for 24 hours
-func cacheControl(h http.Handler) http.HandlerFunc {
+// used to cache static assets for specified seconds passed in function parameter
+func cacheControl(h http.Handler, seconds string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// max age is the number of seconds to cache
-		w.Header().Set("Cache-Control", "private, max-age=86400")
+		w.Header().Set("Cache-Control", "private, max-age="+seconds)
 		h.ServeHTTP(w, r)
 	}
 }
