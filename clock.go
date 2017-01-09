@@ -9,91 +9,91 @@ import (
 )
 
 //starting white's clock first, this goroutine will keep track of both players clock for this game
-func setClocks(gameID int, name string) {
+func (game *ChessGame) setClocks(name string) {
 
 	var result float64
 	go func() {
 
-		All.Games[gameID].WhiteMinutes, All.Games[gameID].WhiteSeconds, All.Games[gameID].WhiteMilli = StartClock(gameID, All.Games[gameID].WhiteMinutes, All.Games[gameID].WhiteSeconds, All.Games[gameID].WhiteMilli, "White")
+		game.WhiteMinutes, game.WhiteSeconds, game.WhiteMilli = StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, game.WhiteMilli, "White")
 
 	}()
 
 	//checks whether or not clock has timed out
 	for {
 		select {
-		case <-Verify.AllTables[gameID].whiteTimeOut:
+		case <-Verify.AllTables[game.ID].whiteTimeOut:
 
 			result = 0.0
 			//update ratings
-			if All.Games[gameID].Rated == "Yes" {
-				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
+			if game.Rated == "Yes" {
+				ComputeRating(name, game.ID, game.GameType, result)
 			}
 
 			//Black won as white ran out of time
-			All.Games[gameID].Status = "Black won on time"
-			All.Games[gameID].Type = "game_over"
-			All.Games[gameID].Result = 0
+			game.Status = "Black won on time"
+			game.Type = "game_over"
+			game.Result = 0
 
 			//now store game in MySQL database
-			allMoves, err := json.Marshal(All.Games[gameID].GameMoves)
+			allMoves, err := json.Marshal(game.GameMoves)
 			if err != nil {
 				fmt.Println("Error marshalling data to store in MySQL")
 			}
 			//gets length of all the moves in the game
-			totalMoves := (len(All.Games[gameID].GameMoves) + 1) / 2
+			totalMoves := (len(game.GameMoves) + 1) / 2
 			//save game to database before deleting it from memory
-			storeGame(totalMoves, allMoves, All.Games[gameID])
+			storeGame(totalMoves, allMoves, game)
 
 			//notifiy both player that black won on time
 			if _, ok := Active.Clients[PrivateChat[name]]; ok { // send data if other guy is still connected
-				websocket.JSON.Send(Active.Clients[PrivateChat[name]], All.Games[gameID])
+				websocket.JSON.Send(Active.Clients[PrivateChat[name]], game)
 			}
 
 			if _, ok := Active.Clients[name]; ok { // send data if other guy is still connected
-				websocket.JSON.Send(Active.Clients[name], All.Games[gameID])
+				websocket.JSON.Send(Active.Clients[name], game)
 			}
 
-			delete(All.Games, gameID)
-			delete(Verify.AllTables, gameID)
+			delete(All.Games, game.ID)
+			delete(Verify.AllTables, game.ID)
 
 			return
-		case <-Verify.AllTables[gameID].blackTimeOut:
+		case <-Verify.AllTables[game.ID].blackTimeOut:
 
 			//White won as black ran out of time
-			All.Games[gameID].Status = "White won on time"
+			game.Status = "White won on time"
 			result = 1.0
-			All.Games[gameID].Type = "game_over"
-			All.Games[gameID].Result = 1
+			game.Type = "game_over"
+			game.Result = 1
 
 			//now store game in MySQL database
-			allMoves, err := json.Marshal(All.Games[gameID].GameMoves)
+			allMoves, err := json.Marshal(game.GameMoves)
 			if err != nil {
 				fmt.Println("Error marshalling data to store in MySQL")
 			}
 			//gets length of all the moves in the game
-			totalMoves := (len(All.Games[gameID].GameMoves) + 1) / 2
+			totalMoves := (len(game.GameMoves) + 1) / 2
 			//save game to database before deleting it from memory
-			storeGame(totalMoves, allMoves, All.Games[gameID])
+			storeGame(totalMoves, allMoves, game)
 
 			//update ratings
-			if All.Games[gameID].Rated == "Yes" {
-				ComputeRating(name, gameID, All.Games[gameID].GameType, result)
+			if game.Rated == "Yes" {
+				ComputeRating(name, game.ID, game.GameType, result)
 			}
 
 			//notifiy both player that white won on time
 			if _, ok := Active.Clients[PrivateChat[name]]; ok { // send data if other guy is still connected
-				websocket.JSON.Send(Active.Clients[PrivateChat[name]], All.Games[gameID])
+				websocket.JSON.Send(Active.Clients[PrivateChat[name]], game)
 			}
 
 			if _, ok := Active.Clients[name]; ok { // send data if other guy is still connected
-				websocket.JSON.Send(Active.Clients[name], All.Games[gameID])
+				websocket.JSON.Send(Active.Clients[name], game)
 			}
 
-			delete(All.Games, gameID)
-			delete(Verify.AllTables, gameID)
+			delete(All.Games, game.ID)
+			delete(Verify.AllTables, game.ID)
 
 			return
-		case <-Verify.AllTables[gameID].gameOver:
+		case <-Verify.AllTables[game.ID].gameOver:
 			//fmt.Println("Game is over but clocks have not ran out so break out of clocks")
 			return
 		}

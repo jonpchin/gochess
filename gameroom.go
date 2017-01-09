@@ -711,7 +711,10 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game
-				go setClocks(game.ID, t.Name)
+				chessgame := All.Games[game.ID]
+				go func() {
+					chessgame.setClocks(t.Name)
+				}()
 
 			case "draw_game":
 
