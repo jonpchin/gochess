@@ -481,7 +481,6 @@ func robot(w http.ResponseWriter, r *http.Request) {
 
 func redir(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
-
 }
 
 // used to cache static assets for specified seconds passed in function parameter
