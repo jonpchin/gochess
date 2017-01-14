@@ -43,6 +43,7 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
+	http.HandleFunc("/engine", engine)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -438,6 +439,23 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 				if err := highscores.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
+				return
+			}
+		}
+	}
+	w.WriteHeader(404)
+	http.ServeFile(w, r, "404.html")
+}
+
+func engine(w http.ResponseWriter, r *http.Request) {
+	username, err := r.Cookie("username")
+	if err == nil {
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+
+				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+				http.ServeFile(w, r, "cinnamon.html")
 				return
 			}
 		}
