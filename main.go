@@ -18,6 +18,14 @@ const (
 	days = "180" // Number of days used to remove old games, forgot and activate tokens
 )
 
+type justFilesFilesystem struct {
+	fs http.FileSystem
+}
+
+type neuteredReaddirFile struct {
+	http.File
+}
+
 func main() {
 
 	http.HandleFunc("/", mainPage)
@@ -57,11 +65,18 @@ func main() {
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 
-	http.Handle("/css/", cacheControl(http.FileServer(http.Dir("")), "259200"))
-	http.Handle("/img/", http.FileServer(http.Dir("")))
-	http.Handle("/js/", cacheControl(http.FileServer(http.Dir("")), "86400"))
-	http.Handle("/data/", http.FileServer(http.Dir("")))
-	http.Handle("/sound/", http.FileServer(http.Dir("")))
+	// jsBlock, csBlock, etc prevent directory listing
+	jsBlock := justFilesFilesystem{http.Dir("")}
+	cssBlock := justFilesFilesystem{http.Dir("")}
+	imgBlock := justFilesFilesystem{http.Dir("")}
+	dataBlock := justFilesFilesystem{http.Dir("")}
+	soundBlock := justFilesFilesystem{http.Dir("")}
+
+	http.Handle("/css/", cacheControl(http.FileServer(cssBlock), "259200"))
+	http.Handle("/img/", http.FileServer(imgBlock))
+	http.Handle("/js/", cacheControl(http.FileServer(jsBlock), "86400"))
+	http.Handle("/data/", http.FileServer(dataBlock))
+	http.Handle("/sound/", http.FileServer(soundBlock))
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
@@ -508,4 +523,16 @@ func cacheControl(h http.Handler, seconds string) http.HandlerFunc {
 		w.Header().Set("Cache-Control", "private, max-age="+seconds)
 		h.ServeHTTP(w, r)
 	}
+}
+
+func (fs justFilesFilesystem) Open(name string) (http.File, error) {
+	f, err := fs.fs.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	return neuteredReaddirFile{f}, nil
+}
+
+func (f neuteredReaddirFile) Readdir(count int) ([]os.FileInfo, error) {
+	return nil, nil
 }
