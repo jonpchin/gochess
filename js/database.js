@@ -235,3 +235,13 @@ $('#searchID').keypress(function(event) {
 	   $('#searchGameButton').click();	
     }
 });
+
+function detectMobile(){ //tries to detect if user is using a mobile device
+		
+	if(screen.width <= 900){
+		console.log("mobile device detected...adjusting board size and layout");
+		document.getElementById("chatleft").style.display = "none";
+	}
+}
+
+detectMobile(); //calls function

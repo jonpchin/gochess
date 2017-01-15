@@ -1,4 +1,4 @@
-cinnamonCommand = Module.cwrap('command', 'string', ['string','string'])
+cinnamonCommand = Module.cwrap('command', 'string', ['string','string']);
 
 // milliseconds for engine to think before making a move
 cinnamonCommand("setMaxTimeMillsec", 1000);
@@ -53,7 +53,7 @@ var init = function() {
 	// update the board position after the piece snap 
 	// for castling, en passant, pawn promotion
 	var onSnapEnd = function() {
-	board.position(game.fen());
+		board.position(game.fen());
 	};
 
 	function engineGo(){
@@ -140,9 +140,10 @@ var init = function() {
 	$('#startPositionBtn').on('click', function() {
 		board.destroy();
 		$(document).ready(init);
-		
 	});
 
+	// action listener for board flip
+	$('#flipOrientationBtn').on('click', board.flip);
 };
 
 $(document).ready(init);
@@ -150,3 +151,14 @@ $(document).ready(init);
 document.getElementById('setThinkTime').onclick = function() {
 	cinnamonCommand("setMaxTimeMillsec", document.getElementById('thinkTime').value);
 }
+
+function detectMobile(){ //tries to detect if user is using a mobile device
+		
+	if(screen.width <= 900){
+		console.log("mobile device detected...adjusting board size and layout");
+		document.getElementById("chatleft").style.display = "none";
+		document.getElementById("notation").style.display = "none";	
+	}
+}
+
+detectMobile(); //calls function

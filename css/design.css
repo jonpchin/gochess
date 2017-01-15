@@ -1,3 +1,8 @@
+body{
+    font-family:  Courier;
+    font-size: 14px;
+}
+
 #center{
 	text-align:center;
 }
@@ -11,6 +16,25 @@
 #googleLinechart{
     width: 87%;
     float: right;
+}
+
+button {
+	color:black;
+	background-color:#F9F9F9;
+	height:20px; 
+	font-size: 14px;
+	text-align: center;
+	border: 1px solid green;
+	padding: 0 8px;
+	font-family:  Courier;
+	/* rounded corners */
+	-webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+}
+button:hover {
+  background-color: #C1FFC1;
+  border: 1px solid green;
 }
 
 table.table2, table.database {
@@ -153,8 +177,8 @@ tr:hover{background-color:#C1FFC1}
 footer {
 	bottom:0;
 	width:100%;
+    font-family:  Courier;
 	text-align: center;
-	font-family: Verdana;
 	font-size:12px;
 }
 

@@ -20,7 +20,6 @@
 </div> 
 <input type="hidden" id="user" value="{{.User}}" />
 <script src="../js/chess.js"></script>
-<h1><span id="checkwebsocket"></span></h1>
 
 <div id="chatleft">
 <textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea>
@@ -28,22 +27,21 @@
 </div>
 <span id="playernames"><div id="topPlay"><span id="top">Black:</span> <input id="toptime" size="14"  value="10:00" readonly="true"> </div> <div id="bottomPlay">
 <span id="bottom">White:</span> <input id="bottomtime" size="14" value="10:00" readonly="true">  </div>
-<br><br><input type="button" id="rematchButton" value="Rematch" /></span>
+<br><br><button id="newGameButton">New Game</button></span>
 
 <div id="content">
 <div id="board"></div>
-<input type="button" id="flipOrientationBtn" value="Flip" />
-&nbsp;&nbsp;<input type="button" id="abortButton" value="Abort" />
-&nbsp;&nbsp;<input type="button" id="drawButton" value="Offer Draw" />
-&nbsp;&nbsp;<input type="button" id="resignButton" value="Resign" />
+<button id="flipOrientationBtn">Flip</button>
+&nbsp;&nbsp;<button id="drawButton">Offer Draw</button>
+&nbsp;&nbsp;<button id="resignButton">Resign</button>
+&nbsp;&nbsp;<button id="exportPGN">Export PGN</button>
 </div>
 
 <div id="notation">
-&nbsp;&nbsp;<input type="button" id="goStart" value="<<" />
-&nbsp;&nbsp;<input type="button" id="goBack" value="<-" />
-&nbsp;&nbsp;<input type="button" id="goForward" value="->" />
-&nbsp;&nbsp;<input type="button" id="goEnd" value=">>" />
-&nbsp;&nbsp;<input type="button" id="exportPGN" value="Export PGN" />
+&nbsp;&nbsp;<button id="goStart"><<</button>
+&nbsp;&nbsp;<button id="goBack"><-</button>
+&nbsp;&nbsp;<button id="goForward">-></button>
+&nbsp;&nbsp;<button id="goEnd">>></button>
 
 <p>Status: <span id="status"></span></p>
 <p>PGN: <span id="pgn"></span><p>
