@@ -2,6 +2,8 @@ cinnamonCommand = Module.cwrap('command', 'string', ['string','string']);
 
 // milliseconds for engine to think before making a move
 cinnamonCommand("setMaxTimeMillsec", 1000);
+// the color the computer is playing, switch this to switch sides for computer
+var computer = 'b';
 
 var init = function() {
 
@@ -60,7 +62,7 @@ var init = function() {
 		
 		cinnamonCommand("position",game.fen());
 		var move=cinnamonCommand("go","");
-		
+;
 		var from=move.substring(0,2);
 		var to=move.substring(2,4);
 		var move = game.move({
@@ -96,7 +98,7 @@ var init = function() {
 
 	var updateStatus = function() {
 
-		if (game.turn() === 'b') {
+		if (game.turn() === computer) {
 			engineGo()
 		}
 		var status = '';
@@ -144,6 +146,17 @@ var init = function() {
 
 	// action listener for board flip
 	$('#flipOrientationBtn').on('click', board.flip);
+
+	// force the computer to make a move thus switching sides of the game
+	document.getElementById('forceMoveButton').onclick = function(){
+		if(computer === 'b'){
+			computer = 'w';
+		}else{
+			computer = 'b';
+		}
+		updateStatus();
+		board.position(game.fen());
+	}
 };
 
 $(document).ready(init);
