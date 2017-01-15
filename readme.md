@@ -29,6 +29,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>16. Players can view on going chess games in real time as spectators</p>
 <p>17. Lobby and game room chat.</p>
 <p>18. Rating history timeline on player's profile using Google Charts.</p>
+<p>19. Players can play against cinnamon chess engine.</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Configure Twitter bot.</p>
