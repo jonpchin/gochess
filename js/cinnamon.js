@@ -5,6 +5,13 @@ cinnamonCommand("setMaxTimeMillsec", 1000);
 // the color the computer is playing, switch this to switch sides for computer
 var computer = 'b';
 
+//global array of FEN strings, PGN, and statuus used when reviewing game
+var totalFEN = [];
+var totalPGN = [];
+var totalStatus = []
+//used to store what move the game is on, their will be double moves in total one for black and one for white
+var moveCounter = 0;
+
 var init = function() {
 
 	//--- start example JS ---
@@ -13,6 +20,9 @@ var init = function() {
 	statusEl = $('#status'),
 	fenEl = $('#fen'),
 	pgnEl = $('#pgn');
+
+	//always push the default starting position
+	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
 	var onDragStart = function(source, piece) {
 		// do not pick up pieces if the game is over
@@ -48,8 +58,13 @@ var init = function() {
 		});
 
 		// illegal move
-		if (move === null) return 'snapback';
-		updateStatus();
+		if (move === null){
+			return 'snapback';
+		} 
+		totalFEN.push(game.fen());
+		totalPGN.push(game.pgn());
+		totalStatus.push(updateStatus());
+		++moveCounter;
 	};
 
 	// update the board position after the piece snap 
@@ -70,6 +85,11 @@ var init = function() {
 			to: to,
 			promotion: 'q' // NOTE: always promote to a queen for example simplicity
 		});
+
+		totalFEN.push(game.fen());
+		totalPGN.push(game.pgn());
+		totalStatus.push(updateStatus());
+		++moveCounter;
 	}
 	var onMouseoverSquare = function(square, piece) {
 		// get list of possible moves for this square
@@ -124,6 +144,8 @@ var init = function() {
 		statusEl.html(status);
 		fenEl.html(game.fen());
 		pgnEl.html(game.pgn());
+
+		return status;
 	};
 
 	var cfg = {
@@ -149,14 +171,61 @@ var init = function() {
 
 	// force the computer to make a move thus switching sides of the game
 	document.getElementById('forceMoveButton').onclick = function(){
-		if(computer === 'b'){
-			computer = 'w';
-		}else{
-			computer = 'b';
+			if(computer === 'b'){
+				computer = 'w';
+			}else{
+				computer = 'b';
+			}
+			// need to make sure its the most current move before forcing engine to move
+			document.getElementById('goEnd').click();
+			updateStatus();
+			board.position(game.fen());
 		}
-		updateStatus();
-		board.position(game.fen());
+
+		document.getElementById('goStart').onclick = function(){
+		board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+		moveCounter = 0;
+		setStatusAndPGN("White to move", "")
 	}
+
+	//go forward one move
+	document.getElementById('goForward').onclick = function(){
+
+		if(moveCounter < totalFEN.length-1){	
+			moveCounter++;
+		}
+		//make a global array and iterate forwards through the global array when going forward
+		board.position(totalFEN[moveCounter]);	
+		setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
+	} 
+
+	$('#goBack').on('click', function() {
+		if(moveCounter > 0){
+			
+			moveCounter--;
+		}
+		//make a global array and iterate backwards through the global array when going back
+		board.position(totalFEN[moveCounter]);	
+		setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
+	});
+
+	//move forward to last move
+	document.getElementById('goEnd').onclick = function(){
+
+		for(var i=moveCounter; i<totalFEN.length; i++){
+			board.position(totalFEN[i]);
+		}
+		moveCounter = totalFEN.length-1;
+		if(moveCounter>=0){
+			setStatusAndPGN(totalStatus[moveCounter-1], totalPGN[moveCounter-1]);
+		}
+	}
+
+	var setStatusAndPGN = function(status, pgn){
+		statusEl.html(status);
+		//	fenEl.html(game.fen()); FEN string is not being used
+		pgnEl.html(pgn);
+	} 
 };
 
 $(document).ready(init);
