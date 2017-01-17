@@ -222,7 +222,7 @@ var init = function() {
 		}
 		moveCounter = totalFEN.length-1;
 		if(moveCounter>=0){
-			setStatusAndPGN(totalStatus[moveCounter-1], totalPGN[moveCounter-1]);
+			setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
 		}
 	}
 

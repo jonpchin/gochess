@@ -143,7 +143,7 @@ function loadGame(gameData){
 
 //go forward one move
 document.getElementById('goForward').onclick = function(){
-	if(moveCounter < totalFEN.length){	
+	if(moveCounter < totalFEN.length-1){	
 		moveCounter++;
 	}
 	//make a global array and iterate forwards through the global array when going forward
@@ -165,9 +165,9 @@ document.getElementById('goEnd').onclick = function(){
 	for(var i=moveCounter; i<totalFEN.length; i++){
 		board.position(totalFEN[i]);
 	}
-	moveCounter = totalFEN.length;
+	moveCounter = totalFEN.length-1;
 	if(moveCounter>=0){
-		setStatusAndPGN(totalStatus[moveCounter-1], totalPGN[moveCounter-1]);
+		setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
 	}
 }
 
