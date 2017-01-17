@@ -118,6 +118,11 @@ var init = function() {
 
 	var updateStatus = function() {
 
+		if (game.in_checkmate()){
+			alert('Game over, ' + moveColor + ' is in checkmate.');
+			return;
+		}
+
 		if (game.turn() === computer) {
 			engineGo()
 		}
