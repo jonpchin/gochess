@@ -37,6 +37,11 @@ button:hover {
   border: 1px solid green;
 }
 
+button:disabled {
+  background-color: green;
+  color: white;
+}
+
 table.table2, table.database {
 	width: 42%;
     height: 37%;

@@ -8,7 +8,6 @@ var computer = 'b';
 //global array of FEN strings, PGN, and statuus used when reviewing game
 var totalFEN = [];
 var totalPGN = [];
-var totalStatus = []
 //used to store what move the game is on, their will be double moves in total one for black and one for white
 var moveCounter = 0;
 
@@ -23,6 +22,7 @@ var init = function() {
 
 	//always push the default starting position
 	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	totalPGN.push("");
 
 	var onDragStart = function(source, piece) {
 		// do not pick up pieces if the game is over
@@ -63,7 +63,7 @@ var init = function() {
 		} 
 		totalFEN.push(game.fen());
 		totalPGN.push(game.pgn());
-		totalStatus.push(updateStatus());
+		updateStatus();
 		++moveCounter;
 	};
 
@@ -88,7 +88,7 @@ var init = function() {
 
 		totalFEN.push(game.fen());
 		totalPGN.push(game.pgn());
-		totalStatus.push(updateStatus());
+		updateStatus();
 		++moveCounter;
 	}
 	var onMouseoverSquare = function(square, piece) {
@@ -188,10 +188,10 @@ var init = function() {
 		}
 
 		document.getElementById('goStart').onclick = function(){
-		board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
-		moveCounter = 0;
-		setStatusAndPGN("White to move", "")
-	}
+			board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+			moveCounter = 0;
+			setPGN(totalPGN[moveCounter]);
+		}
 
 	//go forward one move
 	document.getElementById('goForward').onclick = function(){
@@ -201,7 +201,7 @@ var init = function() {
 		}
 		//make a global array and iterate forwards through the global array when going forward
 		board.position(totalFEN[moveCounter]);	
-		setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
+		setPGN(totalPGN[moveCounter]);
 	} 
 
 	$('#goBack').on('click', function() {
@@ -211,7 +211,7 @@ var init = function() {
 		}
 		//make a global array and iterate backwards through the global array when going back
 		board.position(totalFEN[moveCounter]);	
-		setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
+		setPGN(totalPGN[moveCounter]);
 	});
 
 	//move forward to last move
@@ -222,15 +222,47 @@ var init = function() {
 		}
 		moveCounter = totalFEN.length-1;
 		if(moveCounter>=0){
-			setStatusAndPGN(totalStatus[moveCounter], totalPGN[moveCounter]);
+			setPGN(totalPGN[moveCounter]);
 		}
 	}
 
-	var setStatusAndPGN = function(status, pgn){
-		statusEl.html(status);
-		//	fenEl.html(game.fen()); FEN string is not being used
+	var setPGN = function(pgn){
 		pgnEl.html(pgn);
+	}
+
+	document.getElementById('newGameButton').onclick = function(){
+		totalFEN = [];
+		totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+		totalPGN = [];
+		totalPGN.push("");
+		moveCounter = 0;
+		board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+		board.orientation('white');
+		game.reset();
 	} 
+
+	//action listener for exporting game to PGN file
+	document.getElementById('exportPGN').onclick = function(){
+		
+		// TODO Fill out parameters
+		var gameResult = "???";
+		var whiteRating = "????";
+		var blackRating = "????"
+		var timeGet = "???";
+		var gameDate = Date();
+		var whitePlayer = document.getElementById('user').value;;
+		var blackPlayer = "Cinnamon Computuer";
+		if(computer === 'w'){
+			whitePlayer =  "Cinnamon Computuer";
+			blackPlayer = document.getElementById('user').value;
+		}
+
+		game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', whitePlayer, 'Black', blackPlayer, 
+			'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
+
+		// second parameter is file name
+		download(game.pgn(), whitePlayer + " vs. " + blackPlayer + ".pgn", "application/x-chess-pgn");
+	}
 };
 
 $(document).ready(init);

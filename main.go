@@ -470,7 +470,12 @@ func engine(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				http.ServeFile(w, r, "cinnamon.html")
+				var memberChess = template.Must(template.ParseFiles("cinnamon.html"))
+				p := gostuff.Person{User: username.Value}
+
+				if err := memberChess.Execute(w, &p); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
 				return
 			}
 		}

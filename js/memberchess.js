@@ -8,6 +8,8 @@ var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
 var gameSound = new Audio('../sound/startgame.mp3');
 
+console.log(document.getElementById("drawButton"));
+
 var whiteClock = new Tock({
 	countdown: true,
 	interval: 1000,
@@ -223,8 +225,8 @@ window.onload = function() {
 				moveCounter++;
 
 				//if draw button is Accept draw then make it say offer draw
-				if (document.getElementById("drawButton").value === "Accept Draw"){
-					document.getElementById("drawButton").value= "Offer Draw";
+				if (document.getElementById("drawButton").innerHTML === "Accept Draw"){
+					document.getElementById("drawButton").innerHTML = "Offer Draw";
 				}			
 	
 				//disables abort button
@@ -353,9 +355,16 @@ window.onload = function() {
 					chessGameOver = false; 		
 					
 					//reset game position to brand new game, used for rematch
+					totalFEN = [];
+					totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+					totalPGN = [];
+					totalPGN.push("");
+					totalStatus = [];
+					moveCounter = 0;
+					totalStatus.push("White to move");
 					board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 					board.orientation('white');
-					game.reset();								
+					game.reset();							
 				}
 
 				// enable abort button if less then 3 moves
@@ -377,8 +386,14 @@ window.onload = function() {
 					document.getElementById("resignButton").disabled = false;
 				}
 
-				if (user === json.WhitePlayer){
-														
+				if(json.CountryWhite === ""){
+					json.CountryWhite = "globe";
+				}
+				if(json.CountryBlack === ""){
+					json.CountryBlack = "globe";
+				}
+
+				if (user === json.WhitePlayer){			
 					document.getElementById("bottom").innerHTML = "W: <img src='../img/flags/" + 
 						json.CountryWhite + ".png'><a href='/profile?name=" + json.WhitePlayer + 
 						"'>" + json.WhitePlayer + "</a>"  +	json.WhiteRating +")";
@@ -437,7 +452,7 @@ window.onload = function() {
 				break;
 			case "offer_draw":
 				document.getElementById('textbox').innerHTML += (timeStamp() + " " + json.Name +" offers you a draw." + '\n');
-				document.getElementById("drawButton").value= "Accept Draw";
+				document.getElementById("drawButton").innerHTML = "Accept Draw";
 				break;
 			
 			case "accept_draw":
@@ -455,7 +470,7 @@ window.onload = function() {
 			case "cancel_draw":
 				document.getElementById('textbox').innerHTML += (timeStamp() + " Draw offer declined." + '\n');
 				document.getElementById("drawButton").disabled = false; 
-				document.getElementById("drawButton").value= "Offer Draw";
+				document.getElementById("drawButton").innerHTML = "Offer Draw";
 				break;
 			
 			case "resign":
@@ -506,7 +521,7 @@ window.onload = function() {
 				
 			case "rematch":
 				document.getElementById('textbox').innerHTML += (timeStamp() + " Your opponent offers you a rematch." + '\n');
-				document.getElementById('rematchButton').value = "Accept Rematch";
+				document.getElementById('rematchButton').innerHTML = "Accept Rematch";
 				break;
 				
 			case "match_three":
@@ -562,7 +577,7 @@ window.onload = function() {
 	//allows player to quit the game before move two, this button is also used to accept draws
 	document.getElementById('drawButton').onclick = function(){
 		
-		if (document.getElementById("drawButton").value === "Accept Draw"){
+		if (document.getElementById("drawButton").innerHTML === "Accept Draw"){
 			var message = {
 				Type: "accept_draw",
 				Name: user,
@@ -681,7 +696,7 @@ document.getElementById('rematchButton').onclick = function(){
 		fighter = WhiteSide;
 	}
 	
-	if(document.getElementById('rematchButton').value === "Rematch"){
+	if(document.getElementById('rematchButton').innerHTML === "Rematch"){
 		var message = {
 			Type: "rematch",
 			Name: user,	
@@ -698,7 +713,7 @@ document.getElementById('rematchButton').onclick = function(){
 			Opponent: fighter,
 			TimeControl: timeGet
 		}
-		document.getElementById('rematchButton').value = "Rematch";
+		document.getElementById('rematchButton').innerHTML = "Rematch";
 	}
 	//hiding button after click to prevent rematch abuse
 	$('#rematchButton').hide();
