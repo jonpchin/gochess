@@ -4,10 +4,6 @@ version: "{build}"
 os: Windows Server 2012 R2
 
 clone_folder: c:\gopath\src\github.com\jonpchin\gochess
-
-branches:  
-  only:
-    - master
 	
 environment:
   GOPATH: c:\gopath
@@ -36,6 +32,7 @@ install:
 build_script:
   - go build main.go
   - go test ./gostuff
+  - go test ./_appveyor
 
 # to disable deployment
 deploy: off
