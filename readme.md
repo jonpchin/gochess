@@ -38,7 +38,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>4. Support correspondence games</p>
 <br>
 
-Special thanks to those who provided amazing third party libaries:
+<b>Special thanks to those who provided amazing third party libaries</b>:
 <p>1. chess.js</p>
 <p>2. chessboard.js</p>
 <p>3. goglicko by Josh Hoak aka Kashomon</p>

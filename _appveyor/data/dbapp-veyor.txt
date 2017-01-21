@@ -1,4 +1,4 @@
 root
-Password12!
+UGFzc3dvcmQxMiE=
 localhost
 3306
