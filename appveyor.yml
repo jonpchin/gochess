@@ -17,7 +17,6 @@ install:
   - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
   - go version
   - go env
-  - mkdir c:\gopath
   - go get -u github.com/go-sql-driver/mysql
   - go get -u github.com/dchest/captcha
   - go get -u github.com/fatih/color
