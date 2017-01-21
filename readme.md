@@ -1,4 +1,5 @@
 ![Alt text](https://travis-ci.org/jonpchin/GoChess.svg?branch=master "Travis CI Go Play Chess Image")
+[![Build status](https://ci.appveyor.com/api/projects/status/96kvdw3mr190y854?svg=true)](https://ci.appveyor.com/project/jonpchin/gochess)
 <br><br>
 <br>
 ![Alt text](/img/screenshots/lobbyresize.png?raw=true "Chess Lobby")
