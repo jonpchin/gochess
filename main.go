@@ -65,18 +65,15 @@ func main() {
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 
-	// jsBlock, csBlock, etc prevent directory listing
-	jsBlock := justFilesFilesystem{http.Dir("")}
-	cssBlock := justFilesFilesystem{http.Dir("")}
-	imgBlock := justFilesFilesystem{http.Dir("")}
-	dataBlock := justFilesFilesystem{http.Dir("")}
-	soundBlock := justFilesFilesystem{http.Dir("")}
+	// prevent directory listing
+	currentDir := justFilesFilesystem{http.Dir("")}
 
-	http.Handle("/css/", cacheControl(http.FileServer(cssBlock), "259200"))
-	http.Handle("/img/", http.FileServer(imgBlock))
-	http.Handle("/js/", cacheControl(http.FileServer(jsBlock), "86400"))
-	http.Handle("/data/", http.FileServer(dataBlock))
-	http.Handle("/sound/", http.FileServer(soundBlock))
+	http.Handle("/css/", cacheControl(http.FileServer(currentDir), "259200"))
+	http.Handle("/img/", http.FileServer(currentDir))
+	http.Handle("/js/", cacheControl(http.FileServer(currentDir), "86400"))
+	http.Handle("/third-party-js/", cacheControl(http.FileServer(currentDir), "432000"))
+	http.Handle("/data/", http.FileServer(currentDir))
+	http.Handle("/sound/", http.FileServer(currentDir))
 
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
@@ -470,10 +467,10 @@ func engine(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var memberChess = template.Must(template.ParseFiles("cinnamon.html"))
+				var engine = template.Must(template.ParseFiles("cinnamon.html"))
 				p := gostuff.Person{User: username.Value}
 
-				if err := memberChess.Execute(w, &p); err != nil {
+				if err := engine.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 				return

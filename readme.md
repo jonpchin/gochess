@@ -35,6 +35,15 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>1. Configure Twitter bot.</p>
 <p>2. Sound on when king is in put in check in a game.</p>
 <p>3. Chess TV where live games are randomly broadcasted.</p>
-<p>4. Run one script to deploy, build and run web server.<p>
-<p>5. Support correspondence games</p>
+<p>4. Support correspondence games</p>
 <br>
+
+Special thanks to those who provided amazing third party libaries:
+<p>1. chess.js</p>
+<p>2. chessboard.js</p>
+<p>3. goglicko by Josh Hoak aka Kashomon</p>
+<p>4. Tock.js</p>
+<p>5. Cinnamon JS Engine</p>
+<p>6. download.js v4.1, by dandavis</p>
+<p>7. dchest/captcha</p>
+<p>8. robfig/cron</p>

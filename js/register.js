@@ -9,15 +9,15 @@ function setSrcQuery(e, q) {
 document.getElementById('playAudio').onclick = function() {
 	var le = document.getElementById("lang");
 	var lang = le.options[le.selectedIndex].value;
-	var e = document.getElementById('audio')
-	setSrcQuery(e, "lang=" + lang)
+	var e = document.getElementById('audio');
+	setSrcQuery(e, "lang=" + lang);
 	e.style.display = 'block';
 	e.autoplay = 'true';
 	return false;
 }
 
 document.getElementById("lang").addEventListener("change", function(){
-	var e = document.getElementById('audio')
+	var e = document.getElementById('audio');
 	if (e.style.display == 'block') {
 		playAudio();
 	}

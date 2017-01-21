@@ -8,8 +8,6 @@ var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
 var gameSound = new Audio('../sound/startgame.mp3');
 
-console.log(document.getElementById("drawButton"));
-
 var whiteClock = new Tock({
 	countdown: true,
 	interval: 1000,
