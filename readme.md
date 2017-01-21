@@ -47,3 +47,5 @@ Special thanks to those who provided amazing third party libaries:
 <p>6. download.js v4.1, by dandavis</p>
 <p>7. dchest/captcha</p>
 <p>8. robfig/cron</p>
+<p>9. gopkg.in/gomail.v2 </p>
+<p>10. golang.org/x/crypto/scrypt </p>

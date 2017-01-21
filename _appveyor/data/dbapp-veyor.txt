@@ -1,0 +1,4 @@
+root
+Password12!
+localhost
+3306
