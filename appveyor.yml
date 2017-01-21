@@ -27,6 +27,7 @@ install:
   - go get -u github.com/disintegration/imaging
   - go get -u github.com/mholt/archiver
   - go get -u github.com/sclevine/agouti
+  - go get -u gopkg.in/freeeve/pgn.v1
 
 build_script:
   - go build main.go
