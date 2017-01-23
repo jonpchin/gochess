@@ -9,6 +9,3 @@ services:
 script: 
   - go test ./gostuff
   - go test ./_travis
-
-after_deploy:
-  goplaychess
