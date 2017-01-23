@@ -37,6 +37,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>2. Sound on when king is in put in check in a game.</p>
 <p>3. Chess TV where live games are randomly broadcasted.</p>
 <p>4. Support correspondence games</p>
+<p>5. Codedeploy</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
