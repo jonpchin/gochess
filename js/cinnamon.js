@@ -10,6 +10,7 @@ var totalFEN = [];
 var totalPGN = [];
 //used to store what move the game is on, their will be double moves in total one for black and one for white
 var moveCounter = 0;
+var pieceTheme = getCookie("pieceTheme");
 
 var init = function() {
 
@@ -33,6 +34,7 @@ var init = function() {
 			return false;
 		}
 	};
+	
 	var removeGreySquares = function() {
 		$('#board .square-55d63').css('background', '');
 	};
@@ -47,8 +49,9 @@ var init = function() {
 
 		squareEl.css('background', background);
 	};
+	
 	var onDrop = function(source, target) {
-		removeGreySquares();
+		//removeGreySquares();
 
 		// see if the move is legal
 		var move = game.move({
@@ -161,7 +164,8 @@ var init = function() {
 		moveSpeed: 'slow',
 		onMouseoutSquare: onMouseoutSquare,
 		onMouseoverSquare: onMouseoverSquare,
-		onSnapEnd: onSnapEnd
+		onSnapEnd: onSnapEnd,
+		pieceTheme: '../img/chesspieces/'+ pieceTheme +'/{piece}.png'
 	};
 	board = new ChessBoard('board', cfg);
 
@@ -270,6 +274,24 @@ $(document).ready(init);
 document.getElementById('setThinkTime').onclick = function() {
 	cinnamonCommand("setMaxTimeMillsec", document.getElementById('thinkTime').value);
 }
+
+function getCookie(cname) { //gets cookies value
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+function defaultTheme(){
+	if (pieceTheme === ""){
+		pieceTheme = "wikipedia"
+	}
+}
+defaultTheme();
 
 function detectMobile(){ //tries to detect if user is using a mobile device
 		

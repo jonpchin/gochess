@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/Goworkspace/src/github.com/jonpchin/gochess
+hooks:
+  AfterInstall:
+    - location: ./gitpull.sh
+      timeout: 180
+runas: root
