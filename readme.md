@@ -38,6 +38,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>3. Chess TV where live games are randomly broadcasted.</p>
 <p>4. Support correspondence games</p>
 <p>5. Codedeploy</p>
+</p>6. Forums</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
