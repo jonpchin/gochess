@@ -86,7 +86,8 @@ window.onload = function() {
 	if (typeof reviewMoves !== "undefined"){
 		
 		reviewGame = true;
-		
+		detectMobile(false); // Show notation when reviewing game
+			
 		var whiteName = token.white;
 		var blackName = token.black;
 		var whiteR = token.whiteRating;
@@ -139,6 +140,8 @@ window.onload = function() {
 			totalStatus.push(updateStatus());
 		}
 		return; //prevents game from loading if game is being reviewed	
+	}else{
+		detectMobile(true);	
 	}
 	//hide export PGN button and add favorites button as player is not reviewing a game
 	$('#exportPGN').hide();
@@ -749,13 +752,13 @@ function gameOver(){
 	}
 }
 
-function detectMobile(){ //tries to detect if user is using a mobile device
+function detectMobile(isHideNotation){ //tries to detect if user is using a mobile device
 		
 	if(screen.width <= 900){
 		console.log("mobile device detected...adjusting board size and layout");
 		document.getElementById("chatleft").style.display = "none";
-		document.getElementById("notation").style.display = "none";	
+		if(isHideNotation){
+			document.getElementById("notation").style.display = "none";	
+		}
 	}
 }
-
-detectMobile(); //calls function
