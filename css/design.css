@@ -86,14 +86,7 @@ table.table2 {
     border-collapse: collapse;
 }
 
-table.table1 {
-	width: 87%;
-    height: 37%;
-	overflow:auto;
-	float:right;
-    border: 1px solid green;
-    border-collapse: collapse;
-}
+
 table.table1 th, table.table2 th, table.table3 th, table.table4 th, table.table5 th, table.table6 th, table.table7 th, table.table8 th {
     background-color: #4CAF50;
     color: white;
@@ -118,7 +111,17 @@ tr:hover{background-color:#C1FFC1}
 	#board {
 		width:125%;
 	}
-		
+    #notation {
+        float: right;
+        width: 86%;
+    }
+    table.table1 {
+        width: 87%;
+        height: 37%;
+        overflow:auto;
+        border: 1px solid green;
+        border-collapse: collapse;
+    }	
 }
 @media (max-width: 900px) and (orientation: landscape) {
 	#topPlay {
@@ -136,7 +139,17 @@ tr:hover{background-color:#C1FFC1}
 	    float: left;
 	    width: 25%;
 	}
-
+    #notation {
+        float: right;
+        width: 86%;
+    }
+    table.table1 {
+        width: 87%;
+        height: 37%;
+        overflow:auto;
+        border: 1px solid green;
+        border-collapse: collapse;
+    }
 }
 @media (min-width: 901px)  {
 	#topPlay {
@@ -157,6 +170,18 @@ tr:hover{background-color:#C1FFC1}
 	    float: left;
 	    width: 25%;
 	}
+    #notation {
+        float: right;
+        width: 26%;
+    }
+    table.table1 {
+        width: 87%;
+        height: 37%;
+        overflow:auto;
+        float:right;
+        border: 1px solid green;
+        border-collapse: collapse;
+    }
 }
 
 #seekparameters{
@@ -172,11 +197,6 @@ tr:hover{background-color:#C1FFC1}
 #chatleft {
     float: left;
     width: 21%;
-}
-
-#notation {
-    float: right;
-    width: 26%;
 }
 
 footer {
