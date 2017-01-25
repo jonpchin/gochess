@@ -17,10 +17,8 @@ type ChessGame struct {
 	TimeControl  int
 	BlackMinutes int
 	BlackSeconds int
-	BlackMilli   int
 	WhiteMinutes int
 	WhiteSeconds int
-	WhiteMilli   int
 	PendingDraw  bool   //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
 	Spectate     bool
@@ -43,10 +41,8 @@ type ClockMove struct {
 	UpdateWhite  bool //If true then update white's clock
 	WhiteMinutes int
 	WhiteSeconds int
-	WhiteMilli   int
 	BlackMinutes int
 	BlackSeconds int
-	BlackMilli   int
 }
 
 // used to unmarshall game ID that is being observed by player(Name)

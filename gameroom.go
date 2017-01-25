@@ -55,9 +55,11 @@ func (c *Connection) ChessConnect() {
 				if _, ok := All.Games[game.ID]; !ok {
 					break
 				}
+				chessgame := All.Games[game.ID]
+				table := Verify.AllTables[game.ID]
 
-				var white = All.Games[game.ID].WhitePlayer
-				var black = All.Games[game.ID].BlackPlayer
+				var white = chessgame.WhitePlayer
+				var black = chessgame.BlackPlayer
 
 				// spectators should not be able to make moves for the two chess players
 				if t.Name != white && t.Name != black {
@@ -70,16 +72,16 @@ func (c *Connection) ChessConnect() {
 				result = chessVerify(game.Source, game.Target, game.Promotion, game.ID)
 
 				if result == false {
-					totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
+					totalMoves := (len(chessgame.GameMoves) + 1) / 2
 					log.Printf("Invalid chess move by %s move %s - %s in gameID %d on move %d", c.username, game.Source, game.Target, game.ID, totalMoves)
 					break
 				}
-				Verify.AllTables[game.ID].Connection <- true
+				table.Connection <- true
 				//printBoard(game.ID)
 
 				//checkin if there is a pending draw and if so it removes it
-				if All.Games[game.ID].PendingDraw == true {
-					All.Games[game.ID].PendingDraw = false
+				if chessgame.PendingDraw == true {
+					chessgame.PendingDraw = false
 
 					t.Type = "cancel_draw"
 
@@ -89,66 +91,22 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//now switch to the other players turn
-				if All.Games[game.ID].Status == "White" {
-					All.Games[game.ID].Status = "Black"
-
-					//now switch clocks
-					go func() {
+				if chessgame.Status == "White" {
+					chessgame.Status = "Black"
+					go func() { //now switch clocks
 						var clock ClockMove
 						clock.Type = "sync_clock"
-
-						All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, All.Games[game.ID].BlackMilli = StartClock(game.ID, All.Games[game.ID].BlackMinutes, All.Games[game.ID].BlackSeconds, All.Games[game.ID].BlackMilli, "Black")
-
-						if _, ok := All.Games[game.ID]; !ok {
-							return
-						}
-
-						clock.BlackMinutes = All.Games[game.ID].BlackMinutes
-						clock.BlackSeconds = All.Games[game.ID].BlackSeconds
-						clock.BlackMilli = All.Games[game.ID].BlackMilli
-						clock.UpdateWhite = false
-
-						// sync clock with players only, not spectators
-						if _, ok := Active.Clients[t.Name]; ok {
-							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
-								log.Println("error sending clock")
-							}
-						}
-						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
-							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
-								log.Println("error sending clock")
-							}
-						}
+						chessgame.BlackMinutes, chessgame.BlackSeconds =
+							table.startClock(game.ID, chessgame.BlackMinutes, chessgame.BlackSeconds, "Black")
 					}()
 
-				} else if All.Games[game.ID].Status == "Black" {
-					All.Games[game.ID].Status = "White"
-
+				} else if chessgame.Status == "Black" {
+					chessgame.Status = "White"
 					go func() {
 						var clock ClockMove
 						clock.Type = "sync_clock"
-
-						All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, All.Games[game.ID].WhiteMilli = StartClock(game.ID, All.Games[game.ID].WhiteMinutes, All.Games[game.ID].WhiteSeconds, All.Games[game.ID].WhiteMilli, "White")
-
-						if _, ok := All.Games[game.ID]; !ok {
-							return
-						}
-
-						clock.WhiteMinutes = All.Games[game.ID].WhiteMinutes
-						clock.WhiteSeconds = All.Games[game.ID].WhiteSeconds
-						clock.WhiteMilli = All.Games[game.ID].WhiteMilli
-						clock.UpdateWhite = true
-
-						if _, ok := Active.Clients[t.Name]; ok {
-							if err := websocket.JSON.Send(Active.Clients[t.Name], &clock); err != nil {
-								log.Println("error sending clock")
-							}
-						}
-						if _, ok := Active.Clients[PrivateChat[t.Name]]; ok {
-							if err := websocket.JSON.Send(Active.Clients[PrivateChat[t.Name]], &clock); err != nil {
-								log.Println("error sending clock")
-							}
-						}
+						chessgame.WhiteMinutes, chessgame.WhiteSeconds =
+							table.startClock(game.ID, chessgame.WhiteMinutes, chessgame.WhiteSeconds, "White")
 					}()
 				} else {
 					log.Println("Invalid game status, most likely game is over for ", t.Name)
@@ -160,17 +118,17 @@ func (c *Connection) ChessConnect() {
 				move.T = game.Target
 				move.P = game.Promotion
 				//append move to back end storage for retrieval from database later
-				All.Games[game.ID].GameMoves = append(All.Games[game.ID].GameMoves, move)
+				chessgame.GameMoves = append(chessgame.GameMoves, move)
 
-				for _, name := range Verify.AllTables[game.ID].observe.Names {
+				for _, name := range table.observe.Names {
 					if _, ok := Active.Clients[name]; ok {
 						if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
 							log.Println("error sending chess move to", name)
 						}
 					} else if name != white && name != black { //remove spectator if they are no longer viewing game
-						Verify.AllTables[game.ID].observe.Lock()
-						Verify.AllTables[game.ID].observe.Names = removeViewer(name, game.ID)
-						Verify.AllTables[game.ID].observe.Unlock()
+						table.observe.Lock()
+						table.observe.Names = removeViewer(name, game.ID)
+						table.observe.Unlock()
 					}
 				}
 
@@ -209,7 +167,8 @@ func (c *Connection) ChessConnect() {
 				}
 
 				if exist {
-					for _, name := range Verify.AllTables[gameID].observe.Names {
+					table := Verify.AllTables[gameID]
+					for _, name := range table.observe.Names {
 						if _, ok := Active.Clients[name]; ok {
 							if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
 								// we could not send the message to a peer
@@ -217,9 +176,9 @@ func (c *Connection) ChessConnect() {
 							}
 						} else if name != white && name != black {
 							//remove spectator if they are no longer viewing game
-							Verify.AllTables[gameID].observe.Lock()
-							Verify.AllTables[gameID].observe.Names = removeViewer(name, gameID)
-							Verify.AllTables[gameID].observe.Unlock()
+							table.observe.Lock()
+							table.observe.Names = removeViewer(name, gameID)
+							table.observe.Unlock()
 						}
 					}
 					// if game does not exist but user is still in chess room allow
@@ -669,10 +628,8 @@ func (c *Connection) ChessConnect() {
 				game.TimeControl = Pending.Matches[match.MatchID].TimeControl
 				game.WhiteMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.WhiteSeconds = 0
-				game.WhiteMilli = 0
 				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
 				game.BlackSeconds = 0
-				game.BlackMilli = 0
 				game.PendingDraw = false
 				game.Rated = Pending.Matches[match.MatchID].Rated
 
