@@ -12,16 +12,15 @@ import (
 func (game *ChessGame) setClocks(name string) {
 
 	var result float64
+	table := Verify.AllTables[game.ID]
 	go func() {
-
-		game.WhiteMinutes, game.WhiteSeconds, game.WhiteMilli = StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, game.WhiteMilli, "White")
-
+		game.WhiteMinutes, game.WhiteSeconds = table.startClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, "White")
 	}()
 
 	//checks whether or not clock has timed out
 	for {
 		select {
-		case <-Verify.AllTables[game.ID].whiteTimeOut:
+		case <-table.whiteTimeOut:
 
 			result = 0.0
 			//update ratings
@@ -57,7 +56,7 @@ func (game *ChessGame) setClocks(name string) {
 			delete(Verify.AllTables, game.ID)
 
 			return
-		case <-Verify.AllTables[game.ID].blackTimeOut:
+		case <-table.blackTimeOut:
 
 			//White won as black ran out of time
 			game.Status = "White won on time"
@@ -93,7 +92,7 @@ func (game *ChessGame) setClocks(name string) {
 			delete(Verify.AllTables, game.ID)
 
 			return
-		case <-Verify.AllTables[game.ID].gameOver:
+		case <-table.gameOver:
 			//fmt.Println("Game is over but clocks have not ran out so break out of clocks")
 			return
 		}
@@ -101,39 +100,48 @@ func (game *ChessGame) setClocks(name string) {
 }
 
 //returns the remaining time of players's clock
-func StartClock(gameID int, minutes int, seconds int, milliseconds int, color string) (int, int, int) {
+func (table *Table) startClock(gameID int, minutes int, seconds int, color string) (int, int) {
 
-	timerChan := time.NewTicker(time.Millisecond).C
+	timerChan := time.NewTicker(time.Second).C
 
-	clock := (60000 * minutes) + (seconds * 1000) + milliseconds
+	clock := (minutes * 60) + seconds
 	if clock <= 0 {
-		return 0, 0, 0
+		return 0, 0
 	}
 
-	Verify.AllTables[gameID].Connection = make(chan bool)
+	table.Connection = make(chan bool)
+	chessgame := All.Games[gameID]
 
 	for {
 		select {
-		case <-Verify.AllTables[gameID].Connection:
+		case <-table.Connection:
 
-			remainingMinutes := (clock / 60000)
-			remainingSeconds := (clock / 1000) % 60
-			remainingMilli := clock % 1000
-			// fmt.Printf("Clock here is %d %d color is %s\n",  remainingMinutes, remainingSeconds, color)
-			return remainingMinutes, remainingSeconds, remainingMilli
+			remainingMinutes := clock / 60
+			remainingSeconds := clock % 60
+			//fmt.Printf("Clock here is %d %d color is %s\n", remainingMinutes, remainingSeconds, color)
+			return remainingMinutes, remainingSeconds
 
 		case <-timerChan:
 
 			clock--
+			remainingMinutes := clock / 60
+			remainingSeconds := clock % 60
+			if color == "White" {
+				chessgame.WhiteMinutes = remainingMinutes
+				chessgame.WhiteSeconds = remainingSeconds
+			} else {
+				chessgame.BlackMinutes = remainingMinutes
+				chessgame.BlackSeconds = remainingSeconds
+			}
 			if clock <= 0 && color == "White" {
-				Verify.AllTables[gameID].whiteTimeOut <- true
-				return 0, 0, 0
+				table.whiteTimeOut <- true
+				return 0, 0
 			} else if clock <= 0 && color == "Black" {
-				Verify.AllTables[gameID].blackTimeOut <- true
-				return 0, 0, 0
+				table.blackTimeOut <- true
+				return 0, 0
 			}
 		}
 	}
 
-	return 0, 0, 0
+	return 0, 0
 }

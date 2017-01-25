@@ -457,10 +457,8 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	//for simplicity we will only allow minutes
 	game.WhiteMinutes = Pending.Matches[matchID].TimeControl
 	game.WhiteSeconds = 0
-	game.WhiteMilli = 0
 	game.BlackMinutes = Pending.Matches[matchID].TimeControl
 	game.BlackSeconds = 0
-	game.BlackMilli = 0
 	game.PendingDraw = false
 	game.Rated = Pending.Matches[matchID].Rated
 	game.Spectate = false

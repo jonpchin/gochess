@@ -13,10 +13,10 @@ var whiteClock = new Tock({
 	interval: 1000,
 	callback: function () {
         if(user === WhiteSide){
-	        $('#bottomtime').val(whiteClock.msToTime(whiteClock.lap()));	
+	        $('#bottomtime').val(whiteClock.msToTimecode(whiteClock.lap()));	
 	    }
 		else{
-			$('#toptime').val(whiteClock.msToTime(whiteClock.lap()));	
+			$('#toptime').val(whiteClock.msToTimecode(whiteClock.lap()));	
 		}  
     }
 });
@@ -26,10 +26,10 @@ var blackClock = new Tock({
 	interval: 1000,
 	callback: function () {
     	if(user === BlackSide ){
-	        $('#bottomtime').val(blackClock.msToTime(blackClock.lap()));	
+	        $('#bottomtime').val(blackClock.msToTimecode(blackClock.lap()));	
 	    }
 		else{
-			$('#toptime').val(blackClock.msToTime(blackClock.lap()));	
+			$('#toptime').val(blackClock.msToTimecode(blackClock.lap()));	
 		}
     }
 });
@@ -268,25 +268,23 @@ window.onload = function() {
 				if(user === WhiteSide){
 					if(json.UpdateWhite){
 						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + 
-							json.WhiteSeconds + "." + json.WhiteMilli;
-					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds + "." + json.WhiteMilli);
+							json.WhiteSeconds
+					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds);
 					}
 					else{
 						document.getElementById("toptime").value = json.BlackMinutes + ":" + 
-						json.BlackSeconds + "." + json.BlackMilli;	
-					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
+							json.BlackSeconds;	
+					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds);
 					}
 				}
 				else if(user === BlackSide){
 					if(json.UpdateWhite){
-						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds + "." +
-							json.WhiteMilli;
-					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds  + "." + json.WhiteMilli);
+						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds);
 					}
 					else{
-						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds + "." + 
-							json.BlackMilli;
-					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds + "." + json.BlackMilli);
+						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
+					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds);
 					}			
 				}	
 				break;

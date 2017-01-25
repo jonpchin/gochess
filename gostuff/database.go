@@ -471,10 +471,8 @@ func fetchSavedGame(id string, user string) bool {
 
 	game.WhiteMinutes = whiteminutes
 	game.WhiteSeconds = whiteseconds
-	game.WhiteMilli = 0
 	game.BlackMinutes = blackminutes
 	game.BlackSeconds = blackseconds
-	game.BlackMilli = 0
 	game.PendingDraw = false
 	game.CountryWhite = countrywhite
 	game.CountryBlack = countryblack
