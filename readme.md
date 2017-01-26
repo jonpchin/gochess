@@ -1,3 +1,5 @@
+Go Play Chess - Free Online Real time chess web server using websockets - Creator: Jonathan Chin<br><br>
+
 ![Alt text](https://travis-ci.org/jonpchin/GoChess.svg?branch=master "Travis CI Go Play Chess Image")
 [![Build status](https://ci.appveyor.com/api/projects/status/96kvdw3mr190y854?svg=true)](https://ci.appveyor.com/project/jonpchin/gochess)
 <br><br>
@@ -8,14 +10,12 @@
 <br><br>
 12/10/2015 - Start date of project.<br><br>
 5/31/2016 This project is officially open source. - All commit history has been cleared as some of the git history contained sensitive data. 
-If you are interesting in contributing please open a new issue here:
+<br><br>If you are interesting in contributing please open a new issue here:
 https://github.com/jonpchin/GoChess/issues
 In the issue state what you want to work on and I'll add you as a contributor. 
 If you are open to doing anything I can assign you one of the open tasks in the back log.
 Once your changes are ready, make a pull request and I"ll review it.
 <br>
-
-Go Play Chess - Free Online Real time chess web server using websockets - Creator: Jonathan Chin
 <br><b>Features:</b><br>
 <p>1. User accounts</p>
 <p>2. Time controls</p>
