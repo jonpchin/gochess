@@ -398,21 +398,23 @@ func startPendingMatch(seekerName string, matchID int) bool {
 		return true
 	}
 
-	if Pending.Matches[matchID].Opponent == "" { //only use this case for public matches
-		if Pending.Matches[matchID].GameType == "bullet" && (bullet < Pending.Matches[matchID].MinRating || bullet > Pending.Matches[matchID].MaxRating) {
+	match := Pending.Matches[matchID]
+
+	if match.Opponent == "" { //only use this case for public matches
+		if match.GameType == "bullet" && (bullet < match.MinRating || bullet > match.MaxRating) {
 			//fmt.Println("Bullet Rating not in range.")
 			return true
-		} else if Pending.Matches[matchID].GameType == "blitz" && (blitz < Pending.Matches[matchID].MinRating || blitz > Pending.Matches[matchID].MaxRating) {
+		} else if match.GameType == "blitz" && (blitz < match.MinRating || blitz > match.MaxRating) {
 			//fmt.Println("Blitz Rating not in range.")
 			return true
-		} else if Pending.Matches[matchID].GameType == "standard" && (standard < Pending.Matches[matchID].MinRating || standard > Pending.Matches[matchID].MaxRating) {
+		} else if match.GameType == "standard" && (standard < match.MinRating || standard > match.MaxRating) {
 			//fmt.Println("Standard Rating not in range.")
 			return true
 		}
 	}
 
 	//bullet, blitz or standard game type
-	game.GameType = Pending.Matches[matchID].GameType
+	game.GameType = match.GameType
 
 	//seting up the game info such as white/black player, time control, etc
 	rand.Seed(time.Now().UnixNano())
@@ -430,11 +432,11 @@ func startPendingMatch(seekerName string, matchID int) bool {
 			game.WhiteRating = standard
 		}
 
-		game.BlackRating = Pending.Matches[matchID].Rating
-		game.BlackPlayer = Pending.Matches[matchID].Name
+		game.BlackRating = match.Rating
+		game.BlackPlayer = match.Name
 
 	} else {
-		game.WhitePlayer = Pending.Matches[matchID].Name
+		game.WhitePlayer = match.Name
 		if game.GameType == "bullet" {
 			game.BlackRating = bullet
 
@@ -444,7 +446,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 			game.BlackRating = standard
 		}
 
-		game.WhiteRating = Pending.Matches[matchID].Rating
+		game.WhiteRating = match.Rating
 		game.BlackPlayer = seekerName
 	}
 	//White for white to move or Black for black to move, white won, black won, stalemate or draw.
@@ -453,14 +455,14 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	//no moves yet so nill/null
 	game.GameMoves = nil
 
-	game.TimeControl = Pending.Matches[matchID].TimeControl
+	game.TimeControl = match.TimeControl
 	//for simplicity we will only allow minutes
-	game.WhiteMinutes = Pending.Matches[matchID].TimeControl
+	game.WhiteMinutes = match.TimeControl
 	game.WhiteSeconds = 0
-	game.BlackMinutes = Pending.Matches[matchID].TimeControl
+	game.BlackMinutes = match.TimeControl
 	game.BlackSeconds = 0
 	game.PendingDraw = false
-	game.Rated = Pending.Matches[matchID].Rated
+	game.Rated = match.Rated
 	game.Spectate = false
 	game.CountryWhite = getCountry(game.WhitePlayer)
 	game.CountryBlack = getCountry(game.BlackPlayer)
