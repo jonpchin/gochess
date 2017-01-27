@@ -33,16 +33,20 @@ func RoundPlus(f float64, places int) float64 {
 //computes the rating for one player and the other player and updates the database and notifies both players, result can be white, black or draw
 func ComputeRating(name string, gameID int, gameType string, result float64) {
 
-	var bullet, blitz, standard, bulletRD, blitzRD, standardRD float64
-	var oBullet, oBlitz, oStandard, oBulletRD, oBlitzRD, oStandardRD float64
+	var bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondenceRD float64
+	var oBullet, oBlitz, oStandard, oCorrespondence, oBulletRD, oBlitzRD, oStandardRD, oCorrespondenceRD float64
 
 	//update player's rating and notify them of rating change, also determine player color to assign correct rating
 	if All.Games[gameID].WhitePlayer == name {
-		_, bullet, blitz, standard, bulletRD, blitzRD, standardRD = GetRatingAndRD(name)
-		_, oBullet, oBlitz, oStandard, oBulletRD, oBlitzRD, oStandardRD = GetRatingAndRD(PrivateChat[name])
+		_, bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD,
+			correspondenceRD = GetRatingAndRD(name)
+		_, oBullet, oBlitz, oStandard, oCorrespondence, oBulletRD, oBlitzRD,
+			oStandardRD, oCorrespondenceRD = GetRatingAndRD(PrivateChat[name])
 	} else {
-		_, bullet, blitz, standard, bulletRD, blitzRD, standardRD = GetRatingAndRD(PrivateChat[name])
-		_, oBullet, oBlitz, oStandard, oBulletRD, oBlitzRD, oStandardRD = GetRatingAndRD(name)
+		_, bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD,
+			correspondenceRD = GetRatingAndRD(PrivateChat[name])
+		_, oBullet, oBlitz, oStandard, oCorrespondence, oBulletRD, oBlitzRD,
+			oStandardRD, oCorrespondenceRD = GetRatingAndRD(name)
 	}
 
 	var whiteRating float64
@@ -85,6 +89,19 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 
 		whiteRating, whiteRD = grabRating(standard, standardRD, oStandard, oStandardRD, result)
 		blackRating, blackRD = grabRating(oStandard, oStandardRD, standard, standardRD, 1.0-result)
+		//updates database with players new rating and RD
+		if All.Games[gameID].WhitePlayer == name {
+			updateRating("standard", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, "standard", whiteRating)
+			updateRatingHistory(PrivateChat[name], "standard", blackRating)
+		} else {
+			updateRating("standard", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], "standard", whiteRating)
+			updateRatingHistory(name, "standard", blackRating)
+		}
+	} else if gameType == "correspondence" {
+		whiteRating, whiteRD = grabRating(correspondence, correspondenceRD, oCorrespondence, oCorrespondenceRD, result)
+		blackRating, blackRD = grabRating(oCorrespondence, oCorrespondenceRD, correspondence, correspondenceRD, 1.0-result)
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating("standard", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)

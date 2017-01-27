@@ -12,6 +12,7 @@ var user = document.getElementById('user').value;
 var bullet = document.getElementById('bullet').value;
 var blitz = document.getElementById('blitz').value;
 var standard = document.getElementById('standard').value;
+var correspondence = document.getElementById('correspondence').value;
 
 window.onload = function() {	
 	
@@ -110,8 +111,12 @@ window.onload = function() {
 			else if(json.GameType === "blitz" && (blitz < json.MinRating || blitz > json.MaxRating)){
 					return;
 			}
-			else if (json.GameType === "standard" && (standard < json.MinRating || standard > json.MaxRati)){
+			else if (json.GameType === "standard" && (standard < json.MinRating || standard > json.MaxRating)){
 					return;		
+			}
+			else if(json.GameType === "correspondence" && (correspondence < json.MinRating || 
+				correspondence > json.MaxRating)){
+					return;
 			}
 			else{	
 				if(json.Opponent !== ""){ //then its a private match

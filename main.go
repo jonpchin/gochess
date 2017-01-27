@@ -238,14 +238,17 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 
 				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var lobby = template.Must(template.ParseFiles("lobby.html"))
-				var bulletRating, blitzRating, standardRating int16
+				var bulletRating, blitzRating, standardRating, correspondenceRating int16
 				var errMessage string
 
-				errMessage, bulletRating, blitzRating, standardRating = gostuff.GetRating(username.Value)
+				errMessage, bulletRating, blitzRating, standardRating,
+					correspondenceRating = gostuff.GetRating(username.Value)
+
 				if errMessage != "" {
 					fmt.Println("Problem fetching rating lobby main.go")
 				}
-				p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating, Standard: standardRating}
+				p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating,
+					Standard: standardRating, Correspondence: correspondenceRating}
 
 				if err := lobby.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -340,16 +343,19 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 				var all []gostuff.GoGame
 				var ratErr string
-				var bulletRating, blitzRating, standardRating, bulletRD, blitzRD, standardRD float64
+				var bulletRating, blitzRating, standardRating, correspondenceRating,
+					bulletRD, blitzRD, standardRD, correspondenceRD float64
 
 				name := r.URL.Query().Get("name")
 				var inputName string                 //used to pass to template to specify what profile name is being viewed
 				if r.URL.Query().Get("name") == "" { //then look at own profile
-					_, bulletRating, blitzRating, standardRating, bulletRD, blitzRD, standardRD = gostuff.GetRatingAndRD(username.Value)
+					_, bulletRating, blitzRating, standardRating, correspondenceRating,
+						bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(username.Value)
 					all = gostuff.GetGames(username.Value)
 					inputName = username.Value
 				} else { //otherwise look at specified player's profile
-					ratErr, bulletRating, blitzRating, standardRating, bulletRD, blitzRD, standardRD = gostuff.GetRatingAndRD(name)
+					ratErr, bulletRating, blitzRating, standardRating, correspondenceRating,
+						bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(name)
 					if ratErr != "" { //this means someone typed a profile url which no player exists in database
 						http.ServeFile(w, r, "nouser.html")
 						return
@@ -364,9 +370,11 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 				bulletN := gostuff.Round(bulletRating)
 				blitzN := gostuff.Round(blitzRating)
 				standardN := gostuff.Round(standardRating)
+				correspondenceN := gostuff.Round(correspondenceRating)
 				bulletR := gostuff.RoundPlus(bulletRD, 2)
 				blitzR := gostuff.RoundPlus(blitzRD, 2)
 				standardR := gostuff.RoundPlus(standardRD, 2)
+				correspondenceR := gostuff.RoundPlus(correspondenceRD, 2)
 				gameID, exist := gostuff.GetGameID(inputName)
 				opponent := ""
 
@@ -378,8 +386,8 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 				}
 
 				p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
-					BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
-					Games: all, GameID: gameID, Opponent: opponent, Days: days}
+					Correspondence: correspondenceN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
+					CorrespondenceRD: correspondenceR, Games: all, GameID: gameID, Opponent: opponent, Days: days}
 
 				if err := playerProfile.Execute(w, &p); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)

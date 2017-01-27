@@ -32,7 +32,9 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	lookupName := template.HTMLEscapeString(r.FormValue("user"))
 
 	//getting player rating
-	ratingError, bulletRating, blitzRating, standardRating := GetRating(lookupName)
+	ratingError, bulletRating, blitzRating, standardRating,
+		_ := GetRating(lookupName)
+
 	if ratingError != "" {
 		w.Write([]byte("Service is down."))
 		return
@@ -41,6 +43,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	bullet := fmt.Sprintf("%d", bulletRating)
 	blitz := fmt.Sprintf("%d", blitzRating)
 	standard := fmt.Sprintf("%d", standardRating)
+	//correspondence := fmt.Sprintf("%d", correspondenceRating)
 
 	//checking if the player is a game
 	status := ""

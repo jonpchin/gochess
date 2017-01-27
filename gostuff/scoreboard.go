@@ -12,10 +12,11 @@ const (
 )
 
 type ScoreBoard struct {
-	Bullet   [total]TopRating
-	Blitz    [total]TopRating
-	Standard [total]TopRating
-	Recent   [total]RecentPlayer //ten most recently registered players
+	Bullet         [total]TopRating
+	Blitz          [total]TopRating
+	Standard       [total]TopRating
+	Correspondence [total]TopRating
+	Recent         [total]RecentPlayer //ten most recently registered players
 }
 
 //used for bullet, blitz and standard

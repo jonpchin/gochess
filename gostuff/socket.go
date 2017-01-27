@@ -28,7 +28,7 @@ type SeekMatch struct {
 	Name        string
 	Opponent    string
 	Rating      int16  //player own rating
-	GameType    string //bullet, blitz, standard
+	GameType    string //bullet, blitz, standard, correspondence
 	MatchID     int
 	TimeControl int
 	MinRating   int16

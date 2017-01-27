@@ -312,13 +312,19 @@ func undoMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, pi
 	}
 }
 
-//checks if the time choices are valid
-func checkTime(choice int) bool {
-	timeChoices := []int{1, 2, 3, 4, 5, 10, 15, 20, 30, 45}
+// checks if the time choices are valid
+// gameType can be used to check correspondence times in minutes
+func checkTime(choice int, gametype string) bool {
 
-	var v int
+	var timeChoices []int
 
-	for _, v = range timeChoices {
+	if gametype == "correspondence" {
+		timeChoices = []int{1440, 2880, 4320, 5760}
+	} else {
+		timeChoices = []int{1, 2, 3, 4, 5, 10, 15, 20, 30, 45}
+	}
+
+	for _, v := range timeChoices {
 		if choice == v {
 			return true
 		}
