@@ -512,13 +512,13 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//verify.go
-				if checkTime(match.TimeControl) == false {
+				if checkTime(match.TimeControl, match.GameType) == false {
 					fmt.Println("An invalid time control has been selected.")
 					break
 				}
 
 				//fetching rating from back end
-				errMessage, bullet, blitz, standard := GetRating(match.Name)
+				errMessage, bullet, blitz, standard, correspondence := GetRating(match.Name)
 				if errMessage != "" {
 					log.Println("Cannot get rating in rematch")
 					break
@@ -542,9 +542,21 @@ func (c *Connection) ChessConnect() {
 				case 10:
 					match.Rating = blitz
 					match.GameType = "blitz"
-				default: //for 15, 20, 30 or 45 minute game defaults to standard
+				case 15:
 					match.Rating = standard
 					match.GameType = "standard"
+				case 20:
+					match.Rating = standard
+					match.GameType = "standard"
+				case 30:
+					match.Rating = standard
+					match.GameType = "standard"
+				case 45:
+					match.Rating = standard
+					match.GameType = "standard"
+				default: //for 1440, 2880, 4320 or 5760 minute game defaults to standard
+					match.Rating = correspondence
+					match.GameType = "correspondence"
 				}
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
@@ -595,7 +607,7 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//checking to make sure both player's rating is in range, used as a backend rating check
-				errMessage, bullet, blitz, standard := GetRating(match.Name)
+				errMessage, bullet, blitz, standard, correspondence := GetRating(match.Name)
 				if errMessage != "" {
 					log.Println("Cannot get rating")
 					break
@@ -618,8 +630,10 @@ func (c *Connection) ChessConnect() {
 					} else if game.GameType == "blitz" {
 						game.WhiteRating = blitz
 
-					} else {
+					} else if game.GameType == "standard" {
 						game.WhiteRating = standard
+					} else {
+						game.WhiteRating = correspondence
 					}
 
 					game.BlackRating = Pending.Matches[match.MatchID].Rating
@@ -679,8 +693,8 @@ func (c *Connection) ChessConnect() {
 
 				//starting game for both players, this does NOT include spectators
 				for _, name := range Verify.AllTables[game.ID].observe.Names {
-					if _, ok := Active.Clients[name]; ok {
-						if err := websocket.JSON.Send(Active.Clients[name], &game); err != nil {
+					if client, ok := Active.Clients[name]; ok {
+						if err := websocket.JSON.Send(client, &game); err != nil {
 							log.Println(err)
 						}
 					}
@@ -728,14 +742,14 @@ func (c *Connection) ChessConnect() {
 				chessgame.Result = 2
 
 				//rate.go
-				if All.Games[game.ID].Rated == "Yes" {
+				if chessgame.Rated == "Yes" {
 					ComputeRating(t.Name, game.ID, chessgame.GameType, 0.5)
 				}
 
 				//closing web socket on front end for self and opponent
 				for _, name := range table.observe.Names {
-					if _, ok := Active.Clients[name]; ok {
-						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+					if client, ok := Active.Clients[name]; ok {
+						if err := websocket.Message.Send(client, reply); err != nil {
 							log.Println(err)
 						}
 					}

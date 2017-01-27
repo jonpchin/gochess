@@ -139,13 +139,13 @@ func (c *Connection) LobbyConnect() {
 				}
 
 				//verify.go
-				if checkTime(match.TimeControl) == false {
+				if checkTime(match.TimeControl, match.GameType) == false {
 					fmt.Println("An invalid time control has been selected.")
 					break
 				}
 
 				//fetching rating from back end
-				errRate, bullet, blitz, standard := GetRating(match.Name)
+				errRate, bullet, blitz, standard, correspondence := GetRating(match.Name)
 				if errRate != "" {
 					fmt.Println("Cannot get rating lobby.go match_seek")
 					break
@@ -169,9 +169,21 @@ func (c *Connection) LobbyConnect() {
 				case 10:
 					match.Rating = blitz
 					match.GameType = "blitz"
-				default: //for 15, 20, 30 or 45 minute game defaults to standard
+				case 15:
 					match.Rating = standard
 					match.GameType = "standard"
+				case 20:
+					match.Rating = standard
+					match.GameType = "standard"
+				case 30:
+					match.Rating = standard
+					match.GameType = "standard"
+				case 45:
+					match.Rating = standard
+					match.GameType = "standard"
+				default: //for 1440, 2880, 4320 or 5760 minute game defaults to standard
+					match.Rating = correspondence
+					match.GameType = "correspondence"
 				}
 
 				// if a seek matches an existing one do not post another seek
@@ -302,13 +314,13 @@ func (c *Connection) LobbyConnect() {
 				}
 
 				//verify.go
-				if checkTime(match.TimeControl) == false {
+				if checkTime(match.TimeControl, match.GameType) == false {
 					fmt.Println("An invalid time control has been selected.")
 					break
 				}
 
 				//fetching rating from back end
-				errMessage, bullet, blitz, standard := GetRating(match.Name)
+				errMessage, bullet, blitz, standard, correspondence := GetRating(match.Name)
 				if errMessage != "" {
 					fmt.Println("Cannot get rating lobby.go private_match")
 					break
@@ -332,9 +344,21 @@ func (c *Connection) LobbyConnect() {
 				case 10:
 					match.Rating = blitz
 					match.GameType = "blitz"
-				default: //for 15, 20, 30 or 45 minute game defaults to standard
+				case 15:
 					match.Rating = standard
 					match.GameType = "standard"
+				case 20:
+					match.Rating = standard
+					match.GameType = "standard"
+				case 30:
+					match.Rating = standard
+					match.GameType = "standard"
+				case 45:
+					match.Rating = standard
+					match.GameType = "standard"
+				default: //for 1440, 2880, 4320 or 5760 minute game defaults to standard
+					match.Rating = correspondence
+					match.GameType = "correspondence"
 				}
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
@@ -392,7 +416,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	var game ChessGame
 
 	//checking to make sure player's rating is in range, used as a backend rating check
-	errMessage, bullet, blitz, standard := GetRating(seekerName)
+	errMessage, bullet, blitz, standard, correspondence := GetRating(seekerName)
 	if errMessage != "" {
 		fmt.Println("Cannot get rating connection.go accept_match")
 		return true
@@ -409,6 +433,10 @@ func startPendingMatch(seekerName string, matchID int) bool {
 			return true
 		} else if match.GameType == "standard" && (standard < match.MinRating || standard > match.MaxRating) {
 			//fmt.Println("Standard Rating not in range.")
+			return true
+		} else if match.GameType == "correspondence" && (correspondence < match.MinRating ||
+			correspondence > match.MaxRating) {
+			//fmt.Println("Correspondence Rating not in range.")
 			return true
 		}
 	}

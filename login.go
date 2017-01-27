@@ -22,10 +22,11 @@ var SessionManager = make(map[string]string)
 
 //stores rating inforation about user in memory
 type Person struct {
-	User     string
-	Bullet   int16
-	Blitz    int16
-	Standard int16
+	User           string
+	Bullet         int16
+	Blitz          int16
+	Standard       int16
+	Correspondence int16
 }
 
 //process user input when signing in

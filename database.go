@@ -17,18 +17,20 @@ import (
 
 //stores information about players games extracted from database when player clicks there profile
 type ProfileGames struct {
-	User       string
-	SessionID  string
-	Bullet     float64
-	Blitz      float64
-	Standard   float64
-	BulletRD   float64
-	BlitzRD    float64
-	StandardRD float64
-	Games      []GoGame
-	GameID     int
-	Opponent   string
-	Days       string
+	User             string
+	SessionID        string
+	Bullet           float64
+	Blitz            float64
+	Standard         float64
+	Correspondence   float64
+	BulletRD         float64
+	BlitzRD          float64
+	StandardRD       float64
+	CorrespondenceRD float64
+	Games            []GoGame
+	GameID           int
+	Opponent         string
+	Days             string
 }
 
 //an individual game
@@ -213,7 +215,7 @@ func ReadFile(path string) (string, string) {
 }
 
 //fetches players bullet, blitz and standard rating
-func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
+func GetRating(name string) (errMessage string, bullet, blitz, standard int16, correspondence int16) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -222,23 +224,23 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16) {
 	//check if database connection is open
 	if db.Ping() != nil {
 		log.Println("DATABASE DOWN!")
-		return "Database down", 0, 0, 0
+		return "Database down", 0, 0, 0, 0
 	}
 
 	//looking up players rating
-	err2 := db.QueryRow("SELECT bullet, blitz, standard FROM rating WHERE username=?",
-		name).Scan(&bullet, &blitz, &standard)
+	err2 := db.QueryRow("SELECT bullet, blitz, standard, correspondence FROM rating WHERE username=?",
+		name).Scan(&bullet, &blitz, &standard, &correspondence)
 
 	if err2 != nil {
 		log.Println(err2)
-		return "No such player", 0, 0, 0
+		return "No such player", 0, 0, 0, 0
 	}
-	return "", bullet, blitz, standard
+	return "", bullet, blitz, standard, correspondence
 }
 
 //fetches players bullet, blitz and standard rating and RD
-func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulletRD,
-	blitzRD, standardRD float64) {
+func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, correspondence, bulletRD,
+	blitzRD, standardRD float64, correspondeceRD float64) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -247,7 +249,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 	//check if database connection is open
 	if db.Ping() != nil {
 		log.Println("DATABASE DOWN!")
-		return "DB down @GetRatingAndRD()", 0, 0, 0, 0, 0, 0
+		return "DB down @GetRatingAndRD()", 0, 0, 0, 0, 0, 0, 0, 0
 	}
 
 	//looking up players rating
@@ -257,9 +259,9 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, bulle
 
 	if err2 != nil {
 		log.Println(err2)
-		return "No such player", 0, 0, 0, 0, 0, 0
+		return "No such player", 0, 0, 0, 0, 0, 0, 0, 0
 	}
-	return "", bullet, blitz, standard, bulletRD, blitzRD, standardRD
+	return "", bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondeceRD
 }
 
 //updates both players chess rating
