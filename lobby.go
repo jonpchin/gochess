@@ -181,7 +181,7 @@ func (c *Connection) LobbyConnect() {
 				case 45:
 					match.Rating = standard
 					match.GameType = "standard"
-				default: //for 1440, 2880, 4320 or 5760 minute game defaults to standard
+				default: //for 1440, 2880, 4320 or 5760 minute game defaults to correspondence
 					match.Rating = correspondence
 					match.GameType = "correspondence"
 				}
