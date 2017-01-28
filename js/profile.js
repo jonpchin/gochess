@@ -64,6 +64,19 @@ function getStandardHistory(lookupName){
    		}	
     });
 }
+
+function getCorrespondenceHistory(lookupName){
+	return $.ajax({
+  		url: 'fetchCorrespondenceHistory',
+   		type: 'post',
+   		dataType: 'html',
+		data : {'user': lookupName},
+   		success : function(data) {			
+			//console.log(data);		
+   		}	
+    });
+}
+
 function setupRatingChart(){
 	
 	var url = parseUrl();
@@ -76,12 +89,14 @@ function setupRatingChart(){
 	}
 
 	// the code here will be executed when all three ajax requests resolve.
-	// bullet blitz, standard are lists of length 3 containing the response text,
+	// bullet blitz, standard, correspondence are lists of length 3 containing the response text,
 	// status, and jqXHR object for each of the three ajax calls respectively.
-	$.when(getBulletHistory(name), getBlitzHistory(name), getStandardHistory(name)).done(function(bullet, blitz, standard){
+	$.when(getBulletHistory(name), getBlitzHistory(name), getStandardHistory(name), 
+		fetchCorrespondenceHistory(name)).done(function(bullet, blitz, standard, correspondence){
 		
 		var ratingHistory = [];
 		var showChart = false;
+
 		if (bullet[0] !== ""){
 			showChart = true;
 			var bulletHistory = JSON.parse(bullet[0]);	
@@ -97,7 +112,8 @@ function setupRatingChart(){
 				var second = dateString.substring(12, 14);
 				
 				// 00 is Jan, 01 is Feb, 02 is March so month needs to be subtracted by 1 for zero indexing
-				oneGame.push(new Date(year, month-1, day, hour, minute, second), bulletHistory[i].Rating, null, null);
+				oneGame.push(new Date(year, month-1, day, hour, minute, second), 
+					bulletHistory[i].Rating, null, null, null);
 				ratingHistory.push(oneGame);
 			}
 		}
@@ -118,10 +134,12 @@ function setupRatingChart(){
 				var minute = dateString.substring(10, 12);
 				var second = dateString.substring(12, 14);
 
-				oneGame.push(new Date(year, month-1, day, hour, minute, second), null, blitzHistory[i].Rating, null);
+				oneGame.push(new Date(year, month-1, day, hour, minute, second), null,
+					blitzHistory[i].Rating, null, null);
 				ratingHistory.push(oneGame);
 			}
 		}
+
 		if(standard[0] !== ""){
 			showChart = true;
 			var standardHistory = JSON.parse(standard[0]);
@@ -135,10 +153,31 @@ function setupRatingChart(){
 				var hour = dateString.substring(8, 10);
 				var minute = dateString.substring(10, 12);
 				var second = dateString.substring(12, 14);
-				oneGame.push(new Date(year, month-1, day, hour, minute, second),null, null, standardHistory[i].Rating);
+				oneGame.push(new Date(year, month-1, day, hour, minute, second),null, 
+					null, standardHistory[i].Rating, null);
 				ratingHistory.push(oneGame);
 			}
 		}
+
+		if(correspondence[0] !== ""){
+			showChart = true;
+			var correspondenceHistory = JSON.parse(standard[0]);
+
+			for(var i=0; i<correspondenceHistory.length; ++i){
+				var oneGame = [];
+				var dateString = correspondenceHistory[i].DateTime;
+				var year = dateString.substring(0, 4);
+				var month = dateString.substring(4, 6);
+				var day = dateString.substring(6, 8);
+				var hour = dateString.substring(8, 10);
+				var minute = dateString.substring(10, 12);
+				var second = dateString.substring(12, 14);
+				oneGame.push(new Date(year, month-1, day, hour, minute, second),null, null,
+					null, correspondenceHistory[i].Rating);
+				ratingHistory.push(oneGame);
+			}
+		}
+
 		if(showChart){
 			
 			google.charts.load('current', {'packages':['line']});
@@ -152,6 +191,7 @@ function setupRatingChart(){
 				data.addColumn('number', 'Bullet');
 				data.addColumn('number', 'Blitz');
 				data.addColumn('number', 'Standard');
+				data.addColumn('number', 'Correspondence');
 
 				data.addRows(ratingHistory);
 

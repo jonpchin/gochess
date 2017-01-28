@@ -282,7 +282,7 @@ func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// fetches players rating blitz history from database
+// fetches players blitz history rating from database
 func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 	valid := validateCredentials(w, r)
 	if valid == false {
@@ -297,7 +297,7 @@ func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// fetches players rating blitz history from database
+// fetches players standard rating history from database
 func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 	valid := validateCredentials(w, r)
 	if valid == false {
@@ -307,6 +307,21 @@ func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 	standard, isHistory := getRatingHistory(user, "standard")
 	if isHistory {
 		w.Write([]byte(standard))
+	} else {
+		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+	}
+}
+
+// fetches players rating blitz history from database
+func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
+	valid := validateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	user := template.HTMLEscapeString(r.FormValue("user"))
+	correspondence, isHistory := getRatingHistory(user, "correspondence")
+	if isHistory {
+		w.Write([]byte(correspondence))
 	} else {
 		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
 	}
