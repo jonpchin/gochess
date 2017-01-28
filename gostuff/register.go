@@ -128,8 +128,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			}(email, token, username, r.Host)
 
 			//setting up player's rating
-			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?,
-				correspondence=?, bulletRD=?, blitzRD=?, standardRD=?, correspondenceRD=?")
+			stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, correspondence=?, bulletRD=?, blitzRD=?, standardRD=?, correspondenceRD=?")
 			if err != nil {
 				w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 34"))
 				log.Println(err)
