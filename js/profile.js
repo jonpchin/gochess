@@ -92,7 +92,7 @@ function setupRatingChart(){
 	// bullet blitz, standard, correspondence are lists of length 3 containing the response text,
 	// status, and jqXHR object for each of the three ajax calls respectively.
 	$.when(getBulletHistory(name), getBlitzHistory(name), getStandardHistory(name), 
-		fetchCorrespondenceHistory(name)).done(function(bullet, blitz, standard, correspondence){
+		getCorrespondenceHistory(name)).done(function(bullet, blitz, standard, correspondence){
 		
 		var ratingHistory = [];
 		var showChart = false;

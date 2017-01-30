@@ -512,7 +512,7 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//verify.go
-				if checkTime(match.TimeControl, match.GameType) == false {
+				if checkTime(match.TimeControl) == false {
 					fmt.Println("An invalid time control has been selected.")
 					break
 				}

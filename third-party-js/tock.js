@@ -244,7 +244,7 @@ if ( typeof Function.prototype.bind != 'function' ) {
 
 	var seconds = Math.floor((ms / MS_PER_SEC) % 60).toString(),
 		minutes = Math.floor((ms / (MS_PER_MIN)) % 60).toString(),
-		MS_PER_HOURs = Math.floor((ms / (MS_PER_HOUR)) % 60).toString();
+		MS_PER_HOURs = Math.floor((ms / (MS_PER_HOUR))).toString();
 
 	if ( seconds.length === 1 ) {
 	  seconds = '0' + seconds;

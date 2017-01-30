@@ -42,7 +42,7 @@ button:disabled {
   color: white;
 }
 
-table.table2, table.database {
+table.table2 {
 	width: 42%;
     height: 37%;
 	overflow:auto;

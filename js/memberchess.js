@@ -12,7 +12,7 @@ var whiteClock = new Tock({
 	countdown: true,
 	interval: 1000,
 	callback: function () {
-        if(user === WhiteSide){
+		if(user === WhiteSide){
 	        $('#bottomtime').val(whiteClock.msToTimecode(whiteClock.lap()));	
 	    }
 		else{
@@ -370,14 +370,21 @@ window.onload = function() {
 				if(totalFEN.length <= 2){
 					document.getElementById("abortButton").disabled = false; 
 				}
-				
+
+				var hours = "00";
+				if(json.WhiteMinutes > 59){
+					// black and white should always have equal clock time
+					hours = Math.floor(json.WhiteMinutes / 60);
+					json.WhiteMinutes = json.WhiteMinutes % 60;
+					json.BlackMinutes = json.BlackMinutes % 60;
+				}
 				//formating time for clock 
 				json.WhiteMinutes = json.WhiteMinutes < 10 ? "0" + json.WhiteMinutes : json.WhiteMinutes;
 				json.WhiteSeconds = json.WhiteSeconds < 10 ? "0" + json.WhiteSeconds : json.WhiteSeconds;
-	            
+
 				json.BlackMinutes = json.BlackMinutes < 10 ? "0" + json.BlackMinutes : json.BlackMinutes;
 				json.BlackSeconds = json.BlackSeconds < 10 ? "0" + json.BlackSeconds : json.BlackSeconds;
-				
+
 				if(typeof token.spectate !== "undefined"){
 					user = json.WhitePlayer; // default to showing white for spectator		
 				}else{
@@ -413,16 +420,16 @@ window.onload = function() {
 				
 				if(json.Status === "White"){
 					if(user === json.WhitePlayer){
-						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+						document.getElementById("bottomtime").value = hours + ":" + json.WhiteMinutes + ":" + json.WhiteSeconds;
 						whiteClock.start($('#bottomtime').val());
-					    document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds;
+					    document.getElementById("toptime").value = hours + ":" + json.BlackMinutes + ":" + json.BlackSeconds;
 						blackClock.start($('#toptime').val());
 						blackClock.pause();
 					}
 					else{
-						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+						document.getElementById("toptime").value = hours + ":" + json.WhiteMinutes + ":" + json.WhiteSeconds;
 						whiteClock.start($('#toptime').val());
-						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
+						document.getElementById("bottomtime").value = hours + ":" + json.BlackMinutes + ":" + json.BlackSeconds;
 						blackClock.start($('#bottomtime').val());
 						blackClock.pause();
 					}		
@@ -430,16 +437,16 @@ window.onload = function() {
 				//else if (json.Status === "Black)
 				else {
 					if(user === json.WhitePlayer){
-						document.getElementById("toptime").value = json.BlackMinutes + ":" + json.BlackSeconds;
+						document.getElementById("toptime").value = hours + ":" + json.BlackMinutes + ":" + json.BlackSeconds;
 						blackClock.start($('#toptime').val());
-						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+						document.getElementById("bottomtime").value = hours + ":" + json.WhiteMinutes + ":" + json.WhiteSeconds;
 						whiteClock.start($('#bottomtime').val());
 						whiteClock.pause();
 					}
 					else{
-						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
+						document.getElementById("bottomtime").value = hours + ":" + json.BlackMinutes + ":" + json.BlackSeconds;
 						blackClock.start($('#bottomtime').val());
-						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
+						document.getElementById("toptime").value = hours + ":" + json.WhiteMinutes + ":" + json.WhiteSeconds;
 						whiteClock.start($('#toptime').val());
 						whiteClock.pause();
 					}				

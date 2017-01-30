@@ -80,26 +80,33 @@ window.onload = function() {
 			}
 		}
 		else if(json.Type === "match_seek" || json.Type === "fetch_matches"){
+			
+			var gameTypeUnits = " minutes";
+
+			if(json.GameType === "correspondence"){
+				gameTypeUnits = " day(s)";
+				// 1440 is number of minutes in a day;
+				json.TimeControl = json.TimeControl / 1440;
+			}
+
 			if(json.Name === user){
-				
 				if(json.Opponent !== ""){ //then its a private match
 					$('#seekmatch').html(function() {
-					
 						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +
 							json.MatchID + ' class=NameID' + json.Opponent + '><td>' + json.Name +  '</td><td>' + 
 							json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
-							json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+							json.TimeControl + gameTypeUnits + '</td><td>' + "Private-Match" + '</td></tr>';
 					});
 					if(toggleSound !== "false"){
 						challenge.play();//plays sound to notify player they got a private match sent to them
 					}
 				}
 				else{
-					$('#seekmatch').html(function() {
+					$('#seekmatch').html(function() {	
 						return  $(this).html() + '<tr onclick="cancelMatch('+ json.MatchID + ');" id=MatchID' +
 							json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' +
 							json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' +
-							json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + 
+							json.TimeControl + gameTypeUnits + '</td><td>' + json.MinRating + "-" + json.MaxRating + 
 							'</td></tr>';
 					});
 				}
@@ -124,7 +131,7 @@ window.onload = function() {
 	   					return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +
 						   json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Opponent +  '</td><td>' + 
 						   json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
-						   json.TimeControl + " Minutes" + '</td><td>' + "Private-Match" + '</td></tr>';
+						   json.TimeControl + gameTypeUnits + '</td><td>' + "Private-Match" + '</td></tr>';
 					});	
 				}
 				else{
@@ -132,7 +139,7 @@ window.onload = function() {
    						return  $(this).html() + '<tr onclick="acceptMatch('+ json.MatchID + ');" id=MatchID' +
 						   json.MatchID + ' class=NameID' + json.Name + '><td>' + json.Name +  '</td><td>' + 
 						   json.Rating + '</td><td>' + json.Rated + '</td><td>' + json.GameType + '</td><td>' + 
-						   json.TimeControl + " Minutes" + '</td><td>' + json.MinRating + "-" + json.MaxRating + 
+						   json.TimeControl + gameTypeUnits + '</td><td>' + json.MinRating + "-" + json.MaxRating + 
 						   '</td></tr>';
 					});
 				}
