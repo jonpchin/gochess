@@ -240,7 +240,7 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16, c
 
 //fetches players bullet, blitz and standard rating and RD
 func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, correspondence, bulletRD,
-	blitzRD, standardRD float64, correspondeceRD float64) {
+	blitzRD, standardRD float64, correspondenceRD float64) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
@@ -253,15 +253,16 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, corre
 	}
 
 	//looking up players rating
-	err2 := db.QueryRow("SELECT bullet, blitz, standard, bulletRD, blitzRD, standardRD "+
-		"FROM rating WHERE username=?", name).Scan(&bullet, &blitz, &standard,
-		&bulletRD, &blitzRD, &standardRD)
+	err2 := db.QueryRow("SELECT bullet, blitz, standard, correspondence, bulletRD,"+
+		" blitzRD, standardRD, correspondenceRD FROM rating WHERE username=?",
+		name).Scan(&bullet, &blitz, &standard, &correspondence,
+		&bulletRD, &blitzRD, &standardRD, &correspondenceRD)
 
 	if err2 != nil {
 		log.Println(err2)
 		return "No such player", 0, 0, 0, 0, 0, 0, 0, 0
 	}
-	return "", bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondeceRD
+	return "", bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondenceRD
 }
 
 //updates both players chess rating
