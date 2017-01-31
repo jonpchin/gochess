@@ -476,7 +476,7 @@ func engine(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var engine = template.Must(template.ParseFiles("cinnamon.html"))
+				var engine = template.Must(template.ParseFiles("engine.html"))
 				p := gostuff.Person{User: username.Value}
 
 				if err := engine.Execute(w, &p); err != nil {

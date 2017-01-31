@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"> 
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go Play Chess - Cinnamon Engine</title>
+<title>Go Play Chess - Chess Engine</title>
 <link href="../css/design.css" rel="stylesheet"/>
 <link rel='shortcut icon' href='../img/favicon.ico' type='image/x-icon'/>
 </head>
@@ -22,8 +22,10 @@
 <script src="../third-party-js/chess.js"></script>
 
 <div id="chatleft">
-<textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea>
-<p><input id="thinkTime" type="text" maxlength="68" size="10" value="1000"><button id="setThinkTime">Set Think Time(Milliseconds)</button></p>
+<textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea><br>
+<input type="radio" id="cinnamonRadioButton" name="engineSwitch" value="cinnamon" onclick="startCinnamon()"> Cinnamon
+<input type="radio" id="stockfishRadioButton" name="engineSwitch" value="stockfish" onclick="startStockFish()" checked> Stockfish
+<p>Think Time(Milliseconds): <input id="thinkTime" type="text" maxlength="68" size="10" value="1000"></p>
 </div>
 <span id="playernames"><div id="topPlay"><span id="top">Black:</span> <input id="toptime" size="14"  value="10:00" readonly="true"> </div> <div id="bottomPlay">
 <span id="bottom">White:</span> <input id="bottomtime" size="14" value="10:00" readonly="true">  </div>
@@ -56,6 +58,6 @@
 <script src="../third-party-js/chessboard.js"></script>
 <script src="../third-party-js/download.js"></script>
 <script src="../third-party-js/cinnamon_engine.js"></script>
-<script src="../js/cinnamon.js"></script>
+<script src="../js/engine.js"></script>
 </body>
 </html>
