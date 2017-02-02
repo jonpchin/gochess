@@ -48,6 +48,8 @@ var updateStatus = function(engineType) {
 
 	if (game.turn() === computer && engineType === "cinnamon") {
 		engineGo()
+	}else{ // then send move to stockfish
+
 	}
 	var status = '';
 
@@ -320,8 +322,7 @@ function startStockFish(){
 			to: target,
 			promotion: 'q' // NOTE: always promote to a queen for example simplicity
 		});
-		console.log("result is:");
-		console.log(move);
+
 		// illegal move
 		if (move === null){
 			return 'snapback';
@@ -344,8 +345,6 @@ function startStockFish(){
 		pieceTheme: '../img/chesspieces/'+ pieceTheme +'/{piece}.png'
 	};
 	board = new ChessBoard('board', cfg);
-
-	
 
 	//always push the default starting position
 	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");

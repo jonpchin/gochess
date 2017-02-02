@@ -229,294 +229,211 @@ func resetpass(w http.ResponseWriter, r *http.Request) {
 }
 
 func lobby(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
 
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var lobby = template.Must(template.ParseFiles("lobby.html"))
+		var bulletRating, blitzRating, standardRating, correspondenceRating int16
+		var errMessage string
+		username, _ := r.Cookie("username")
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
+		errMessage, bulletRating, blitzRating, standardRating,
+			correspondenceRating = gostuff.GetRating(username.Value)
 
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var lobby = template.Must(template.ParseFiles("lobby.html"))
-				var bulletRating, blitzRating, standardRating, correspondenceRating int16
-				var errMessage string
+		if errMessage != "" {
+			fmt.Println("Problem fetching rating lobby main.go")
+		}
 
-				errMessage, bulletRating, blitzRating, standardRating,
-					correspondenceRating = gostuff.GetRating(username.Value)
+		p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating,
+			Standard: standardRating, Correspondence: correspondenceRating}
 
-				if errMessage != "" {
-					fmt.Println("Problem fetching rating lobby main.go")
-				}
-				p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating,
-					Standard: standardRating, Correspondence: correspondenceRating}
-
-				if err := lobby.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		if err := lobby.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func memberChess(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
 
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var memberChess = template.Must(template.ParseFiles("memberchess.html"))
+		username, _ := r.Cookie("username")
+		p := gostuff.Person{User: username.Value}
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var memberChess = template.Must(template.ParseFiles("memberchess.html"))
-				p := gostuff.Person{User: username.Value}
-
-				if err := memberChess.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		if err := memberChess.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func memberHome(w http.ResponseWriter, r *http.Request) {
 
-	username, err := r.Cookie("username")
-	if err == nil {
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "private, max-age=432000")
+		var memberHome = template.Must(template.ParseFiles("memberHome.html"))
+		username, _ := r.Cookie("username")
+		p := gostuff.Person{User: username.Value}
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				w.Header().Set("Cache-Control", "private, max-age=432000")
-				var memberHome = template.Must(template.ParseFiles("memberHome.html"))
-				p := gostuff.Person{User: username.Value}
-
-				if err := memberHome.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		if err := memberHome.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func database(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				w.Header().Set("Cache-Control", "private, max-age=432000")
-				var memberHome = template.Must(template.ParseFiles("database.html"))
-				p := gostuff.Person{User: username.Value}
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "private, max-age=432000")
+		var memberHome = template.Must(template.ParseFiles("database.html"))
+		username, _ := r.Cookie("username")
 
-				if err := memberHome.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		p := gostuff.Person{User: username.Value}
+
+		if err := memberHome.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func playerProfile(w http.ResponseWriter, r *http.Request) {
 
-	username, err := r.Cookie("username")
-	if err == nil {
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var all []gostuff.GoGame
+		var ratErr string
+		var bulletRating, blitzRating, standardRating, correspondenceRating,
+			bulletRD, blitzRD, standardRD, correspondenceRD float64
 
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
+		name := r.URL.Query().Get("name")
+		username, _ := r.Cookie("username")
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var all []gostuff.GoGame
-				var ratErr string
-				var bulletRating, blitzRating, standardRating, correspondenceRating,
-					bulletRD, blitzRD, standardRD, correspondenceRD float64
-
-				name := r.URL.Query().Get("name")
-				var inputName string                 //used to pass to template to specify what profile name is being viewed
-				if r.URL.Query().Get("name") == "" { //then look at own profile
-					_, bulletRating, blitzRating, standardRating, correspondenceRating,
-						bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(username.Value)
-					all = gostuff.GetGames(username.Value)
-					inputName = username.Value
-				} else { //otherwise look at specified player's profile
-					ratErr, bulletRating, blitzRating, standardRating, correspondenceRating,
-						bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(name)
-					if ratErr != "" { //this means someone typed a profile url which no player exists in database
-						http.ServeFile(w, r, "nouser.html")
-						return
-					}
-					all = gostuff.GetGames(name)
-					inputName = name
-				}
-
-				var playerProfile = template.Must(template.ParseFiles("profile.html"))
-
-				//rounding floats
-				bulletN := gostuff.Round(bulletRating)
-				blitzN := gostuff.Round(blitzRating)
-				standardN := gostuff.Round(standardRating)
-				correspondenceN := gostuff.Round(correspondenceRating)
-				bulletR := gostuff.RoundPlus(bulletRD, 2)
-				blitzR := gostuff.RoundPlus(blitzRD, 2)
-				standardR := gostuff.RoundPlus(standardRD, 2)
-				correspondenceR := gostuff.RoundPlus(correspondenceRD, 2)
-				gameID, exist := gostuff.GetGameID(inputName)
-				opponent := ""
-
-				// if a player is not playing a game use -1 for the gameID
-				if exist == false {
-					gameID = -1
-				} else {
-					opponent = gostuff.PrivateChat[inputName]
-				}
-
-				p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
-					Correspondence: correspondenceN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
-					CorrespondenceRD: correspondenceR, Games: all, GameID: gameID, Opponent: opponent, Days: days}
-
-				if err := playerProfile.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
+		var inputName string                 //used to pass to template to specify what profile name is being viewed
+		if r.URL.Query().Get("name") == "" { //then look at own profile
+			_, bulletRating, blitzRating, standardRating, correspondenceRating,
+				bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(username.Value)
+			all = gostuff.GetGames(username.Value)
+			inputName = username.Value
+		} else { //otherwise look at specified player's profile
+			ratErr, bulletRating, blitzRating, standardRating, correspondenceRating,
+				bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(name)
+			if ratErr != "" { //this means someone typed a profile url which no player exists in database
+				http.ServeFile(w, r, "nouser.html")
 				return
 			}
+			all = gostuff.GetGames(name)
+			inputName = name
 		}
+
+		var playerProfile = template.Must(template.ParseFiles("profile.html"))
+
+		//rounding floats
+		bulletN := gostuff.Round(bulletRating)
+		blitzN := gostuff.Round(blitzRating)
+		standardN := gostuff.Round(standardRating)
+		correspondenceN := gostuff.Round(correspondenceRating)
+		bulletR := gostuff.RoundPlus(bulletRD, 2)
+		blitzR := gostuff.RoundPlus(blitzRD, 2)
+		standardR := gostuff.RoundPlus(standardRD, 2)
+		correspondenceR := gostuff.RoundPlus(correspondenceRD, 2)
+		gameID, exist := gostuff.GetGameID(inputName)
+		opponent := ""
+
+		// if a player is not playing a game use -1 for the gameID
+		if exist == false {
+			gameID = -1
+		} else {
+			opponent = gostuff.PrivateChat[inputName]
+		}
+
+		p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
+			Correspondence: correspondenceN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
+			CorrespondenceRD: correspondenceR, Games: all, GameID: gameID, Opponent: opponent, Days: days}
+
+		if err := playerProfile.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 //logs the user out by deleting the cookies and back end session and redirecting them to the homepage
 func logout(w http.ResponseWriter, r *http.Request) {
 
-	username, err := r.Cookie("username")
-	if err == nil && len(username.Value) >= 3 && len(username.Value) <= 12 {
-
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
-
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-
-				delete(gostuff.SessionManager, username.Value)
-				cookie := http.Cookie{Name: "username", Value: "0", MaxAge: -1}
-				http.SetCookie(w, &cookie)
-				cookie = http.Cookie{Name: "sessionID", Value: "0", MaxAge: -1}
-				http.SetCookie(w, &cookie)
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				http.ServeFile(w, r, "index.html")
-				return
-			}
-		}
+	if isAuthorized(w, r) {
+		username, _ := r.Cookie("username")
+		delete(gostuff.SessionManager, username.Value)
+		cookie := http.Cookie{Name: "username", Value: "0", MaxAge: -1}
+		http.SetCookie(w, &cookie)
+		cookie = http.Cookie{Name: "sessionID", Value: "0", MaxAge: -1}
+		http.SetCookie(w, &cookie)
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		http.ServeFile(w, r, "index.html")
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func settings(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				http.ServeFile(w, r, "settings.html")
-				return
-			}
-		}
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		http.ServeFile(w, r, "settings.html")
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func highscores(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var highscores = template.Must(template.ParseFiles("highscore.html"))
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var highscores = template.Must(template.ParseFiles("highscore.html"))
 
-				var p gostuff.ScoreBoard
-				p = gostuff.LeaderBoard.Scores
+		var p gostuff.ScoreBoard
+		p = gostuff.LeaderBoard.Scores
 
-				if err := highscores.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		if err := highscores.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func engine(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var engine = template.Must(template.ParseFiles("engine.html"))
-				p := gostuff.Person{User: username.Value}
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var engine = template.Must(template.ParseFiles("engine.html"))
 
-				if err := engine.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		username, _ := r.Cookie("username")
+		p := gostuff.Person{User: username.Value}
+
+		if err := engine.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		return
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func saved(w http.ResponseWriter, r *http.Request) {
-	username, err := r.Cookie("username")
-	if err == nil {
-		sessionID, err := r.Cookie("sessionID")
-		if err == nil {
 
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var all []gostuff.GoGame
 
-				w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-				var all []gostuff.GoGame
+		name := r.URL.Query().Get("user")
+		all = gostuff.GetSaved(name)
 
-				name := r.URL.Query().Get("user")
-				all = gostuff.GetSaved(name)
+		var saved = template.Must(template.ParseFiles("saved.html"))
 
-				var saved = template.Must(template.ParseFiles("saved.html"))
+		p := gostuff.ProfileGames{User: name, Games: all, Days: days}
 
-				p := gostuff.ProfileGames{User: name, Games: all, Days: days}
-
-				if err := saved.Execute(w, &p); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		if err := saved.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {
@@ -526,6 +443,28 @@ func robot(w http.ResponseWriter, r *http.Request) {
 func redir(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 }
+
+// returns false if a user credentials are invalid
+func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
+	username, err := r.Cookie("username")
+	if err == nil {
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+				return true
+			}
+		}
+	}
+	w.WriteHeader(404)
+	http.ServeFile(w, r, "404.html")
+	return false
+}
+
+// custom 404 error
+//func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+//	w.WriteHeader(404)
+//	http.ServeFile(w, r, "404.html")
+//}
 
 // used to cache static assets for specified seconds passed in function parameter
 func cacheControl(h http.Handler, seconds string) http.HandlerFunc {

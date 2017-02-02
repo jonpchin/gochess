@@ -53,64 +53,71 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 	var blackRating float64
 	var whiteRD float64
 	var blackRD float64
-	if gameType == "bullet" {
+	const (
+		bulletString         = "bullet"
+		blitzString          = "blitz"
+		standardString       = "standard"
+		correspondenceString = "correspondence"
+	)
+
+	if gameType == bulletString {
 
 		whiteRating, whiteRD = grabRating(bullet, bulletRD, oBullet, oBulletRD, result)
 		blackRating, blackRD = grabRating(oBullet, oBulletRD, bullet, bulletRD, 1.0-result)
 
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
-			updateRating("bullet", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, "bullet", whiteRating)
-			updateRatingHistory(PrivateChat[name], "bullet", blackRating)
+			updateRating(bulletString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, bulletString, whiteRating)
+			updateRatingHistory(PrivateChat[name], bulletString, blackRating)
 		} else {
-			updateRating("bullet", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], "bullet", whiteRating)
-			updateRatingHistory(name, "bullet", blackRating)
+			updateRating(bulletString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], bulletString, whiteRating)
+			updateRatingHistory(name, bulletString, blackRating)
 		}
 
-	} else if gameType == "blitz" {
+	} else if gameType == blitzString {
 
 		whiteRating, whiteRD = grabRating(blitz, blitzRD, oBlitz, oBlitzRD, result)
 		blackRating, blackRD = grabRating(oBlitz, oBlitzRD, blitz, blitzRD, 1.0-result)
 
 		//updates both players rating
 		if All.Games[gameID].WhitePlayer == name {
-			updateRating("blitz", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, "blitz", whiteRating)
-			updateRatingHistory(PrivateChat[name], "blitz", blackRating)
+			updateRating(blitzString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, blitzString, whiteRating)
+			updateRatingHistory(PrivateChat[name], blitzString, blackRating)
 		} else {
-			updateRating("blitz", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], "blitz", whiteRating)
-			updateRatingHistory(name, "blitz", blackRating)
+			updateRating(blitzString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], blitzString, whiteRating)
+			updateRatingHistory(name, blitzString, blackRating)
 		}
 
-	} else if gameType == "standard" {
+	} else if gameType == standardString {
 
 		whiteRating, whiteRD = grabRating(standard, standardRD, oStandard, oStandardRD, result)
 		blackRating, blackRD = grabRating(oStandard, oStandardRD, standard, standardRD, 1.0-result)
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
-			updateRating("standard", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, "standard", whiteRating)
-			updateRatingHistory(PrivateChat[name], "standard", blackRating)
+			updateRating(standardString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, standardString, whiteRating)
+			updateRatingHistory(PrivateChat[name], standardString, blackRating)
 		} else {
-			updateRating("standard", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], "standard", whiteRating)
-			updateRatingHistory(name, "standard", blackRating)
+			updateRating(standardString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], standardString, whiteRating)
+			updateRatingHistory(name, standardString, blackRating)
 		}
-	} else if gameType == "correspondence" {
+	} else if gameType == correspondenceString {
 		whiteRating, whiteRD = grabRating(correspondence, correspondenceRD, oCorrespondence, oCorrespondenceRD, result)
 		blackRating, blackRD = grabRating(oCorrespondence, oCorrespondenceRD, correspondence, correspondenceRD, 1.0-result)
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
-			updateRating("standard", name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, "standard", whiteRating)
-			updateRatingHistory(PrivateChat[name], "standard", blackRating)
+			updateRating(correspondenceString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
+			updateRatingHistory(name, correspondenceString, whiteRating)
+			updateRatingHistory(PrivateChat[name], correspondenceString, blackRating)
 		} else {
-			updateRating("standard", PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], "standard", whiteRating)
-			updateRatingHistory(name, "standard", blackRating)
+			updateRating(correspondenceString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
+			updateRatingHistory(PrivateChat[name], correspondenceString, whiteRating)
+			updateRatingHistory(name, correspondenceString, blackRating)
 		}
 	} else {
 		fmt.Println("Not a valid game type rate.go 1")

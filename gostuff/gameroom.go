@@ -632,6 +632,7 @@ func (c *Connection) ChessConnect() {
 
 					} else if game.GameType == "standard" {
 						game.WhiteRating = standard
+
 					} else {
 						game.WhiteRating = correspondence
 					}
@@ -646,8 +647,12 @@ func (c *Connection) ChessConnect() {
 
 					} else if game.GameType == "blitz" {
 						game.BlackRating = blitz
-					} else {
+
+					} else if game.GameType == "standard" {
 						game.BlackRating = standard
+
+					} else {
+						game.BlackRating = correspondence
 					}
 
 					game.WhiteRating = Pending.Matches[match.MatchID].Rating

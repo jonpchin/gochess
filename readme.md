@@ -34,14 +34,14 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>16. Players can view on going chess games in real time as spectators</p>
 <p>17. Lobby and game room chat.</p>
 <p>18. Rating history timeline on player's profile using Google Charts.</p>
-<p>19. Players can play against cinnamon chess engine.</p>
+<p>19. Players can play against cinnamon chess engine and stockfish chess engine.</p>
+<p>20. Runs on Windows and Linux.</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Configure Twitter bot.</p>
-<p>2. Sound on when king is in put in check in a game.</p>
-<p>3. Chess TV where live games are randomly broadcasted.</p>
-<p>4. Support correspondence games</p>
-</p>5. Forums</p>
+<p>2. Chess TV where live games are randomly broadcasted.</p>
+<p>3. Support correspondence games</p>
+</p>4. Forums</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

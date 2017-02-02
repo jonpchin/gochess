@@ -161,7 +161,7 @@ function setupRatingChart(){
 
 		if(correspondence[0] !== ""){
 			showChart = true;
-			var correspondenceHistory = JSON.parse(standard[0]);
+			var correspondenceHistory = JSON.parse(correspondence[0]);
 
 			for(var i=0; i<correspondenceHistory.length; ++i){
 				var oneGame = [];
