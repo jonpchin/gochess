@@ -26,6 +26,10 @@ type neuteredReaddirFile struct {
 	http.File
 }
 
+type fullPath struct {
+	Url string
+}
+
 func main() {
 
 	http.HandleFunc("/", mainPage)
@@ -143,7 +147,13 @@ func main() {
 func mainPage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		w.WriteHeader(404)
-		http.ServeFile(w, r, "404.html")
+		var doesNotExist = template.Must(template.ParseFiles("404.html"))
+
+		p := fullPath{Url: r.Host}
+
+		if err := doesNotExist.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 	http.ServeFile(w, r, "index.html")
@@ -459,12 +469,6 @@ func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
 	http.ServeFile(w, r, "404.html")
 	return false
 }
-
-// custom 404 error
-//func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
-//	w.WriteHeader(404)
-//	http.ServeFile(w, r, "404.html")
-//}
 
 // used to cache static assets for specified seconds passed in function parameter
 func cacheControl(h http.Handler, seconds string) http.HandlerFunc {

@@ -35,7 +35,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>17. Lobby and game room chat.</p>
 <p>18. Rating history timeline on player's profile using Google Charts.</p>
 <p>19. Players can play against cinnamon chess engine and stockfish chess engine.</p>
-<p>20. Runs on Windows and Linux.</p>
+<p>20. Web server runs Windows and Linux.</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Configure Twitter bot.</p>
