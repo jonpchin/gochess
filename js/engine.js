@@ -42,7 +42,6 @@ var greySquare = function(square) {
 	if (squareEl.hasClass('black-3c85d') === true) {
 		background = '#696969';
 	}
-
 	squareEl.css('background', background);
 };
 
@@ -56,10 +55,8 @@ var updateStatus = function(moveString) {
 	if(document.getElementById("cinnamonRadioButton").checked === true){
 		cinnamonEngineGo()
 	}else{ // then send move to stockfish
-		console.log("move string is");
-		console.log(moveString);
 		stockfish.postMessage("position startpos moves " + moveString);
-		stockfish.postMessage("go movetime 2000");
+		stockfish.postMessage("go movetime " + document.getElementById('thinkTime').value);
 	}
 	var status = '';
 
@@ -110,6 +107,23 @@ function cinnamonEngineGo(){
 	totalPGN.push(game.pgn());
 	++moveCounter;
 }
+
+// updates the board with the move stock fish had in mine
+// @param src the starting location of the square the piece/pawn is from
+// @param tar the target location of the square the piece/pawn is moving too
+function stockFishEngineGo(src, tar){
+	var move = game.move({
+		from: src,
+		to: tar,
+		promotion: 'q' // NOTE: always promote to a queen for example simplicity
+	});
+
+	board.position(game.fen());
+	totalFEN.push(game.fen());
+	totalPGN.push(game.pgn());
+	++moveCounter;	
+}
+
 var onMouseoverSquare = function(square, piece) {
 	// get list of possible moves for this square
 	var moves = game.moves({
@@ -136,8 +150,20 @@ var onMouseoutSquare = function(square, piece) {
 };
 
 var onDrop = function(source, target) {
-	//removeGreySquares();
+	
+	$.ajax({
+  		url: 'checkInGame',
+   		type: 'post',
+		data : { 'user': document.getElementById('user').value},
+   		success : function(data) {		
+			if(data === "inGame"){
+				alert("Engine use when you are playing a game against a real person is not allowed!");
+				window.location = "/memberHome";
+			}
+   		},
+	});
 
+	//removeGreySquares();
 	// see if the move is legal
 	var move = game.move({
 		from: source,
@@ -318,23 +344,10 @@ function startStockFish(){
 
 	stockfish.onmessage = function(event) {
 		//NOTE: Web Workers wrap the response in an object.
-		if(event.data){
-			var bestMove = event.data;
-			//console.log(bestMove);
-			var checkBestMove = bestMove.startsWith("bestmove");
-			if(checkBestMove){
-				console.log("The moves are :");
-				console.log(bestMove.substring(9, 13));
-				//console.log(bestMove.substring(21, 25)); //This is for ponder
-			}
-		}else{
-			var bestMove = event;
-			//console.log(event);
-			var checkBestMove = event.startsWith("bestmove"); 
-			if(checkBestMove){
-				console.log("The moves are :");
-				console.log(bestMove.substring(9, 13));
-				//console.log(bestMove.substring(21, 25));
+		var data = event.data;
+		if(data){
+			if(data.startsWith("bestmove")){
+				stockFishEngineGo(data.substring(9, 11), data.substring(11, 13));
 			}
 		}	
 	};

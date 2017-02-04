@@ -136,6 +136,13 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// a player shouldn't be using the database if they are in a game playing another person
+	user, _ := r.Cookie("username")
+	if isPlayerInGame(user.Value, "") {
+		w.Write([]byte("Database use is not allowed when you are playing a game against a real person!"))
+		return
+	}
+
 	id := template.HTMLEscapeString(r.FormValue("gameID"))
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -184,6 +191,12 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
 	valid := validateCredentials(w, r)
 	if valid == false {
+		return
+	}
+
+	user, _ := r.Cookie("username")
+	if isPlayerInGame(user.Value, "") {
+		w.Write([]byte("Database use is not allowed when you are playing a game against a real person!"))
 		return
 	}
 
@@ -346,4 +359,18 @@ func validateCredentials(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	return true
+}
+
+// checks if a player is in a game
+func CheckInGame(w http.ResponseWriter, r *http.Request) {
+	valid := validateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	user := template.HTMLEscapeString(r.FormValue("user"))
+	if isPlayerInGame(user, "") {
+		w.Write([]byte("inGame"))
+	} else {
+		w.Write([]byte("Safe"))
+	}
 }

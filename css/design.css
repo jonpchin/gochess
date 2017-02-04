@@ -51,7 +51,7 @@ table.table2 {
     border-collapse: collapse;
 }
 
-table.table5, table.table6, table.table7, table.table8  {
+table.table5, table.table6, table.table7, table.table8, table.table9  {
 	width: 25%;
     height: 37%;
 	overflow:auto;
@@ -87,14 +87,14 @@ table.table2 {
 }
 
 
-table.table1 th, table.table2 th, table.table3 th, table.table4 th, table.table5 th, table.table6 th, table.table7 th, table.table8 th {
+table.table1 th, table.table2 th, table.table3 th, table.table4 th, table.table5 th, table.table6 th, table.table7 th, table.table8 th, table.table9 th {
     background-color: #4CAF50;
     color: white;
 	padding: 8px;
     text-align: left;
     border-bottom: 1px solid green;
 }
-table.table1 td, table.table2 td, table.table3 td, table.table4 td, table.table5 td, table.table6 td, table.table7 td, table.table8 td{
+table.table1 td, table.table2 td, table.table3 td, table.table4 td, table.table5 td, table.table6 td, table.table7 td, table.table8 td, table.table9 td{
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid green;

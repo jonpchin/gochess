@@ -55,6 +55,17 @@
 {{end}}
 </table>
 <table class="table8">
+<caption>Top Ten Correspondence</caption>
+	<tr>
+<th>Rank</th><th>Player</th><th>Date</th>
+	</tr>
+{{range .Correspondence}}
+	<tr onclick="reviewProfile({{.Name}})"> 
+	<td>{{.Index}}.</td><td>{{.Name}}</td><td>{{.Rating}}</td> 
+	</tr>	
+{{end}}
+</table>
+<table class="table9">
 <caption>Newest Members</caption>
 	<tr>
 <th>Rank</th><th>Player</th><th>Date</th>

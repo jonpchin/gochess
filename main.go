@@ -67,6 +67,7 @@ func main() {
 	http.HandleFunc("/fetchBlitzHistory", gostuff.FetchBlitzHistory)
 	http.HandleFunc("/fetchStandardHistory", gostuff.FetchStandardHistory)
 	http.HandleFunc("/fetchCorrespondenceHistory", gostuff.FetchCorrespondenceHistory)
+	http.HandleFunc("/checkInGame", gostuff.CheckInGame)
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 
@@ -416,8 +417,8 @@ func engine(w http.ResponseWriter, r *http.Request) {
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		var engine = template.Must(template.ParseFiles("engine.html"))
-
 		username, _ := r.Cookie("username")
+
 		p := gostuff.Person{User: username.Value}
 
 		if err := engine.Execute(w, &p); err != nil {

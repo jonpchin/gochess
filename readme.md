@@ -26,7 +26,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>8. Logging(partially shown on GitHub)</p>
 <p>9. Graceful shutdown and recovery of active games</p>
 <p>10. Automated deployment of web server to production environment(not shown on GitHub)</p>
-<p>11. Highscore board containing top bullet, blitz and standard ratings.</p>
+<p>11. Highscore board containing top bullet, blitz standard, and correspondence ratings.</p>
 <p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
 <p>13. Database of over 1.8 million chess games, most of which are master/grandmaster games.</p>
 <p>14. Player profiles to view rating and past games.</p>
@@ -34,8 +34,8 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>16. Players can view on going chess games in real time as spectators</p>
 <p>17. Lobby and game room chat.</p>
 <p>18. Rating history timeline on player's profile using Google Charts.</p>
-<p>19. Players can play against cinnamon chess engine and stockfish chess engine.</p>
-<p>20. Web server runs Windows and Linux.</p>
+<p>19. Players can play against cinnamon chess engine and stockfish chess engine (web workers).</p>
+<p>20. Web server runs in Windows and Linux.</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Configure Twitter bot.</p>
