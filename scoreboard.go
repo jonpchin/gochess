@@ -127,6 +127,26 @@ func UpdateHighScore() {
 		score.Recent[i].Index = i + 1
 		i++
 	}
+
+	i = 0
+
+	query = "SELECT username, correspondence FROM rating order by correspondence DESC limit " + strconv.Itoa(total)
+
+	rows, err = db.Query(query)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&score.Correspondence[i].Name, &score.Correspondence[i].Rating); err != nil {
+			log.Println(err)
+		}
+		score.Correspondence[i].Index = i + 1
+		i++
+	}
+
 	//secure mutex lock before modifying global leaderboard in memory
 	LeaderBoard.Lock()
 	LeaderBoard.Scores = score
