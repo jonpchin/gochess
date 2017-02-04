@@ -600,8 +600,8 @@ func (c *Connection) ChessConnect() {
 					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
-				//isPlayerInGame function is located in socket.go
-				if isPlayerInGame(match.Name, match.Opponent) {
+				//isPlayersInGame function is located in socket.go
+				if isPlayersInGame(match.Name, match.Opponent) {
 					log.Println("Player is already in a game")
 					break
 				}

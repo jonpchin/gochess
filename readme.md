@@ -40,8 +40,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p><b>To Do List:</b></p>
 <p>1. Configure Twitter bot.</p>
 <p>2. Chess TV where live games are randomly broadcasted.</p>
-<p>3. Support correspondence games</p>
-</p>4. Forums</p>
+<p>3. Forums</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
