@@ -19,7 +19,6 @@ install:
   - go env
   - go get -u github.com/go-sql-driver/mysql
   - go get -u github.com/dchest/captcha
-  - go get -u github.com/fatih/color
   - go get -u golang.org/x/net/websocket
   - go get -u gopkg.in/gomail.v2
   - go get -u golang.org/x/crypto/scrypt

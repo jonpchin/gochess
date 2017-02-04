@@ -12,7 +12,14 @@ var totalFEN = [];
 var totalPGN = [];
 //used to store what move the game is on, their will be double moves in total one for black and one for white
 var moveCounter = 0;
-var pieceTheme = getCookie("pieceTheme");
+var chessPieceTheme = getCookie("pieceTheme");
+
+function defaultTheme(){
+	if (chessPieceTheme === ""){
+		chessPieceTheme = "wikipedia"
+	}
+}
+defaultTheme();
 
 var onDragStart = function(source, piece) {
 	// do not pick up pieces if the game is over
@@ -39,17 +46,20 @@ var greySquare = function(square) {
 	squareEl.css('background', background);
 };
 
-var updateStatus = function(engineType) {
+var updateStatus = function(moveString) {
 
 	if (game.in_checkmate()){
 		alert('Game over, ' + moveColor + ' is in checkmate.');
 		return;
 	}
 
-	if (game.turn() === computer && engineType === "cinnamon") {
-		engineGo()
+	if(document.getElementById("cinnamonRadioButton").checked === true){
+		cinnamonEngineGo()
 	}else{ // then send move to stockfish
-
+		console.log("move string is");
+		console.log(moveString);
+		stockfish.postMessage("position startpos moves " + moveString);
+		stockfish.postMessage("go movetime 2000");
 	}
 	var status = '';
 
@@ -82,7 +92,7 @@ var onSnapEnd = function() {
 	board.position(game.fen());
 };
 
-function engineGo(){
+function cinnamonEngineGo(){
 	
 	cinnamonCommand("setMaxTimeMillsec", document.getElementById('thinkTime').value);
 	cinnamonCommand("position",game.fen());
@@ -98,7 +108,6 @@ function engineGo(){
 
 	totalFEN.push(game.fen());
 	totalPGN.push(game.pgn());
-	updateStatus();
 	++moveCounter;
 }
 var onMouseoverSquare = function(square, piece) {
@@ -126,144 +135,151 @@ var onMouseoutSquare = function(square, piece) {
 	removeGreySquares();
 };
 
-var init = function() {
+var onDrop = function(source, target) {
+	//removeGreySquares();
 
-	//always push the default starting position
-	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	totalPGN.push("");
-	
-	var onDrop = function(source, target) {
-		//removeGreySquares();
-
-		// see if the move is legal
-		var move = game.move({
-			from: source,
-			to: target,
-			promotion: 'q' // NOTE: always promote to a queen for example simplicity
-		});
-
-		// illegal move
-		if (move === null){
-			return 'snapback';
-		} 
-		totalFEN.push(game.fen());
-		totalPGN.push(game.pgn());
-		updateStatus("cinnamon");
-		++moveCounter;
-	};
-
-	// update the board position after the piece snap 
-	// for castling, en passant, pawn promotion
-	
-
-	var cfg = {
-		draggable: true,
-		position: 'start',
-		onDragStart: onDragStart,
-		onDrop: onDrop,
-		moveSpeed: 'slow',
-		onMouseoutSquare: onMouseoutSquare,
-		onMouseoverSquare: onMouseoverSquare,
-		onSnapEnd: onSnapEnd,
-		pieceTheme: '../img/chesspieces/'+ pieceTheme +'/{piece}.png'
-	};
-	board = new ChessBoard('board', cfg);
-
-	updateStatus("cinnamon");
-
-	// action listener for board flip
-	$('#flipOrientationBtn').on('click', board.flip);
-
-	// force the computer to make a move thus switching sides of the game
-	document.getElementById('forceMoveButton').onclick = function(){
-		if(computer === 'b'){
-			computer = 'w';
-		}else{
-			computer = 'b';
-		}
-		// need to make sure its the most current move before forcing engine to move
-		document.getElementById('goEnd').click();
-		updateStatus("cinnamon");
-		board.position(game.fen());
-	}
-
-	document.getElementById('goStart').onclick = function(){
-		board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
-		moveCounter = 0;
-		setPGN(totalPGN[moveCounter]);
-	}
-
-	//go forward one move
-	document.getElementById('goForward').onclick = function(){
-
-		if(moveCounter < totalFEN.length-1){	
-			moveCounter++;
-		}
-		//make a global array and iterate forwards through the global array when going forward
-		board.position(totalFEN[moveCounter]);	
-		setPGN(totalPGN[moveCounter]);
-	} 
-
-	$('#goBack').on('click', function() {
-		if(moveCounter > 0){
-			
-			moveCounter--;
-		}
-		//make a global array and iterate backwards through the global array when going back
-		board.position(totalFEN[moveCounter]);	
-		setPGN(totalPGN[moveCounter]);
+	// see if the move is legal
+	var move = game.move({
+		from: source,
+		to: target,
+		promotion: 'q' // NOTE: always promote to a queen for example simplicity
 	});
 
-	//move forward to last move
-	document.getElementById('goEnd').onclick = function(){
-
-		for(var i=moveCounter; i<totalFEN.length; i++){
-			board.position(totalFEN[i]);
-		}
-		moveCounter = totalFEN.length-1;
-		if(moveCounter>=0){
-			setPGN(totalPGN[moveCounter]);
-		}
-	}
-
-	var setPGN = function(pgn){
-		pgnEl.html(pgn);
-	}
-
-	document.getElementById('newGameButton').onclick = function(){
-		totalFEN = [];
-		totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-		totalPGN = [];
-		totalPGN.push("");
-		moveCounter = 0;
-		board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
-		board.orientation('white');
-		game.reset();
+	// illegal move
+	if (move === null){
+		return 'snapback';
 	} 
 
-	//action listener for exporting game to PGN file
-	document.getElementById('exportPGN').onclick = function(){
-		
-		// TODO Fill out parameters
-		var gameResult = "???";
-		var whiteRating = "????";
-		var blackRating = "????"
-		var timeGet = "???";
-		var gameDate = Date();
-		var whitePlayer = document.getElementById('user').value;;
-		var blackPlayer = "Cinnamon Computuer";
-		if(computer === 'w'){
-			whitePlayer =  "Cinnamon Computuer";
-			blackPlayer = document.getElementById('user').value;
-		}
+	makeEngineMove();
 
-		game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', whitePlayer, 'Black', blackPlayer, 
-			'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
-
-		// second parameter is file name
-		download(game.pgn(), whitePlayer + " vs. " + blackPlayer + ".pgn", "application/x-chess-pgn");
-	}
+	totalFEN.push(game.fen());
+	totalPGN.push(game.pgn());
+	++moveCounter;
 };
+
+var cfg = {
+	draggable: true,
+	position: 'start',
+	onDragStart: onDragStart,
+	onDrop: onDrop,
+	moveSpeed: 'slow',
+	onMouseoutSquare: onMouseoutSquare,
+	onMouseoverSquare: onMouseoverSquare,
+	onSnapEnd: onSnapEnd,
+	pieceTheme: '../img/chesspieces/'+ chessPieceTheme +'/{piece}.png'
+};
+board = new ChessBoard('board', cfg);
+
+// force the computer to make a move thus switching sides of the game
+document.getElementById('forceMoveButton').onclick = function(){
+	if(computer === 'b'){
+		computer = 'w';
+	}else{
+		computer = 'b';
+	}
+	// need to make sure its the most current move before forcing engine to move
+	document.getElementById('goEnd').click();
+	makeEngineMove();
+	board.position(game.fen());
+}
+
+//checks to see which engine is turned on and makes a move for that engine
+function makeEngineMove(){
+	if(document.getElementById("cinnamonRadioButton").checked === true){
+		updateStatus("");
+	}else{
+		var gameHistory = game.history({verbose: true});
+		var length = gameHistory.length;
+		var moveString = "";
+		for(var i = 0; i<length; ++i){
+			moveString += (gameHistory[i].from + gameHistory[i].to + " ");
+		}
+		updateStatus(moveString);
+	}
+}
+
+document.getElementById('goStart').onclick = function(){
+	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+	moveCounter = 0;
+	setPGN(totalPGN[moveCounter]);
+}
+
+//go forward one move
+document.getElementById('goForward').onclick = function(){
+
+	if(moveCounter < totalFEN.length-1){	
+		moveCounter++;
+	}
+	//make a global array and iterate forwards through the global array when going forward
+	board.position(totalFEN[moveCounter]);	
+	setPGN(totalPGN[moveCounter]);
+} 
+
+$('#goBack').on('click', function() {
+	if(moveCounter > 0){
+		
+		moveCounter--;
+	}
+	//make a global array and iterate backwards through the global array when going back
+	board.position(totalFEN[moveCounter]);	
+	setPGN(totalPGN[moveCounter]);
+});
+
+//move forward to last move
+document.getElementById('goEnd').onclick = function(){
+
+	for(var i=moveCounter; i<totalFEN.length; i++){
+		board.position(totalFEN[i]);
+	}
+	moveCounter = totalFEN.length-1;
+	if(moveCounter>=0){
+		setPGN(totalPGN[moveCounter]);
+	}
+}
+
+var setPGN = function(pgn){
+	pgnEl.html(pgn);
+}
+
+//action listener for exporting game to PGN file
+document.getElementById('exportPGN').onclick = function(){
+	
+	// TODO Fill out parameters
+	var gameResult = "???";
+	var whiteRating = "????";
+	var blackRating = "????"
+	var timeGet = "???";
+	var gameDate = Date();
+	var whitePlayer = document.getElementById('user').value;;
+	var blackPlayer = "Cinnamon Computuer";
+	if(computer === 'w'){
+		whitePlayer =  "Cinnamon Computuer";
+		blackPlayer = document.getElementById('user').value;
+	}
+
+	game.header('Site', "Go Play Chess", 'Date', gameDate, 'White', whitePlayer, 'Black', blackPlayer, 
+		'Result', gameResult, 'WhiteElo', whiteRating, 'BlackElo', blackRating, 'TimeControl', timeGet);
+
+	// second parameter is file name
+	download(game.pgn(), whitePlayer + " vs. " + blackPlayer + ".pgn", "application/x-chess-pgn");
+}
+
+// action listener for board flip
+$('#flipOrientationBtn').on('click', board.flip);
+//always push the default starting position
+totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+totalPGN.push("");
+
+document.getElementById('newGameButton').onclick = function(){
+	totalFEN = [];
+	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	totalPGN = [];
+	totalPGN.push("");
+	moveCounter = 0;
+	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+	board.orientation('white');
+	game.reset();
+} 
 
 function getCookie(cname) { //gets cookies value
     var name = cname + "=";
@@ -275,13 +291,6 @@ function getCookie(cname) { //gets cookies value
     }
     return "";
 }
-
-function defaultTheme(){
-	if (pieceTheme === ""){
-		pieceTheme = "wikipedia"
-	}
-}
-defaultTheme();
 
 function detectMobile(){ //tries to detect if user is using a mobile device
 		
@@ -298,57 +307,37 @@ function startCinnamon(){
 	cinnamonCommand = Module.cwrap('command', 'string', ['string','string']);
 	// milliseconds for engine to think before making a move
 	cinnamonCommand("setMaxTimeMillsec", 1000);
-	init();
 }
 
+var stockfish;
 
 function startStockFish(){
+	
 	newGameButton.click();
-	var stockfish = new Worker("../third-party-js/stockfish.js");
-	stockfish.postMessage("position startpos moves e2e4");
+	stockfish = new Worker("../third-party-js/stockfish.js");
 
 	stockfish.onmessage = function(event) {
 		//NOTE: Web Workers wrap the response in an object.
-		console.log(event.data ? event.data : event);
+		if(event.data){
+			var bestMove = event.data;
+			//console.log(bestMove);
+			var checkBestMove = bestMove.startsWith("bestmove");
+			if(checkBestMove){
+				console.log("The moves are :");
+				console.log(bestMove.substring(9, 13));
+				//console.log(bestMove.substring(21, 25)); //This is for ponder
+			}
+		}else{
+			var bestMove = event;
+			//console.log(event);
+			var checkBestMove = event.startsWith("bestmove"); 
+			if(checkBestMove){
+				console.log("The moves are :");
+				console.log(bestMove.substring(9, 13));
+				//console.log(bestMove.substring(21, 25));
+			}
+		}	
 	};
-	stockfish.postMessage("go movetime 5000");
-
-	var onDrop = function(source, target) {
-		//removeGreySquares();
-
-		// see if the move is legal
-		var move = game.move({
-			from: source,
-			to: target,
-			promotion: 'q' // NOTE: always promote to a queen for example simplicity
-		});
-
-		// illegal move
-		if (move === null){
-			return 'snapback';
-		} 
-		totalFEN.push(game.fen());
-		totalPGN.push(game.pgn());
-		updateStatus("stockfish");
-		++moveCounter;
-	};
-
-	var cfg = {
-		draggable: true,
-		position: 'start',
-		onDragStart: onDragStart,
-		onDrop: onDrop,
-		moveSpeed: 'slow',
-		onMouseoutSquare: onMouseoutSquare,
-		onMouseoverSquare: onMouseoverSquare,
-		onSnapEnd: onSnapEnd,
-		pieceTheme: '../img/chesspieces/'+ pieceTheme +'/{piece}.png'
-	};
-	board = new ChessBoard('board', cfg);
-
-	//always push the default starting position
-	totalFEN.push("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	totalPGN.push("");
 }
 
 // starts the engine that radio button is checked for
