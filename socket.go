@@ -165,6 +165,8 @@ func exitGame(user string) {
 }
 
 //returns true if a player is at a given table
+// function isPlayersInGame is similar to this checkTable
+// this checkTable only checks one username instead of two like isPlayersInGame
 func checkTable(user string) bool {
 	for _, table := range All.Games {
 		if table.WhitePlayer == user || table.BlackPlayer == user {
@@ -175,7 +177,7 @@ func checkTable(user string) bool {
 }
 
 //returns true if a player or opponent has a game started
-func isPlayerInGame(name, opponent string) bool {
+func isPlayersInGame(name, opponent string) bool {
 	for _, game := range All.Games {
 		if game.WhitePlayer == name || game.BlackPlayer == name {
 			return true

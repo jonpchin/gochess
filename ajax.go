@@ -60,7 +60,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//second username is nil as it only checks one name
-	if isPlayerInGame(lookupName, "") {
+	if checkTable(lookupName) {
 		status = "vs. " + PrivateChat[lookupName] + "<src='img/flags/'" +
 			enemyFlag + ".png>"
 		icon = "<img src='../img/icons/playing.png' alt='status'>"
@@ -95,7 +95,7 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 	chat.Type = "chess_game"
 	var success bool
 	if user.Value == white {
-		if isPlayerInLobby(black) == true && !isPlayerInGame(black, "") {
+		if isPlayerInLobby(black) == true && !checkTable(black) {
 			success = fetchSavedGame(id, user.Value)
 			if success == false {
 				w.Write([]byte("false"))
@@ -109,7 +109,7 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else if user.Value == black {
-		if isPlayerInLobby(white) == true && !isPlayerInGame(white, "") {
+		if isPlayerInLobby(white) == true && !checkTable(white) {
 			success = fetchSavedGame(id, user.Value)
 			if success == false {
 				w.Write([]byte("false"))
@@ -138,7 +138,7 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 
 	// a player shouldn't be using the database if they are in a game playing another person
 	user, _ := r.Cookie("username")
-	if isPlayerInGame(user.Value, "") {
+	if checkTable(user.Value) {
 		w.Write([]byte("Database use is not allowed when you are playing a game against a real person!"))
 		return
 	}
@@ -195,7 +195,7 @@ func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, _ := r.Cookie("username")
-	if isPlayerInGame(user.Value, "") {
+	if checkTable(user.Value) {
 		w.Write([]byte("Database use is not allowed when you are playing a game against a real person!"))
 		return
 	}
@@ -368,7 +368,7 @@ func CheckInGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	if isPlayerInGame(user, "") {
+	if checkTable(user) {
 		w.Write([]byte("inGame"))
 	} else {
 		w.Write([]byte("Safe"))
