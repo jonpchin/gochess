@@ -187,6 +187,7 @@ func VerifyGrandmasterGames(total int) bool {
 		var legal bool
 
 		initGame(gameID, "", "")
+
 		for j := 0; j < len(move); j++ {
 			legal = chessVerify(move[j].S, move[j].T, move[j].P, gameID)
 			totalMoves := (j / 2) + 1

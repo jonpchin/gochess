@@ -19,9 +19,9 @@ func blackPawnAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol i
 	return false
 }
 
-func bishopAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
+func (table *Table) bishopAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8) bool {
 	for i, j := sourceRow-1, sourceCol-1; i >= targetRow; i, j = i-1, j-1 { //top left diagonal
-		if i >= 0 && j >= 0 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i >= 0 && j >= 0 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -34,7 +34,7 @@ func bishopAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8
 
 	}
 	for i, j := sourceRow-1, sourceCol+1; i >= targetRow; i, j = i-1, j+1 { //top right diagonal
-		if i >= 0 && j <= 7 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i >= 0 && j <= 7 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -47,7 +47,7 @@ func bishopAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8
 
 	}
 	for i, j := sourceRow+1, sourceCol-1; i <= targetRow; i, j = i+1, j-1 { //bottom left diagonal
-		if i <= 7 && j >= 0 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i <= 7 && j >= 0 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -60,7 +60,7 @@ func bishopAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8
 
 	}
 	for i, j := sourceRow+1, sourceCol+1; i <= targetRow; i, j = i+1, j+1 { //bottom right diagonal
-		if i <= 7 && j <= 7 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i <= 7 && j <= 7 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -90,10 +90,10 @@ func knightAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8
 }
 
 //rook + bishop movments
-func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
+func (table *Table) queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8) bool {
 	//bishop movements
 	for i, j := sourceRow-1, sourceCol-1; i >= targetRow; i, j = i-1, j-1 { //top left diagonal
-		if i >= 0 && j >= 0 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i >= 0 && j >= 0 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -106,7 +106,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 
 	}
 	for i, j := sourceRow-1, sourceCol+1; i >= targetRow; i, j = i-1, j+1 { //top right diagonal
-		if i >= 0 && j <= 7 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i >= 0 && j <= 7 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -119,7 +119,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 
 	}
 	for i, j := sourceRow+1, sourceCol-1; i <= targetRow; i, j = i+1, j-1 { //bottom left diagonal
-		if i <= 7 && j >= 0 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i <= 7 && j >= 0 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -133,7 +133,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 
 	}
 	for i, j := sourceRow+1, sourceCol+1; i <= targetRow; i, j = i+1, j+1 { //bottom right diagonal
-		if i <= 7 && j <= 7 && Verify.AllTables[gameID].ChessBoard[i][j] == "-" {
+		if i <= 7 && j <= 7 && table.ChessBoard[i][j] == "-" {
 			if i == targetRow && j == targetCol {
 				return true
 			}
@@ -147,7 +147,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 	}
 	//rook movements
 	for i := sourceRow + 1; i <= targetRow; i++ { //up
-		if i <= 7 && Verify.AllTables[gameID].ChessBoard[i][sourceCol] == "-" {
+		if i <= 7 && table.ChessBoard[i][sourceCol] == "-" {
 			if i == targetRow && sourceCol == targetCol {
 				return true
 			}
@@ -160,7 +160,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 
 	}
 	for i := sourceRow - 1; i >= targetRow; i-- { //down
-		if i >= 0 && Verify.AllTables[gameID].ChessBoard[i][sourceCol] == "-" {
+		if i >= 0 && table.ChessBoard[i][sourceCol] == "-" {
 			if i == targetRow && sourceCol == targetCol {
 				return true
 			}
@@ -173,7 +173,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 
 	}
 	for i := sourceCol + 1; i <= targetCol; i++ { //right
-		if i <= 7 && Verify.AllTables[gameID].ChessBoard[sourceRow][i] == "-" {
+		if i <= 7 && table.ChessBoard[sourceRow][i] == "-" {
 			if i == targetCol && sourceRow == targetRow {
 				return true
 			}
@@ -186,7 +186,7 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 
 	}
 	for i := sourceCol - 1; i >= targetCol; i-- { //left
-		if i >= 0 && Verify.AllTables[gameID].ChessBoard[sourceRow][i] == "-" {
+		if i >= 0 && table.ChessBoard[sourceRow][i] == "-" {
 			if i == targetCol && sourceRow == targetRow {
 				return true
 			}
@@ -201,9 +201,9 @@ func queenAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
 	return false
 }
 
-func rookAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, gameID int) bool {
+func (table *Table) rookAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8) bool {
 	for i := sourceRow + 1; i <= targetRow; i++ { //up
-		if i <= 7 && Verify.AllTables[gameID].ChessBoard[i][sourceCol] == "-" {
+		if i <= 7 && table.ChessBoard[i][sourceCol] == "-" {
 			if i == targetRow && sourceCol == targetCol {
 				return true
 			}
@@ -216,7 +216,7 @@ func rookAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, 
 
 	}
 	for i := sourceRow - 1; i >= targetRow; i-- { //down
-		if i >= 0 && Verify.AllTables[gameID].ChessBoard[i][sourceCol] == "-" {
+		if i >= 0 && table.ChessBoard[i][sourceCol] == "-" {
 			if i == targetRow && sourceCol == targetCol {
 				return true
 			}
@@ -229,7 +229,7 @@ func rookAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, 
 
 	}
 	for i := sourceCol + 1; i <= targetCol; i++ { //right
-		if i <= 7 && Verify.AllTables[gameID].ChessBoard[sourceRow][i] == "-" {
+		if i <= 7 && table.ChessBoard[sourceRow][i] == "-" {
 			if i == targetCol && sourceRow == targetRow {
 				return true
 			}
@@ -242,7 +242,7 @@ func rookAttack(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, 
 
 	}
 	for i := sourceCol - 1; i >= targetCol; i-- { //left
-		if i >= 0 && Verify.AllTables[gameID].ChessBoard[sourceRow][i] == "-" {
+		if i >= 0 && table.ChessBoard[sourceRow][i] == "-" {
 			if i == targetCol && sourceRow == targetRow {
 				return true
 			}

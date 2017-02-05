@@ -399,16 +399,17 @@ func (c *Connection) ChessConnect() {
 				var mated string
 
 				chessgame := All.Games[game.ID]
+				table := Verify.AllTables[game.ID]
 
 				if game.Status == "White" {
-					checkMate = isWhiteInMate(game.ID)
+					checkMate = table.isWhiteInMate()
 					mater = chessgame.BlackPlayer
 					mated = chessgame.WhitePlayer
 
 				} else if game.Status == "Black" {
 					mater = chessgame.WhitePlayer
 					mated = chessgame.BlackPlayer
-					checkMate = isBlackInMate(game.ID)
+					checkMate = table.isBlackInMate()
 
 				} else { //this should never happen, if it does most likely caused by tampering or its a bug
 					fmt.Println("Invalid game status for checking mate.")
@@ -435,7 +436,6 @@ func (c *Connection) ChessConnect() {
 					result = 1.0
 				}
 
-				table := Verify.AllTables[game.ID]
 				table.Connection <- true
 				table.gameOver <- true
 
@@ -719,19 +719,20 @@ func (c *Connection) ChessConnect() {
 				}
 
 				table := Verify.AllTables[game.ID]
+				chessgame := All.Games[game.ID]
 
 				//checking to see if the side whose turn it is to move is in stalemate
 				if table.whiteTurn == true {
-					if isWhiteStaleMate(game.ID) == true || noMaterial(game.ID) == true ||
-						threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
+					if table.isWhiteStaleMate() || table.noMaterial() ||
+						chessgame.threeRep() || table.fiftyMoves(game.ID) {
 						log.Println("forced draw_game")
 					} else {
 						break
 					}
 				} else {
 
-					if isBlackStaleMate(game.ID) == true || noMaterial(game.ID) == true ||
-						threeRep(game.ID) == true || fiftyMoves(game.ID) == true {
+					if table.isBlackStaleMate() || table.noMaterial() ||
+						chessgame.threeRep() || table.fiftyMoves(game.ID) {
 						log.Println("forced draw_game")
 					} else {
 						break
@@ -740,8 +741,6 @@ func (c *Connection) ChessConnect() {
 
 				table.Connection <- true
 				table.gameOver <- true
-
-				chessgame := All.Games[game.ID]
 				chessgame.Status = "Forced Draw"
 				//2 means the game is a draw and stored as an int in the database
 				chessgame.Result = 2

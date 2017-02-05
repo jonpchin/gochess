@@ -46,8 +46,9 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		fmt.Println("Please call initGame() function before proceeding")
 		return false
 	}
+	table := Verify.AllTables[gameID]
 	//identifying the piece that was selected
-	piece := Verify.AllTables[gameID].ChessBoard[newSourceRow][newSourceCol]
+	piece := table.ChessBoard[newSourceRow][newSourceCol]
 
 	//no piece was selected
 	if piece[0:1] == "-" {
@@ -57,11 +58,11 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 	noColorPiece := piece[1:2]
 	colorOnly := piece[0:1]
 
-	if (Verify.AllTables[gameID].whiteTurn == true && colorOnly == "b") || (Verify.AllTables[gameID].whiteTurn == false && colorOnly == "w") || source == "-" {
+	if (table.whiteTurn && colorOnly == "b") || (table.whiteTurn == false && colorOnly == "w") || source == "-" {
 		return false
 	}
 	//checking to make sure player doesn't capture his own pieces
-	targetSquare := Verify.AllTables[gameID].ChessBoard[newTargetRow][newTargetCol]
+	targetSquare := table.ChessBoard[newTargetRow][newTargetCol]
 	targetColor := targetSquare[0:1]
 
 	if colorOnly == targetColor {
@@ -73,20 +74,20 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 	switch noColorPiece {
 	case "P":
 		if piece == "wP" {
-			result := whitePawnMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, gameID)
+			result := table.whitePawnMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol)
 			if result == false {
 				return false
 			}
 			//then a succesful pawn move is made
-			Verify.AllTables[gameID].pawnMove = (Verify.AllTables[gameID].moveCount + 1) / 2
+			table.pawnMove = (table.moveCount + 1) / 2
 
 		} else {
 
-			result := blackPawnMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, gameID)
+			result := table.blackPawnMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol)
 			if result == false {
 				return false
 			}
-			Verify.AllTables[gameID].pawnMove = (Verify.AllTables[gameID].moveCount + 1) / 2
+			table.pawnMove = (table.moveCount + 1) / 2
 		}
 
 	case "N":
@@ -96,31 +97,31 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		}
 
 	case "B":
-		result := bishopMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, gameID)
+		result := table.bishopMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol)
 		if result == false {
 			return false
 		}
 
 	case "Q":
-		result := queenMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, gameID)
+		result := table.queenMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol)
 		if result == false {
 			return false
 		}
 
 	case "R":
-		result := rookMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, gameID)
+		result := table.rookMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol)
 		if result == false {
 			return false
 		} else {
-			Verify.AllTables[gameID].rookUpdate = true //used to indicate if a rook has moved, used for castling rights
+			table.rookUpdate = true //used to indicate if a rook has moved, used for castling rights
 		}
 
 	case "K":
-		result := kingMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, gameID)
+		result := table.kingMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol)
 		if result == false {
 			return false
 		} else { //if its valid king move then update coordinates in the global variables which keeps track of kings location
-			Verify.AllTables[gameID].kingUpdate = true
+			table.kingUpdate = true
 		}
 
 	default:
@@ -130,7 +131,7 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 
 	}
 	// Do NOT MOVE, this allows selected promotion piece to be updated in the back end
-	Verify.AllTables[gameID].promotion = promotion
+	table.promotion = promotion
 
 	// this promotion check is only used when checking with grand master games
 	/*
@@ -142,84 +143,84 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 			}
 			switch convertedPromote {
 			case 113:
-				Verify.AllTables[gameID].promotion = "q"
+				table.promotion = "q"
 			case 114:
-				Verify.AllTables[gameID].promotion = "r"
+				table.promotion = "r"
 			case 110:
-				Verify.AllTables[gameID].promotion = "n"
+				table.promotion = "n"
 			case 98:
-				Verify.AllTables[gameID].promotion = "b"
+				table.promotion = "b"
 			default:
 				// then do nothing as promotion piece is already set
 			}
 		}
 	*/
-	capturedPiece := makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, gameID)
+	capturedPiece := table.makeMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece)
 
 	//if a piece is captured within 50 moves then 50 move rule effect is canceled
 	if capturedPiece != "-" {
-		Verify.AllTables[gameID].lastCapture = (Verify.AllTables[gameID].pawnMove + 1) / 2
+		table.lastCapture = (table.pawnMove + 1) / 2
 	}
 	//used to update king position if they are in check
-	if Verify.AllTables[gameID].kingUpdate == true {
+	if table.kingUpdate == true {
 		if colorOnly == "b" {
 			//storing old coordinates
-			Verify.AllTables[gameID].blackOldX = newSourceRow
-			Verify.AllTables[gameID].blackOldY = newSourceCol
+			table.blackOldX = newSourceRow
+			table.blackOldY = newSourceCol
 
-			Verify.AllTables[gameID].blackKingX = newTargetRow
-			Verify.AllTables[gameID].blackKingY = newTargetCol
+			table.blackKingX = newTargetRow
+			table.blackKingY = newTargetCol
 
 		} else if colorOnly == "w" {
 			//storing old coordinates
-			Verify.AllTables[gameID].whiteOldX = newSourceRow
-			Verify.AllTables[gameID].whiteOldY = newSourceCol
+			table.whiteOldX = newSourceRow
+			table.whiteOldY = newSourceCol
 
-			Verify.AllTables[gameID].whiteKingX = newTargetRow
-			Verify.AllTables[gameID].whiteKingY = newTargetCol
+			table.whiteKingX = newTargetRow
+			table.whiteKingY = newTargetCol
 
 		} else {
 			fmt.Println("Invalid king color")
 		}
 	}
 	//if the player made a move and his king can be captured that move has to be undone and return false as he didn't stop the check
-	if Verify.AllTables[gameID].whiteTurn == true && isWhiteInCheck(gameID) == true {
-		undoMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, capturedPiece, gameID)
+	if table.whiteTurn == true && table.isWhiteInCheck() == true {
+		table.undoMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, capturedPiece)
 		fmt.Println("White cannot make that move as they are in check")
 		return false
-	} else if Verify.AllTables[gameID].whiteTurn == false && isBlackInCheck(gameID) == true {
-		undoMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, capturedPiece, gameID)
+	} else if table.whiteTurn == false && table.isBlackInCheck() == true {
+		table.undoMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, capturedPiece)
 		fmt.Println("Black cannot make that move as they are in check")
 		return false
 	}
-	if Verify.AllTables[gameID].kingUpdate == true { //updating new location of king for quick access
+	if table.kingUpdate == true { //updating new location of king for quick access
 		if colorOnly == "b" {
-			Verify.AllTables[gameID].bkMoved = true //can no longer castle with black king
+			table.bkMoved = true //can no longer castle with black king
 		} else if colorOnly == "w" {
 
-			Verify.AllTables[gameID].wkMoved = true //can no longer castle with white king
+			table.wkMoved = true //can no longer castle with white king
 		} else {
 			fmt.Println("Invalid king color")
 		}
-		Verify.AllTables[gameID].kingUpdate = false
+		table.kingUpdate = false
 	}
 
-	if Verify.AllTables[gameID].rookUpdate == true {
+	if table.rookUpdate == true {
 		if piece == "bR" && newSourceRow == 0 && newSourceCol == 0 { //black queen rook
-			Verify.AllTables[gameID].bqrMoved = true
+			table.bqrMoved = true
 		} else if piece == "bR" && newSourceRow == 0 && newSourceCol == 7 { //black king rook
-			Verify.AllTables[gameID].bkrMoved = true
+			table.bkrMoved = true
 		} else if piece == "wR" && newSourceRow == 7 && newSourceCol == 0 { //white queen rook
-			Verify.AllTables[gameID].wqrMoved = true
+			table.wqrMoved = true
 		} else if piece == "wR" && newSourceRow == 7 && newSourceCol == 7 { //white king rook move
-			Verify.AllTables[gameID].wkrMoved = true
+			table.wkrMoved = true
 		}
-		Verify.AllTables[gameID].rookUpdate = false
+		table.rookUpdate = false
 	}
-	Verify.AllTables[gameID].undoWPass = false //no longer need to watch out for undo en passent
-	Verify.AllTables[gameID].undoBPass = false
-	Verify.AllTables[gameID].pawnMove++
-	switchTurns(gameID)
+	table.undoWPass = false //no longer need to watch out for undo en passent
+	table.undoBPass = false
+	table.pawnMove++
+	table.switchTurns()
 	return true
 }
 
@@ -249,66 +250,70 @@ func convertLetter(letter byte) int8 {
 
 }
 
-//makes the chess move on the board, verify the move first, returns captured piece as a string to be used in case of a move undo
-func makeMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, piece string, gameID int) string {
+//makes the chess move on the board, verify the move first, returns captured piece
+//as a string to be used in case of a move undo
+func (table *Table) makeMove(sourceRow int8, sourceCol int8, targetRow int8,
+	targetCol int8, piece string) string {
 
-	capturedPiece := Verify.AllTables[gameID].ChessBoard[targetRow][targetCol]
+	capturedPiece := table.ChessBoard[targetRow][targetCol]
 	//make the source square blank as now the piece is no longer there
-	Verify.AllTables[gameID].ChessBoard[sourceRow][sourceCol] = "-"
+	table.ChessBoard[sourceRow][sourceCol] = "-"
 
 	if targetRow == 0 && piece == "wP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "w" + strings.ToUpper(Verify.AllTables[gameID].promotion)
+		table.ChessBoard[targetRow][targetCol] = "w" + strings.ToUpper(table.promotion)
 	} else if targetRow == 7 && piece == "bP" {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = "b" + strings.ToUpper(Verify.AllTables[gameID].promotion)
+		table.ChessBoard[targetRow][targetCol] = "b" + strings.ToUpper(table.promotion)
 	} else {
-		Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = piece //place the piece to its new target square
+		table.ChessBoard[targetRow][targetCol] = piece //place the piece to its new target square
 	}
 	return capturedPiece
 
 }
 
-func switchTurns(gameID int) {
-	if Verify.AllTables[gameID].whiteTurn == true {
-		Verify.AllTables[gameID].whiteTurn = false
+func (table *Table) switchTurns() {
+	if table.whiteTurn == true {
+		table.whiteTurn = false
 	} else {
-		Verify.AllTables[gameID].whiteTurn = true
+		table.whiteTurn = true
 	}
 }
 
-func printBoard(gameID int) {
+func (table *Table) sprintBoard() {
 
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {
-			fmt.Printf("%s ", Verify.AllTables[gameID].ChessBoard[i][j])
+			fmt.Printf("%s ", table.ChessBoard[i][j])
 		}
 		fmt.Printf("\n")
 	}
 }
 
 //undo a move if a player makes a move and doesn't stop check
-func undoMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8, piece string, capturedPiece string, gameID int) {
-	Verify.AllTables[gameID].ChessBoard[sourceRow][sourceCol] = piece
-	Verify.AllTables[gameID].ChessBoard[targetRow][targetCol] = capturedPiece
+func (table *Table) undoMove(sourceRow int8, sourceCol int8, targetRow int8, targetCol int8,
+	piece string, capturedPiece string) {
+
+	table.ChessBoard[sourceRow][sourceCol] = piece
+	table.ChessBoard[targetRow][targetCol] = capturedPiece
 
 	//revert back to original location coordinates for the king
-	if Verify.AllTables[gameID].kingUpdate == true {
+	if table.kingUpdate == true {
 
-		if Verify.AllTables[gameID].whiteTurn == true {
-			Verify.AllTables[gameID].whiteKingX = Verify.AllTables[gameID].whiteOldX
-			Verify.AllTables[gameID].whiteKingY = Verify.AllTables[gameID].whiteOldY
+		if table.whiteTurn == true {
+			table.whiteKingX = table.whiteOldX
+			table.whiteKingY = table.whiteOldY
 		} else {
-			Verify.AllTables[gameID].blackKingX = Verify.AllTables[gameID].blackOldX
-			Verify.AllTables[gameID].blackKingY = Verify.AllTables[gameID].blackOldY
+			table.blackKingX = table.blackOldX
+			table.blackKingY = table.blackOldY
 		}
 
-		Verify.AllTables[gameID].kingUpdate = false
+		table.kingUpdate = false
 	}
 	//checking if there is an enpassent that needs to be undone
-	if Verify.AllTables[gameID].undoWPass == true {
-		Verify.AllTables[gameID].ChessBoard[targetRow+1][targetCol] = "bP" //placing back the pawn
+	if table.undoWPass == true {
+		table.ChessBoard[targetRow+1][targetCol] = "bP" //placing back the pawn
 	}
-	if Verify.AllTables[gameID].undoBPass == true {
-		Verify.AllTables[gameID].ChessBoard[targetRow-1][targetCol] = "wP"
+	if table.undoBPass == true {
+		table.ChessBoard[targetRow-1][targetCol] = "wP"
 	}
 }
 

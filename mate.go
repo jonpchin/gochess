@@ -4,16 +4,16 @@ import "fmt"
 
 //runs through the entire ChessBoard array and searches for black pieces and brute all their possible moves
 //to see if it can capture the white king in one move
-func isWhiteInCheck(gameID int) bool {
-	result := canBlackKillSquare(Verify.AllTables[gameID].whiteKingX, Verify.AllTables[gameID].whiteKingY, gameID)
+func (table *Table) isWhiteInCheck() bool {
+	result := table.canBlackKillSquare(table.whiteKingX, table.whiteKingY)
 	if result == true { //then white's king is in check
 		return true
 	}
 	return false
 }
 
-func isBlackInCheck(gameID int) bool {
-	result := canWhiteKillSquare(Verify.AllTables[gameID].blackKingX, Verify.AllTables[gameID].blackKingY, gameID)
+func (table *Table) isBlackInCheck() bool {
+	result := table.canWhiteKillSquare(table.blackKingX, table.blackKingY)
 
 	if result == true { //then black's king is in check
 		return true
@@ -22,9 +22,9 @@ func isBlackInCheck(gameID int) bool {
 }
 
 //checks to see if white is in checkmate by bruteforcing all possible white moves and seeing if white is still in check
-func isWhiteInMate(gameID int) bool {
+func (table *Table) isWhiteInMate() bool {
 
-	if isWhiteInCheck(gameID) == false {
+	if table.isWhiteInCheck() == false {
 		return false
 	}
 
@@ -32,48 +32,48 @@ func isWhiteInMate(gameID int) bool {
 	var j int8
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			color := Verify.AllTables[gameID].ChessBoard[i][j]
+			color := table.ChessBoard[i][j]
 			if color[0:1] == "w" {
 
 				switch color[1:2] {
 				case "P":
 
-					result := whitePawn(i, j, gameID)
+					result := table.whitePawn(i, j)
 					if result == false { //if there is a pawn move in which king is not in check, then its not mate
 
 						return false
 					}
 				case "N":
 
-					result := whiteKnight(i, j, gameID)
+					result := table.whiteKnight(i, j)
 					if result == false {
 
 						return false
 					}
 				case "B":
 
-					result := whiteBishop(i, j, gameID)
+					result := table.whiteBishop(i, j)
 					if result == false {
 
 						return false
 					}
 				case "R":
 
-					result := whiteRook(i, j, gameID)
+					result := table.whiteRook(i, j)
 					if result == false {
 
 						return false
 					}
 				case "Q":
 
-					result := whiteQueen(i, j, gameID)
+					result := table.whiteQueen(i, j)
 					if result == false {
 
 						return false
 					}
 				case "K":
 
-					result := whiteKing(i, j, gameID)
+					result := table.whiteKing(i, j)
 					if result == false {
 
 						return false
@@ -88,52 +88,52 @@ func isWhiteInMate(gameID int) bool {
 	return true
 }
 
-func isBlackInMate(gameID int) bool {
-	if isBlackInCheck(gameID) == false {
+func (table *Table) isBlackInMate() bool {
+	if table.isBlackInCheck() == false {
 		return false
 	}
 
 	var i int8
 	var j int8
+
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			color := Verify.AllTables[gameID].ChessBoard[i][j]
+			color := table.ChessBoard[i][j]
 			if color[0:1] == "b" {
 
 				switch color[1:2] {
 				case "P":
-
-					result := blackPawn(i, j, gameID)
+					result := table.blackPawn(i, j)
 					if result == false { //if there is a pawn move in which king is not in check, then its not mate
 
 						return false
 					}
 				case "N":
-					result := blackKnight(i, j, gameID)
+					result := table.blackKnight(i, j)
 					if result == false {
 
 						return false
 					}
 				case "B":
-					result := blackBishop(i, j, gameID)
+					result := table.blackBishop(i, j)
 					if result == false {
 
 						return false
 					}
 				case "R":
-					result := blackRook(i, j, gameID)
+					result := table.blackRook(i, j)
 					if result == false {
 
 						return false
 					}
 				case "Q":
-					result := blackQueen(i, j, gameID)
+					result := table.blackQueen(i, j)
 					if result == false {
 
 						return false
 					}
 				case "K":
-					result := blackKing(i, j, gameID)
+					result := table.blackKing(i, j)
 					if result == false {
 
 						return false
@@ -148,46 +148,46 @@ func isBlackInMate(gameID int) bool {
 	return true
 }
 
-func isWhiteStaleMate(gameID int) bool {
-	if isWhiteInCheck(gameID) == true || isWhiteInMate(gameID) == true {
+func (table *Table) isWhiteStaleMate() bool {
+	if table.isWhiteInCheck() || table.isWhiteInMate() {
 		return false
 	}
 	var i int8
 	var j int8
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			piece := Verify.AllTables[gameID].ChessBoard[i][j]
+			piece := table.ChessBoard[i][j]
 			if piece[0:1] == "w" {
 				switch piece[1:2] {
 
 				case "P":
-					result := whitePawnStaleMate(i, j, gameID)
+					result := table.whitePawnStaleMate(i, j)
 					if result == false {
 						return false
 					}
 
 				case "N":
-					result := whiteKnightStaleMate(i, j, gameID)
+					result := table.whiteKnightStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "B":
-					result := whiteBishopStaleMate(i, j, gameID)
+					result := table.whiteBishopStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "R":
-					result := whiteRookStaleMate(i, j, gameID)
+					result := table.whiteRookStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "Q":
-					result := whiteQueenStaleMate(i, j, gameID)
+					result := table.whiteQueenStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "K":
-					result := whiteKingStaleMate(i, j, gameID)
+					result := table.whiteKingStaleMate(i, j)
 					if result == false {
 						return false
 					}
@@ -202,46 +202,46 @@ func isWhiteStaleMate(gameID int) bool {
 	return true
 }
 
-func isBlackStaleMate(gameID int) bool {
-	if isBlackInCheck(gameID) == true || isBlackInMate(gameID) == true {
+func (table *Table) isBlackStaleMate() bool {
+	if table.isBlackInCheck() || table.isBlackInMate() {
 		return false
 	}
 	var i int8
 	var j int8
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			piece := Verify.AllTables[gameID].ChessBoard[i][j]
+			piece := table.ChessBoard[i][j]
 			if piece[0:1] == "b" {
 				switch piece[1:2] {
 
 				case "P":
-					result := blackPawnStaleMate(i, j, gameID)
+					result := table.blackPawnStaleMate(i, j)
 					if result == false {
 						return false
 					}
 
 				case "N":
-					result := blackKnightStaleMate(i, j, gameID)
+					result := table.blackKnightStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "B":
-					result := blackBishopStaleMate(i, j, gameID)
+					result := table.blackBishopStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "R":
-					result := blackRookStaleMate(i, j, gameID)
+					result := table.blackRookStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "Q":
-					result := blackQueenStaleMate(i, j, gameID)
+					result := table.blackQueenStaleMate(i, j)
 					if result == false {
 						return false
 					}
 				case "K":
-					result := blackKingStaleMate(i, j, gameID)
+					result := table.blackKingStaleMate(i, j)
 					if result == false {
 						return false
 					}
@@ -257,7 +257,7 @@ func isBlackStaleMate(gameID int) bool {
 }
 
 //checks if no material for mating, KvK, K+B vs K, K+B vs K+B, K+N vs K, K+N vs K+N.
-func noMaterial(gameID int) bool {
+func (table *Table) noMaterial() bool {
 
 	//used to store piece count pawn=0 knight=1 bishop=2 rook=3 queen=4 king=5
 	var white [6]int
@@ -267,7 +267,7 @@ func noMaterial(gameID int) bool {
 	var j int8
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			color := Verify.AllTables[gameID].ChessBoard[i][j]
+			color := table.ChessBoard[i][j]
 			if color[0:1] == "w" {
 
 				switch color[1:2] {
@@ -336,7 +336,7 @@ func noMaterial(gameID int) bool {
 }
 
 //checks if three reptition rule which leads to a draw. returns false if no three repetition is found
-func threeRep(gameID int) bool {
+func (game *ChessGame) threeRep() bool {
 
 	var eightSrc string
 	var eightTar string
@@ -355,31 +355,31 @@ func threeRep(gameID int) bool {
 	var oneSrc string
 	var oneTar string
 
-	var length = len(All.Games[gameID].GameMoves)
+	var length = len(game.GameMoves)
 
-	eightSrc = All.Games[gameID].GameMoves[length-1].S
-	eightTar = All.Games[gameID].GameMoves[length-1].T
+	eightSrc = game.GameMoves[length-1].S
+	eightTar = game.GameMoves[length-1].T
 
-	sevenSrc = All.Games[gameID].GameMoves[length-2].S
-	sevenTar = All.Games[gameID].GameMoves[length-2].T
+	sevenSrc = game.GameMoves[length-2].S
+	sevenTar = game.GameMoves[length-2].T
 
-	sixSrc = All.Games[gameID].GameMoves[length-3].S
-	sixTar = All.Games[gameID].GameMoves[length-3].T
+	sixSrc = game.GameMoves[length-3].S
+	sixTar = game.GameMoves[length-3].T
 
-	fiveSrc = All.Games[gameID].GameMoves[length-4].S
-	fiveTar = All.Games[gameID].GameMoves[length-4].T
+	fiveSrc = game.GameMoves[length-4].S
+	fiveTar = game.GameMoves[length-4].T
 
-	fourSrc = All.Games[gameID].GameMoves[length-5].S
-	fourTar = All.Games[gameID].GameMoves[length-5].T
+	fourSrc = game.GameMoves[length-5].S
+	fourTar = game.GameMoves[length-5].T
 
-	threeSrc = All.Games[gameID].GameMoves[length-6].S
-	threeTar = All.Games[gameID].GameMoves[length-6].T
+	threeSrc = game.GameMoves[length-6].S
+	threeTar = game.GameMoves[length-6].T
 
-	twoSrc = All.Games[gameID].GameMoves[length-7].S
-	twoTar = All.Games[gameID].GameMoves[length-7].T
+	twoSrc = game.GameMoves[length-7].S
+	twoTar = game.GameMoves[length-7].T
 
-	oneSrc = All.Games[gameID].GameMoves[length-8].S
-	oneTar = All.Games[gameID].GameMoves[length-8].T
+	oneSrc = game.GameMoves[length-8].S
+	oneTar = game.GameMoves[length-8].T
 
 	if eightSrc == fourSrc && eightTar == fourTar && sevenSrc == threeSrc &&
 		sevenTar == threeTar && sixSrc == twoSrc && sixTar == twoTar &&
@@ -391,27 +391,27 @@ func threeRep(gameID int) bool {
 }
 
 //checks if fifty moves have been made without a pawn push or capture
-func fiftyMoves(gameID int) bool {
+func (table *Table) fiftyMoves(gameID int) bool {
 	var thisMove int
 	thisMove = (len(All.Games[gameID].GameMoves) + 1) / 2
 	//no capture within 50 moves
-	if (thisMove - Verify.AllTables[gameID].lastCapture) >= 50 {
+	if (thisMove - table.lastCapture) >= 50 {
 		return true
 		//no pawn move within 50 moves
-	} else if (thisMove - Verify.AllTables[gameID].pawnMove) >= 50 {
+	} else if (thisMove - table.pawnMove) >= 50 {
 		return true
 	}
 	return false
 }
 
 //checks if a square is attacked by white in one turn, used to identify check and checkmates
-func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int) bool {
+func (table *Table) canWhiteKillSquare(targetRow int8, targetCol int8) bool {
 	var i int8
 	var j int8
 
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			color := Verify.AllTables[gameID].ChessBoard[i][j]
+			color := table.ChessBoard[i][j]
 			if color[0:1] == "w" {
 				switch color[1:2] {
 				case "P":
@@ -425,17 +425,17 @@ func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int) bool {
 						return true
 					}
 				case "B":
-					result := bishopAttack(i, j, targetRow, targetCol, gameID)
+					result := table.bishopAttack(i, j, targetRow, targetCol)
 					if result == true {
 						return true
 					}
 				case "R":
-					result := rookAttack(i, j, targetRow, targetCol, gameID)
+					result := table.rookAttack(i, j, targetRow, targetCol)
 					if result == true {
 						return true
 					}
 				case "Q":
-					result := queenAttack(i, j, targetRow, targetCol, gameID)
+					result := table.queenAttack(i, j, targetRow, targetCol)
 					if result == true {
 						return true
 					}
@@ -455,13 +455,13 @@ func canWhiteKillSquare(targetRow int8, targetCol int8, gameID int) bool {
 	return false
 }
 
-func canBlackKillSquare(targetRow int8, targetCol int8, gameID int) bool {
+func (table *Table) canBlackKillSquare(targetRow int8, targetCol int8) bool {
 	var i int8
 	var j int8
 
 	for i = 0; i < 8; i++ {
 		for j = 0; j < 8; j++ {
-			color := Verify.AllTables[gameID].ChessBoard[i][j]
+			color := table.ChessBoard[i][j]
 			if color[0:1] == "b" {
 				switch color[1:2] {
 				case "P":
@@ -475,17 +475,17 @@ func canBlackKillSquare(targetRow int8, targetCol int8, gameID int) bool {
 						return true
 					}
 				case "B":
-					result := bishopAttack(i, j, targetRow, targetCol, gameID)
+					result := table.bishopAttack(i, j, targetRow, targetCol)
 					if result == true {
 						return true
 					}
 				case "R":
-					result := rookAttack(i, j, targetRow, targetCol, gameID)
+					result := table.rookAttack(i, j, targetRow, targetCol)
 					if result == true {
 						return true
 					}
 				case "Q":
-					result := queenAttack(i, j, targetRow, targetCol, gameID)
+					result := table.queenAttack(i, j, targetRow, targetCol)
 					if result == true {
 						return true
 					}
