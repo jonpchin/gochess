@@ -56,6 +56,7 @@ func main() {
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
 	http.HandleFunc("/engine", engine)
+	http.HandleFunc("/news", news)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -90,8 +91,8 @@ func main() {
 	//parse console arguments to determine OS environment to use localhost or goplaychess.com
 	//default is localhost if no argument is passed
 	if len(os.Args) > 1 {
-		certPath = "secret/combine.crt"
-		keyPath = "secret/go.key"
+		certPath = "secret/combine2017.crt"
+		keyPath = "secret/go2017.key"
 	}
 
 	go func() {
@@ -132,7 +133,8 @@ func main() {
 			os.Exit(1)
 		}()
 	}()
-
+	//gostuff.FetchNewsSources()
+	//gostuff.ReadAllNews()
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
@@ -178,6 +180,27 @@ func login(w http.ResponseWriter, r *http.Request) {
 func help(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "help.html")
+}
+
+func news(w http.ResponseWriter, r *http.Request) {
+
+	//w.Header().Set("Cache-Control", "public, max-age=14400")
+	var news = template.Must(template.ParseFiles("news.html"))
+
+	providers, success := gostuff.ReadAllNews()
+
+	if success == false {
+		http.Error(w, "Can't read news", http.StatusInternalServerError)
+		return
+	}
+
+	p := gostuff.AllNewsProviders{Providers: providers}
+
+	if err := news.Execute(w, &p); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return
+
 }
 
 func screenshots(w http.ResponseWriter, r *http.Request) {

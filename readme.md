@@ -41,6 +41,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>1. Configure Twitter bot.</p>
 <p>2. Chess TV where live games are randomly broadcasted.</p>
 <p>3. Forums</p>
+<p>4. Admin control</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

@@ -1,6 +1,6 @@
 body{
-    font-family:  Courier;
-    font-size: 14px;
+    font-family:  Verdana;
+    font-size: 13px;
 }
 
 #center{
@@ -16,6 +16,13 @@ body{
 #googleLinechart{
     width: 87%;
     float: right;
+}
+
+.imageSizeLimit{
+    max-height:500px;
+    max-width:500px;
+    height:auto;
+    width:auto;
 }
 
 button {
