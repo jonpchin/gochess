@@ -70,6 +70,36 @@ func SendForgot(target string, token string, url string) {
 	}
 }
 
+// sends sms using email
+// the subject and message that will be sent to the admin
+// which will be delivered in a text message
+func SendSms(subject string, message string) {
+	problem, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer problem.Close()
+	log.SetOutput(problem)
+	readFile, err := os.Open("secret/sms.txt")
+	defer readFile.Close()
+	if err != nil {
+		log.Println("SendSms mail.go ", err)
+	}
+
+	scanner := bufio.NewScanner(readFile)
+
+	scanner.Scan()
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", "goplaychess@gmail.com", "Go Play Chess")
+	m.SetHeader("To", scanner.Text())
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", message)
+
+	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "goplaychess@gmail.com", mailConfig())
+
+	if err := d.DialAndSend(m); err != nil {
+		fmt.Println("error in SendSms mail.go ", err)
+	}
+}
+
 //fetches pass for email account
 func mailConfig() string {
 
