@@ -75,16 +75,17 @@ func FetchNewsSources() {
 		fmt.Println("Just receieved a message I couldn't decode in news.go FetchNewsSources 1:", string(responseData), err)
 	}
 
+	apiKey := getApiKey()
 	for _, source := range newsProviders.Sources {
-		url := "https://newsapi.org/v1/articles?source=" + source.ID + "&apiKey=" + getApiKey()
-		//SaveNewsToFile(source.ID, url)
+		url := "https://newsapi.org/v1/articles?source=" + source.ID + "&apiKey=" + apiKey
+		//saveNewsToFile(source.ID, url)
 		unmarshalNews(url)
 	}
 }
 
 // fetches and saves a single source of news
 // @param url to fetch JSON of articles from a single news provider
-func SaveNewsToFile(filename string, url string) {
+func saveNewsToFile(filename string, url string) {
 
 	responseData := getHttpResponse(url)
 	//fmt.Println(string(responseData))
@@ -100,12 +101,12 @@ func SaveNewsToFile(filename string, url string) {
 func getHttpResponse(url string) []byte {
 	response, err := http.Get(url)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("getHttpResponse 0", err)
 	}
 	defer response.Body.Close()
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("getHttpResponse 1", err)
 	}
 	return responseData
 }
@@ -153,6 +154,26 @@ func getNewsFromFile(path string) (NewsProvider, bool) {
 		return newsProvider, false
 	}
 	return newsProvider, true
+}
+
+// updates all news files that are listed in the newsConfig.txt
+func UpdateNewsFromConfig() {
+
+	const newsConfigPath = "data/newsConfig.txt"
+	config, err := os.Open(newsConfigPath)
+	defer config.Close()
+
+	if err != nil {
+		fmt.Println("news.go getApiKey 1", err)
+	}
+	scanner := bufio.NewScanner(config)
+	apiKey := getApiKey()
+
+	for scanner.Scan() {
+		fileName := scanner.Text()
+		url := "https://newsapi.org/v1/articles?source=" + fileName + "&apiKey=" + apiKey
+		saveNewsToFile(fileName, url)
+	}
 }
 
 // returns news API key
