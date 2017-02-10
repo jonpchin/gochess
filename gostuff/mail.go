@@ -84,7 +84,6 @@ func SendSms(subject string, message string) {
 	}
 
 	scanner := bufio.NewScanner(readFile)
-
 	scanner.Scan()
 
 	m := gomail.NewMessage()

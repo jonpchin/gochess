@@ -13,6 +13,7 @@ func StartCron() {
 	c.AddFunc("@daily", updateRD)
 	//	c.AddFunc("@weekly", ExportDatabase)
 	c.AddFunc("@hourly", UpdateHighScore)
+	c.AddFunc("@hourly", UpdateNewsFromConfig)
 	c.Start()
 }
 

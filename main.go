@@ -11,6 +11,7 @@ import (
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/gostuff"
+
 	"golang.org/x/net/websocket"
 )
 
@@ -135,6 +136,7 @@ func main() {
 	}()
 	//gostuff.FetchNewsSources()
 	//gostuff.ReadAllNews()
+
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
@@ -183,24 +185,8 @@ func help(w http.ResponseWriter, r *http.Request) {
 }
 
 func news(w http.ResponseWriter, r *http.Request) {
-
-	//w.Header().Set("Cache-Control", "public, max-age=14400")
-	var news = template.Must(template.ParseFiles("news.html"))
-
-	providers, success := gostuff.ReadAllNews()
-
-	if success == false {
-		http.Error(w, "Can't read news", http.StatusInternalServerError)
-		return
-	}
-
-	p := gostuff.AllNewsProviders{Providers: providers}
-
-	if err := news.Execute(w, &p); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	return
-
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	http.ServeFile(w, r, "news.html")
 }
 
 func screenshots(w http.ResponseWriter, r *http.Request) {
