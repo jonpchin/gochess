@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"strings"
 )
 
@@ -29,7 +28,12 @@ func setCountry(username string, ipAddress string) string {
 
 	var country = "globe"
 
-	response, err := http.Get("http://freegeoip.net/json/" + ipAddress)
+	client := timeOutHttp(5)
+	response, err := client.Get("http://freegeoip.net/json/" + ipAddress)
+	if response == nil {
+		fmt.Println("URL time out for http://freegeoip.net/json/ in setCountry")
+		return "globe"
+	}
 	defer response.Body.Close()
 	if err != nil {
 		fmt.Println("error in get language 1", err)

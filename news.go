@@ -7,8 +7,8 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
+	"strings"
 )
 
 type NewsProviders struct {
@@ -61,7 +61,12 @@ func FetchNewsSources() {
 	const (
 		newsSourceList = "https://newsapi.org/v1/sources?language=en"
 	)
-	response, err := http.Get(newsSourceList)
+	client := timeOutHttp(5)
+	response, err := client.Get(newsSourceList)
+	if response == nil {
+		fmt.Println("FetchNewsSources URL time out for ", newsSourceList)
+		return
+	}
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -101,7 +106,9 @@ func saveNewsToFile(filename string, url string) {
 // returns the http response of the url in byte
 // convert to string for human readable format
 func getHttpResponse(url string) []byte {
-	response, err := http.Get(url)
+
+	client := timeOutHttp(5)
+	response, err := client.Get(url)
 	if err != nil {
 		fmt.Println("getHttpResponse 0", err)
 	}
@@ -141,6 +148,7 @@ func ReadAllNews() []NewsProvider {
 	for scanner.Scan() {
 		fileName := scanner.Text()
 		article, success := getNewsFromFile("data/news/" + fileName + ".json")
+		article.convertToHttps()
 
 		if success == false {
 			fmt.Println("error reading news source for ", fileName)
@@ -214,6 +222,14 @@ func CreateNewsCache() {
 		return
 	}
 
+}
+
+// makes image url that are http into https if its valid
+// in a NewsProvider
+func (newsProvider *NewsProvider) convertToHttps() {
+	for index, article := range newsProvider.Articles {
+		newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage, "http://", "https://", 1)
+	}
 }
 
 // returns news API key

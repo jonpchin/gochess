@@ -3,12 +3,16 @@ package gostuff
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"testing"
 )
 
 func TestLocale(t *testing.T) {
-	response, err := http.Get("http://freegeoip.net/json/77.124.0.0")
+
+	client := timeOutHttp(5)
+	response, err := client.Get("http://freegeoip.net/json/77.124.0.0")
+	if response == nil {
+		t.Error("URL time out for http://freegeoip.net/json/77.124.0.0 in TestLocale")
+	}
 	if err != nil {
 		t.Error("Failed TestLocale http get")
 	}
@@ -17,6 +21,7 @@ func TestLocale(t *testing.T) {
 	if err != nil {
 		t.Error("Failed TestLocale read body")
 	}
+
 	var ipLocation IPLocation
 
 	if err := json.Unmarshal(htmlData, &ipLocation); err != nil {
