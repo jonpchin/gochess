@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
@@ -123,18 +125,30 @@ func unmarshalNews(url string) NewsProvider {
 }
 
 // reads all news from all files that are listed in a textfile
-// returns false if there was an error reading news
-func ReadAllNews() ([]NewsProvider, bool) {
+func ReadAllNews() []NewsProvider {
 	// for now we will read one news file, later we will loop through more
 	var allArticles []NewsProvider
-	article, success := getNewsFromFile("data/news/hacker-news.json")
-	if success == false {
-		fmt.Println("ReadAllNews 1")
-		return allArticles, false
+
+	const newsConfigPath = "data/newsConfig.txt"
+	config, err := os.Open(newsConfigPath)
+	defer config.Close()
+
+	if err != nil {
+		fmt.Println("news.go ReadAllNews 0", err)
 	}
-	allArticles = append(allArticles, article)
-	//fmt.Println(allArticles)
-	return allArticles, true
+	scanner := bufio.NewScanner(config)
+
+	for scanner.Scan() {
+		fileName := scanner.Text()
+		article, success := getNewsFromFile("data/news/" + fileName + ".json")
+
+		if success == false {
+			fmt.Println("error reading news source for ", fileName)
+		}
+
+		allArticles = append(allArticles, article)
+	}
+	return allArticles
 }
 
 //gets news from file and unmarshalls to be passed to the front end for templating
@@ -164,7 +178,7 @@ func UpdateNewsFromConfig() {
 	defer config.Close()
 
 	if err != nil {
-		fmt.Println("news.go getApiKey 1", err)
+		fmt.Println("news.go UpdateNewsFromConfig 1", err)
 	}
 	scanner := bufio.NewScanner(config)
 	apiKey := getApiKey()
@@ -174,6 +188,32 @@ func UpdateNewsFromConfig() {
 		url := "https://newsapi.org/v1/articles?source=" + fileName + "&apiKey=" + apiKey
 		saveNewsToFile(fileName, url)
 	}
+	CreateNewsCache()
+}
+
+// creates a cached news file
+func CreateNewsCache() {
+	t, err := template.ParseFiles("data/newsTemplate.html")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	f, err := os.Create("news.html")
+	if err != nil {
+		log.Println("create file: ", err)
+		return
+	}
+
+	providers := ReadAllNews()
+
+	config := AllNewsProviders{Providers: providers}
+
+	err = t.Execute(f, config)
+	if err != nil {
+		fmt.Println("execute: ", err)
+		return
+	}
+
 }
 
 // returns news API key
