@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
@@ -96,7 +95,7 @@ func saveNewsToFile(filename string, url string) {
 
 	responseData := getHttpResponse(url)
 	//fmt.Println(string(responseData))
-	newsOutputPath := "data/news/" + filename + ".json"
+	newsOutputPath := "privatedata/news/" + filename + ".json"
 	err := ioutil.WriteFile(newsOutputPath, responseData, 0666)
 	if err != nil {
 		fmt.Println(err)
@@ -136,7 +135,7 @@ func ReadAllNews() []NewsProvider {
 	// for now we will read one news file, later we will loop through more
 	var allArticles []NewsProvider
 
-	const newsConfigPath = "data/newsConfig.txt"
+	const newsConfigPath = "privatedata/newsConfig.txt"
 	config, err := os.Open(newsConfigPath)
 	defer config.Close()
 
@@ -147,7 +146,7 @@ func ReadAllNews() []NewsProvider {
 
 	for scanner.Scan() {
 		fileName := scanner.Text()
-		article, success := getNewsFromFile("data/news/" + fileName + ".json")
+		article, success := getNewsFromFile("privatedata/news/" + fileName + ".json")
 		article.convertToHttps()
 
 		if success == false {
@@ -181,7 +180,7 @@ func getNewsFromFile(path string) (NewsProvider, bool) {
 // updates all news files that are listed in the newsConfig.txt
 func UpdateNewsFromConfig() {
 
-	const newsConfigPath = "data/newsConfig.txt"
+	const newsConfigPath = "privatedata/newsConfig.txt"
 	config, err := os.Open(newsConfigPath)
 	defer config.Close()
 
@@ -201,14 +200,14 @@ func UpdateNewsFromConfig() {
 
 // creates a cached news file
 func CreateNewsCache() {
-	t, err := template.ParseFiles("data/newsTemplate.html")
+	t, err := template.ParseFiles("cache/newsTemplate.html")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	f, err := os.Create("news.html")
 	if err != nil {
-		log.Println("create file: ", err)
+		fmt.Println("create file: ", err)
 		return
 	}
 
@@ -236,7 +235,7 @@ func (newsProvider *NewsProvider) convertToHttps() {
 func getApiKey() string {
 
 	// The file path where the news API key is
-	const apiKeyPath = "data/newsApiKey.txt"
+	const apiKeyPath = "privatedata/newsApiKey.txt"
 	config, err := os.Open(apiKeyPath)
 	defer config.Close()
 
