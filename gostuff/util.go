@@ -5,8 +5,10 @@ import (
 	"image"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/disintegration/imaging"
 	"github.com/mholt/archiver"
@@ -152,4 +154,13 @@ func getImageDimensions(imagePath string) (int, int) {
 		log.Println(err)
 	}
 	return image.Width, image.Height
+}
+
+// returns a http client to time out requests that take too long
+// @seconds number of seconds for the request before it times out
+func timeOutHttp(seconds time.Duration) http.Client {
+	timeout := time.Duration(seconds * time.Second)
+	return http.Client{
+		Timeout: timeout,
+	}
 }
