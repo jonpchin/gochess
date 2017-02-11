@@ -42,6 +42,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>2. Chess TV where live games are randomly broadcasted.</p>
 <p>3. Forums</p>
 <p>4. Admin control</p>
+<p>5. Configure weekly backup sync to dropbox, exclude games folder</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

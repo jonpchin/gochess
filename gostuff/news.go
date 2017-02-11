@@ -68,6 +68,7 @@ func FetchNewsSources() {
 	}
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer response.Body.Close()
 	responseData, err := ioutil.ReadAll(response.Body)
@@ -79,13 +80,13 @@ func FetchNewsSources() {
 
 	if err := json.Unmarshal(responseData, &newsProviders); err != nil {
 		fmt.Println("Just receieved a message I couldn't decode in news.go FetchNewsSources 1:", string(responseData), err)
+		return
 	}
 
 	apiKey := getApiKey()
 	for _, source := range newsProviders.Sources {
 		url := "https://newsapi.org/v1/articles?source=" + source.ID + "&apiKey=" + apiKey
-		//saveNewsToFile(source.ID, url)
-		unmarshalNews(url)
+		saveNewsToFile(source.ID, url)
 	}
 }
 
@@ -94,7 +95,6 @@ func FetchNewsSources() {
 func saveNewsToFile(filename string, url string) {
 
 	responseData := getHttpResponse(url)
-	//fmt.Println(string(responseData))
 	newsOutputPath := "privatedata/news/" + filename + ".json"
 	err := ioutil.WriteFile(newsOutputPath, responseData, 0666)
 	if err != nil {
@@ -119,21 +119,8 @@ func getHttpResponse(url string) []byte {
 	return responseData
 }
 
-// unmarshalls news and returns an array of all articles from a news provider
-func unmarshalNews(url string) NewsProvider {
-
-	var newsProvider NewsProvider
-	newsData := getHttpResponse(url)
-	if err := json.Unmarshal(newsData, &newsProvider); err != nil {
-		fmt.Println("Just receieved a message I couldn't decode in news.go FetchNewsSources 1:", string(newsData), err)
-	}
-	return newsProvider
-}
-
 // reads all news from all files that are listed in a textfile
-func ReadAllNews() []NewsProvider {
-	// for now we will read one news file, later we will loop through more
-	var allArticles []NewsProvider
+func (allArticles *AllNewsProviders) ReadAllNews() {
 
 	const newsConfigPath = "privatedata/newsConfig.txt"
 	config, err := os.Open(newsConfigPath)
@@ -146,35 +133,34 @@ func ReadAllNews() []NewsProvider {
 
 	for scanner.Scan() {
 		fileName := scanner.Text()
-		article, success := getNewsFromFile("privatedata/news/" + fileName + ".json")
-		article.convertToHttps()
-
+		var newsProvider NewsProvider
+		success := newsProvider.getNewsFromFile("privatedata/news/" + fileName + ".json")
 		if success == false {
 			fmt.Println("error reading news source for ", fileName)
 		}
-
-		allArticles = append(allArticles, article)
+		newsProvider.convertToHttps()
+		allArticles.Providers = append(allArticles.Providers, newsProvider)
 	}
-	return allArticles
 }
 
 //gets news from file and unmarshalls to be passed to the front end for templating
 // returns true if sucessfully reads and unmarshals
-func getNewsFromFile(path string) (NewsProvider, bool) {
+func (newsProvider *NewsProvider) getNewsFromFile(path string) bool {
 
 	newsData, err := ioutil.ReadFile(path)
-	var newsProvider NewsProvider
 
 	if err != nil {
 		fmt.Println(err)
-		return newsProvider, false
+		return false
 	}
 
 	if err := json.Unmarshal(newsData, &newsProvider); err != nil {
-		fmt.Println("Just receieved a message I couldn't decode in news.go FetchNewsSources 1:", string(newsData), err)
-		return newsProvider, false
+		fmt.Println("Just receieved a message I couldn't decode in news.go getNewsFromFile 1:",
+			string(newsData), err)
+		return false
 	}
-	return newsProvider, true
+
+	return true
 }
 
 // updates all news files that are listed in the newsConfig.txt
@@ -207,27 +193,33 @@ func CreateNewsCache() {
 	}
 	f, err := os.Create("news.html")
 	if err != nil {
-		fmt.Println("create file: ", err)
+		fmt.Println("CreateNewsCache 0: ", err)
 		return
 	}
+	var allNewProviders AllNewsProviders
+	allNewProviders.ReadAllNews()
 
-	providers := ReadAllNews()
-
-	config := AllNewsProviders{Providers: providers}
-
-	err = t.Execute(f, config)
+	err = t.Execute(f, allNewProviders)
 	if err != nil {
-		fmt.Println("execute: ", err)
+		fmt.Println("CreateNewsCache 1: ", err)
 		return
 	}
 
 }
 
 // makes image url that are http into https if its valid
-// in a NewsProvider
+// in a NewsProvider, othwerise convert back to http if https times out
 func (newsProvider *NewsProvider) convertToHttps() {
 	for index, article := range newsProvider.Articles {
-		newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage, "http://", "https://", 1)
+		newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage,
+			"http://", "https://", 1)
+
+		client := timeOutHttp(5)
+		response, err := client.Get(newsProvider.Articles[index].UrlToImage)
+		if response == nil {
+			fmt.Println("convertToHttps URL time out for ",
+				newsProvider.Articles[index].UrlToImage, err)
+		}
 	}
 }
 
