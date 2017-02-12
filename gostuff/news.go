@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 )
@@ -60,26 +61,31 @@ func FetchNewsSources() {
 	const (
 		newsSourceList = "https://newsapi.org/v1/sources?language=en"
 	)
+
+	logFile, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer logFile.Close()
+	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
+
 	client := timeOutHttp(5)
 	response, err := client.Get(newsSourceList)
 	if response == nil {
-		fmt.Println("FetchNewsSources URL time out for ", newsSourceList)
+		log.Println("FetchNewsSources URL time out for ", newsSourceList)
 		return
 	}
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	defer response.Body.Close()
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	var newsProviders NewsProviders
 
 	if err := json.Unmarshal(responseData, &newsProviders); err != nil {
-		fmt.Println("Just receieved a message I couldn't decode in news.go FetchNewsSources 1:", string(responseData), err)
+		log.Println("Just receieved a message I couldn't decode in news.go FetchNewsSources 1:", string(responseData), err)
 		return
 	}
 
@@ -150,7 +156,7 @@ func (newsProvider *NewsProvider) getNewsFromFile(path string) bool {
 	newsData, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("getNewsFromFile", err)
 		return false
 	}
 
@@ -186,14 +192,19 @@ func UpdateNewsFromConfig() {
 
 // creates a cached news file
 func CreateNewsCache() {
+
+	logFile, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer logFile.Close()
+	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
+
 	t, err := template.ParseFiles("cache/newsTemplate.html")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	f, err := os.Create("news.html")
 	if err != nil {
-		fmt.Println("CreateNewsCache 0: ", err)
+		log.Println(err)
 		return
 	}
 	var allNewProviders AllNewsProviders
@@ -201,7 +212,7 @@ func CreateNewsCache() {
 
 	err = t.Execute(f, allNewProviders)
 	if err != nil {
-		fmt.Println("CreateNewsCache 1: ", err)
+		log.Println(err)
 		return
 	}
 
@@ -210,6 +221,10 @@ func CreateNewsCache() {
 // makes image url that are http into https if its valid
 // in a NewsProvider, othwerise convert back to http if https times out
 func (newsProvider *NewsProvider) convertToHttps() {
+	logFile, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+	defer logFile.Close()
+	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
+
 	for index, article := range newsProvider.Articles {
 		newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage,
 			"http://", "https://", 1)
@@ -217,7 +232,7 @@ func (newsProvider *NewsProvider) convertToHttps() {
 		client := timeOutHttp(5)
 		response, err := client.Get(newsProvider.Articles[index].UrlToImage)
 		if response == nil {
-			fmt.Println("convertToHttps URL time out for ",
+			log.Println("convertToHttps URL time out for ",
 				newsProvider.Articles[index].UrlToImage, err)
 		}
 	}

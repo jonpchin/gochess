@@ -137,6 +137,7 @@ func main() {
 	//gostuff.FetchNewsSources()
 	//gostuff.ReadAllNews()
 	//gostuff.UpdateNewsFromConfig()
+	//gostuff.FakeDataForTravis()
 
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
