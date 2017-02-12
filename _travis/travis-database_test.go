@@ -2,6 +2,7 @@ package travis
 
 import (
 	"database/sql"
+	"fmt"
 	"os/exec"
 	"testing"
 
@@ -59,8 +60,9 @@ func importDbIntoTravis() error {
 	const (
 		filePath = "./data/gochessTemplate.sql"
 	)
-	_, err := exec.Command("mysql", "-u", "root", "-h", "localhost", "-d", "gochess", "-a", "-f", filePath).Output()
+	result, err := exec.Command("mysql", "-u", "root", "-h", "localhost", "-d", "gochess", "-a", "-f", filePath).Output()
 	if err != nil {
+		fmt.Println(result)
 		return err
 	}
 	return nil
