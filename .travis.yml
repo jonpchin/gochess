@@ -6,11 +6,9 @@ services:
 script:
 - go test ./gostuff
 - go test ./_travis
-
+sudo: true
 before_install:
-- chmod +x ./_travis/data/*
-- ./_travis/data/travis_mysql_5.7.sh
-- ./_travis/data/mysql-reset-root-password.sh
+- bash ./_travis/data/travis-install-mysql-5.7.sh
 - mysql --version
 - pwd
 - cd ./_travis/data
