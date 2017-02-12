@@ -2,7 +2,6 @@ package travis
 
 import (
 	"database/sql"
-	"fmt"
 	"os/exec"
 	"testing"
 
@@ -13,6 +12,7 @@ var db *sql.DB
 
 // Travis CI default MySQL username and pass is public information
 func TestDbConnect(t *testing.T) {
+
 	// make sure MySQL connection is alive before proceeding
 	if gostuff.CheckDBConnection("data/dbtravis.txt") == false {
 		t.Fatal("Failed to connect to MySQL in Travis CI")
@@ -30,9 +30,9 @@ func TestDbConnect(t *testing.T) {
 		t.Fatal("Can't ping MySQL")
 	}
 
-	err, result := importDbIntoTravis()
+	err = importDbIntoTravis()
 	if err != nil {
-		t.Fatal("Can't import database", err, "result is", result)
+		t.Fatal("Can't import database", err)
 	}
 	/*
 		err = importTablesIntoTravis()
@@ -56,17 +56,15 @@ func TestDbConnect(t *testing.T) {
 }
 
 // imports template database into travis, returns error if there was one
-func importDbIntoTravis() (error, string) {
+func importDbIntoTravis() error {
 	const (
 		filePath = "./data/gochessTemplate.sql"
 	)
-	result, err := exec.Command("ls").Output()
-	fmt.Println(string(result))
+	_, err := exec.Command("/bin/bash", "-c", "cd data && bash importTravisTemplate.sh").Output()
 	if err != nil {
-		fmt.Println(result)
-		return err, string(result)
+		return err
 	}
-	return nil, ""
+	return nil
 }
 
 // imports fake data into tables on travis, returns error if there was one
