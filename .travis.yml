@@ -6,6 +6,8 @@ services:
 script:
 - go test ./gostuff
 - go test ./_travis
+before_install:
+- mysql -e 'CREATE DATABASE IF NOT EXISTS gochess;'
 dd:
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
   -in importTravisTemplate.sh.enc -out importTravisTemplate.sh -d
