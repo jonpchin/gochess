@@ -29,12 +29,12 @@ func TestDbConnect(t *testing.T) {
 		t.Fatal("Can't ping MySQL")
 	}
 
-	err := importDbIntoTravis()
+	err = importDbIntoTravis()
 	if err != nil {
 		t.Fatal("Can't import database", err)
 	}
 
-	err := importDbIntoTravis()
+	err = importDbIntoTravis()
 	if err != nil {
 		t.Fatal("Error importing tables into travis", err)
 	}

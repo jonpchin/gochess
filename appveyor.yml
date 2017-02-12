@@ -27,6 +27,7 @@ install:
   - go get -u github.com/mholt/archiver
   - go get -u github.com/sclevine/agouti
   - go get -u gopkg.in/freeeve/pgn.v1
+  - go get -u github.com/icrowley/fake
 
 build_script:
   - go build main.go
