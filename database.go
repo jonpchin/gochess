@@ -7,8 +7,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -556,4 +558,20 @@ func getRatingHistory(name string, gametype string) (string, bool) {
 		return "", false
 	}
 	return ratingHistory, true
+}
+
+// execute line by line in sql script, does not work for stored procedures
+func executeSqlScript(filepath string) {
+	file, err := ioutil.ReadAll("/path/to/file")
+
+	if err != nil {
+		// handle error
+	}
+
+	requests := strings.Split(string(file), ";")
+
+	for _, request := range requests {
+		result, err := db.Exec(request)
+		// do whatever you need with result and error
+	}
 }
