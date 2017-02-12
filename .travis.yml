@@ -10,5 +10,6 @@ script:
 before_install:
 - openssl aes-256-cbc -K $encrypted_bec7680ae95b_key -iv $encrypted_bec7680ae95b_iv
   -in ./_travis/data/travis.tar.enc -out ./_travis/data/travis.tar -d
+- tar xvf travis.tar
 - bash ./_travis/data/importTravisTemplate.sh
 - bash ./_travis/data/importTravisTables.sh
