@@ -61,6 +61,7 @@ func importDbIntoTravis() (error, string) {
 		filePath = "./data/gochessTemplate.sql"
 	)
 	result, err := exec.Command("ls").Output()
+	fmt.Println(string(result))
 	if err != nil {
 		fmt.Println(result)
 		return err, string(result)
