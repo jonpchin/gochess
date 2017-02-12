@@ -8,8 +8,8 @@ script:
 - go test ./_travis
 dd:
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
-  -in importTables.sh.enc -out importTables.sh -d
+  -in importTravisTemplate.sh.enc -out importTravisTemplate.sh -d
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
-  -in importTemplate.sh.enc -out importTemplate.sh -d
+  -in importTravisTables.sh.enc -out importTravisTables.sh -d
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
   -in gochessTemplate.sql.enc -out gochessTemplate.sql -d
