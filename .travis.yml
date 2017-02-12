@@ -8,6 +8,9 @@ script:
 - go test ./_travis
 
 before_install:
+- chmod +x ./_travis/data/
+- ./_travis/data/travis_mysql_5.7.sh
+- ./_travis/data/mysql-reset-root-password.sh
 - mysql --version
 - pwd
 - cd ./_travis/data
