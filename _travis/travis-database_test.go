@@ -57,7 +57,7 @@ func TestDbConnect(t *testing.T) {
 // imports template database into travis, returns error if there was one
 func importDbIntoTravis() error {
 	const (
-		filePath = "./_travis/data/gochessTemplate.sql"
+		filePath = "./data/gochessTemplate.sql"
 	)
 	_, err := exec.Command("mysql", "-u", "root", "-h", "localhost", "-d", "gochess", "-a", "-f", filePath).Output()
 	if err != nil {
@@ -68,7 +68,7 @@ func importDbIntoTravis() error {
 
 // imports fake data into tables on travis, returns error if there was one
 func importTablesIntoTravis() error {
-	_, err := exec.Command("/bin/bash", "-c", "cd _travis/data && bash importTravisTables.sh").Output()
+	_, err := exec.Command("/bin/bash", "-c", "cd data && bash importTravisTables.sh").Output()
 	if err != nil {
 		return err
 	}
