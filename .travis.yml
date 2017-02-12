@@ -9,13 +9,11 @@ script:
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
-  -in importTravisTemplate.sh.enc -out importTravisTemplate.sh -d
+  -in ./_travis/data/importTravisTemplate.sh.enc -out ./_travis/data/importTravisTemplate.sh -d
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
-  -in importTravisTables.sh.enc -out importTravisTables.sh -d
+  -in ./_travis/data/importTravisTables.sh.enc -out ./_travis/data/importTravisTables.sh -d
 - openssl aes-256-cbc -K $encrypted_19d459116927_key -iv $encrypted_19d459116927_iv
-  -in gochessTemplate.sql.enc -out gochessTemplate.sql -d
+  -in ./_travis/data/gochessTemplate.sql.enc -out ./_travis/data/gochessTemplate.sql -d
 - mysql -e 'CREATE DATABASE IF NOT EXISTS gochess;'
-
-script:
-    - bash ./_travis/data/importTravisTemplate.sh
-    - bash ./_travis/data/importTravisTables.sh
+- bash ./_travis/data/importTravisTemplate.sh
+- bash ./_travis/data/importTravisTables.sh
