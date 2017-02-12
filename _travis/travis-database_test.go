@@ -29,11 +29,12 @@ func TestDbConnect(t *testing.T) {
 	if db.Ping() != nil {
 		t.Fatal("Can't ping MySQL")
 	}
-
-	err, result := importDbIntoTravis()
-	if err != nil {
-		t.Fatal("Can't import database", err, "result is ", result)
-	}
+	/*
+		err, result := importDbIntoTravis()
+		if err != nil {
+			t.Fatal("Can't import database", err, "result is ", result)
+		}
+	*/
 	/*
 		err = importTablesIntoTravis()
 		if err != nil {
