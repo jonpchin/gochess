@@ -30,9 +30,9 @@ func TestDbConnect(t *testing.T) {
 		t.Fatal("Can't ping MySQL")
 	}
 
-	err = importDbIntoTravis()
+	err ,result,  := importDbIntoTravis()
 	if err != nil {
-		t.Fatal("Can't import database", err)
+		t.Fatal("Can't import database", err, "result is", result)
 	}
 	/*
 		err = importTablesIntoTravis()
@@ -56,16 +56,16 @@ func TestDbConnect(t *testing.T) {
 }
 
 // imports template database into travis, returns error if there was one
-func importDbIntoTravis() error {
+func importDbIntoTravis() (error, string) {
 	const (
 		filePath = "./data/gochessTemplate.sql"
 	)
-	result, err := exec.Command("mysql", "-u", "root", "-h", "localhost", "-d", "gochess", "-a", "-f", filePath).Output()
+	result, err := exec.Command("ls").Output()
 	if err != nil {
 		fmt.Println(result)
-		return err
+		return err, result
 	}
-	return nil
+	return nil, ""
 }
 
 // imports fake data into tables on travis, returns error if there was one
