@@ -17,3 +17,4 @@ before_install:
 - tar xvf travis.tar
 - bash ./importTravisTemplate.sh
 - bash ./importTravisTables.sh
+- cd ../../
