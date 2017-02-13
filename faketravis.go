@@ -77,5 +77,4 @@ func populateUserInfo(rows int) {
 		// write out csv into file
 		fmt.Fprintln(file, row)
 	}
-
 }

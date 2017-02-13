@@ -194,7 +194,6 @@ func hashPass(username string, password string) (string, error) {
 	dk, err := scrypt.Key([]byte(password), []byte(username), 16384, 8, 1, 32)
 
 	if err != nil {
-
 		log.Println(err)
 		return "", err
 	}
