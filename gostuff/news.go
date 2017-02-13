@@ -165,7 +165,6 @@ func (newsProvider *NewsProvider) getNewsFromFile(path string) bool {
 			string(newsData), err)
 		return false
 	}
-
 	return true
 }
 
@@ -215,7 +214,6 @@ func CreateNewsCache() {
 		log.Println(err)
 		return
 	}
-
 }
 
 // makes image url that are http into https if its valid
