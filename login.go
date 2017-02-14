@@ -81,7 +81,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 
 		//if user entered password incorrect two times or more then they need to enter captcha to login
 		if captcha >= 2 {
-			w.Write([]byte("<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' /> You entered password incorrecty too many times. Now you need to enter captcha."))
+			w.Write([]byte("<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' /> You entered password incorrectly too many times. Now you need to enter captcha."))
 			return
 		}
 		//checking if password entered by user matches encrypted key
@@ -100,7 +100,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 			needToActivate(w, r, username)
 			return
 		}
-		// update captcha to zero since login was a sucess
+		// update captcha to zero since login was a success
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		defer stmt.Close()
 		if err != nil {
@@ -202,7 +202,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		enterInside(w, username, ipAddress)
 
-		// update captcha to zero since login was a sucess
+		// update captcha to zero since login was a success
 		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
 		defer stmt.Close()
 

@@ -97,10 +97,10 @@ func DbSetup(backup string) bool {
 				fmt.Println("database.go Dbsetup FAILED to import both databases!")
 				return false
 			} else {
-				fmt.Println("Empty template database sucessfully imported!")
+				fmt.Println("Empty template database successfully imported!")
 			}
 		} else {
-			fmt.Println(database, "database sucessfully imported!")
+			fmt.Println(database, "database successfully imported!")
 		}
 		// Pinging database again to see if newly database exists
 		if db.Ping() != nil {

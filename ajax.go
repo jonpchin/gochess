@@ -291,7 +291,7 @@ func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
 	if isHistory {
 		w.Write([]byte(bullet))
 	} else {
-		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
 	}
 }
 
@@ -306,7 +306,7 @@ func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 	if isHistory {
 		w.Write([]byte(blitz))
 	} else {
-		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
 	}
 }
 
@@ -321,7 +321,7 @@ func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 	if isHistory {
 		w.Write([]byte(standard))
 	} else {
-		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
 	}
 }
 
@@ -336,7 +336,7 @@ func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
 	if isHistory {
 		w.Write([]byte(correspondence))
 	} else {
-		w.Write([]byte("")) // blank string will be checked if history was sucesfully fetched
+		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
 	}
 }
 

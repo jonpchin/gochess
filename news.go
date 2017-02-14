@@ -150,7 +150,7 @@ func (allArticles *AllNewsProviders) ReadAllNews() {
 }
 
 //gets news from file and unmarshalls to be passed to the front end for templating
-// returns true if sucessfully reads and unmarshals
+// returns true if successfully reads and unmarshals
 func (newsProvider *NewsProvider) getNewsFromFile(path string) bool {
 
 	newsData, err := ioutil.ReadFile(path)

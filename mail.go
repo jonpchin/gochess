@@ -11,7 +11,6 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-//returns true if sucessful sent email
 func Sendmail(target string, token string, name string, url string) {
 
 	m := gomail.NewMessage()
