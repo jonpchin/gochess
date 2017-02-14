@@ -43,7 +43,7 @@ func CompressDatabase() {
 	}
 }
 
-//imports the main gochess database, returns true if sucessful
+//imports the main gochess database, returns true if successful
 func importDatabase() bool {
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()

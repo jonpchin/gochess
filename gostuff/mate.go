@@ -335,7 +335,7 @@ func (table *Table) noMaterial() bool {
 	return false
 }
 
-//checks if three reptition rule which leads to a draw. returns false if no three repetition is found
+//checks if three repetition rule which leads to a draw. returns false if no three repetition is found
 func (game *ChessGame) threeRep() bool {
 
 	var eightSrc string

@@ -1,5 +1,7 @@
 ![Alt text](https://travis-ci.org/jonpchin/GoChess.svg?branch=master "Travis CI Go Play Chess Image")
 [![Build status](https://ci.appveyor.com/api/projects/status/96kvdw3mr190y854?svg=true)](https://ci.appveyor.com/project/jonpchin/gochess)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jonpchin/gochess)](https://goreportcard.com/report/github.com/jonpchin/gochess)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 <br><br>
 <br>
 ![Alt text](/img/screenshots/lobbyresize.png?raw=true "Chess Lobby")
@@ -42,7 +44,6 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>2. Chess TV where live games are randomly broadcasted.</p>
 <p>3. Forums</p>
 <p>4. Admin control</p>
-<p>5. Configure weekly backup sync to dropbox, exclude games folder</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

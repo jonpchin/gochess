@@ -64,7 +64,7 @@ func populateUserInfo(rows int) {
 		//default to yes they are activated, will still test
 		//account activiation by setting one to no
 		row = row + "No,"
-		// set to zero to signify no incorect captcha entered yet
+		// set to zero to signify no incorrect captcha entered yet
 		row = row + "0,"
 		// default to us country code
 		row = row + "us,"

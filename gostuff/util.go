@@ -133,7 +133,7 @@ func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight
 			return
 		}
 	}
-	fmt.Println("Images sucessfully resized")
+	fmt.Println("Images successfully resized")
 }
 
 // pass in file path to image, returns width and heigh of image

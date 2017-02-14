@@ -542,6 +542,6 @@ func startPendingMatch(seekerName string, matchID int) bool {
 		chessgame.setClocks(game.WhitePlayer)
 	}()
 
-	// a match was sucessfully started so do not proceed in sending a new seek
+	// a match was succesfully started so do not proceed in sending a new seek
 	return false
 }

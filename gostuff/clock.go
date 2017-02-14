@@ -142,6 +142,4 @@ func (table *Table) startClock(gameID int, minutes int, seconds int, color strin
 			}
 		}
 	}
-
-	return 0, 0
 }

@@ -9,7 +9,7 @@ import (
 // Overrideable Defaults
 var (
 	// Constrains the volatility. Typically set between 0.3 and 1.2.  Often
-	// refered to as the 'system' constant.
+	// referred to as the 'system' constant.
 	DefaultTau = 0.3
 
 	DefaultRat = 1500.0 // Default starting rating
