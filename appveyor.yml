@@ -31,7 +31,7 @@ build_script:
   - secure-file\tools\secure-file -decrypt importAppVeyorTables.sh.enc -secret %gochess_decrypt%
   - secure-file\tools\secure-file -decrypt importAppVeyorTemplate.sh.enc -secret %gochess_decrypt%
   - secure-file\tools\secure-file -decrypt my.ini.enc -secret %gochess_decrypt%
-  - copy my.ini "C:\Program Files\MySql\MySQL Server 5.7"" /y
+  - copy my.ini "C:\Program Files\MySql\MySQL Server 5.7" /y
   - bash importAppVeyorTemplate.sh
   - bash importAppVeyorTables.sh
   - cd ../..
