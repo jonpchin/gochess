@@ -21,10 +21,10 @@ install:
   - go env
   - go get -t -v ./...
   - nuget install secure-file -ExcludeVersion
-  - secure-file\tools\secure-file -decrypt _appveyor/data/gochessTemplate.sql.enc -secret %gochess_decrypt%
-  - secure-file\tools\secure-file -decrypt _appveyor/data/importAppVeyorTables.sh.enc -secret %gochess_decrypt%
-  - secure-file\tools\secure-file -decrypt _appveyor/data/importAppVeyorTemplate.sh.enc -secret %gochess_decrypt%
   - cd _appveyor\data
+  - secure-file\tools\secure-file -decrypt gochessTemplate.sql.enc -secret %gochess_decrypt%
+  - secure-file\tools\secure-file -decrypt importAppVeyorTables.sh.enc -secret %gochess_decrypt%
+  - secure-file\tools\secure-file -decrypt importAppVeyorTemplate.sh.enc -secret %gochess_decrypt%
   - bash importAppVeyorTemplate.sh
   - bash importAppVeyorTables.sh
   - cd ../..
