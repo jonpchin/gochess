@@ -21,7 +21,9 @@ install:
   - go env
   - go get -t -v ./...
   - nuget install secure-file -ExcludeVersion
+  - ls
   - cd _appveyor\data
+  - ls
   - secure-file\tools\secure-file -decrypt gochessTemplate.sql.enc -secret %gochess_decrypt%
   - secure-file\tools\secure-file -decrypt importAppVeyorTables.sh.enc -secret %gochess_decrypt%
   - secure-file\tools\secure-file -decrypt importAppVeyorTemplate.sh.enc -secret %gochess_decrypt%
