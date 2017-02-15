@@ -8,13 +8,11 @@ clone_folder: c:\gopath\src\github.com\jonpchin\gochess
 environment:
   GOPATH: c:\gopath
   GOVERSION: 1.7.4
+  gochess_decrypt:
+    secure: yeEOqoy3DBRMeIA/10O3jA==
 
 services:
   - mysql
-  
-environment:
-  gochess_decrypt:
-    secure: yeEOqoy3DBRMeIA/10O3jA==
 
 # scripts that run after cloning repository  
 install:
