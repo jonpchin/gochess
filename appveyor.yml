@@ -11,6 +11,10 @@ environment:
 
 services:
   - mysql
+  
+environment:
+  gochess_decrypt:
+    secure: yeEOqoy3DBRMeIA/10O3jA==
 
 # scripts that run after cloning repository  
 install:
@@ -18,6 +22,14 @@ install:
   - go version
   - go env
   - go get -t -v ./...
+  - nuget install secure-file -ExcludeVersion
+  - secure-file\tools\secure-file -decrypt _appveyor/data/gochessTemplate.sql.enc -secret %gochess_decrypt%
+  - secure-file\tools\secure-file -decrypt _appveyor/data/importAppVeyorTables.sh.enc -secret %gochess_decrypt%
+  - secure-file\tools\secure-file -decrypt _appveyor/data/importAppVeyorTemplate.sh.enc -secret %gochess_decrypt%
+  - cd _appveyor\data
+  - bash importAppVeyorTemplate.sh
+  - bash importAppVeyorTables.sh
+  - cd ../..
 
 build_script:
   - go build main.go
