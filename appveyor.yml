@@ -16,7 +16,7 @@ services:
 
 # scripts that run after cloning repository  
 install:
-  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%;C:\Program Files\MySql\MySQL Server 5.6\bin
   - go version
   - go env
   - go get -t -v ./...
