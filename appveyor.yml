@@ -20,6 +20,11 @@ install:
   - go version
   - go env
   - go get -t -v ./...
+
+build_script:
+  - go build main.go
+  - go test ./gostuff
+  - go test ./_appveyor
   - cd _appveyor\data
   - nuget install secure-file -ExcludeVersion
   - secure-file\tools\secure-file -decrypt gochessTemplate.sql.enc -secret %gochess_decrypt%
@@ -28,11 +33,6 @@ install:
   - bash importAppVeyorTemplate.sh
   - bash importAppVeyorTables.sh
   - cd ../..
-
-build_script:
-  - go build main.go
-  - go test ./gostuff
-  - go test ./_appveyor
 
 # to disable deployment
 deploy: off
