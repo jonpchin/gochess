@@ -1,0 +1,16 @@
+.editorconfig
+.git
+.gitignore
+.vscode
+_appveyor
+_travis
+_webtest
+appveyor.yml
+backup
+debug
+games
+gitpull.sh
+main
+main.exe
+travis.yml
+logs

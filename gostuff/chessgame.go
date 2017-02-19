@@ -13,12 +13,13 @@ type ChessGame struct {
 	GameMoves    []Move //stores chess move for games
 	Status       string //white to move, black to move, white won, black won, or draw
 	Result       int8   //0 means black won, 1 means white won and 2 means draw. 2 is used intead of 0.5 as database type is int
-	GameType     string //bullet, blitz or standard
+	GameType     string //bullet, blitz, standard, correspondence
 	TimeControl  int
 	BlackMinutes int
 	BlackSeconds int
 	WhiteMinutes int
 	WhiteSeconds int
+	StartMinutes int    // used to keep track of start time for correspondence
 	PendingDraw  bool   //used to keep track if a player has offered a draw
 	Rated        string //Yes if the game is rated, No if the game is unrated
 	Spectate     bool
@@ -33,16 +34,6 @@ type GameMove struct {
 	Source    string
 	Target    string
 	Promotion string
-}
-
-//stores the minutes and seconds per move
-type ClockMove struct {
-	Type         string
-	UpdateWhite  bool //If true then update white's clock
-	WhiteMinutes int
-	WhiteSeconds int
-	BlackMinutes int
-	BlackSeconds int
 }
 
 // used to unmarshall game ID that is being observed by player(Name)
@@ -116,10 +107,10 @@ type Table struct {
 	pawnMove    int //keeps track of what move was the last pawn move made, used for fifty move rule
 	lastCapture int
 
-	whiteTimeOut chan bool
-	blackTimeOut chan bool
-	gameOver     chan bool
-	Connection   chan bool
+	resetWhiteTime chan bool
+	resetBlackTime chan bool
+	gameOver       chan bool
+	whiteToMove    bool
 
 	moveCount int       //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string    //keeps track of the piece that is being promoted too
@@ -194,8 +185,9 @@ func initGame(gameID int, name string, fighter string) {
 	Verify.AllTables[gameID].undoWPass = false
 	Verify.AllTables[gameID].undoBPass = false
 
-	Verify.AllTables[gameID].whiteTimeOut = make(chan bool)
-	Verify.AllTables[gameID].blackTimeOut = make(chan bool)
+	//reset times are used for correspondence
+	Verify.AllTables[gameID].resetWhiteTime = make(chan bool)
+	Verify.AllTables[gameID].resetBlackTime = make(chan bool)
 	Verify.AllTables[gameID].gameOver = make(chan bool)
 
 	Verify.AllTables[gameID].pawnMove = 0

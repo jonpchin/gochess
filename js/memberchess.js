@@ -8,6 +8,10 @@ var matchID;
 var moveSound = new Audio('../sound/chessmove.mp3');
 var gameSound = new Audio('../sound/startgame.mp3');
 
+// used to reset timer for correpsondence, seconds always equal zero on start
+var gameType = "blitz";
+var startMinutes = 0;
+
 var whiteClock = new Tock({
 	countdown: true,
 	interval: 1000,
@@ -256,37 +260,54 @@ window.onload = function() {
 					preMoveYes = false;
 					removeHighlights('color');		
 				}
+				
+				if(gameType === "correspondence"){
+
+					var hours = Math.floor(startMinutes / 60);
+					whiteClock.stop();
+					blackClock.stop();
+					document.getElementById("bottomtime").value = hours + ":00:00";
+					document.getElementById("toptime").value =  hours + ":00:00";
 					
-				whiteClock.pause();
-	            blackClock.pause();
+					// reset the correspondence time of the other player that just moved
+					if(sideToMove === "White"){
+						if(user === WhiteSide){
+							whiteClock.start($('#bottomtime').val());
+							blackClock.start($('#toptime').val());
+							blackClock.pause();
+						}
+						else{
+							whiteClock.start($('#toptime').val());
+							blackClock.start($('#bottomtime').val());
+							blackClock.pause();
+						}		
+					}
+					//else if (json.Status === "Black)
+					else {
+						if(user === WhiteSide){
+							blackClock.start($('#toptime').val());
+							whiteClock.start($('#bottomtime').val());
+							whiteClock.pause();
+						}
+						else{
+							blackClock.start($('#bottomtime').val());
+							whiteClock.start($('#toptime').val());
+							whiteClock.pause();
+						}				
+					}
+					
+					
+				}
+				else{
+					whiteClock.pause();
+	            	blackClock.pause();
+				}
+				
+				
+				
 				if(toggleSound !== "false"){
 					moveSound.play();
 				}
-				break;
-				
-			case "sync_clock":
-				if(user === WhiteSide){
-					if(json.UpdateWhite){
-						document.getElementById("bottomtime").value = json.WhiteMinutes + ":" + 
-							json.WhiteSeconds
-					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds);
-					}
-					else{
-						document.getElementById("toptime").value = json.BlackMinutes + ":" + 
-							json.BlackSeconds;	
-					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds);
-					}
-				}
-				else if(user === BlackSide){
-					if(json.UpdateWhite){
-						document.getElementById("toptime").value = json.WhiteMinutes + ":" + json.WhiteSeconds;
-					//	console.log("White: " + json.WhiteMinutes + ":" + json.WhiteSeconds);
-					}
-					else{
-						document.getElementById("bottomtime").value = json.BlackMinutes + ":" + json.BlackSeconds;
-					//	console.log("Black: " + json.BlackMinutes + ":" + json.BlackSeconds);
-					}			
-				}	
 				break;
 			
 			case "chat_private":
@@ -304,6 +325,8 @@ window.onload = function() {
 				matchID = json.ID;
 				WhiteSide = json.WhitePlayer;
 				BlackSide = json.BlackPlayer;
+				gameType = json.GameType;
+				startMinutes = json.StartMinutes;
 
 				// if spectate is turned off then other people cannot view this game
 				var spectateResult = "No";

@@ -21,6 +21,10 @@ var preMoveYes = false;
 //stores premove in string
 var srcPreMove;
 var targetPreMove;
+
+// the side that is to move
+var sideToMove = "White";
+
 //user preferences
 var togglePremove = getCookie("premove");
 var pieceTheme = getCookie("pieceTheme");
@@ -137,6 +141,7 @@ var updateStatus = function() {
 	if (game.turn() === 'b') {
 	  moveColor = 'Black';
 	}
+	sideToMove = moveColor;
 
 	// checkmate?
 	if (game.in_checkmate() === true) {
