@@ -77,7 +77,6 @@ func (c *Connection) ChessConnect() {
 				}
 
 				table := Verify.AllTables[game.ID]
-				table.Connection <- true
 				//printBoard(game.ID)
 
 				//checkin if there is a pending draw and if so it removes it
@@ -94,21 +93,17 @@ func (c *Connection) ChessConnect() {
 				//now switch to the other players turn
 				if chessgame.Status == "White" {
 					chessgame.Status = "Black"
-					go func() { //now switch clocks
-						var clock ClockMove
-						clock.Type = "sync_clock"
-						chessgame.BlackMinutes, chessgame.BlackSeconds =
-							table.startClock(game.ID, chessgame.BlackMinutes, chessgame.BlackSeconds, "Black")
-					}()
+					table.whiteToMove = false
 
+					if chessgame.GameType == "correspondence" {
+						table.resetWhiteTime <- true
+					}
 				} else if chessgame.Status == "Black" {
 					chessgame.Status = "White"
-					go func() {
-						var clock ClockMove
-						clock.Type = "sync_clock"
-						chessgame.WhiteMinutes, chessgame.WhiteSeconds =
-							table.startClock(game.ID, chessgame.WhiteMinutes, chessgame.WhiteSeconds, "White")
-					}()
+					table.whiteToMove = true
+					if chessgame.GameType == "correspondence" {
+						table.resetBlackTime <- true
+					}
 				} else {
 					log.Println("Invalid game status, most likely game is over for ", t.Name)
 					break
@@ -252,7 +247,6 @@ func (c *Connection) ChessConnect() {
 					}
 				}
 
-				table.Connection <- true
 				table.gameOver <- true
 
 				delete(All.Games, game.ID)
@@ -363,7 +357,6 @@ func (c *Connection) ChessConnect() {
 					break
 				}
 
-				table.Connection <- true
 				table.gameOver <- true
 
 				chessgame.Status = "Agreed Draw"
@@ -436,7 +429,6 @@ func (c *Connection) ChessConnect() {
 					result = 1.0
 				}
 
-				table.Connection <- true
 				table.gameOver <- true
 
 				//notifying both players and spectators game is over
@@ -480,7 +472,6 @@ func (c *Connection) ChessConnect() {
 				}
 
 				table := Verify.AllTables[game.ID]
-				table.Connection <- true
 				table.gameOver <- true
 
 				//letting both players and spectators know that a resignation occured
@@ -707,9 +698,7 @@ func (c *Connection) ChessConnect() {
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game
 				chessgame := All.Games[game.ID]
-				go func() {
-					chessgame.setClocks(t.Name)
-				}()
+				go chessgame.setClocks(t.Name)
 
 			case "draw_game":
 
@@ -739,7 +728,6 @@ func (c *Connection) ChessConnect() {
 					}
 				}
 
-				table.Connection <- true
 				table.gameOver <- true
 				chessgame.Status = "Forced Draw"
 				//2 means the game is a draw and stored as an int in the database
