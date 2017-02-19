@@ -295,16 +295,12 @@ window.onload = function() {
 							whiteClock.pause();
 						}				
 					}
-					
-					
 				}
 				else{
 					whiteClock.pause();
 	            	blackClock.pause();
 				}
-				
-				
-				
+
 				if(toggleSound !== "false"){
 					moveSound.play();
 				}
