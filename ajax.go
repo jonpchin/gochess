@@ -94,9 +94,10 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 	var chat ChatInfo
 	chat.Type = "chess_game"
 	var success bool
+	var game ChessGame
 	if user.Value == white {
 		if isPlayerInLobby(black) == true && !checkTable(black) {
-			success = fetchSavedGame(id, user.Value)
+			success = game.fetchSavedGame(id, user.Value)
 			if success == false {
 				w.Write([]byte("false"))
 				return
@@ -110,7 +111,7 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 
 	} else if user.Value == black {
 		if isPlayerInLobby(white) == true && !checkTable(white) {
-			success = fetchSavedGame(id, user.Value)
+			success = game.fetchSavedGame(id, user.Value)
 			if success == false {
 				w.Write([]byte("false"))
 				return
