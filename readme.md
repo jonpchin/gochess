@@ -40,10 +40,12 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>20. Web server runs in Windows and Linux.</p>
 <br>
 <p><b>To Do List:</b></p>
-<p>1. Configure Twitter bot.</p>
-<p>2. Chess TV where live games are randomly broadcasted.</p>
-<p>3. Forums</p>
-<p>4. Admin control</p>
+<p>1. Chess TV where live games are randomly broadcasted.</p>
+<p>2. Forums</p>
+<p>3. Admin control</p>
+<p>4. Friends list</p>
+<p>5. Inbox system</p>
+<p>6. Update help, documentation and screenshots</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

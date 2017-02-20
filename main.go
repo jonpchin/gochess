@@ -133,6 +133,7 @@ func main() {
 			gostuff.Cleanup()
 			os.Exit(1)
 		}()
+		gostuff.CheckNullInTable("ratinghistory")
 	}()
 	//gostuff.FetchNewsSources()
 	//gostuff.ReadAllNews()
@@ -144,6 +145,7 @@ func main() {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
 		}
 	}()
+
 	//	gostuff.ConvertAllPGN()
 	fmt.Println("Web server is now running.")
 	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {

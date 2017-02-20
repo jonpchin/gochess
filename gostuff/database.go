@@ -417,44 +417,31 @@ func GetSaved(name string) (storage []GoGame) {
 }
 
 //fetches saved/adjourned game from database
-func fetchSavedGame(id string, user string) bool {
+func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
-	var white string
-	var black string
-	var gametype string
-	var rated string
-	var whiterating int16
-	var blackrating int16
-	var blackminutes int
-	var blackseconds int
-	var whiteminutes int
-	var whiteseconds int
-	var timecontrol int
+	//these are in the database but not part of the ChessGame struct
 	var moves string
 	var totalmoves int
-	var status string
-	var countrywhite string
-	var countryblack string
+
+	//game status options are:
+	//White for white to move or Black for black to move, white won, black won, stalemate or draw.
 
 	err = db.QueryRow("SELECT white, black, gametype, rated, whiterating, "+
 		"blackrating, blackminutes, blackseconds, whiteminutes, whiteseconds, "+
-		"timecontrol, moves, totalmoves, status, countrywhite, countryblack FROM saved WHERE id=?", id).Scan(&white,
-		&black, &gametype, &rated, &whiterating, &blackrating, &blackminutes,
-		&blackseconds, &whiteminutes, &whiteseconds, &timecontrol, &moves,
-		&totalmoves, &status, &countrywhite, &countryblack)
+		"timecontrol, moves, totalmoves, status, countrywhite, countryblack FROM saved WHERE id=?", id).Scan(&game.WhitePlayer,
+		&game.BlackPlayer, &game.GameType, &game.Rated, &game.WhiteRating, &game.BlackRating, &game.BlackMinutes,
+		&game.BlackSeconds, &game.WhiteMinutes, &game.WhiteSeconds, &game.TimeControl, &moves,
+		&totalmoves, &game.Status, &game.CountryWhite, &game.CountryBlack)
 	if err != nil {
 		log.Println(err)
 	}
 
-	var game ChessGame
 	game.Type = "chess_game"
 	var holder []Move
-	//White for white to move or Black for black to move, white won, black won, stalemate or draw.
-	game.Status = status
 
 	storage := []byte(moves)
 	err = json.Unmarshal(storage, &holder)
@@ -462,22 +449,7 @@ func fetchSavedGame(id string, user string) bool {
 		log.Println(err)
 	}
 	game.GameMoves = holder
-	game.WhitePlayer = white
-	game.BlackPlayer = black
-	game.WhiteRating = whiterating
-	game.BlackRating = blackrating
-	game.TimeControl = timecontrol
-	game.GameType = gametype
-	game.Rated = rated
-	game.Status = status
-
-	game.WhiteMinutes = whiteminutes
-	game.WhiteSeconds = whiteseconds
-	game.BlackMinutes = blackminutes
-	game.BlackSeconds = blackseconds
 	game.PendingDraw = false
-	game.CountryWhite = countrywhite
-	game.CountryBlack = countryblack
 
 	var start int = 0
 	for {
@@ -490,10 +462,10 @@ func fetchSavedGame(id string, user string) bool {
 	//value := fmt.Sprintf("%d", start)
 	game.ID = start
 	//used in backend to keep track of all pending games waiting for a player to accept
-	All.Games[start] = &game
+	All.Games[start] = game
 
 	//intitalizes all the variables of the game
-	initGame(game.ID, white, black)
+	initGame(game.ID, game.WhitePlayer, game.BlackPlayer)
 
 	var result bool
 
@@ -507,8 +479,8 @@ func fetchSavedGame(id string, user string) bool {
 			return false
 		}
 	}
-	PrivateChat[white] = black
-	PrivateChat[black] = white
+	PrivateChat[game.WhitePlayer] = game.BlackPlayer
+	PrivateChat[game.BlackPlayer] = game.WhitePlayer
 
 	chessgame := All.Games[game.ID]
 
