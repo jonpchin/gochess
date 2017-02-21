@@ -8,13 +8,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-//starting white's clock first, this goroutine will keep track of both players clock for this game
-func (game *ChessGame) setClocks(name string) {
-
-	table := Verify.AllTables[game.ID]
-	go table.startClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, name)
-}
-
 // keep track of both sides of the clock, when function exits the game is over
 func (table *Table) startClock(gameID int, minutes int, seconds int, name string) {
 

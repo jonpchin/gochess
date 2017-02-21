@@ -482,10 +482,9 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 	PrivateChat[game.WhitePlayer] = game.BlackPlayer
 	PrivateChat[game.BlackPlayer] = game.WhitePlayer
 
-	chessgame := All.Games[game.ID]
-
 	//starting white's clock first, this goroutine will keep track of both players clock for this game
-	go chessgame.setClocks(user)
+	table := Verify.AllTables[game.ID]
+	go table.startClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, user)
 
 	//delete saved game from database now that its in memory
 	stmt, err := db.Prepare("DELETE FROM saved where id=?")
