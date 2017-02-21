@@ -23,13 +23,13 @@ func ExportDatabase(isTemplate bool) {
 	if runtime.GOOS == "windows" {
 		_, err := exec.Command("cmd.exe", "/C", "cd config && bash "+backup+".sh").Output()
 		if err != nil {
-			log.Println("backup.go ExportDatabase 1", err)
+			log.Println(err)
 			fmt.Println("Error in exporting database, please check logs")
 		}
 	} else {
 		_, err := exec.Command("/bin/bash", "-c", "cd config && bash  "+backup+".sh").Output()
 		if err != nil {
-			log.Println("backup.go ExportDatabase 2", err)
+			log.Println(err)
 			fmt.Println("Error in exporting database, please check logs")
 		}
 	}
@@ -57,14 +57,14 @@ func importDatabase() bool {
 	if runtime.GOOS == "windows" {
 		_, err := exec.Command("cmd.exe", "/C", "cd config && bash importGoChess.sh").Output()
 		if err != nil {
-			log.Println("backup.go importDatabase 1", err)
+			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")
 			return false
 		}
 	} else {
 		_, err := exec.Command("/bin/bash", "-c", "cd config && bash importGoChess.sh").Output()
 		if err != nil {
-			log.Println("backup.go importDatabase 2", err)
+			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")
 			return false
 		}
@@ -82,14 +82,14 @@ func importTemplateDatabase() bool {
 	if runtime.GOOS == "windows" {
 		_, err := exec.Command("cmd.exe", "/C", "cd config && bash importTemplate.sh").Output()
 		if err != nil {
-			log.Println("backup.go importTemplateDatabase 1", err)
+			log.Println(err)
 			fmt.Println("Error in importing template database, please check logs")
 			return false
 		}
 	} else {
 		_, err := exec.Command("/bin/bash", "-c", "cd config && bash importTemplate.sh").Output()
 		if err != nil {
-			log.Println("backup.go importTemplateDatabase 2", err)
+			log.Println(err)
 			fmt.Println("Error in importing template database, please check logs")
 			return false
 		}

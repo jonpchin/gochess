@@ -227,8 +227,7 @@ func RandomString() string {
 		fmt.Println("login.go RandomString 1 ", err)
 	}
 
-	token := base64.URLEncoding.EncodeToString(rb)
-	return token
+	return base64.URLEncoding.EncodeToString(rb)
 }
 
 // after successfully identifying credentials, setup session and cookies

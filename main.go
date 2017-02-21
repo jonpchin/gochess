@@ -133,7 +133,7 @@ func main() {
 			gostuff.Cleanup()
 			os.Exit(1)
 		}()
-		gostuff.CheckNullInTable("ratinghistory")
+		//gostuff.CheckNullInTable("ratinghistory")
 	}()
 	//gostuff.FetchNewsSources()
 	//gostuff.ReadAllNews()

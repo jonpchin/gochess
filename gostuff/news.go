@@ -224,14 +224,18 @@ func (newsProvider *NewsProvider) convertToHttps() {
 	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
 
 	for index, article := range newsProvider.Articles {
-		newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage,
-			"http://", "https://", 1)
 
-		client := timeOutHttp(5)
-		response, err := client.Get(newsProvider.Articles[index].UrlToImage)
-		if response == nil {
-			log.Println("convertToHttps URL time out for ",
-				newsProvider.Articles[index].UrlToImage, err)
+		// Check to make sure link is not empty
+		if newsProvider.Articles[index].UrlToImage != "" {
+			newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage,
+				"http://", "https://", 1)
+
+			client := timeOutHttp(5)
+			response, err := client.Get(newsProvider.Articles[index].UrlToImage)
+			if response == nil {
+				log.Println("convertToHttps URL time out for ",
+					newsProvider.Articles[index].UrlToImage, err)
+			}
 		}
 	}
 }
