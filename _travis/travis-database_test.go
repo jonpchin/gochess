@@ -2,8 +2,10 @@ package travis
 
 import (
 	"database/sql"
+	"net/http"
 	"testing"
 
+	"github.com/icrowley/fake"
 	"github.com/jonpchin/gochess/gostuff"
 )
 
@@ -27,5 +29,25 @@ func TestDbConnect(t *testing.T) {
 	//if database ping fails here that means connection is alive but database is missing
 	if db.Ping() != nil {
 		t.Fatal("Can't ping MySQL")
+	}
+
+	// registers a random person to the database
+	var userInfo gostuff.UserInfo
+	userInfo.Username = fake.UserName()
+	userInfo.Password = fake.Password(5, 32, true, true, false)
+
+	userInfo.Email = fake.EmailAddress()
+	userInfo.IpAddress = fake.IPv4()
+
+	var w http.ResponseWriter
+	var r *http.Request
+	err = userInfo.Register(w, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	found := gostuff.CheckUserNameInDb(userInfo.Username)
+	if found == false {
+		t.Fatal("Username was not found in the database")
 	}
 }

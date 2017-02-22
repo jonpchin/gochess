@@ -1,7 +1,6 @@
 package gostuff
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -259,23 +258,18 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ipAddress, _, _ := net.SplitHostPort(r.RemoteAddr)
-		//check if database connection is open
+
 		if db.Ping() != nil {
 			fmt.Printf("ERROR 2 PINGING DB IP: %s \n", ipAddress)
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please come back later."))
 			return
 		}
 
-		var name string
-		//checking if name exists
-		checkName := db.QueryRow("SELECT username FROM userinfo WHERE username=?", username).Scan(&name)
-		switch {
-		case checkName == sql.ErrNoRows:
+		//check if database connection is open
+		found := CheckUserNameInDb(username)
+		if found {
 			w.Write([]byte(" <img src='img/ajax/available.png' /> Username available"))
-			fmt.Printf("Username %s is available.\n", username)
-		case checkName != nil:
-			fmt.Printf("ERROR 3 CHECKNAME IP is %s\n", ipAddress)
-		default:
+		} else {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Username taken"))
 		}
 	}
