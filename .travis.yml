@@ -4,8 +4,10 @@ go:
 services:
 - mysql
 script:
+- go build main.go
 - go test ./gostuff
 - go test ./_travis
+- main.exe
 sudo: true
 before_install:
 - bash ./_travis/data/travis-install-mysql-5.7.sh

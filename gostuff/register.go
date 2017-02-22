@@ -86,7 +86,6 @@ func (userInfo *UserInfo) Register(w http.ResponseWriter, r *http.Request) error
 	//check if database connection is open
 	if db.Ping() != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 27"))
-		log.Println()
 		return errors.New("DATABASE DOWN in register.go Register 0")
 	}
 
