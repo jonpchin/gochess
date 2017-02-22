@@ -26,18 +26,18 @@ func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
 	} else {
 
 		var userInfo UserInfo
-		userInfo.username = template.HTMLEscapeString(r.FormValue("user"))
-		userInfo.token = template.HTMLEscapeString(r.FormValue("token"))
-		userInfo.password = template.HTMLEscapeString(r.FormValue("pass"))
+		userInfo.Username = template.HTMLEscapeString(r.FormValue("user"))
+		userInfo.Token = template.HTMLEscapeString(r.FormValue("token"))
+		userInfo.Password = template.HTMLEscapeString(r.FormValue("pass"))
 		confirm := template.HTMLEscapeString(r.FormValue("confirm"))
-		userInfo.ipAddress, _, _ = net.SplitHostPort(r.RemoteAddr)
+		userInfo.IpAddress, _, _ = net.SplitHostPort(r.RemoteAddr)
 
 		//check if password and confirm match
-		if userInfo.password != confirm {
+		if userInfo.Password != confirm {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> The password you entered does not match. Please try again."))
 			return
 		}
-		if len(userInfo.password) < 5 || len(userInfo.password) > 32 {
+		if len(userInfo.Password) < 5 || len(userInfo.Password) > 32 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> The password you entered must be 5-32 characters long."))
 			return
 		}
@@ -60,15 +60,15 @@ func (userInfo *UserInfo) resetPass(w http.ResponseWriter, r *http.Request) {
 	var tokenInDB string
 
 	//checking if token matches the one entered by user
-	err2 := db.QueryRow("SELECT token FROM forgot WHERE username=?", userInfo.username).Scan(&tokenInDB)
+	err2 := db.QueryRow("SELECT token FROM forgot WHERE username=?", userInfo.Username).Scan(&tokenInDB)
 	if err2 != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
 		log.Println(err2)
 		return
 	}
-	if tokenInDB != userInfo.token {
+	if tokenInDB != userInfo.Token {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
-		log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", userInfo.ipAddress, r.Method, r.URL.Path, r.UserAgent())
+		log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", userInfo.IpAddress, r.Method, r.URL.Path, r.UserAgent())
 		return
 	}
 
@@ -82,14 +82,14 @@ func (userInfo *UserInfo) resetPass(w http.ResponseWriter, r *http.Request) {
 	defer stmt.Close()
 
 	//hashing password
-	key, err := hashPass(userInfo.username, userInfo.password)
+	key, err := hashPass(userInfo.Username, userInfo.Password)
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 4."))
 		log.Println(err)
 		return
 	}
 
-	_, err = stmt.Exec(key, userInfo.username)
+	_, err = stmt.Exec(key, userInfo.Username)
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 5."))
 		log.Println(err)
@@ -104,7 +104,7 @@ func (userInfo *UserInfo) resetPass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := stmt.Exec(userInfo.username)
+	res, err := stmt.Exec(userInfo.Username)
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 7"))
 		log.Println(err)
@@ -118,7 +118,7 @@ func (userInfo *UserInfo) resetPass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("%d row was deleted from the activate table by user %s\n", affect, userInfo.username)
+	log.Printf("%d row was deleted from the activate table by user %s\n", affect, userInfo.Username)
 	w.Write([]byte("<img src='img/ajax/available.png' /> Your password is now changed!"))
 }
 
@@ -136,9 +136,9 @@ func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		var userInfo UserInfo
-		userInfo.username = template.HTMLEscapeString(r.FormValue("user"))
-		userInfo.token = template.HTMLEscapeString(r.FormValue("token"))
-		userInfo.ipAddress, _, _ = net.SplitHostPort(r.RemoteAddr)
+		userInfo.Username = template.HTMLEscapeString(r.FormValue("user"))
+		userInfo.Token = template.HTMLEscapeString(r.FormValue("token"))
+		userInfo.IpAddress, _, _ = net.SplitHostPort(r.RemoteAddr)
 
 		userInfo.activate(w, r)
 		//once a user activates his acccount update the highscore board so it shows him as new user
@@ -162,10 +162,10 @@ func (userInfo *UserInfo) activate(w http.ResponseWriter, r *http.Request) bool 
 	var tokenInDB string
 
 	//checking if token matches the one entered by user
-	err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userInfo.username).Scan(&tokenInDB)
-	if err2 != nil || tokenInDB != userInfo.token {
+	err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userInfo.Username).Scan(&tokenInDB)
+	if err2 != nil || tokenInDB != userInfo.Token {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination"))
-		log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", userInfo.ipAddress, r.Method, r.URL.Path, r.UserAgent())
+		log.Printf("FAILED ACTIVATION Host: %s  Method: %s Location: %s Agent: %s\n", userInfo.IpAddress, r.Method, r.URL.Path, r.UserAgent())
 		return false
 	}
 	//setting verify to yes and deleting row from activate table as well as captcha to zero to signfy user unlocked account
@@ -177,7 +177,7 @@ func (userInfo *UserInfo) activate(w http.ResponseWriter, r *http.Request) bool 
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec("YES", 0, userInfo.username)
+	_, err = stmt.Exec("YES", 0, userInfo.Username)
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 13."))
 		log.Println(err)
@@ -185,7 +185,7 @@ func (userInfo *UserInfo) activate(w http.ResponseWriter, r *http.Request) bool 
 	}
 
 	//now user may login so we can redirect while token deletion proceeds in the background
-	message := "<script>window.location = 'login?user=" + userInfo.username + "';</script>"
+	message := "<script>window.location = 'login?user=" + userInfo.Username + "';</script>"
 	w.Write([]byte(message))
 
 	stmt, err = db.Prepare("DELETE FROM activate where username=?")
@@ -195,7 +195,7 @@ func (userInfo *UserInfo) activate(w http.ResponseWriter, r *http.Request) bool 
 		return false
 	}
 
-	res, err := stmt.Exec(userInfo.username)
+	res, err := stmt.Exec(userInfo.Username)
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Something is wrong with the server. Tell admin error 16."))
 		log.Println(err)
@@ -208,7 +208,7 @@ func (userInfo *UserInfo) activate(w http.ResponseWriter, r *http.Request) bool 
 		log.Println(err)
 		return false
 	}
-	log.Printf("%d row was deleted from the activate table by user %s\n", affect, userInfo.username)
+	log.Printf("%d row was deleted from the activate table by user %s\n", affect, userInfo.Username)
 	return true
 }
 
@@ -228,15 +228,15 @@ func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 	} else {
 
 		var userInfo UserInfo
-		userInfo.username = template.HTMLEscapeString(r.FormValue("user"))
-		userInfo.email = template.HTMLEscapeString(r.FormValue("email"))
+		userInfo.Username = template.HTMLEscapeString(r.FormValue("user"))
+		userInfo.Email = template.HTMLEscapeString(r.FormValue("email"))
 
 		success := userInfo.forgot(w, r)
 
 		if success {
 
 			//sends pasword reset information to email of user
-			go SendForgot(userInfo.email, userInfo.token, r.Host)
+			go SendForgot(userInfo.Email, userInfo.Token, r.Host)
 			w.Write([]byte("<img src='img/ajax/available.png' /> Your password reset information has been sent your email."))
 		}
 	}
@@ -256,26 +256,26 @@ func (userInfo *UserInfo) forgot(w http.ResponseWriter, r *http.Request) bool {
 	}
 	var match string
 	//checking if email and username entered matches what is in database
-	err2 := db.QueryRow("SELECT email FROM userinfo WHERE username=?", userInfo.username).Scan(&match)
+	err2 := db.QueryRow("SELECT email FROM userinfo WHERE username=?", userInfo.Username).Scan(&match)
 	if err2 != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong email/username combination."))
 		log.Println(err2)
 		return false
 	}
-	if match != userInfo.email {
+	if match != userInfo.Email {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong email/username combination."))
-		log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", userInfo.ipAddress, r.Method, r.URL.Path, r.UserAgent())
+		log.Printf("FAILED SEND PASSWORD RESET TO EMAIL Host: %s  Method: %s Location: %s Agent: %s\n", userInfo.IpAddress, r.Method, r.URL.Path, r.UserAgent())
 		return false
 	}
 
 	token := RandomString()
 	//check for duplicate entry in forgot table
 	var found string
-	_ = db.QueryRow("SELECT token FROM forgot WHERE username=?", userInfo.username).Scan(&found)
+	_ = db.QueryRow("SELECT token FROM forgot WHERE username=?", userInfo.Username).Scan(&found)
 
 	if found != "" {
 		w.Write([]byte("<img src='img/ajax/available.png' /> Activation token resent to your email."))
-		go SendForgot(userInfo.email, found, r.Host)
+		go SendForgot(userInfo.Email, found, r.Host)
 		return false
 	}
 
@@ -288,7 +288,7 @@ func (userInfo *UserInfo) forgot(w http.ResponseWriter, r *http.Request) bool {
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(userInfo.username, token, time.Now())
+	res, err := stmt.Exec(userInfo.Username, token, time.Now())
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Report to admin Error 21"))
 		log.Println(err)
