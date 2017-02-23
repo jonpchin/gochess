@@ -1,4 +1,4 @@
-package travis
+package gostuff
 
 import (
 	"database/sql"
@@ -7,22 +7,26 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"testing"
 
 	"github.com/icrowley/fake"
-	"github.com/jonpchin/gochess/gostuff"
 )
 
-var db *sql.DB
-
 // Travis CI default MySQL username and pass is public information
+
 func TestDbConnect(t *testing.T) {
 
+	// only run this test if in windows
+	if runtime.GOOS == "windows" {
+		return
+	}
+
 	// make sure MySQL connection is alive before proceeding
-	if gostuff.CheckDBConnection("data/dbtravis.txt") == false {
+	if CheckDBConnection("data/dbtravis.txt") == false {
 		t.Fatal("Failed to connect to MySQL in Travis CI")
 	}
-	dbString, _ := gostuff.ReadFile("data/dbtravis.txt")
+	dbString, _ := ReadFile("data/dbtravis.txt")
 	db, err := sql.Open("mysql", dbString)
 	defer db.Close()
 	//	db.SetMaxIdleConns(20)
@@ -36,7 +40,7 @@ func TestDbConnect(t *testing.T) {
 	}
 
 	// registers a random person to the database
-	var userInfo gostuff.UserInfo
+	var userInfo UserInfo
 	userInfo.Username = fake.UserName()
 	userInfo.Password = fake.Password(5, 32, true, true, false)
 
@@ -63,9 +67,8 @@ func TestDbConnect(t *testing.T) {
 
 	fmt.Printf("%s", greeting)
 
-	found := gostuff.CheckUserNameInDb(userInfo.Username)
+	found := CheckUserNameInDb(userInfo.Username)
 	if found == false {
 		t.Fatal("Username was not found in the database")
 	}
-
 }

@@ -163,9 +163,9 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 		if err := doesNotExist.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
+	} else {
+		http.ServeFile(w, r, "index.html")
 	}
-	http.ServeFile(w, r, "index.html")
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -288,7 +288,6 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 		if err := memberChess.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
@@ -303,7 +302,6 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 		if err := memberHome.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
@@ -319,7 +317,6 @@ func database(w http.ResponseWriter, r *http.Request) {
 		if err := memberHome.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
@@ -380,7 +377,6 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 		if err := playerProfile.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
@@ -396,7 +392,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &cookie)
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		http.ServeFile(w, r, "index.html")
-		return
 	}
 }
 
@@ -405,7 +400,6 @@ func settings(w http.ResponseWriter, r *http.Request) {
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		http.ServeFile(w, r, "settings.html")
-		return
 	}
 }
 
@@ -421,7 +415,6 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 		if err := highscores.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
@@ -437,7 +430,6 @@ func engine(w http.ResponseWriter, r *http.Request) {
 		if err := engine.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 	}
 }
 
