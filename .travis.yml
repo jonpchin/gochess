@@ -8,7 +8,7 @@ services:
 
 script:
 - go build main.go
-- sudo ./main
+- sudo nohup ./main
 - go test ./gostuff
 
 sudo: true
