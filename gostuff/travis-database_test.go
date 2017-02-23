@@ -21,12 +21,14 @@ func TestDbConnect(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		return
 	}
-
+	const (
+		travisPath = "../_travis/data/dbtravis.txt"
+	)
 	// make sure MySQL connection is alive before proceeding
-	if CheckDBConnection("../_travis/data/dbtravis.txt") == false {
+	if CheckDBConnection(travisPath) == false {
 		t.Fatal("Failed to connect to MySQL in Travis CI")
 	}
-	dbString, _ := ReadFile("data/dbtravis.txt")
+	dbString, _ := ReadFile(travisPath)
 	db, err := sql.Open("mysql", dbString)
 	defer db.Close()
 	//	db.SetMaxIdleConns(20)
