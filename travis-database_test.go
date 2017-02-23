@@ -23,7 +23,7 @@ func TestDbConnect(t *testing.T) {
 	}
 
 	// make sure MySQL connection is alive before proceeding
-	if CheckDBConnection("data/dbtravis.txt") == false {
+	if CheckDBConnection("../_travis/data/dbtravis.txt") == false {
 		t.Fatal("Failed to connect to MySQL in Travis CI")
 	}
 	dbString, _ := ReadFile("data/dbtravis.txt")
