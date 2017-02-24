@@ -88,12 +88,16 @@ func DbSetup(backup string) bool {
 		db, err = sql.Open("mysql", dbString)
 		if err != nil {
 			fmt.Println("Can't open MySQL in Travis")
+			return false
 		}
 
 		//if database ping fails here that means connection is alive but database is missing
 		if db.Ping() != nil {
 			fmt.Println("Can't ping MySQL in Travis")
+			return false
 		}
+		fmt.Println("MySQL is now connected in Travis.")
+
 	} else if isEnvironmentAppVeyor() {
 		const (
 			appVeyorPath = "_appveyor/data/dbapp-veyor.txt"
@@ -101,19 +105,24 @@ func DbSetup(backup string) bool {
 		// make sure MySQL connection is alive before proceeding
 		if CheckDBConnection(appVeyorPath) == false {
 			fmt.Println("Failed to connect to MySQL in App Veyor")
+			return false
 		}
 		dbString, _ := ReadFile(appVeyorPath)
-		db, err := sql.Open("mysql", dbString)
-		defer db.Close()
+		db, err = sql.Open("mysql", dbString)
+
 		//	db.SetMaxIdleConns(20)
 		if err != nil {
-			fmt.Println("Can't open MySQL")
+			fmt.Println("Can't open MySQL in App Veyor")
+			return false
 		}
 
 		//if database ping fails here that means connection is alive but database is missing
 		if db.Ping() != nil {
 			fmt.Println("Can't ping MySQL in AppVeyor")
+			return false
 		}
+		fmt.Println("MySQL is now connected in App Veyor.")
+
 	} else {
 		// make sure MySQL connection is alive before proceeding
 		if CheckDBConnection("secret/checkdb.txt") == false {
@@ -150,9 +159,10 @@ func DbSetup(backup string) bool {
 				fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
 				return false
 			}
+			fmt.Println("MySQL is now connected.")
 		}
 	}
-	fmt.Println("MySQL is now connected.")
+
 	return true
 }
 
