@@ -12,7 +12,6 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jonpchin/gochess/gostuff"
 )
 
 //stores information about players games extracted from database when player clicks there profile
@@ -97,15 +96,15 @@ func DbSetup(backup string) bool {
 		}
 	} else if isEnvironmentAppVeyor() {
 		// make sure MySQL connection is alive before proceeding
-		if gostuff.CheckDBConnection("data/dbapp-veyor.txt") == false {
-			t.Fatal("Failed to connect to MySQL in App Veyor")
+		if CheckDBConnection("data/dbapp-veyor.txt") == false {
+			fmt.Println("Failed to connect to MySQL in App Veyor")
 		}
-		dbString, _ := gostuff.ReadFile("data/dbapp-veyor.txt")
+		dbString, _ := ReadFile("data/dbapp-veyor.txt")
 		db, err := sql.Open("mysql", dbString)
 		defer db.Close()
 		//	db.SetMaxIdleConns(20)
 		if err != nil {
-			t.Fatal("Can't open MySQL")
+			fmt.Println("Can't open MySQL")
 		}
 
 		//if database ping fails here that means connection is alive but database is missing
