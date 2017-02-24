@@ -16,7 +16,7 @@ import (
 func TestTravisConnect(t *testing.T) {
 
 	// only run this test in Travis
-	if isEnvironmentTravis() == false {
+	if IsEnvironmentTravis() == false {
 		return
 	}
 

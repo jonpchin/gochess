@@ -101,7 +101,10 @@ func main() {
 		proceed := gostuff.DbSetup("./backup")
 
 		//removes games older then 180 days from database
-		if proceed == true {
+		// only proceed if not in App Veyor or Travis environments
+		// this is only temporarily until all the tables are imported
+		if proceed == true && gostuff.IsEnvironmentTravis() == false &&
+			gostuff.IsEnvironmentAppVeyor() == false {
 
 			//setting up cron job
 			gostuff.StartCron()

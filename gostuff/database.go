@@ -74,7 +74,7 @@ func DbSetup(backup string) bool {
 	}
 
 	// Determine the environment to connect with the right DB credentials
-	if isEnvironmentTravis() {
+	if IsEnvironmentTravis() {
 
 		const (
 			travisPath = "_travis/data/dbtravis.txt"
@@ -98,7 +98,7 @@ func DbSetup(backup string) bool {
 		}
 		fmt.Println("MySQL is now connected in Travis.")
 
-	} else if isEnvironmentAppVeyor() {
+	} else if IsEnvironmentAppVeyor() {
 		const (
 			appVeyorPath = "_appveyor/data/dbapp-veyor.txt"
 		)
@@ -124,10 +124,12 @@ func DbSetup(backup string) bool {
 		fmt.Println("MySQL is now connected in App Veyor.")
 
 	} else {
+
 		// make sure MySQL connection is alive before proceeding
 		if CheckDBConnection("secret/checkdb.txt") == false {
 			return false
 		}
+
 		dbString, database := ReadFile("secret/config.txt")
 		db, err = sql.Open("mysql", dbString)
 
@@ -159,15 +161,16 @@ func DbSetup(backup string) bool {
 				fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
 				return false
 			}
-			fmt.Println("MySQL is now connected.")
+
 		}
+		fmt.Println("MySQL is now connected.")
 	}
 
 	return true
 }
 
 // Returns true if the environment is in Travis
-func isEnvironmentTravis() bool {
+func IsEnvironmentTravis() bool {
 	if os.Getenv("GOCHESSENV") == "travis" {
 		return true
 	}
@@ -175,7 +178,7 @@ func isEnvironmentTravis() bool {
 }
 
 // Returns true if the environment is in App Veyor
-func isEnvironmentAppVeyor() bool {
+func IsEnvironmentAppVeyor() bool {
 	if os.Getenv("APPVEYOR") == "True" {
 		return true
 	}
