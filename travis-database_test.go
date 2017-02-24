@@ -1,13 +1,11 @@
 package gostuff
 
 import (
-	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"runtime"
 	"testing"
 
 	"github.com/icrowley/fake"
@@ -17,28 +15,14 @@ import (
 
 func TestDbConnect(t *testing.T) {
 
-	// only run this test if in windows
-	if runtime.GOOS == "windows" {
+	// only run this test in Travis
+	if isEnvironmentTravis() == false {
 		return
-	}
-	const (
-		travisPath = "../_travis/data/dbtravis.txt"
-	)
-	// make sure MySQL connection is alive before proceeding
-	if CheckDBConnection(travisPath) == false {
-		t.Fatal("Failed to connect to MySQL in Travis CI")
-	}
-	dbString, _ := ReadFile(travisPath)
-	db, err := sql.Open("mysql", dbString)
-	defer db.Close()
-	//	db.SetMaxIdleConns(20)
-	if err != nil {
-		t.Fatal("Can't open MySQL")
 	}
 
 	//if database ping fails here that means connection is alive but database is missing
 	if db.Ping() != nil {
-		t.Fatal("Can't ping MySQL")
+		t.Fatal("Can't ping MySQL in Travis")
 	}
 
 	// registers a random person to the database

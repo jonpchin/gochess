@@ -12,6 +12,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jonpchin/gochess/gostuff"
 )
 
 //stores information about players games extracted from database when player clicks there profile
@@ -72,44 +73,101 @@ func DbSetup(backup string) bool {
 			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
 		}
 	}
-	// make sure MySQL connection is alive before proceeding
-	if CheckDBConnection("secret/checkdb.txt") == false {
-		return false
-	}
-	dbString, database := ReadFile("secret/config.txt")
-	//connecting to database
-	db, err = sql.Open("mysql", dbString)
-	//	db.SetMaxIdleConns(20)
-	if err != nil {
-		fmt.Println("Error opening Database DBSetup 2", err)
-		return false
-	}
 
-	//if database ping fails here that means connection is alive but database is missing
-	if db.Ping() != nil {
-		fmt.Println("Database", database, "does not exist")
-		fmt.Println("Please wait while database is imported...")
+	// Determine the environment to connect with the right DB credentials
+	if isEnvironmentTravis() {
 
-		result := importDatabase()
-		if result == false {
-			result = importTemplateDatabase()
-			if result == false {
-				fmt.Println("database.go Dbsetup FAILED to import both databases!")
-				return false
-			} else {
-				fmt.Println("Empty template database successfully imported!")
-			}
-		} else {
-			fmt.Println(database, "database successfully imported!")
+		const (
+			travisPath = "../_travis/data/dbtravis.txt"
+		)
+
+		// make sure MySQL connection is alive before proceeding
+		if CheckDBConnection(travisPath) == false {
+			fmt.Println("Failed to connect to MySQL in Travis CI")
 		}
-		// Pinging database again to see if newly database exists
+		dbString, _ := ReadFile(travisPath)
+		db, err = sql.Open("mysql", dbString)
+		if err != nil {
+			fmt.Println("Can't open MySQL in Travis")
+		}
+
+		//if database ping fails here that means connection is alive but database is missing
 		if db.Ping() != nil {
-			fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
+			fmt.Println("Can't ping MySQL in Travis")
+		}
+	} else if isEnvironmentAppVeyor() {
+		// make sure MySQL connection is alive before proceeding
+		if gostuff.CheckDBConnection("data/dbapp-veyor.txt") == false {
+			t.Fatal("Failed to connect to MySQL in App Veyor")
+		}
+		dbString, _ := gostuff.ReadFile("data/dbapp-veyor.txt")
+		db, err := sql.Open("mysql", dbString)
+		defer db.Close()
+		//	db.SetMaxIdleConns(20)
+		if err != nil {
+			t.Fatal("Can't open MySQL")
+		}
+
+		//if database ping fails here that means connection is alive but database is missing
+		if db.Ping() != nil {
+			fmt.Println("Can't ping MySQL in AppVeyor")
+		}
+	} else {
+		// make sure MySQL connection is alive before proceeding
+		if CheckDBConnection("secret/checkdb.txt") == false {
 			return false
+		}
+		dbString, database := ReadFile("secret/config.txt")
+		db, err = sql.Open("mysql", dbString)
+
+		if err != nil {
+			fmt.Println("Error opening Database DBSetup 2", err)
+			return false
+		}
+
+		//if database ping fails here that means connection is alive but database is missing
+		if db.Ping() != nil {
+			fmt.Println("Database", database, "does not exist")
+			fmt.Println("Please wait while database is imported...")
+
+			result := importDatabase()
+			if result == false {
+				result = importTemplateDatabase()
+				if result == false {
+					fmt.Println("database.go Dbsetup FAILED to import both databases!")
+					return false
+				} else {
+					fmt.Println("Empty template database successfully imported!")
+				}
+			} else {
+				fmt.Println(database, "database successfully imported!")
+			}
+
+			// Pinging database again to see if newly database exists
+			if db.Ping() != nil {
+				fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
+				return false
+			}
 		}
 	}
 	fmt.Println("MySQL is now connected.")
 	return true
+}
+
+// Returns true if the environment is in Travis
+func isEnvironmentTravis() bool {
+	if os.Getenv("GOCHESSENV") == "travis" {
+		return true
+	}
+	return false
+}
+
+// Returns true if the environment is in App Veyor
+func isEnvironmentAppVeyor() bool {
+	if os.Getenv("GOCHESSENV") == "appveyor" {
+		return true
+	}
+	return false
 }
 
 // checks if database connection is open, returns true if MySQL is running
