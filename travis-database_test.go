@@ -34,7 +34,7 @@ func TestDbConnect(t *testing.T) {
 	userInfo.IpAddress = fake.IPv4()
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err = userInfo.Register(w, r)
+		err := userInfo.Register(w, r)
 		if err != nil {
 			t.Fatal(err)
 		}
