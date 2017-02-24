@@ -6,6 +6,9 @@ go:
 services:
 - mysql
 
+env:
+- GOCHESSENV=travis
+
 script:
 - go build main.go
 - sudo ./main &
