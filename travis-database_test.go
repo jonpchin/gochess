@@ -13,7 +13,7 @@ import (
 
 // Travis CI default MySQL username and pass is public information
 
-func TestDbConnect(t *testing.T) {
+func TestTravisConnect(t *testing.T) {
 
 	// only run this test in Travis
 	if isEnvironmentTravis() == false {
