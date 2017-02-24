@@ -163,7 +163,7 @@ func isEnvironmentTravis() bool {
 
 // Returns true if the environment is in App Veyor
 func isEnvironmentAppVeyor() bool {
-	if os.Getenv("GOCHESSENV") == "appveyor" {
+	if os.Getenv("APPVEYOR") == "True" {
 		return true
 	}
 	return false
