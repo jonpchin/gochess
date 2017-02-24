@@ -22,9 +22,6 @@ install:
   - go get -t -v ./...
 
 build_script:
-  - go build main.go
-  - go test ./gostuff
-  - go test ./_appveyor
   - cd _appveyor\data
   - nuget install secure-file -ExcludeVersion
   - secure-file\tools\secure-file -decrypt gochessTemplate.sql.enc -secret %gochess_decrypt%
@@ -35,6 +32,9 @@ build_script:
   - bash importAppVeyorTemplate.sh
   - bash importAppVeyorTables.sh
   - cd ../..
+  - go build main.go
+  - main.exe
+  - go test ./gostuff
 
 # to disable deployment
 deploy: off
