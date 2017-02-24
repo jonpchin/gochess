@@ -95,11 +95,14 @@ func DbSetup(backup string) bool {
 			fmt.Println("Can't ping MySQL in Travis")
 		}
 	} else if isEnvironmentAppVeyor() {
+		const (
+			appVeyorPath = "_appveyor/data/dbapp-veyor.txt"
+		)
 		// make sure MySQL connection is alive before proceeding
-		if CheckDBConnection("data/dbapp-veyor.txt") == false {
+		if CheckDBConnection(appVeyorPath) == false {
 			fmt.Println("Failed to connect to MySQL in App Veyor")
 		}
-		dbString, _ := ReadFile("data/dbapp-veyor.txt")
+		dbString, _ := ReadFile(appVeyorPath)
 		db, err := sql.Open("mysql", dbString)
 		defer db.Close()
 		//	db.SetMaxIdleConns(20)
