@@ -8,7 +8,7 @@ import (
 func TestAppVeyorConnect(t *testing.T) {
 
 	// only run this test in AppVeyor
-	if isEnvironmentAppVeyor() == false {
+	if IsEnvironmentAppVeyor() == false {
 		return
 	}
 

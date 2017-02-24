@@ -33,7 +33,7 @@ build_script:
   - bash importAppVeyorTables.sh
   - cd ../..
   - go build main.go
-  - START "" main.exe
+  - START /B main.exe
   - go test ./gostuff
 
 # to disable deployment
