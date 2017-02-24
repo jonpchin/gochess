@@ -77,7 +77,7 @@ func DbSetup(backup string) bool {
 	if isEnvironmentTravis() {
 
 		const (
-			travisPath = "../_travis/data/dbtravis.txt"
+			travisPath = "_travis/data/dbtravis.txt"
 		)
 
 		// make sure MySQL connection is alive before proceeding
