@@ -268,9 +268,9 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 		//check if database connection is open
 		found := CheckUserNameInDb(username)
 		if found {
-			w.Write([]byte(" <img src='img/ajax/available.png' /> Username available"))
-		} else {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Username taken"))
+		} else {
+			w.Write([]byte(" <img src='img/ajax/available.png' /> Username available"))
 		}
 	}
 }

@@ -555,19 +555,15 @@ func getRatingHistory(name string, gametype string) (string, bool) {
 	return ratingHistory, true
 }
 
-// returns true if username exists, this function assumes database is already pinged
+// returns true if username already exists, this function assumes database is already pinged
 func CheckUserNameInDb(username string) bool {
 
 	var name string
 	//checking if name exists
-	checkName := db.QueryRow("SELECT username FROM userinfo WHERE username=?", username).Scan(&name)
-	switch {
-	case checkName == sql.ErrNoRows:
+	_ = db.QueryRow("SELECT username FROM userinfo WHERE username=?", username).Scan(&name)
+	if username == name { // already exists
 		return true
-	case checkName != nil:
-		fmt.Println("ERROR 3 CHECKNAME IP")
-		return false
-	default:
+	} else {
 		return false
 	}
 }
