@@ -158,7 +158,7 @@ func getImageDimensions(imagePath string) (int, int) {
 
 // returns a http client to time out requests that take too long
 // @seconds number of seconds for the request before it times out
-func timeOutHttp(seconds time.Duration) http.Client {
+func TimeOutHttp(seconds time.Duration) http.Client {
 	return http.Client{
 		Timeout: time.Duration(seconds * time.Second),
 	}
