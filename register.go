@@ -1,7 +1,6 @@
 package gostuff
 
 import (
-	"database/sql"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -93,9 +92,9 @@ func (userInfo *UserInfo) Register(w http.ResponseWriter, r *http.Request) error
 	//use javascript for as well as check this in backend in Golang
 	var name string
 	//checking if name exists
-	checkName := db.QueryRow("SELECT username FROM userinfo WHERE username=?", userInfo.Username).Scan(&name)
+	_ = db.QueryRow("SELECT username FROM userinfo WHERE username=?", userInfo.Username).Scan(&name)
 
-	if checkName != sql.ErrNoRows {
+	if userInfo.Username == name {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Username already exist. Please choose another username"))
 		return fmt.Errorf("Prevented host %s from choosing duplicate username %s\n", userInfo.IpAddress, userInfo.Username)
 	}
