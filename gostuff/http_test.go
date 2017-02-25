@@ -8,7 +8,7 @@ import (
 
 func TestLocale(t *testing.T) {
 
-	client := timeOutHttp(5)
+	client := TimeOutHttp(5)
 	response, err := client.Get("http://freegeoip.net/json/77.124.0.0")
 	if response == nil {
 		t.Error("URL time out for http://freegeoip.net/json/77.124.0.0 in TestLocale")

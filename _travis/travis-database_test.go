@@ -52,7 +52,11 @@ func TestTravisConnect(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	_, _ = http.Get(ts.URL)
+	client := gostuff.TimeOutHttp(5)
+	_, err = client.Get(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	found := gostuff.CheckUserNameInDb(userInfo.Username)
 	if found == false {

@@ -28,7 +28,7 @@ func setCountry(username string, ipAddress string) string {
 
 	var country = "globe"
 
-	client := timeOutHttp(5)
+	client := TimeOutHttp(5)
 	response, err := client.Get("http://freegeoip.net/json/" + ipAddress)
 	if response == nil {
 		fmt.Println("URL time out for http://freegeoip.net/json/ in setCountry")

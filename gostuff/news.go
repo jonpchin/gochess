@@ -66,7 +66,7 @@ func FetchNewsSources() {
 	defer logFile.Close()
 	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
 
-	client := timeOutHttp(5)
+	client := TimeOutHttp(5)
 	response, err := client.Get(newsSourceList)
 	if response == nil {
 		log.Println("FetchNewsSources URL time out for ", newsSourceList)
@@ -112,7 +112,7 @@ func saveNewsToFile(filename string, url string) {
 // convert to string for human readable format
 func getHttpResponse(url string) []byte {
 
-	client := timeOutHttp(5)
+	client := TimeOutHttp(5)
 	response, err := client.Get(url)
 	if err != nil {
 		fmt.Println("getHttpResponse 0", err)
@@ -230,7 +230,7 @@ func (newsProvider *NewsProvider) convertToHttps() {
 			newsProvider.Articles[index].UrlToImage = strings.Replace(article.UrlToImage,
 				"http://", "https://", 1)
 
-			client := timeOutHttp(5)
+			client := TimeOutHttp(5)
 			response, err := client.Get(newsProvider.Articles[index].UrlToImage)
 			if response == nil {
 				log.Println("convertToHttps URL time out for ",
