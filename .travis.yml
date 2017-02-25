@@ -13,6 +13,7 @@ script:
 - go build main.go
 - sudo ./main &
 - go test ./gostuff
+- go test ./_travis
 
 sudo: true
 
