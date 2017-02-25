@@ -2,9 +2,6 @@ package gostuff
 
 import (
 	"database/sql"
-	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -55,17 +52,7 @@ func TestTravisConnect(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := http.Get(ts.URL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	greeting, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("%s", greeting)
+	_, _ = http.Get(ts.URL)
 
 	found := gostuff.CheckUserNameInDb(userInfo.Username)
 	if found == false {
