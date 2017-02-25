@@ -2,6 +2,9 @@ package gostuff
 
 import (
 	"database/sql"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,10 +13,10 @@ import (
 	"github.com/jonpchin/gochess/gostuff"
 )
 
+var db *sql.DB
+
 // Travis CI default MySQL username and pass is public information
 func TestTravisConnect(t *testing.T) {
-
-	db := gostuff.DbConnect()
 
 	// make sure MySQL connection is alive before proceeding
 	if gostuff.CheckDBConnection("data/dbtravis.txt") == false {
@@ -28,6 +31,8 @@ func TestTravisConnect(t *testing.T) {
 	if err != nil {
 		t.Fatal("Can't open MySQL")
 	}
+
+	gostuff.SetDb(db)
 
 	//if database ping fails here that means connection is alive but database is missing
 	if db.Ping() != nil {
@@ -49,6 +54,18 @@ func TestTravisConnect(t *testing.T) {
 		}
 	}))
 	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	greeting, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s", greeting)
 
 	found := gostuff.CheckUserNameInDb(userInfo.Username)
 	if found == false {

@@ -119,6 +119,11 @@ func DbConnect() *sql.DB {
 	return db
 }
 
+// Sets the global database handler
+func SetDb(dataDb *sql.DB) {
+	db = dataDb
+}
+
 // Returns true if the environment is in Travis
 func IsEnvironmentTravis() bool {
 	if os.Getenv("GOCHESSENV") == "travis" {
