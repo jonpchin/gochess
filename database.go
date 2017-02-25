@@ -73,100 +73,50 @@ func DbSetup(backup string) bool {
 		}
 	}
 
-	// Determine the environment to connect with the right DB credentials
-	if IsEnvironmentTravis() {
-
-		const (
-			travisPath = "_travis/data/dbtravis.txt"
-		)
-
-		// make sure MySQL connection is alive before proceeding
-		if CheckDBConnection(travisPath) == false {
-			fmt.Println("Failed to connect to MySQL in Travis CI")
-		}
-		dbString, _ := ReadFile(travisPath)
-		db, err = sql.Open("mysql", dbString)
-		if err != nil {
-			fmt.Println("Can't open MySQL in Travis")
-			return false
-		}
-
-		//if database ping fails here that means connection is alive but database is missing
-		if db.Ping() != nil {
-			fmt.Println("Can't ping MySQL in Travis")
-			return false
-		}
-		fmt.Println("MySQL is now connected in Travis.")
-
-	} else if IsEnvironmentAppVeyor() {
-		const (
-			appVeyorPath = "_appveyor/data/dbapp-veyor.txt"
-		)
-		// make sure MySQL connection is alive before proceeding
-		if CheckDBConnection(appVeyorPath) == false {
-			fmt.Println("Failed to connect to MySQL in App Veyor")
-			return false
-		}
-		dbString, _ := ReadFile(appVeyorPath)
-		db, err = sql.Open("mysql", dbString)
-
-		//	db.SetMaxIdleConns(20)
-		if err != nil {
-			fmt.Println("Can't open MySQL in App Veyor")
-			return false
-		}
-
-		//if database ping fails here that means connection is alive but database is missing
-		if db.Ping() != nil {
-			fmt.Println("Can't ping MySQL in AppVeyor")
-			return false
-		}
-		fmt.Println("MySQL is now connected in App Veyor.")
-
-	} else {
-
-		// make sure MySQL connection is alive before proceeding
-		if CheckDBConnection("secret/checkdb.txt") == false {
-			return false
-		}
-
-		dbString, database := ReadFile("secret/config.txt")
-		db, err = sql.Open("mysql", dbString)
-
-		if err != nil {
-			fmt.Println("Error opening Database DBSetup 2", err)
-			return false
-		}
-
-		//if database ping fails here that means connection is alive but database is missing
-		if db.Ping() != nil {
-			fmt.Println("Database", database, "does not exist")
-			fmt.Println("Please wait while database is imported...")
-
-			result := importDatabase()
-			if result == false {
-				result = importTemplateDatabase()
-				if result == false {
-					fmt.Println("database.go Dbsetup FAILED to import both databases!")
-					return false
-				} else {
-					fmt.Println("Empty template database successfully imported!")
-				}
-			} else {
-				fmt.Println(database, "database successfully imported!")
-			}
-
-			// Pinging database again to see if newly database exists
-			if db.Ping() != nil {
-				fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
-				return false
-			}
-
-		}
-		fmt.Println("MySQL is now connected.")
+	// make sure MySQL connection is alive before proceeding
+	if CheckDBConnection("secret/checkdb.txt") == false {
+		return false
 	}
 
+	dbString, database := ReadFile("secret/config.txt")
+	db, err = sql.Open("mysql", dbString)
+
+	if err != nil {
+		fmt.Println("Error opening Database DBSetup 2", err)
+		return false
+	}
+
+	//if database ping fails here that means connection is alive but database is missing
+	if db.Ping() != nil {
+		fmt.Println("Database", database, "does not exist")
+		fmt.Println("Please wait while database is imported...")
+
+		result := importDatabase()
+		if result == false {
+			result = importTemplateDatabase()
+			if result == false {
+				fmt.Println("database.go Dbsetup FAILED to import both databases!")
+				return false
+			} else {
+				fmt.Println("Empty template database successfully imported!")
+			}
+		} else {
+			fmt.Println(database, "database successfully imported!")
+		}
+
+		// Pinging database again to see if newly database exists
+		if db.Ping() != nil {
+			fmt.Println("database.go Dbsetup 5 ", database, " is still missing after import!!!")
+			return false
+		}
+	}
+	fmt.Println("MySQL is now connected.")
 	return true
+}
+
+// Returns global database handler
+func DbConnect() *sql.DB {
+	return db
 }
 
 // Returns true if the environment is in Travis
