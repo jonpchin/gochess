@@ -38,7 +38,7 @@ func TestTravisConnect(t *testing.T) {
 
 	// registers a random person to the database
 	var userInfo gostuff.UserInfo
-	userInfo.Username = "test1234"
+	userInfo.Username = fake.UserName()
 	userInfo.Password = fake.Password(5, 32, true, true, false)
 
 	userInfo.Email = fake.EmailAddress()
