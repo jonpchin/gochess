@@ -2,3 +2,4 @@ root
 
 localhost
 3306
+gochess
