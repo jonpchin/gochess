@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/icrowley/fake"
 	"github.com/jonpchin/gochess/gostuff"
 )
 
@@ -32,34 +33,26 @@ func TestTravisConnect(t *testing.T) {
 	if db.Ping() != nil {
 		t.Fatal("Can't ping MySQL")
 	}
-	/*
-		// registers a random person to the database
-		var userInfo gostuff.UserInfo
-		userInfo.Username = fake.UserName()
-		userInfo.Password = fake.Password(5, 32, true, true, false)
 
-		userInfo.Email = fake.EmailAddress()
-		userInfo.IpAddress = fake.IPv4()
+	// registers a random person to the database
+	var userInfo gostuff.UserInfo
+	userInfo.Username = fake.UserName()
+	userInfo.Password = fake.Password(5, 32, true, true, false)
 
-			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				err = userInfo.Register(w, r)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}))
-			defer ts.Close()
+	userInfo.Email = fake.EmailAddress()
+	userInfo.IpAddress = fake.IPv4()
 
-			client := gostuff.TimeOutHttp(5)
-			_, err = client.Get(ts.URL)
-			if err != nil {
-				t.Fatal(err)
-			}
-	*/
+	// doesnt matter what parameter as its only for handling corner case in localhost
+	_, err = userInfo.Register("")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	found := gostuff.CheckUserNameInDb("test1234")
 	if found {
 		t.Fatal("Username was found in the database when it was not suppose to be")
 	}
-	found = gostuff.CheckUserNameInDb("yCrawford")
+	found = gostuff.CheckUserNameInDb(userInfo.Username)
 	if found == false {
 		t.Fatal("Username was not found  in the database when it was suppose to be")
 	}

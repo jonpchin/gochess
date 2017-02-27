@@ -62,30 +62,33 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			defer problems.Close()
 			log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
-			err := userInfo.Register(w, r)
+			message, err := userInfo.Register(r.Host)
 			if err == nil {
 				//sends email to user
 				go Sendmail(userInfo.Email, userInfo.Token, userInfo.Username, r.Host)
 
-				message := "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello " +
+				message = "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello " +
 					userInfo.Username + "! Please check email for instructions to verify your account."
 				//if reached here just notify user to check his email and continue on with the account creation
 				w.Write([]byte(message))
 			} else {
+				w.Write([]byte(message))
 				log.Println(err)
 			}
 		}
 	}
 }
 
-//after all credentials are validated adds users info to database
+// After all credentials are validated adds users info to database
+// host param is used to handle corner case for localhost testing
 // returns an error if there was a problem
-func (userInfo *UserInfo) Register(w http.ResponseWriter, r *http.Request) error {
+func (userInfo *UserInfo) Register(host string) (string, error) {
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 27"))
-		return errors.New("DATABASE DOWN in register.go Register 0")
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.",
+			errors.New("DATABASE DOWN in register.go Register 0")
+
 	}
 
 	//check if username already exists, if it does then break out and inform user
@@ -95,14 +98,13 @@ func (userInfo *UserInfo) Register(w http.ResponseWriter, r *http.Request) error
 	_ = db.QueryRow("SELECT username FROM userinfo WHERE username=?", userInfo.Username).Scan(&name)
 
 	if userInfo.Username == name {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> Username already exist. Please choose another username"))
-		return fmt.Errorf("Prevented host %s from choosing duplicate username %s\n", userInfo.IpAddress, userInfo.Username)
+		return "<img src='img/ajax/not-available.png' /> Username already exist. Please choose another username",
+			fmt.Errorf("Prevented host %s from choosing duplicate username %s\n", userInfo.IpAddress, userInfo.Username)
 	}
 
 	key, err := hashPass(userInfo.Username, userInfo.Password)
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 28"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server.", err
 	}
 
 	//inserting into database
@@ -110,16 +112,14 @@ func (userInfo *UserInfo) Register(w http.ResponseWriter, r *http.Request) error
 	defer stmt.Close()
 
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 29"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	date := time.Now()
 
 	_, err = stmt.Exec(userInfo.Username, key, userInfo.Email, date, date, userInfo.IpAddress, "NO", 0)
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 30"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	log.Printf("Account %s was created in userinfo table.\n", userInfo.Username)
@@ -129,57 +129,51 @@ func (userInfo *UserInfo) Register(w http.ResponseWriter, r *http.Request) error
 	//preparing token activation
 	stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 32"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	_, err = stmt.Exec(userInfo.Username, userInfo.Token, userInfo.Email, date)
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 33"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	//setting up player's rating
 	stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, correspondence=?, bulletRD=?, blitzRD=?, standardRD=?, correspondenceRD=?")
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 34"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	_, err = stmt.Exec(userInfo.Username, "1500", "1500", "1500", "1500", "350.0", "350.0", "350.0", "350.0")
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 35"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	// add player to rating history table
 	stmt, err = db.Prepare("INSERT ratinghistory SET username=?")
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 36"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
 	_, err = stmt.Exec(userInfo.Username)
 	if err != nil {
-		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later. Report to admin Error 37"))
-		return err
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 	}
 
-	if r.Host == "localhost" { // handle corner case for localhost testing
+	if host == "localhost" { // handle corner case for localhost testing
 		stmt, err = db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
 		if err != nil {
-			return err
+			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 		}
 
 		_, err = stmt.Exec("globe", userInfo.Username)
 		if err != nil {
-			return err
+			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
 		}
 	} else {
 		// updates players country in database when they register for the first time
 		setCountry(userInfo.Username, userInfo.IpAddress)
 	}
-	return nil
+	return "", nil
 }
 
 // returns the password hash
