@@ -37,6 +37,14 @@ func TestTravisConnect(t *testing.T) {
 	// registers a random person to the database
 	var userInfo gostuff.UserInfo
 	userInfo.Username = fake.UserName()
+
+	// Ensure username is between 3 and 12 characters
+	if len(userInfo.Username) < 3 {
+		userInfo.Username += "tes"
+	} else if len(username) > 12 {
+		userInfo.Username = userInfo.Username[:12]
+	}
+
 	userInfo.Password = fake.Password(5, 32, true, true, false)
 
 	userInfo.Email = fake.EmailAddress()
