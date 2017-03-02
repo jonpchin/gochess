@@ -88,7 +88,7 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 
 	//check if database connection is open
 	if db.Ping() != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.",
+		return "<img src='img/ajax/not-available.png' /> Can't ping database.",
 			errors.New("DATABASE DOWN in register.go Register 0")
 
 	}
@@ -106,7 +106,7 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 
 	key, err := hashPass(userInfo.Username, userInfo.Password)
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server.", err
+		return "<img src='img/ajax/not-available.png' /> Can't hash password.", err
 	}
 
 	//inserting into database
@@ -114,14 +114,14 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 	defer stmt.Close()
 
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't prepare database insertion.", err
 	}
 
 	date := time.Now()
 
 	_, err = stmt.Exec(userInfo.Username, key, userInfo.Email, date, date, userInfo.IpAddress, "NO", 0)
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't execute database.", err
 	}
 
 	log.Printf("Account %s was created in userinfo table.\n", userInfo.Username)
@@ -131,45 +131,45 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 	//preparing token activation
 	stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't prepare token activation", err
 	}
 
 	_, err = stmt.Exec(userInfo.Username, userInfo.Token, userInfo.Email, date)
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't execute token activation", err
 	}
 
 	//setting up player's rating
 	stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, correspondence=?, bulletRD=?, blitzRD=?, standardRD=?, correspondenceRD=?")
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't prepare to update player's rating.", err
 	}
 
 	_, err = stmt.Exec(userInfo.Username, "1500", "1500", "1500", "1500", "350.0", "350.0", "350.0", "350.0")
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't execute player's rating.", err
 	}
 
 	// add player to rating history table
 	stmt, err = db.Prepare("INSERT ratinghistory SET username=?")
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't insert into rating history", err
 	}
 
 	_, err = stmt.Exec(userInfo.Username)
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+		return "<img src='img/ajax/not-available.png' /> Can't execute into rating history", err
 	}
 
 	if host == "localhost" { // handle corner case for localhost testing
 		stmt, err = db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
 		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+			return "<img src='img/ajax/not-available.png' /> Can't prepare to set country.", err
 		}
 
 		_, err = stmt.Exec("globe", userInfo.Username)
 		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.", err
+			return "<img src='img/ajax/not-available.png' /> Can't execute to set country.", err
 		}
 	} else {
 		// updates players country in database when they register for the first time

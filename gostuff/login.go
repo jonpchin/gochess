@@ -160,13 +160,13 @@ func (userinfo *UserInfo) login(method string, url string, agent string, host st
 			//create activation token in database and send user notifying them that their was five incorrect login attempts
 			stmt, err := db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
 			if err != nil {
-				return "", err
+				return "<img src='img/ajax/not-available.png' /> Can't prepare activation token", err
 			}
 
 			token = RandomString()
 			_, err = stmt.Exec(userinfo.Username, token, email, time.Now())
 			if err != nil {
-				return "", err
+				return "<img src='img/ajax/not-available.png' /> Can't execute activation token", err
 			}
 			//sends email to user with the token activation
 			go SendAttempt(email, token, userinfo.Username, userinfo.IpAddress, host)
@@ -178,7 +178,7 @@ func (userinfo *UserInfo) login(method string, url string, agent string, host st
 
 			err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userinfo.Username).Scan(&token)
 			if err2 != nil {
-				return "", err2
+				return "<img src='img/ajax/not-available.png' /> Can't query token from user", err2
 			}
 
 			//sends email again to user with the token activation
@@ -188,11 +188,11 @@ func (userinfo *UserInfo) login(method string, url string, agent string, host st
 		}
 		if pass != key {
 			addOneToCaptcha(userinfo.Username, captcha)
-			return "", errors.New("<img src='img/ajax/not-available.png' /> Wrong username/password combination.")
+			return "<img src='img/ajax/not-available.png' /> Wrong username/password combination.", nil
 		}
 		if verify != "YES" {
-			needToActivate(host, userinfo.Username)
-			return "", errors.New("Need to activate login.go line 195")
+			result, err := needToActivate(host, userinfo.Username)
+			return result, err
 		}
 
 		// update captcha to zero since login was a success
@@ -200,12 +200,12 @@ func (userinfo *UserInfo) login(method string, url string, agent string, host st
 		defer stmt.Close()
 
 		if err != nil {
-			return "", err
+			return "<img src='img/ajax/not-available.png' /> Can't prepare captcha to zero", err
 		}
 
 		_, err = stmt.Exec(0, userinfo.Username)
 		if err != nil {
-			return "", err
+			return "<img src='img/ajax/not-available.png' /> Can't execute captcha to zero", err
 		}
 
 		return "", nil
