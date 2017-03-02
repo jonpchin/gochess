@@ -16,11 +16,13 @@ import (
 )
 
 type UserInfo struct {
-	Username  string
-	Password  string
-	Email     string
-	IpAddress string
-	Token     string
+	Username        string
+	Password        string
+	Email           string
+	IpAddress       string
+	Token           string
+	CaptchaId       string
+	CaptchaSolution string
 }
 
 //processes the users input when signing up
