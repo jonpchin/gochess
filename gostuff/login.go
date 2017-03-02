@@ -53,7 +53,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	if err == nil && result == "" {
+	if result == "" {
 		enterInside(w, userinfo.Username, userinfo.IpAddress)
 	} else {
 		w.Write([]byte(result))
