@@ -41,7 +41,7 @@ func TestTravisConnect(t *testing.T) {
 	// Ensure username is between 3 and 12 characters
 	if len(userInfo.Username) < 3 {
 		userInfo.Username += "tes"
-	} else if len(username) > 12 {
+	} else if len(userInfo.Username) > 12 {
 		userInfo.Username = userInfo.Username[:12]
 	}
 
