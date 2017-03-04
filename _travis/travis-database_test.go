@@ -65,8 +65,11 @@ func TestTravisConnect(t *testing.T) {
 		t.Fatal("Username was not found  in the database when it was suppose to be")
 	}
 
-	_, err = userInfo.Login("", "", "", "localhost")
+	result, err := userInfo.Login("", "", "", "localhost")
 	if err != nil {
 		t.Fatal(err)
+	}
+	if result != "" {
+		t.Fatal("No result for login ", result)
 	}
 }
