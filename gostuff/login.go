@@ -49,7 +49,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	userinfo.CaptchaSolution = template.HTMLEscapeString(r.FormValue("captchaSolution"))
 	userinfo.IpAddress, _, _ = net.SplitHostPort(r.RemoteAddr)
 
-	result, err := userinfo.login(r.Method, r.URL.Path, r.UserAgent(), r.Host)
+	result, err := userinfo.Login(r.Method, r.URL.Path, r.UserAgent(), r.Host)
 	if err != nil {
 		log.Println(err)
 	}
@@ -60,7 +60,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (userinfo *UserInfo) login(method string, url string, agent string, host string) (string, error) {
+func (userinfo *UserInfo) Login(method string, url string, agent string, host string) (string, error) {
 	if userinfo.CaptchaSolution == "" { //then assume user was not displayed captcha
 
 		//check if database connection is open
