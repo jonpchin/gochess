@@ -259,7 +259,7 @@ func needToActivate(host string, username string) (string, error) {
 	} else {
 		go Sendmail(email, tokenInDB, username, host)
 	}
-	return "<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page." +
+	return "<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. " +
 		"An email has been sent again containing your activation code.", nil
 }
 

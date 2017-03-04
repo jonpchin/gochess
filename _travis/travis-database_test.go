@@ -71,9 +71,9 @@ func TestTravisConnect(t *testing.T) {
 	}
 
 	const (
-		needToActivateMessage = "No result for login  <img src='img/ajax/not-available.png' />" +
-			"You must activate your account by entering the activation token in" +
-			"your email at the activation page.An email has been sent again" +
+		needToActivateMessage = "<img src='img/ajax/not-available.png' /> " +
+			"You must activate your account by entering the activation token in " +
+			"your email at the activation page. An email has been sent again " +
 			"containing your activation code."
 	)
 
