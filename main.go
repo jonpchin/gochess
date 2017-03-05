@@ -94,6 +94,9 @@ func main() {
 	if len(os.Args) > 1 {
 		certPath = "secret/combine2017.crt"
 		keyPath = "secret/go2017.key"
+	} else if gostuff.IsEnvironmentTravis() {
+		certPath = "_travis/data/device.crt"
+		keyPath = "_travis/data/device.key"
 	}
 
 	go func() {
