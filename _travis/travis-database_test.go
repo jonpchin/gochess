@@ -27,6 +27,8 @@ func TestTravisConnect(t *testing.T) {
 		t.Fatal("Can't open MySQL")
 	}
 
+	gostuff.SetDb(db)
+
 	//if database ping fails here that means connection is alive but database is missing
 	if db.Ping() != nil {
 		t.Fatal("Can't ping MySQL")
