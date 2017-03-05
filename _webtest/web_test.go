@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jonpchin/gochess/gostuff"
 	"github.com/sclevine/agouti"
 )
 
@@ -39,11 +38,6 @@ func TestLoginDev(t *testing.T) {
 	expectedLoginURL := "https://localhost/login"
 	if loginURL != expectedLoginURL {
 		t.Fatal("Expected URL to be", expectedLoginURL, "but got", loginURL)
-	}
-
-	// TODO: Need to figure out why localhost web test does not work on Travi
-	if gostuff.IsEnvironmentTravis() {
-		return
 	}
 
 	time.Sleep(time.Second)

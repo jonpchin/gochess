@@ -73,12 +73,20 @@ func DbSetup(backup string) bool {
 		}
 	}
 
+	var checkDBConnectFile = "secret/checkdb.txt"
+	var sqlOpenFile = "secret/config.txt"
+
+	if IsEnvironmentTravis() {
+		checkDBConnectFile = "data/dbtravis.txt"
+		sqlOpenFile = "data/dbtravis.txt"
+	}
+
 	// make sure MySQL connection is alive before proceeding
-	if CheckDBConnection("secret/checkdb.txt") == false {
+	if CheckDBConnection(checkDBConnectFile) == false {
 		return false
 	}
 
-	dbString, database := ReadFile("secret/config.txt")
+	dbString, database := ReadFile(sqlOpenFile)
 	db, err = sql.Open("mysql", dbString)
 
 	if err != nil {
