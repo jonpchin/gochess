@@ -163,3 +163,12 @@ func TimeOutHttp(seconds time.Duration) http.Client {
 		Timeout: time.Duration(seconds * time.Second),
 	}
 }
+
+// Returns true if floats are equal withing the tolerance level set by EPSILON
+func IsFloatEqual(a, b float64) bool {
+	var EPSILON float64 = 0.00000001
+	if (a-b) < EPSILON && (b-a) < EPSILON {
+		return true
+	}
+	return false
+}
