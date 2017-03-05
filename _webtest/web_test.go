@@ -40,7 +40,7 @@ func TestLoginDev(t *testing.T) {
 		t.Fatal("Expected URL to be", expectedLoginURL, "but got", loginURL)
 	}
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(10 * time.Second)
 	user1 := "can"
 	err = page1.FindByID("user").Fill(user1)
 	if err != nil {
