@@ -114,8 +114,8 @@ func TestTravisConnect(t *testing.T) {
 		t.Fatal("Ratings part 2 are not set to 1500", blitz, bullet, standard, correspondence)
 	}
 
-	if gostuff.IsFloatEqual(bulletRD, 350.0) == false || gostuff.IsFloatEqual(blitzRD, 350.0) == false ||
-		gostuff.IsFloatEqual(standardRD, 350.0) == false || gostuff.IsFloatEqual(correspondenceRD, 350.0) {
+	if bulletRD != 350 || blitzRD != 350 ||
+		standardRD != 350 || correspondenceRD != 350 {
 		t.Fatal("Rating RD float values are incorrect", bulletRD, blitzRD, standardRD, correspondenceRD)
 	}
 }
