@@ -39,6 +39,8 @@ func TestLoginDev(t *testing.T) {
 	if loginURL != expectedLoginURL {
 		t.Fatal("Expected URL to be", expectedLoginURL, "but got", loginURL)
 	}
+
+	time.Sleep(3 * time.Second)
 	user1 := "can"
 	err = page1.FindByID("user").Fill(user1)
 	if err != nil {
@@ -308,7 +310,7 @@ func TestLoginProduction(t *testing.T) {
 	if err := page2.Navigate("https://goplaychess.com/server/lobby"); err != nil {
 		t.Fatal("Failed to navigate lobby at localhost:", err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(3 * time.Second)
 	err = page2.FindByID("sendSeek").Click()
 	if err != nil {
 		t.Fatal("Couldn't submit:", err)
