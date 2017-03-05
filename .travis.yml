@@ -9,22 +9,25 @@ services:
 env:
 - GOCHESSENV=travis
 
-script:
-- go build main.go
-- sudo ./main &
-- go test ./gostuff
-- go test ./_travis
-- "export PATH=$PATH:/usr/lib/chromium-browser/"
-- "export DISPLAY=:99.0"
-- "sh -e /etc/init.d/xvfb start"
-- go test ./_webtest
-
 sudo: true
 
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+
 before_install:
-- sudo apt-get update
-- sudo apt-get install chromium-chromedriver
-- sleep 3 # give xvfb some time to start
+- wget http://chromedriver.storage.googleapis.com/2.27/chromedriver_linux64.zip
+- unzip chromedriver_linux64.zip
+- sudo apt-get install libnss3
+- sudo apt-get --only-upgrade install google-chrome-stable
+- sudo cp chromedriver /usr/local/bin/.
+- sudo chmod +x /usr/local/bin/chromedriver
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- sleep 3
 - bash ./_travis/data/travis-install-mysql-5.7.sh
 - mysql --version
 - pwd
@@ -35,3 +38,13 @@ before_install:
 - bash ./importTravisTemplate.sh
 - bash ./importTravisTables.sh
 - cd ../../
+
+script:
+- go build main.go
+- sudo ./main &
+- go test ./gostuff
+- go test ./_travis
+- "export PATH=$PATH:/usr/lib/chromium-browser/"
+- "export DISPLAY=:99.0"
+- "sh -e /etc/init.d/xvfb start"
+- go test ./_webtest
