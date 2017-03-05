@@ -13,6 +13,7 @@ sudo: true
 dist: trusty
 
 before_install:
+- go get github.com/sclevine/agouti 
 - sudo apt-get update
 - sudo apt-get install chromium-chromedriver
 - bash ./_travis/data/travis-install-mysql-5.7.sh

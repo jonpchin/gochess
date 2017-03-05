@@ -130,7 +130,7 @@ func TestTravisConnect(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, isActivate := userInfo.Activate("", "", "")
+	_, isActivate = userInfo.Activate("", "", "")
 	if isActivate == false {
 		t.Fatal("Could not activate account on travis unit test", isActivate)
 	}
@@ -145,7 +145,7 @@ func TestTravisConnect(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, isActivate := userInfo.Activate("", "", "")
+	_, isActivate = userInfo.Activate("", "", "")
 	if isActivate == false {
 		t.Fatal("Could not activate account on travis unit test", isActivate)
 	}
