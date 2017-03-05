@@ -77,8 +77,8 @@ func DbSetup(backup string) bool {
 	var sqlOpenFile = "secret/config.txt"
 
 	if IsEnvironmentTravis() {
-		checkDBConnectFile = "data/dbtravis.txt"
-		sqlOpenFile = "data/dbtravis.txt"
+		checkDBConnectFile = "_travis/data/dbtravis.txt"
+		sqlOpenFile = "_travis/data/dbtravis.txt"
 	}
 
 	// make sure MySQL connection is alive before proceeding
