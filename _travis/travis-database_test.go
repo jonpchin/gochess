@@ -95,4 +95,27 @@ func TestTravisConnect(t *testing.T) {
 	if result != "" {
 		t.Fatal("Incorrect login results 2 results should be blank string")
 	}
+
+	errMessage, bullet, blitz, standard, correspondence := gostuff.GetRating(userInfo.Username)
+	if errMessage != "" {
+		t.Fatal("Error in fetching rating for ", userInfo.Username, errMessage)
+	}
+	if blitz != 1500 || bullet != 1500 || standard != 1500 || correspondence != 1500 {
+		t.Fatal("Ratings are not set to 1500", blitz, bullet, standard, correspondence)
+	}
+
+	errMessage, bulletF, blitzF, standardF, correspondenceF, bulletRD,
+		blitzRD, standardRD, correspondenceRD := gostuff.GetRatingAndRD(userInfo.Username)
+
+	if errMessage != "" {
+		t.Fatal("Error in fetching rating and ratngRD for ", userInfo.Username, errMessage)
+	}
+	if blitzF != 1500 || bulletF != 1500 || standardF != 1500 || correspondenceF != 1500 {
+		t.Fatal("Ratings part 2 are not set to 1500", blitz, bullet, standard, correspondence)
+	}
+
+	if gostuff.IsFloatEqual(bulletRD, 350.0) == false || gostuff.IsFloatEqual(blitzRD, 350.0) == false ||
+		gostuff.IsFloatEqual(standardRD, 350.0) == false || gostuff.IsFloatEqual(correspondenceRD, 350.0) {
+		t.Fatal("Rating RD float values are incorrect", bulletRD, blitzRD, standardRD, correspondenceRD)
+	}
 }
