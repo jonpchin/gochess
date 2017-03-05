@@ -14,10 +14,17 @@ script:
 - sudo ./main &
 - go test ./gostuff
 - go test ./_travis
+- "export PATH=$PATH:/usr/lib/chromium-browser/"
+- "export DISPLAY=:99.0"
+- "sh -e /etc/init.d/xvfb start"
+- go test ./_webtest
 
 sudo: true
 
 before_install:
+ - sudo apt-get update
+- sudo apt-get install chromium-chromedriver
+- sleep 3 # give xvfb some time to start
 - bash ./_travis/data/travis-install-mysql-5.7.sh
 - mysql --version
 - pwd
