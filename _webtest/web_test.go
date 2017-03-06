@@ -171,12 +171,13 @@ func TestLoginDev(t *testing.T) {
 			t.Fatal("Couldn't confirm resign popup user1:", err)
 		}
 
+		time.Sleep(3 * time.Second)
 		// Player should have one games on Travis
 		if gostuff.IsEnvironmentTravis() {
 			storage := gostuff.GetGames(user1)
 			if len(storage) != 1 || storage[0].Status != "White Resigned" ||
 				storage[0].Rated != "Yes" || storage[0].TimeControl != 5 {
-				t.Fatal("GetGames does not match the expected output for ", user1)
+				t.Fatal("GetGames does not match the expected output for ", user1, len(storage))
 			}
 		}
 
