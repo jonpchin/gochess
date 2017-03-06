@@ -176,8 +176,7 @@ func TestLoginDev(t *testing.T) {
 			storage := gostuff.GetGames(user1)
 			if len(storage) != 1 || storage[0].Status != "White Resigned" ||
 				storage[0].Rated != "Yes" || storage[0].TimeControl != 5 {
-				t.Fatal("There are more then zero games for ", user1, " when there shouldn't be",
-					storage[0].Status, storage[0].Rated, storage[0].TimeControl)
+				t.Fatal("GetGames does not match the expected output for ", user1)
 			}
 		}
 
@@ -217,8 +216,7 @@ func TestLoginDev(t *testing.T) {
 			storage := gostuff.GetGames(user1)
 			if len(storage) != 2 || storage[1].Status != "Agreed Draw" ||
 				storage[1].Rated != "Yes" || storage[1].TimeControl != 5 {
-				t.Fatal("There is not two games  when there should be",
-					storage[1].Status, storage[1].Rated, storage[1].TimeControl)
+				t.Fatal("GetGames 2 does not match the expected output for ", user1)
 			}
 		}
 
