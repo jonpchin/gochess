@@ -171,7 +171,8 @@ func TestLoginDev(t *testing.T) {
 			t.Fatal("Couldn't confirm resign popup user1:", err)
 		}
 
-		time.Sleep(3 * time.Second)
+		// Gives time to save to database
+		time.Sleep(2 * time.Second)
 		// Player should have one games on Travis
 		if gostuff.IsEnvironmentTravis() {
 			storage := gostuff.GetGames(user1)
@@ -211,6 +212,8 @@ func TestLoginDev(t *testing.T) {
 		}
 		// TODO: Check if game really ended and check if the other player really won
 		// Still need to test abort failure, abort sucess, draw, and checkmate
+
+		time.Sleep(2 * time.Second)
 
 		// Player should have two games on Travis
 		if gostuff.IsEnvironmentTravis() {
