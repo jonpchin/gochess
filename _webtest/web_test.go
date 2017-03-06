@@ -19,7 +19,7 @@ func TestLoginDev(t *testing.T) {
 
 	if gostuff.IsEnvironmentTravis() {
 		const (
-			travisFile = "_travis/data/dbtravis.txt"
+			travisFile = "../_travis/data/dbtravis.txt"
 		)
 		// make sure MySQL connection is alive before proceeding
 		if gostuff.CheckDBConnection(travisFile) == false {
