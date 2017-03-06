@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jonpchin/gochess/gostuff"
 	"github.com/sclevine/agouti"
 )
 
@@ -42,6 +43,15 @@ func TestLoginDev(t *testing.T) {
 
 	time.Sleep(time.Second)
 	user1 := "can"
+
+	// Player should have zero games on Travis
+	if gostuff.IsEnvironmentTravis() {
+		storage := gostuff.GetGames(user1)
+		if len(storage) > 0 {
+			t.Fatal("There are more then zero games for ", user1, " when there shouldn't be")
+		}
+	}
+
 	err = page1.FindByID("user").Fill(user1)
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
@@ -131,6 +141,17 @@ func TestLoginDev(t *testing.T) {
 		if err != nil {
 			t.Fatal("Couldn't confirm resign popup user1:", err)
 		}
+
+		// Player should have one games on Travis
+		if gostuff.IsEnvironmentTravis() {
+			storage := gostuff.GetGames(user1)
+			if len(storage) != 1 || storage[0].Status != "White Resigned" ||
+				storage[0].Rated != "Yes" || storage[0].TimeControl != 5 {
+				t.Fatal("There are more then zero games for ", user1, " when there shouldn't be",
+					storage[0].Status, storage[0].Rated, storage[0].TimeControl)
+			}
+		}
+
 		err = page1.FindByID("rematchButton").Click()
 		if err != nil {
 			t.Fatal("Couldn't find rematch button  user 1:", err)
@@ -161,6 +182,16 @@ func TestLoginDev(t *testing.T) {
 		}
 		// TODO: Check if game really ended and check if the other player really won
 		// Still need to test abort failure, abort sucess, draw, and checkmate
+
+		// Player should have two games on Travis
+		if gostuff.IsEnvironmentTravis() {
+			storage := gostuff.GetGames(user1)
+			if len(storage) != 2 || storage[1].Status != "Agreed Draw" ||
+				storage[1].Rated != "Yes" || storage[1].TimeControl != 5 {
+				t.Fatal("There is not two games  when there should be",
+					storage[1].Status, storage[1].Rated, storage[1].TimeControl)
+			}
+		}
 
 	} else if user2 == whitePlayer {
 		page2.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
@@ -251,7 +282,9 @@ func TestLoginProduction(t *testing.T) {
 	if loginURL != expectedLoginURL {
 		t.Fatal("Expected URL to be", expectedLoginURL, "but got", loginURL)
 	}
+
 	user1 := "foo"
+
 	err = page1.FindByID("user").Fill(user1)
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
