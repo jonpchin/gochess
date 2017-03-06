@@ -41,7 +41,7 @@ func TestTravisConnect(t *testing.T) {
 	// Setting up users for chrominum driver web test
 	userInfo.Username = "ben"
 	userInfo.Password = "test123"
-	userInfo.Email = fake.EmailAddress()
+	userInfo.Email = "fake@email.com"
 	userInfo.IpAddress = fake.IPv4()
 
 	// doesnt matter what parameter as its only for handling corner case in localhost
