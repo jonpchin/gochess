@@ -38,14 +38,9 @@ func TestTravisConnect(t *testing.T) {
 	var userInfo gostuff.UserInfo
 	userInfo.Username = fake.UserName()
 
-	// Ensure username is between 3 and 12 characters
-	if len(userInfo.Username) < 3 {
-		userInfo.Username += "tes"
-	} else if len(userInfo.Username) > 12 {
-		userInfo.Username = userInfo.Username[:12]
-	}
-
-	userInfo.Password = fake.Password(5, 32, true, true, false)
+	// Setting up users for chrominum driver web test
+	userInfo.Username = "ben"
+	userInfo.Password = "test123"
 	userInfo.Email = fake.EmailAddress()
 	userInfo.IpAddress = fake.IPv4()
 
@@ -116,23 +111,6 @@ func TestTravisConnect(t *testing.T) {
 	if bulletRD != 350 || blitzRD != 350 ||
 		standardRD != 350 || correspondenceRD != 350 {
 		t.Fatal("Rating RD float values are incorrect", bulletRD, blitzRD, standardRD, correspondenceRD)
-	}
-
-	// Setting up users for chrominum driver web test
-	userInfo.Username = "ben"
-	userInfo.Password = "test123"
-	userInfo.Email = fake.EmailAddress()
-	userInfo.IpAddress = fake.IPv4()
-
-	// doesnt matter what parameter as its only for handling corner case in localhost
-	_, err = userInfo.Register("")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, isActivate = userInfo.Activate("", "", "")
-	if isActivate == false {
-		t.Fatal("Could not activate account on travis unit test", isActivate)
 	}
 
 	userInfo.Username = "can"
