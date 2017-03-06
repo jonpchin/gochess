@@ -2,6 +2,7 @@ package webtest
 
 import (
 	"bufio"
+	"database/sql"
 	"log"
 	"os"
 	"testing"
@@ -13,6 +14,27 @@ import (
 
 //localhost testing
 func TestLoginDev(t *testing.T) {
+
+	// make sure MySQL connection is alive before proceeding
+	if gostuff.CheckDBConnection("data/dbtravis.txt") == false {
+		t.Fatal("Failed to connect to MySQL in Travis CI")
+	}
+
+	var err error
+	dbString, _ := gostuff.ReadFile("data/dbtravis.txt")
+	db, err = sql.Open("mysql", dbString)
+	//defer db.Close()
+
+	if err != nil {
+		t.Fatal("Can't open MySQL")
+	}
+
+	gostuff.SetDb(db)
+
+	//if database ping fails here that means connection is alive but database is missing
+	if db.Ping() != nil {
+		t.Fatal("Can't ping MySQL")
+	}
 
 	driver := agouti.ChromeDriver()
 	if err := driver.Start(); err != nil {
