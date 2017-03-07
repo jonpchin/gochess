@@ -17,30 +17,32 @@ var db *sql.DB
 //localhost testing
 func TestLoginDev(t *testing.T) {
 
+	var dbFile string
 	if gostuff.IsEnvironmentTravis() {
-		const (
-			travisFile = "../_travis/data/dbtravis.txt"
-		)
-		// make sure MySQL connection is alive before proceeding
-		if gostuff.CheckDBConnection(travisFile) == false {
-			t.Fatal("Failed to connect to MySQL in Travis CI")
-		}
+		dbFile = "../_travis/data/dbtravis.txt"
+	} else {
+		dbFile = "../secret/checkdb.txt"
+	}
 
-		var err error
-		dbString, _ := gostuff.ReadFile(travisFile)
-		db, err = sql.Open("mysql", dbString)
-		//defer db.Close()
+	// make sure MySQL connection is alive before proceeding
+	if gostuff.CheckDBConnection(dbFile) == false {
+		t.Fatal("Failed to connect to MySQL in Travis CI")
+	}
 
-		if err != nil {
-			t.Fatal("Can't open MySQL")
-		}
+	var err error
+	dbString, _ := gostuff.ReadFile(dbFile)
+	db, err = sql.Open("mysql", dbString)
+	//defer db.Close()
 
-		gostuff.SetDb(db)
+	if err != nil {
+		t.Fatal("Can't open MySQL")
+	}
 
-		//if database ping fails here that means connection is alive but database is missing
-		if db.Ping() != nil {
-			t.Fatal("Can't ping MySQL")
-		}
+	gostuff.SetDb(db)
+
+	//if database ping fails here that means connection is alive but database is missing
+	if db.Ping() != nil {
+		t.Fatal("Can't ping MySQL")
 	}
 
 	driver := agouti.ChromeDriver()
@@ -482,7 +484,6 @@ func TestLoginProduction(t *testing.T) {
 		time.Sleep(time.Second)
 		page2.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
 
-		time.Sleep(2 * time.Second)
 		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
 			t.Error("board does not match user2")
 		}
