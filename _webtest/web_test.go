@@ -420,7 +420,7 @@ func TestLoginProduction(t *testing.T) {
 		t.Fatal("Couldn't submit:", err)
 	}
 
-	time.Sleep(time.Second)
+	time.Sleep(2 * time.Second)
 	var whitePlayer string
 	page2.RunScript("return WhiteSide;", map[string]interface{}{}, &whitePlayer)
 	var jsResult string
@@ -533,7 +533,7 @@ func TestLoginProduction(t *testing.T) {
 		if err != nil {
 			t.Fatal("Couldn't find abort button  user 2:", err)
 		}
-		t.Fatal("No user matched as whitePlayer")
+		t.Fatal("No user matched as whitePlayer", whitePlayer)
 	}
 	time.Sleep(time.Second)
 	if err := driver.Stop(); err != nil {
