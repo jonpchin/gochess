@@ -546,7 +546,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 
 // gets rating history of player based on type, returns JSON string of ratings with their date time
 // returns false if there was an error
-func getRatingHistory(name string, gametype string) (string, bool) {
+func GetRatingHistory(name string, gametype string) (string, bool) {
 
 	var ratingHistory string
 
