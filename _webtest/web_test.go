@@ -482,6 +482,7 @@ func TestLoginProduction(t *testing.T) {
 		time.Sleep(time.Second)
 		page2.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
 
+		time.Sleep(2 * time.Second)
 		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
 			t.Error("board does not match user2")
 		}
