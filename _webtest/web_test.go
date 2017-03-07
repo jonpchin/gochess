@@ -73,6 +73,11 @@ func TestLoginDev(t *testing.T) {
 	time.Sleep(time.Second)
 	user1 := "can"
 
+	history, result := gostuff.GetRatingHistory(user1, "blitz")
+	if result || history != "" {
+		t.Fatal("GetRatingHistory should be blank but it isn't for", user1)
+	}
+
 	// Player should have zero games on Travis
 	if gostuff.IsEnvironmentTravis() {
 		storage := gostuff.GetGames(user1)
@@ -178,8 +183,36 @@ func TestLoginDev(t *testing.T) {
 			storage := gostuff.GetGames(user1)
 			if len(storage) != 1 || storage[0].Status != "White Resigned" ||
 				storage[0].Rated != "Yes" || storage[0].TimeControl != 5 {
-				t.Fatal("GetGames does not match the expected output for ", user1, len(storage))
+				if len(storage) > 0 {
+					t.Fatal("GetGames does not match the expected output for ", user1, storage[0].Status,
+						storage[0].Rated, storage[0].TimeControl)
+				} else {
+					t.Fatal("GetGames does not match the expected output for ", user1, len(storage))
+				}
 			}
+		}
+
+		history, result := gostuff.GetRatingHistory(user1, "blitz")
+		if result == false || history == "" {
+			t.Fatal("Could not GetRatingHistory for blitz", user1, result)
+		}
+		history, result = gostuff.GetRatingHistory(user2, "blitz")
+		if result == false || history == "" {
+			t.Fatal("Could not GetRatingHistory 2 for blitz", user2, result)
+		}
+
+		history, result = gostuff.GetRatingHistory(user1, "standard")
+		if result || history != "" {
+			t.Fatal("There should be no GetRatingHistory for standard", user1, result)
+		}
+
+		history, result = gostuff.GetRatingHistory(user1, "bullet")
+		if result || history != "" {
+			t.Fatal("There should be no GetRatingHistory for bullet", user1, result)
+		}
+		history, result = gostuff.GetRatingHistory(user1, "correspondence")
+		if result || history != "" {
+			t.Fatal("There should be no GetRatingHistory for correspondence", user1, result)
 		}
 
 		err = page1.FindByID("rematchButton").Click()
@@ -220,7 +253,12 @@ func TestLoginDev(t *testing.T) {
 			storage := gostuff.GetGames(user1)
 			if len(storage) != 2 || storage[1].Status != "Agreed Draw" ||
 				storage[1].Rated != "Yes" || storage[1].TimeControl != 5 {
-				t.Fatal("GetGames 2 does not match the expected output for ", user1)
+				if len(storage) > 1 {
+					t.Fatal("GetGames 2 does not match the expected output for ", user1, storage[1].Status,
+						storage[1].Rated, storage[1].TimeControl)
+				} else {
+					t.Fatal("GetGames 2 does not match the expected output for ", user1)
+				}
 			}
 		}
 

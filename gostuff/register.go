@@ -90,7 +90,6 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 	if db.Ping() != nil {
 		return "<img src='img/ajax/not-available.png' /> Can't ping database.",
 			errors.New("DATABASE DOWN in register.go Register 0")
-
 	}
 
 	//check if username already exists, if it does then break out and inform user
@@ -125,7 +124,6 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 	}
 
 	log.Printf("Account %s was created in userinfo table.\n", userInfo.Username)
-
 	userInfo.Token = RandomString()
 
 	//preparing token activation
