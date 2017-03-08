@@ -434,7 +434,7 @@ func TestLoginProduction(t *testing.T) {
 
 		// check to make sure the position is what it should be
 		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
-			t.Fatal("board does not match user1", jsresult)
+			t.Fatal("board does not match user1", jsResult)
 		}
 
 		// now try to resign the game
