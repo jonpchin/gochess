@@ -114,7 +114,7 @@ func TestTravisConnect(t *testing.T) {
 	}
 
 	userInfo.Username = "can"
-	userInfo.Email = fake.EmailAddress()
+	userInfo.Email = "fake@fake.com"
 	userInfo.IpAddress = fake.IPv4()
 
 	// doesnt matter what parameter as its only for handling corner case in localhost
