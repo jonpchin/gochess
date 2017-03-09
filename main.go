@@ -58,6 +58,7 @@ func main() {
 	http.HandleFunc("/highscores", highscores)
 	http.HandleFunc("/engine", engine)
 	http.HandleFunc("/news", news)
+	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -456,6 +457,10 @@ func saved(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func runJsTests(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "runJsTests.html")
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {
