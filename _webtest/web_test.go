@@ -145,21 +145,6 @@ func TestLoginDev(t *testing.T) {
 	}
 	time.Sleep(time.Second * 1)
 
-	if err := page2.Navigate("https://localhost/runtest"); err != nil {
-		t.Fatal("Failed to navigate to runtest at localhost:", err)
-	}
-
-	time.Sleep(time.Second * 3)
-	htmlContent, err := page2.HTML()
-
-	if err != nil {
-		t.Fatal("Failed to get html of runtest webpage", err)
-	}
-
-	if strings.Contains(htmlContent, "not-available.png") {
-		t.Fatal("not-available.png was found when running AJAX unit tests localhost", htmlContent)
-	}
-
 	if err := page2.Navigate("https://localhost/server/lobby"); err != nil {
 		t.Fatal("Failed to navigate lobby at localhost:", err)
 	}
