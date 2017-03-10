@@ -121,9 +121,6 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("true"))
 			return
 		}
-
-	} else {
-		fmt.Println("Invalid user ajax.go ResumeGame 1")
 	}
 	w.Write([]byte("false"))
 }

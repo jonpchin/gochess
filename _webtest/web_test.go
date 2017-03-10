@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -142,7 +143,22 @@ func TestLoginDev(t *testing.T) {
 	if err != nil {
 		t.Fatal("Couldn't submit:", err)
 	}
-	time.Sleep(time.Second)
+	time.Sleep(time.Second * 1)
+
+	if err := page2.Navigate("https://localhost/runtest"); err != nil {
+		t.Fatal("Failed to navigate to runtest at localhost:", err)
+	}
+
+	time.Sleep(time.Second * 3)
+	htmlContent, err := page2.HTML()
+
+	if err != nil {
+		t.Fatal("Failed to get html of runtest webpage", err)
+	}
+
+	if strings.Contains(htmlContent, "not-available.png") {
+		t.Fatal("not-available.png was found when running AJAX unit tests localhost", htmlContent)
+	}
 
 	if err := page2.Navigate("https://localhost/server/lobby"); err != nil {
 		t.Fatal("Failed to navigate lobby at localhost:", err)
@@ -410,6 +426,21 @@ func TestLoginProduction(t *testing.T) {
 		t.Fatal("Couldn't submit:", err)
 	}
 	time.Sleep(time.Second)
+
+	if err := page2.Navigate("https://goplaychess.com/runtest"); err != nil {
+		t.Fatal("Failed to navigate to runtest at goplaychess.com:", err)
+	}
+
+	time.Sleep(time.Second * 3)
+	htmlContent, err := page2.HTML()
+
+	if err != nil {
+		t.Fatal("Failed to get html of runtest webpage", err)
+	}
+
+	if strings.Contains(htmlContent, "not-available.png") {
+		t.Fatal("not-available.png was found when running AJAX unit tests goplaychess.com", htmlContent)
+	}
 
 	if err := page2.Navigate("https://goplaychess.com/server/lobby"); err != nil {
 		t.Fatal("Failed to navigate lobby at localhost:", err)

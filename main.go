@@ -460,7 +460,9 @@ func saved(w http.ResponseWriter, r *http.Request) {
 }
 
 func runJsTests(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "runJsTests.html")
+	if isAuthorized(w, r) {
+		http.ServeFile(w, r, "runJsTests.html")
+	}
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {

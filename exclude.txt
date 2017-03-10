@@ -15,3 +15,4 @@ main.exe
 travis.yml
 logs
 exports
+/_webtest/debug.log
