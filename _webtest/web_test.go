@@ -423,8 +423,8 @@ func TestLoginProduction(t *testing.T) {
 		t.Fatal("Failed to get html of runtest webpage", err)
 	}
 
-	if strings.Contains(htmlContent, "not-available.png") {
-		t.Fatal("not-available.png was found when running AJAX unit tests goplaychess.com", htmlContent)
+	if strings.Contains(htmlContent, "not-available.png") || strings.Contains(htmlContent, "loading.gif") {
+		t.Fatal("AJAX unit tests failed on goplaychess.com", htmlContent)
 	}
 
 	if err := page2.Navigate("https://goplaychess.com/server/lobby"); err != nil {
