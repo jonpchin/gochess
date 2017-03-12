@@ -30,7 +30,7 @@ func CheckNullInTable(table string) {
 	}
 	concatColNames = strings.TrimSuffix(concatColNames, "OR ")
 
-	fmt.Println(concatColNames)
+	//fmt.Println(concatColNames)
 
 	rows, err := db.Query("SELECT * FROM " + table + " WHERE " + concatColNames)
 	if err != nil {
@@ -55,7 +55,10 @@ func CheckNullInTable(table string) {
 		values[i] = &ii
 	}
 
+	i := 0
+
 	for rows.Next() {
+		i++
 
 		if err := rows.Scan(values...); err != nil {
 			log.Println(err)
@@ -70,12 +73,16 @@ func CheckNullInTable(table string) {
 			var rawType = reflect.TypeOf(rawValue)
 
 			if rawValue != nil {
-				value := fmt.Sprintf("%s", rawValue)
-				fmt.Println(colName, rawType, value)
+				//value := fmt.Sprintf("%s", rawValue)
+				//fmt.Println(colName, rawType, value)
 			} else {
 				fmt.Println(colName, rawType, rawValue)
+				fmt.Println(colName, "is nil!")
 			}
 		}
+	}
+	if i == 0 {
+		fmt.Println("No null values in", table, "table")
 	}
 }
 
