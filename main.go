@@ -59,6 +59,7 @@ func main() {
 	http.HandleFunc("/engine", engine)
 	http.HandleFunc("/news", news)
 	http.HandleFunc("/runtest", runJsTests)
+	http.HandleFunc("forum", forum)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -140,7 +141,7 @@ func main() {
 			gostuff.Cleanup()
 			os.Exit(1)
 		}()
-		//gostuff.CheckNullInTable("ratinghistory")
+		//gostuff.CheckNullInTable("rating")
 	}()
 	//gostuff.FetchNewsSources()
 	//gostuff.ReadAllNews()
@@ -463,6 +464,10 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 	if isAuthorized(w, r) {
 		http.ServeFile(w, r, "runJsTests.html")
 	}
+}
+
+func forum(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "forum.html")
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {
