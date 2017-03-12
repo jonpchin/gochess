@@ -11,6 +11,7 @@ import (
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/gostuff"
+	"github.com/jonpchin/gochess/forum"
 
 	"golang.org/x/net/websocket"
 )
@@ -467,7 +468,13 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 }
 
 func forum(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "forum.html")
+
+	forums: = forum.GetForums()
+	var parsedForums = template.Must(template.ParseFiles("forum.html"))
+
+	if err := parsedForums.Execute(w, &forums); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {

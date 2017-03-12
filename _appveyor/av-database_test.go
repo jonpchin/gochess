@@ -10,7 +10,7 @@ import (
 // App Veyor default MySQL username and pass is public information
 func TestAppVeyorConnect(t *testing.T) {
 
-	db := gostuff.DbConnect()
+	db := gostuff.getDb()
 
 	// make sure MySQL connection is alive before proceeding
 	if gostuff.CheckDBConnection("data/dbapp-veyor.txt") == false {

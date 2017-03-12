@@ -1,4 +1,4 @@
-package forum
+package goforum
 
 type Post struct {
 	ID       int
@@ -9,6 +9,6 @@ type Post struct {
 	Date     string
 }
 
-func showPostsFromThreadId() {
+func getPostsFromThreadId() {
 
 }

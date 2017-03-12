@@ -123,7 +123,7 @@ func DbSetup(backup string) bool {
 }
 
 // Returns global database handler
-func DbConnect() *sql.DB {
+func GetDb() *sql.DB {
 	return db
 }
 
