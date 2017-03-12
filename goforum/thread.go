@@ -1,11 +1,13 @@
 package goforum
 
 type Thread struct {
-	ID      int
-	ForumID int
-	UserID  int
-	Title   string
-	Date    string
+	ID       int
+	ForumID  int
+	Username string
+	Title    string
+	Views    int
+	Replies  int
+	Date     string
 }
 
 func getThreadsFromForumId() {

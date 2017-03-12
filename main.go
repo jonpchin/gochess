@@ -10,8 +10,8 @@ import (
 
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
-	"github.com/jonpchin/gochess/forum"
 
 	"golang.org/x/net/websocket"
 )
@@ -469,7 +469,7 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 
 func forum(w http.ResponseWriter, r *http.Request) {
 
-	forums: = forum.GetForums()
+	forums := goforum.GetForums()
 	var parsedForums = template.Must(template.ParseFiles("forum.html"))
 
 	if err := parsedForums.Execute(w, &forums); err != nil {

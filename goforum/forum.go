@@ -8,8 +8,13 @@ import (
 )
 
 type Forum struct {
-	ID    int
-	Title string
+	ID           int
+	Title        string
+	Description  string
+	TotalThreads int
+	TotalPosts   int
+	RecentUser   string // Most recent user that made a post
+	RecentDate   string // Most recent date the post was made
 }
 
 func GetForums() (forums []Forum) {
@@ -29,7 +34,8 @@ func GetForums() (forums []Forum) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&forum.ID, &forum.Title)
+		err = rows.Scan(&forum.ID, &forum.Title, &forum.Description)
+
 		if err != nil {
 			log.Println(err)
 		}
