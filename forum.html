@@ -17,22 +17,22 @@
 	</ul>
 </div> 
 <div>
-<h3>Go Play Chess Forums</h>
-{{ $length := len .Forums }} 
+<h3>Go Play Chess Forums</h3>
+{{ $length := len . }} 
 {{ if eq $length 0 }}
 	<center>No forums have been found.</center>
 {{else}}
-<table class="table1">
-	<tr>
-<th>Title</th><th>Threads</th><th>Posts</th><th>Last Post</th>
-	</tr>
-{{range .Forums}}
-	<tr> 
-	<td>{{.Title}}</td><td>{{.WhiteRating}}</td><td>{{.Black}}</td><td>{{.BlackRating}}</td>
-	<td>{{.Status}}</td><td>{{.Date}}</td><td>{{.Time}}</td>
-	</tr>	
-{{end}}
-</table>
+	<table class="table1">
+		<tr>
+	<th colspan="2">Title</th><th>Threads</th><th>Posts</th><th colspan="2">Last Post</th>
+		</tr>
+		{{range . }}
+			<tr> 
+			<td>{{.Title}}</td><td>{{.Description}}</td><td>{{.TotalThreads}}</td>
+			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
+			</tr>	
+		{{end}}
+	</table>
 {{ end }}
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
 </body>

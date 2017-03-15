@@ -60,7 +60,7 @@ func main() {
 	http.HandleFunc("/engine", engine)
 	http.HandleFunc("/news", news)
 	http.HandleFunc("/runtest", runJsTests)
-	http.HandleFunc("forum", forum)
+	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)

@@ -34,7 +34,8 @@ func GetForums() (forums []Forum) {
 
 	for rows.Next() {
 
-		err = rows.Scan(&forum.ID, &forum.Title, &forum.Description)
+		err = rows.Scan(&forum.ID, &forum.Title, &forum.Description, &forum.TotalThreads,
+			&forum.TotalPosts, &forum.RecentUser, &forum.RecentDate)
 
 		if err != nil {
 			log.Println(err)
