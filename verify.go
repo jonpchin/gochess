@@ -162,7 +162,7 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		table.lastCapture = (table.pawnMove + 1) / 2
 	}
 	//used to update king position if they are in check
-	if table.kingUpdate == true {
+	if table.kingUpdate {
 		if colorOnly == "b" {
 			//storing old coordinates
 			table.blackOldX = newSourceRow
@@ -184,16 +184,16 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		}
 	}
 	//if the player made a move and his king can be captured that move has to be undone and return false as he didn't stop the check
-	if table.whiteTurn == true && table.isWhiteInCheck() == true {
+	if table.whiteTurn && table.isWhiteInCheck() {
 		table.undoMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, capturedPiece)
 		fmt.Println("White cannot make that move as they are in check")
 		return false
-	} else if table.whiteTurn == false && table.isBlackInCheck() == true {
+	} else if table.whiteTurn == false && table.isBlackInCheck() {
 		table.undoMove(newSourceRow, newSourceCol, newTargetRow, newTargetCol, piece, capturedPiece)
 		fmt.Println("Black cannot make that move as they are in check")
 		return false
 	}
-	if table.kingUpdate == true { //updating new location of king for quick access
+	if table.kingUpdate { //updating new location of king for quick access
 		if colorOnly == "b" {
 			table.bkMoved = true //can no longer castle with black king
 		} else if colorOnly == "w" {
@@ -205,7 +205,7 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 		table.kingUpdate = false
 	}
 
-	if table.rookUpdate == true {
+	if table.rookUpdate {
 		if piece == "bR" && newSourceRow == 0 && newSourceCol == 0 { //black queen rook
 			table.bqrMoved = true
 		} else if piece == "bR" && newSourceRow == 0 && newSourceCol == 7 { //black king rook
@@ -271,7 +271,7 @@ func (table *Table) makeMove(sourceRow int8, sourceCol int8, targetRow int8,
 }
 
 func (table *Table) switchTurns() {
-	if table.whiteTurn == true {
+	if table.whiteTurn {
 		table.whiteTurn = false
 	} else {
 		table.whiteTurn = true
@@ -296,9 +296,9 @@ func (table *Table) undoMove(sourceRow int8, sourceCol int8, targetRow int8, tar
 	table.ChessBoard[targetRow][targetCol] = capturedPiece
 
 	//revert back to original location coordinates for the king
-	if table.kingUpdate == true {
+	if table.kingUpdate {
 
-		if table.whiteTurn == true {
+		if table.whiteTurn {
 			table.whiteKingX = table.whiteOldX
 			table.whiteKingY = table.whiteOldY
 		} else {
@@ -309,10 +309,10 @@ func (table *Table) undoMove(sourceRow int8, sourceCol int8, targetRow int8, tar
 		table.kingUpdate = false
 	}
 	//checking if there is an enpassent that needs to be undone
-	if table.undoWPass == true {
+	if table.undoWPass {
 		table.ChessBoard[targetRow+1][targetCol] = "bP" //placing back the pawn
 	}
-	if table.undoBPass == true {
+	if table.undoBPass {
 		table.ChessBoard[targetRow-1][targetCol] = "wP"
 	}
 }
