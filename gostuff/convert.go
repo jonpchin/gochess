@@ -186,10 +186,10 @@ func VerifyGrandmasterGames(total int) bool {
 		}
 		var legal bool
 
-		initGame(gameID, "", "")
+		InitGame(gameID, "", "")
 
 		for j := 0; j < len(move); j++ {
-			legal = chessVerify(move[j].S, move[j].T, move[j].P, gameID)
+			legal = ChessVerify(move[j].S, move[j].T, move[j].P, gameID)
 			totalMoves := (j / 2) + 1
 			// The people notating game ID 8035 seems to have made a mistake and notated an illegal move
 			if legal == false && gameID != 8035 {

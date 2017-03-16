@@ -33,7 +33,7 @@ build_script:
   - bash importAppVeyorTables.sh
   - cd ../..
   - go build main.go
-  - go test ./gostuff
+  - go test ./testing
   - go test ./_appveyor
 
 # to disable deployment

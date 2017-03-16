@@ -6,7 +6,7 @@ import (
 )
 
 //returns true if the move is valid otherwise it returns false
-func chessVerify(source string, target string, promotion string, gameID int) bool {
+func ChessVerify(source string, target string, promotion string, gameID int) bool {
 	if len(source) != 2 {
 		fmt.Println("Invalid input length")
 		return false
@@ -43,7 +43,7 @@ func chessVerify(source string, target string, promotion string, gameID int) boo
 
 	// make sure Verify.AllTables is inititalized before proceeding
 	if _, ok := Verify.AllTables[gameID]; !ok {
-		fmt.Println("Please call initGame() function before proceeding")
+		fmt.Println("Please call InitGame() function before proceeding")
 		return false
 	}
 	table := Verify.AllTables[gameID]
@@ -278,7 +278,7 @@ func (table *Table) switchTurns() {
 	}
 }
 
-func (table *Table) sprintBoard() {
+func (table *Table) printBoard() {
 
 	for i := 0; i < 8; i++ {
 		for j := 0; j < 8; j++ {

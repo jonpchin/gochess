@@ -1,14 +1,16 @@
-package gostuff
+package testing
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
+
+	"github.com/jonpchin/gochess/gostuff"
 )
 
 func TestLocale(t *testing.T) {
 
-	client := TimeOutHttp(5)
+	client := gostuff.TimeOutHttp(5)
 	response, err := client.Get("http://freegeoip.net/json/77.124.0.0")
 	if response == nil {
 		t.Error("URL time out for http://freegeoip.net/json/77.124.0.0 in TestLocale")
@@ -22,7 +24,7 @@ func TestLocale(t *testing.T) {
 		t.Error("Failed TestLocale read body")
 	}
 
-	var ipLocation IPLocation
+	var ipLocation gostuff.IPLocation
 
 	if err := json.Unmarshal(htmlData, &ipLocation); err != nil {
 		t.Error("Failed in JSON unmarshal", string(htmlData), err)

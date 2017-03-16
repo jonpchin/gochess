@@ -30,7 +30,7 @@ before_install:
 script:
 - go build main.go
 - sudo ./main &
-- go test ./gostuff
+- go test ./testing
 - go test ./_travis
 - "export PATH=$PATH:/usr/lib/chromium-browser/"
 - "export DISPLAY=:99.0"
