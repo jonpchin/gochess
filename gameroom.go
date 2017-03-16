@@ -68,7 +68,7 @@ func (c *Connection) ChessConnect() {
 
 				var result bool
 				//check if its correct players turn and if move is valid before sending
-				result = chessVerify(game.Source, game.Target, game.Promotion, game.ID)
+				result = ChessVerify(game.Source, game.Target, game.Promotion, game.ID)
 
 				if result == false {
 					totalMoves := (len(chessgame.GameMoves) + 1) / 2
@@ -685,7 +685,7 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//intitalizes all the variables of the game
-				initGame(game.ID, game.WhitePlayer, game.BlackPlayer)
+				InitGame(game.ID, game.WhitePlayer, game.BlackPlayer)
 
 				//starting game for both players, this does NOT include spectators
 				for _, name := range Verify.AllTables[game.ID].observe.Names {

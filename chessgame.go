@@ -139,7 +139,7 @@ var Verify = struct {
 var PrivateChat = make(map[string]string)
 
 //intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
-func initGame(gameID int, name string, fighter string) {
+func InitGame(gameID int, name string, fighter string) {
 
 	//setting up back end move verification
 	var table Table
