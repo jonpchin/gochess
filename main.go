@@ -469,8 +469,21 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 
 func forum(w http.ResponseWriter, r *http.Request) {
 
-	forums := goforum.GetForums()
-	var parsedForums = template.Must(template.ParseFiles("forum.html"))
+	var forums interface{}
+	forumId := r.URL.Query().Get("forumId")
+	threadId := r.URL.Query().Get("threadId")
+	var parsedForums *template.Template
+
+	if forumId == "" && threadId == "" { // show main forum
+		forums = goforum.GetForums()
+		parsedForums = template.Must(template.ParseFiles("forum.html"))
+	} else if threadId == "" { //  show all threads in a section
+		forums = goforum.GetThreads(forumId)
+		parsedForums = template.Must(template.ParseFiles("threads.html"))
+	} else { // show all posts in a thread
+		forums = goforum.GetPosts(threadId)
+		parsedForums = template.Must(template.ParseFiles("posts.html"))
+	}
 
 	if err := parsedForums.Execute(w, &forums); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
