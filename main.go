@@ -173,7 +173,18 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	} else {
-		http.ServeFile(w, r, "index.html")
+		var index = template.Must(template.ParseFiles(
+			"index.html",
+			"templates/guestHeader.html",
+		))
+		p := struct {
+			Title string // Title of the web page
+		}{
+			"Free Online Chess",
+		}
+		if err := index.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -304,9 +315,19 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "private, max-age=432000")
-		var memberHome = template.Must(template.ParseFiles("memberHome.html"))
+		var memberHome = template.Must(template.ParseFiles(
+			"memberHome.html",
+			"templates/memberHeader.html",
+		))
+
 		username, _ := r.Cookie("username")
-		p := gostuff.Person{User: username.Value}
+		p := struct {
+			User  string
+			Title string // Title of the web page
+		}{
+			username.Value,
+			"Welcome",
+		}
 
 		if err := memberHome.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
