@@ -102,6 +102,8 @@ func main() {
 		keyPath = "_travis/data/device.key"
 	}
 
+	gostuff.ParseTemplates()
+
 	go func() {
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")
@@ -173,18 +175,7 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	} else {
-		var index = template.Must(template.ParseFiles(
-			"index.html",
-			"templates/guestHeader.html",
-		))
-		p := struct {
-			Title string // Title of the web page
-		}{
-			"Free Online Chess",
-		}
-		if err := index.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		http.ServeFile(w, r, "index.html")
 	}
 }
 

@@ -1,0 +1,17 @@
+{{template "guestHeader" .}}
+<h2>News</h2>
+{{range .Providers}}
+    {{range .Articles}}
+        <center>
+        Title: <a href="{{.Url}}" target="_blank">{{.Title}}</a><br>
+        Author: {{.Author}}<br>
+        Description: {{.Description}}<br>
+        <img class="imageSizeLimit" src="{{.UrlToImage}}"><br>
+        Published On: {{.PublishedAt}}
+        </center>
+        <br><br><br>
+    {{end}}	
+{{end}}
+<br><br><br><footer>Go Play Chess &copy; 2016<br> Where gophers play chess. Powered by <a href="https://newsapi.org" target="_blank">News API</a></footer>
+</body>
+</html>

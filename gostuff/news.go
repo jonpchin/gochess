@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"os"
@@ -35,6 +34,7 @@ type UrlToLogo struct {
 }
 
 type AllNewsProviders struct {
+	PageTitle string
 	Providers []NewsProvider
 }
 
@@ -135,6 +135,9 @@ func (allArticles *AllNewsProviders) ReadAllNews() {
 	if err != nil {
 		fmt.Println("news.go ReadAllNews 0", err)
 	}
+
+	allArticles.PageTitle = "News"
+
 	scanner := bufio.NewScanner(config)
 
 	for scanner.Scan() {
@@ -186,34 +189,8 @@ func UpdateNewsFromConfig() {
 		url := "https://newsapi.org/v1/articles?source=" + fileName + "&apiKey=" + apiKey
 		saveNewsToFile(fileName, url)
 	}
-	CreateNewsCache()
-}
-
-// creates a cached news file
-func CreateNewsCache() {
-
-	logFile, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer logFile.Close()
-	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
-
-	t, err := template.ParseFiles("cache/newsTemplate.html")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	f, err := os.Create("news.html")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	var allNewProviders AllNewsProviders
-	allNewProviders.ReadAllNews()
-
-	err = t.Execute(f, allNewProviders)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	// creates a cached news file, moved to template.go
+	parseTemplate(nil, "templates/newsTemplate.html", "news.html")
 }
 
 // makes image url that are http into https if its valid
