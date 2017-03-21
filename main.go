@@ -102,7 +102,7 @@ func main() {
 		keyPath = "_travis/data/device.key"
 	}
 
-	gostuff.ParseTemplates()
+	//gostuff.OneTimeParseTemplates()
 
 	go func() {
 		//setting up database, the directory location of database backups is passed in
@@ -132,6 +132,7 @@ func main() {
 
 			gostuff.ExportDatabase(false)
 			//gostuff.CompressDatabase()
+			goforum.ConnectForumDb()
 		}
 		//gostuff.SpawnProcess()
 
@@ -313,8 +314,8 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 
 		username, _ := r.Cookie("username")
 		p := struct {
-			User  string
-			Title string // Title of the web page
+			User      string
+			PageTitle string // Title of the web page
 		}{
 			username.Value,
 			"Welcome",
@@ -482,8 +483,9 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 func forum(w http.ResponseWriter, r *http.Request) {
 
 	var forums interface{}
-	forumId := r.URL.Query().Get("forumId")
-	threadId := r.URL.Query().Get("threadId")
+	// goplaychess.com/forum?forumId=2
+	forumId := r.URL.Query().Get("forumid")
+	threadId := r.URL.Query().Get("threadid")
 	var parsedForums *template.Template
 
 	if forumId == "" && threadId == "" { // show main forum

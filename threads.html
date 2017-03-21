@@ -18,17 +18,18 @@
 </div> 
 <div>
 <h3>Go Play Chess Forums</h3>
-{{ $length := len . }} 
+<u>Forums</u> > <u>{{.Title}}</u>
+{{ $length := len .Threads }} 
 {{ if eq $length 0 }}
 	<center>No threads have been found.</center>
 {{else}}
 	<table class="table1">
 		<tr>
-	<th>Title</th><th>Views</th><th>Replies</th><th colspan="2">Last Post</th>
+	<th>Title</th><th>Views</th><th>Replies</th><th>Total Posts</th><th colspan="2">Last Post</th>
 		</tr>
-		{{range . }}
+		{{range .Threads }}
 			<tr> 
-			<td>{{.Title}}</td><td>{{.Views}}</td><td>{{.Replies}}</td>
+			<td><a href="/forum?forumid={{.ForumID}}?threadid={.ID}">{{.Title}}</a></td><td>{{.Views}}</td><td>{{.Replies}}</td>
 			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
 			</tr>	
 		{{end}}

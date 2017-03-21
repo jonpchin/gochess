@@ -1,6 +1,7 @@
 package goforum
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
@@ -17,13 +18,18 @@ type Forum struct {
 	RecentDate   string // Most recent date the post was made
 }
 
+var db *sql.DB
+
+func ConnectForumDb() {
+	db = gostuff.GetDb()
+}
+
 func GetForums() (forums []Forum) {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
 
-	db := gostuff.GetDb()
 	rows, err := db.Query("SELECT * FROM forums")
 	if err != nil {
 		log.Println(err)

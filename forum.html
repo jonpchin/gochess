@@ -28,7 +28,7 @@
 		</tr>
 		{{range . }}
 			<tr> 
-			<td>{{.Title}}</td><td>{{.Description}}</td><td>{{.TotalThreads}}</td>
+			<td><a href="/forum?forumid={{.ID}}">{{.Title}}</a></td><td>{{.Description}}</td><td>{{.TotalThreads}}</td>
 			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
 			</tr>	
 		{{end}}
