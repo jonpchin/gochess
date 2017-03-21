@@ -7,26 +7,30 @@ import (
 )
 
 // Goes through all templates and parses then on startup
-func ParseTemplates() {
+func OneTimeParseTemplates() {
 
-	var allNewProviders AllNewsProviders
-	allNewProviders.ReadAllNews()
-	parseTemplate(allNewProviders, "news.html", []string{"templates/newsTemplate.html",
-		"templates/guestHeader.html"}...)
+	parseNewsCache()
 
 	tempArgs := struct {
 		PageTitle string // Title of the web page
 	}{
 		"Free Online Chess",
 	}
-	parseTemplate(tempArgs, "index.html", []string{"templates/index.html",
+	ParseTemplates(tempArgs, "index.html", []string{"templates/index.html",
+		"templates/guestHeader.html"}...)
+}
+
+func parseNewsCache() {
+	var allNewProviders AllNewsProviders
+	allNewProviders.ReadAllNews()
+	ParseTemplates(allNewProviders, "news.html", []string{"templates/newsTemplate.html",
 		"templates/guestHeader.html"}...)
 }
 
 // @templateArgs Template arguments that will be parsed
 // @outputPath the output file of the parsed template
 // @templatePath relative location to template that is to be parsed
-func parseTemplate(templateArgs interface{}, outputPath string, templatePaths ...string) {
+func ParseTemplates(templateArgs interface{}, outputPath string, templatePaths ...string) {
 
 	var t = template.Must(template.ParseFiles(templatePaths...))
 

@@ -190,7 +190,7 @@ func UpdateNewsFromConfig() {
 		saveNewsToFile(fileName, url)
 	}
 	// creates a cached news file, moved to template.go
-	parseTemplate(nil, "templates/newsTemplate.html", "news.html")
+	parseNewsCache()
 }
 
 // makes image url that are http into https if its valid
