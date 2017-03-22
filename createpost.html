@@ -18,25 +18,11 @@
 </div> 
 <div>
 <h3>Go Play Chess Forums</h3>
- <a href="/forum"><u>Forums</u></a> > <u>{{.Title}}</u><br><br>
- <button id="createThread" value="{{.Title}}">Create new thread</button>
-{{ $length := len .Threads }} 
-{{ if eq $length 0 }}
-	<center>No threads have been found.</center>
-{{else}}
-	<table class="table1">
-		<tr>
-	<th>Title</th><th>Views</th><th>Replies</th><th>Total Posts</th><th colspan="2">Last Post</th>
-		</tr>
-		{{range .Threads }}
-			<tr> 
-			<td><a href="/forum?forumid={{.ForumID}}?threadid={{.ID}}">{{.Title}}</a></td><td>{{.Views}}</td><td>{{.Replies}}</td>
-			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
-			</tr>	
-		{{end}}
-	</table>
-{{ end }}
+<a href="/forum"><u>Forums</u></a> > <u>{{.SectionTitle}}</u><br><br>
+<p>Title:<input type="text" id="user" maxlength="100"></p>
+Message:<br><textarea id="textbox" rows="7" cols="150"></textarea>
+<br><button>Create the thread</button>
+
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
-<script src="js/forum.js"></script>
 </body>
 </html>

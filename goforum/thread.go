@@ -48,11 +48,11 @@ func GetThreads(forumId string) (threadSection ThreadSection) {
 		}
 		threadSection.Threads = append(threadSection.Threads, thread)
 	}
-	threadSection.Title = getForumTitle(forumId)
+	threadSection.Title = GetForumTitle(forumId)
 	return threadSection
 }
 
-func getForumTitle(forumId string) string {
+func GetForumTitle(forumId string) string {
 
 	var forumTitle string
 	err := db.QueryRow("SELECT title from forums where id=?", forumId).Scan(&forumTitle)

@@ -61,6 +61,7 @@ func main() {
 	http.HandleFunc("/news", news)
 	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/forum", forum)
+	http.HandleFunc("/createpost", createPost)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -500,6 +501,21 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := parsedForums.Execute(w, &forums); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func createPost(w http.ResponseWriter, r *http.Request) {
+
+	p := struct {
+		SectionTitle string
+	}{
+		r.URL.Query().Get("forumid"),
+	}
+
+	createpost := template.Must(template.ParseFiles("createpost.html"))
+
+	if err := createpost.Execute(w, &p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
