@@ -1,23 +1,4 @@
-
-<!DOCTYPE html><html lang="en"> 
-<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go Play Chess - Login</title>
-<link href="css/design.css" rel="stylesheet" type = "text/css"/>
-<link rel='shortcut icon' href='img/favicon.ico' type='image/x-icon'/>
-</head>
-<body>
-<div>
-	<ul id="nav">
-	<li><a href="/">Main</a></li>
-	<li><a href="/login">Login</a></li>
-	<li><a href="/register">Register</a></li>
-	<li><a href="/screenshots">Screenshots</a></li>
-	<li><a href="/help">Help</a></li>
-	<li><a href="/news">News</a></li>
-	<li><a href="/forum">Forum</a></li>
-	</ul>
-</div>
-
+{{template "guestHeader" .}}
 <div id="center">
 	<noscript><h1>JavaScript is off. Please enable JavaScript in order for the site to fully function.</h1></noscript>
 	<p><span id="welcome"></span></p>
@@ -34,13 +15,13 @@
 			<option value="zh">Chinese</option>
 		</select>
 	</p>
-	<p><img  id=image src="/captcha/7hBGd8NEkC3cuc8QbYtq.png" alt="Captcha image"></p>
+	<p><img  id=image src="/captcha/{{.CaptchaId}}.png" alt="Captcha image"></p>
 	<a href="#" id="reload">Reload</a> | <a href="#" id="playAudio">Play Audio</a>
-	<audio id=audio controls style="display:none" src="/captcha/7hBGd8NEkC3cuc8QbYtq.wav" preload=none>
+	<audio id=audio controls style="display:none" src="/captcha/{{.CaptchaId}}.wav" preload=none>
 	  You browser doesn't support audio.
-	  <a href="/captcha/download/7hBGd8NEkC3cuc8QbYtq.wav">Download file</a> to play it in the external player.
+	  <a href="/captcha/download/{{.CaptchaId}}.wav">Download file</a> to play it in the external player.
 	</audio>
-	<input type=hidden id=captchaId value="7hBGd8NEkC3cuc8QbYtq"><br>
+	<input type=hidden id=captchaId value="{{.CaptchaId}}"><br>
 	<input id=captchaSolution>
     </div>
 	<p><button id="login">Login</button><p>

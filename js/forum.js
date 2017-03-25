@@ -1,3 +1,3 @@
 document.getElementById('createThread').onclick = function(){
-    window.location = "/createpost?forumid=" + document.getElementById('createThread').value; 
+    window.location = "/createthread?forumname=" + document.getElementById('createThread').value; 
 }

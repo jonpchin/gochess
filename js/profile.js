@@ -20,13 +20,6 @@ function getCookie(cname) { //gets cookies value
     return "";
 }
 
-// gets country flag stored in cookie and updates the img source
-function setFlag(){
-	var countryFlag = getCookie("country");
-	document.getElementById('countryFlag').src = "img/flags/" + countryFlag + ".png"
-}
-setFlag();
-
 function getBulletHistory(lookupName){
 	// NOTE: This function must return the value 
     // from calling the $.ajax() method.

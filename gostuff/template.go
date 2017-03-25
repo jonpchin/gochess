@@ -16,7 +16,7 @@ func OneTimeParseTemplates() {
 	}{
 		"Free Online Chess",
 	}
-	ParseTemplates(tempArgs, "index.html", []string{"templates/index.html",
+	ParseTemplates(tempArgs, "index.html", []string{"templates/indexTemplate.html",
 		"templates/guestHeader.html"}...)
 }
 

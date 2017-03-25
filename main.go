@@ -61,7 +61,9 @@ func main() {
 	http.HandleFunc("/news", news)
 	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/forum", forum)
+	http.HandleFunc("/createthread", createThread)
 	http.HandleFunc("/createpost", createPost)
+	http.HandleFunc("/sendFirstForumPost", goforum.SendFirstForumPost)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -184,16 +186,19 @@ func mainPage(w http.ResponseWriter, r *http.Request) {
 func login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	var login = template.Must(template.ParseFiles("login.html"))
 
 	d := struct {
 		CaptchaId string
+		PageTitle string
 	}{
 		captcha.New(),
+		"Login",
 	}
-	if err := login.Execute(w, &d); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+
+	gostuff.ParseTemplates(d, "login.html", []string{"templates/loginTemplate.html",
+		"templates/guestHeader.html"}...)
+
+	http.ServeFile(w, r, "login.html")
 }
 
 func help(w http.ResponseWriter, r *http.Request) {
@@ -211,17 +216,18 @@ func screenshots(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "screenshots.html")
 }
 func register(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	var register = template.Must(template.ParseFiles("register.html"))
 
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	d := struct {
 		CaptchaId string
+		PageTitle string
 	}{
 		captcha.New(),
+		"Register",
 	}
-	if err := register.Execute(w, &d); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	gostuff.ParseTemplates(d, "register.html", []string{"templates/registerTemplate.html",
+		"templates/guestHeader.html"}...)
+	http.ServeFile(w, r, "register.html")
 }
 
 func activate(w http.ResponseWriter, r *http.Request) {
@@ -372,6 +378,8 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 			inputName = name
 		}
 
+		country := gostuff.GetCountry(name)
+
 		var playerProfile = template.Must(template.ParseFiles("profile.html"))
 
 		//rounding floats
@@ -395,7 +403,8 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 		p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
 			Correspondence: correspondenceN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
-			CorrespondenceRD: correspondenceR, Games: all, GameID: gameID, Opponent: opponent, Days: days}
+			CorrespondenceRD: correspondenceR, Games: all, GameID: gameID, Opponent: opponent,
+			Days: days, Country: country}
 
 		if err := playerProfile.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -505,15 +514,31 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createThread(w http.ResponseWriter, r *http.Request) {
+
+	p := struct {
+		ForumName string
+		PageTitle string
+	}{
+		r.URL.Query().Get("forumname"),
+		"Create Thread",
+	}
+	gostuff.ParseTemplates(p, "createthread.html", []string{"templates/createthreadTemplate.html",
+		"templates/guestHeader.html"}...)
+	http.ServeFile(w, r, "createthread.html")
+}
+
 func createPost(w http.ResponseWriter, r *http.Request) {
 
 	p := struct {
 		SectionTitle string
+		ThreadTitle  string
 	}{
 		r.URL.Query().Get("forumid"),
+		r.URL.Query().Get("threadid"),
 	}
 
-	createpost := template.Must(template.ParseFiles("createpost.html"))
+	createpost := template.Must(template.ParseFiles("createPost.html"))
 
 	if err := createpost.Execute(w, &p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

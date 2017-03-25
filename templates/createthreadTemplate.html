@@ -1,0 +1,12 @@
+{{template "guestHeader" .}}
+<div>
+<h3>Go Play Chess Forums</h3>
+<a href="/forum"><u>Forums</u></a> > <u>{{.ForumName}}</u><br><br>
+<p>Title:<input type="text" id="user" maxlength="100"></p>
+Message:<br><textarea id="textbox" rows="7" cols="150"></textarea>
+<br><button id="createfirstpost">Create the thread</button>
+<input type=hidden id=forumname value="{{.ForumName}}">
+<p><span id="submit-result"></span></p>	
+</div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
+</body>
+</html>

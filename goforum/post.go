@@ -1,5 +1,11 @@
 package goforum
 
+import (
+	"net/http"
+
+	"github.com/jonpchin/gochess/gostuff"
+)
+
 type Post struct {
 	ID       int    // Unique ID of the post
 	ThreadID int    // Used to find other posts in the thread
@@ -13,4 +19,18 @@ type Post struct {
 // Gets posts from thread ID
 func GetPosts(threadId string) (posts []Post) {
 	return posts
+}
+
+// Creates the first post in a thread, must be logged in to do this
+func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
+	username, err := r.Cookie("username")
+	if err == nil {
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+
+			}
+		}
+	}
+	w.Write([]byte("<img src='img/ajax/not-available.png' /> Invalid credentials"))
 }

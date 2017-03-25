@@ -1,6 +1,7 @@
+
 <!DOCTYPE html><html lang="en"> 
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go Play Chess - Forum</title>
+<title>Go Play Chess - Create Thread</title>
 <link href="css/design.css" rel="stylesheet" type = "text/css"/>
 <link rel='shortcut icon' href='img/favicon.ico' type='image/x-icon'/>
 </head>
@@ -15,25 +16,16 @@
 	<li><a href="/news">News</a></li>
 	<li><a href="/forum">Forum</a></li>
 	</ul>
-</div> 
+</div>
+
 <div>
 <h3>Go Play Chess Forums</h3>
-{{ $length := len . }} 
-{{ if eq $length 0 }}
-	<center>No forums have been found.</center>
-{{else}}
-	<table class="table1">
-		<tr>
-	<th colspan="2">Title</th><th>Threads</th><th>Posts</th><th colspan="2">Last Post</th>
-		</tr>
-		{{range . }}
-			<tr> 
-			<td><a href="/forum?forumid={{.ID}}">{{.Title}}</a></td><td>{{.Description}}</td><td>{{.TotalThreads}}</td>
-			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
-			</tr>	
-		{{end}}
-	</table>
-{{ end }}
+<a href="/forum"><u>Forums</u></a> > <u>General Chess Discussion</u><br><br>
+<p>Title:<input type="text" id="user" maxlength="100"></p>
+Message:<br><textarea id="textbox" rows="7" cols="150"></textarea>
+<br><button id="createfirstpost">Create the thread</button>
+<input type=hidden id=forumname value="General Chess Discussion">
+<p><span id="submit-result"></span></p>	
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
 </body>
 </html>

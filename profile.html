@@ -18,7 +18,7 @@
 	<li><a href="/logout">Logout</a></li>
 	</ul>
 </div> 
-{{.User}} <img id="countryFlag" src="img/flags/globe.png"  alt="Country flag">
+{{.User}} <img id="countryFlag" src="img/flags/{{.Country}}.png"  alt="Country flag">
 <input type="hidden" id="user" value="{{.User}}" />
 <div id="googleLinechart"></div>
 {{ if ge .GameID 0 }}

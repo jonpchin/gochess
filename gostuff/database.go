@@ -30,6 +30,7 @@ type ProfileGames struct {
 	GameID           int
 	Opponent         string
 	Days             string
+	Country          string
 }
 
 //an individual game
