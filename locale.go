@@ -69,7 +69,7 @@ func setCountry(username string, ipAddress string) string {
 
 // Fetches country from database for a given player every time they login
 // If country is null then it returns blank string which should be checked
-func getCountry(username string) string {
+func GetCountry(username string) string {
 
 	//globe.png is default country flag
 	var country = "globe"

@@ -49,8 +49,8 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	icon := ""
 	url := ""
 	endUrl := "" //closing the href link
-	countryFlag := getCountry(lookupName)
-	enemyFlag := getCountry(PrivateChat[lookupName])
+	countryFlag := GetCountry(lookupName)
+	enemyFlag := GetCountry(PrivateChat[lookupName])
 	if countryFlag == "" {
 		countryFlag = "globe"
 	}
