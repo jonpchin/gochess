@@ -14,8 +14,9 @@ type Forum struct {
 	Description  string
 	TotalThreads int
 	TotalPosts   int
-	RecentUser   string // Most recent user that made a post
-	RecentDate   string // Most recent date the post was made
+	RecentUser   string   // Most recent user that made a post
+	RecentDate   string   // Most recent date the post was made
+	Threads      []Thread // List of threads in forum
 }
 
 var db *sql.DB

@@ -105,7 +105,7 @@ func main() {
 		keyPath = "_travis/data/device.key"
 	}
 
-	//gostuff.OneTimeParseTemplates()
+	gostuff.OneTimeParseTemplates()
 
 	go func() {
 		//setting up database, the directory location of database backups is passed in

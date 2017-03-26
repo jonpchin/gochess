@@ -2,8 +2,13 @@ package goforum
 
 import (
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
+
+	"github.com/jonpchin/gochess/gostuff"
 )
 
 type ThreadSection struct {
@@ -21,6 +26,7 @@ type Thread struct {
 	Replies    int    // Number of replies the thread has
 	LastPost   string // The user who last made a post
 	Date       string // Date when the thread was created
+	Posts      []Post // List of posts in the Thread
 }
 
 // Gets threads from forumId
@@ -60,4 +66,92 @@ func getForumTitle(forumId string) string {
 		fmt.Println("Could not fetch forum title", err)
 	}
 	return forumTitle
+}
+
+// Creates the first post in a thread, must be logged in to do this
+func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
+	username, err := r.Cookie("username")
+	if err == nil {
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+
+				var thread Thread
+				thread.ForumID, err = strconv.Atoi(template.HTMLEscapeString(r.FormValue("forumname")))
+				if err != nil {
+					fmt.Println("error converting forum name in thread.go")
+				}
+				thread.ForumTitle = template.HTMLEscapeString(r.FormValue("forumname"))
+
+				var post Post
+				// First post of thread always starts with ID zero
+				post.OrderID = 0
+				post.Body = template.HTMLEscapeString(r.FormValue("message"))
+				post.Username = username.Value
+				post.Title = template.HTMLEscapeString(r.FormValue("title"))
+
+				thread.Posts = append(thread.Posts, post)
+
+				updated, forumId := updateForumCount(thread.ForumTitle)
+				if updated {
+					thread.ForumID = forumId
+					thread.createThread()
+				}
+			}
+		}
+	}
+	w.Write([]byte("<img src='img/ajax/not-available.png' /> Invalid credentials"))
+}
+
+// Returns true if succesfully updated forum count, also returns forumId of the forumName
+func updateForumCount(forumName string) (bool, int) {
+
+	var id int
+	var totalthreads int
+	var totalposts int
+
+	err := db.QueryRow("SELECT id totalthreads, totalposts from forums where title=?", forumName).Scan(
+		&id, &totalthreads, &totalposts)
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+
+	stmt, err := db.Prepare("UPDATE forum SET totalthreads=?, totalposts=? WHERE title=?")
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+
+	totalthreads += 1
+	totalposts += 1
+	fmt.Println("total threads is", totalthreads)
+
+	_, err = stmt.Exec(totalthreads, totalposts)
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+	return true, id
+}
+
+// Creates new thread with message and title
+// Returns false if failed to create a new thread
+func (thread *Thread) createThread() bool {
+
+	// Do not set auto incrmement id, it will be automatically set
+	stmt, err := db.Prepare(`INSERT thread SET forumId=?, username=?, title=?, views=?,"
+		replies=?, lastpost=?, date=?`)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	_, err = stmt.Exec(thread.ForumID, thread.Username, thread.Title, thread.Views, thread.Replies,
+		thread.LastPost, thread.Date)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
 }
