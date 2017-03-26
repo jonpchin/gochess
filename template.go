@@ -18,6 +18,22 @@ func OneTimeParseTemplates() {
 	}
 	ParseTemplates(tempArgs, "index.html", []string{"templates/indexTemplate.html",
 		"templates/guestHeader.html"}...)
+
+	tempArgs = struct {
+		PageTitle string // Title of the web page
+	}{
+		"Help",
+	}
+	ParseTemplates(tempArgs, "help.html", []string{"templates/helpTemplate.html",
+		"templates/guestHeader.html"}...)
+
+	tempArgs = struct {
+		PageTitle string // Title of the web page
+	}{
+		"Screenshots",
+	}
+	ParseTemplates(tempArgs, "screenshots.html", []string{"templates/screenshotsTemplate.html",
+		"templates/guestHeader.html"}...)
 }
 
 func parseNewsCache() {

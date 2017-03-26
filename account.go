@@ -68,7 +68,8 @@ func (userInfo *UserInfo) resetPass(w http.ResponseWriter, r *http.Request) {
 	}
 	if tokenInDB != userInfo.Token {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong username/token combination."))
-		log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", userInfo.IpAddress, r.Method, r.URL.Path, r.UserAgent())
+		log.Printf("FAILED PASSWORD RESET IP: %s  Method: %s Location: %s Agent: %s\n", userInfo.IpAddress,
+			r.Method, r.URL.Path, r.UserAgent())
 		return
 	}
 
