@@ -17,3 +17,5 @@ games/
 /gochess.exe
 /exports
 /_webtest/debug.log
+/login.html
+/register.html

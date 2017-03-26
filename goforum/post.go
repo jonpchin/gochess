@@ -14,3 +14,7 @@ type Post struct {
 func GetPosts(threadId string) (posts []Post) {
 	return posts
 }
+
+func (post *Post) createPost() {
+
+}

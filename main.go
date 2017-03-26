@@ -62,7 +62,6 @@ func main() {
 	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/createthread", createThread)
-	http.HandleFunc("/createpost", createPost)
 	http.HandleFunc("/sendFirstForumPost", goforum.SendFirstForumPost)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
@@ -105,7 +104,7 @@ func main() {
 		keyPath = "_travis/data/device.key"
 	}
 
-	gostuff.OneTimeParseTemplates()
+	//gostuff.OneTimeParseTemplates()
 
 	go func() {
 		//setting up database, the directory location of database backups is passed in
@@ -516,32 +515,20 @@ func forum(w http.ResponseWriter, r *http.Request) {
 
 func createThread(w http.ResponseWriter, r *http.Request) {
 
-	p := struct {
-		ForumName string
-		PageTitle string
-	}{
-		r.URL.Query().Get("forumname"),
-		"Create Thread",
-	}
-	gostuff.ParseTemplates(p, "createthread.html", []string{"templates/createthreadTemplate.html",
-		"templates/guestHeader.html"}...)
-	http.ServeFile(w, r, "createthread.html")
-}
-
-func createPost(w http.ResponseWriter, r *http.Request) {
-
-	p := struct {
-		SectionTitle string
-		ThreadTitle  string
-	}{
-		r.URL.Query().Get("forumid"),
-		r.URL.Query().Get("threadid"),
-	}
-
-	createpost := template.Must(template.ParseFiles("createPost.html"))
-
-	if err := createpost.Execute(w, &p); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if isAuthorized(w, r) {
+		username, _ := r.Cookie("username")
+		p := struct {
+			User      string
+			ForumName string
+			PageTitle string
+		}{
+			username.Value,
+			r.URL.Query().Get("forumname"),
+			"Create Thread",
+		}
+		gostuff.ParseTemplates(p, "createthread.html", []string{"templates/createthreadTemplate.html",
+			"templates/guestHeader.html"}...)
+		http.ServeFile(w, r, "createthread.html")
 	}
 }
 

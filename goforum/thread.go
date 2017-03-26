@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/jonpchin/gochess/gostuff"
 )
@@ -82,7 +83,10 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 					fmt.Println("error converting forum name in thread.go")
 				}
 				thread.ForumTitle = template.HTMLEscapeString(r.FormValue("forumname"))
-
+				thread.Views = 0
+				thread.Replies = 0
+				thread.LastPost = username.Value
+				thread.Date = time.Now().String()
 				var post Post
 				// First post of thread always starts with ID zero
 				post.OrderID = 0
@@ -92,10 +96,12 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 
 				thread.Posts = append(thread.Posts, post)
 
-				updated, forumId := updateForumCount(thread.ForumTitle)
+				updated, forumId := updateForumCount(thread.ForumTitle, post.Username)
 				if updated {
 					thread.ForumID = forumId
 					thread.createThread()
+					w.Write([]byte(""))
+					return
 				}
 			}
 		}
@@ -104,7 +110,7 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 }
 
 // Returns true if succesfully updated forum count, also returns forumId of the forumName
-func updateForumCount(forumName string) (bool, int) {
+func updateForumCount(forumName string, name string) (bool, int) {
 
 	var id int
 	var totalthreads int
@@ -117,7 +123,7 @@ func updateForumCount(forumName string) (bool, int) {
 		return false, 0
 	}
 
-	stmt, err := db.Prepare("UPDATE forum SET totalthreads=?, totalposts=? WHERE title=?")
+	stmt, err := db.Prepare("UPDATE forum SET totalthreads=?, totalposts=?, recentuser=?, date=? WHERE id=?")
 	if err != nil {
 		log.Println(err)
 		return false, 0
@@ -127,7 +133,7 @@ func updateForumCount(forumName string) (bool, int) {
 	totalposts += 1
 	fmt.Println("total threads is", totalthreads)
 
-	_, err = stmt.Exec(totalthreads, totalposts)
+	_, err = stmt.Exec(totalthreads, totalposts, name, time.Now(), id)
 	if err != nil {
 		log.Println(err)
 		return false, 0
@@ -153,5 +159,8 @@ func (thread *Thread) createThread() bool {
 		log.Println(err)
 		return false
 	}
+
+	// A newly created thread only has 1 post
+	thread.Posts[0].createPost()
 	return true
 }
