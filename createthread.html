@@ -20,12 +20,17 @@
 
 <div>
 <h3>Go Play Chess Forums</h3>
-<a href="/forum"><u>Forums</u></a> > <u>General Chess Discussion</u><br><br>
-<p>Title:<input type="text" id="title" maxlength="100" value=""></p>
-Message:<br><textarea id="textbox" rows="7" cols="150" value=""></textarea>
+<a href="/forum"><u>Forums</u></a> > <u>General Chess Discussion</u> > <span id="thread-title"></span>
+<br><br>
+<input type=hidden id="forumname" value="General Chess Discussion">
+<input type=hidden id="user" value="Yoda">
+<p>Title:<input type="text" id="title" maxlength="100" id="value"></p>
+Message:<br><textarea id="message" rows="7" cols="150" id="value"></textarea>
 <br><button id="createfirstpost">Create the thread</button>
-<input type=hidden id=forumname value="General Chess Discussion">
 <p><span id="submit-result"></span></p>	
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../third-party-js/jquery-2.1.4.min.js">\x3C/script>')</script>
+<script src="../js/createpost.js"></script>
 </body>
 </html>

@@ -31,7 +31,7 @@
 		{{range .Threads }}
 			<tr> 
 			<td><a href="/forum?forumid={{.ForumID}}?threadid={{.ID}}">{{.Title}}</a></td><td>{{.Views}}</td><td>{{.Replies}}</td>
-			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
+			<td>{{.LastPost}}</td><td>{{.Date}}</td>
 			</tr>	
 		{{end}}
 	</table>

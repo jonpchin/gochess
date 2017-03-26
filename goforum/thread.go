@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/jonpchin/gochess/gostuff"
@@ -18,7 +17,7 @@ type ThreadSection struct {
 }
 
 type Thread struct {
-	ID         int    // Unique ID of the thread
+	ID         int64  // Unique ID of the thread
 	ForumID    int    // Used to find all threads in a forum section
 	ForumTitle string // Title of the forum
 	Username   string // The one who created the thread
@@ -33,9 +32,7 @@ type Thread struct {
 // Gets threads from forumId
 func GetThreads(forumId string) (threadSection ThreadSection) {
 
-	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer problems.Close()
-	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	rows, err := db.Query("SELECT * FROM threads")
 	if err != nil {
@@ -78,21 +75,23 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				var thread Thread
-				thread.ForumID, err = strconv.Atoi(template.HTMLEscapeString(r.FormValue("forumname")))
-				if err != nil {
-					fmt.Println("error converting forum name in thread.go")
-				}
+				date := time.Now().Format("20060102150405")
 				thread.ForumTitle = template.HTMLEscapeString(r.FormValue("forumname"))
+				thread.Username = username.Value
+				threadTitle := template.HTMLEscapeString(r.FormValue("title"))
+				thread.Title = threadTitle
 				thread.Views = 0
 				thread.Replies = 0
 				thread.LastPost = username.Value
-				thread.Date = time.Now().String()
+				thread.Date = date
+
 				var post Post
 				// First post of thread always starts with ID zero
 				post.OrderID = 0
 				post.Body = template.HTMLEscapeString(r.FormValue("message"))
 				post.Username = username.Value
-				post.Title = template.HTMLEscapeString(r.FormValue("title"))
+				post.Title = threadTitle
+				post.Date = date
 
 				thread.Posts = append(thread.Posts, post)
 
@@ -112,18 +111,20 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 // Returns true if succesfully updated forum count, also returns forumId of the forumName
 func updateForumCount(forumName string, name string) (bool, int) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
 	var id int
 	var totalthreads int
 	var totalposts int
 
-	err := db.QueryRow("SELECT id totalthreads, totalposts from forums where title=?", forumName).Scan(
+	err := db.QueryRow("SELECT id, totalthreads, totalposts from forums where title=?", forumName).Scan(
 		&id, &totalthreads, &totalposts)
 	if err != nil {
 		log.Println(err)
 		return false, 0
 	}
 
-	stmt, err := db.Prepare("UPDATE forum SET totalthreads=?, totalposts=?, recentuser=?, date=? WHERE id=?")
+	stmt, err := db.Prepare("UPDATE forums SET totalthreads=?, totalposts=?, recentuser=?, date=? WHERE id=?")
 	if err != nil {
 		log.Println(err)
 		return false, 0
@@ -131,7 +132,6 @@ func updateForumCount(forumName string, name string) (bool, int) {
 
 	totalthreads += 1
 	totalposts += 1
-	fmt.Println("total threads is", totalthreads)
 
 	_, err = stmt.Exec(totalthreads, totalposts, name, time.Now(), id)
 	if err != nil {
@@ -145,22 +145,31 @@ func updateForumCount(forumName string, name string) (bool, int) {
 // Returns false if failed to create a new thread
 func (thread *Thread) createThread() bool {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
 	// Do not set auto incrmement id, it will be automatically set
-	stmt, err := db.Prepare(`INSERT thread SET forumId=?, username=?, title=?, views=?,"
-		replies=?, lastpost=?, date=?`)
+	stmt, err := db.Prepare(`INSERT threads SET forumId=?, username=?, title=?, views=?
+		, replies=?, lastpost=?, date=?`)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
 
-	_, err = stmt.Exec(thread.ForumID, thread.Username, thread.Title, thread.Views, thread.Replies,
+	res, err := stmt.Exec(thread.ForumID, thread.Username, thread.Title, thread.Views, thread.Replies,
 		thread.LastPost, thread.Date)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
 
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Println(err)
+	} else {
+		thread.ID = id
+		thread.Posts[0].ThreadID = id
+	}
+
 	// A newly created thread only has 1 post
-	thread.Posts[0].createPost()
-	return true
+	return thread.Posts[0].createPost()
 }
