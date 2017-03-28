@@ -30,7 +30,7 @@
 		</tr>
 		{{range .Threads }}
 			<tr> 
-			<td><a href="/forum?forumid={{.ForumID}}?threadid={{.ID}}">{{.Title}}</a></td><td>{{.Views}}</td><td>{{.Replies}}</td>
+			<td><a href="/forum?forumid={{.ForumID}}&threadid={{.ID}}">{{.Title}}</a></td><td>{{.Views}}</td><td>{{.Replies}}</td>
 			<td>{{.LastPost}}</td><td>{{.Date}}</td>
 			</tr>	
 		{{end}}

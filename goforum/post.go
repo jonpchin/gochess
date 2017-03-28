@@ -17,6 +17,26 @@ type Post struct {
 
 // Gets posts from thread ID
 func GetPosts(threadId string) (posts []Post) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	rows, err := db.Query("SELECT * FROM posts WHERE threadId=?", threadId)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	var post Post
+
+	for rows.Next() {
+
+		err = rows.Scan(&post.ID, &post.ThreadID, &post.OrderID, &post.Username,
+			&post.Title, &post.Body, &post.Date)
+
+		if err != nil {
+			log.Println(err)
+		}
+	}
 	return posts
 }
 

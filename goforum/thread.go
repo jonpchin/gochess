@@ -98,8 +98,15 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 				updated, forumId := updateForumCount(thread.ForumTitle, post.Username)
 				if updated {
 					thread.ForumID = forumId
-					thread.createThread()
-					w.Write([]byte(""))
+					pass := thread.createThread()
+					if pass {
+						w.Write([]byte("createThread"))
+					} else {
+						w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to create thread"))
+					}
+					return
+				} else {
+					w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to update forum count"))
 					return
 				}
 			}

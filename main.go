@@ -194,10 +194,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 		"Login",
 	}
 
-	gostuff.ParseTemplates(d, "login.html", []string{"templates/loginTemplate.html",
+	gostuff.ParseTemplates(d, w, "login.html", []string{"templates/loginTemplate.html",
 		"templates/guestHeader.html"}...)
-
-	http.ServeFile(w, r, "login.html")
 }
 
 func help(w http.ResponseWriter, r *http.Request) {
@@ -224,9 +222,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 		captcha.New(),
 		"Register",
 	}
-	gostuff.ParseTemplates(d, "register.html", []string{"templates/registerTemplate.html",
+	gostuff.ParseTemplates(d, w, "register.html", []string{"templates/registerTemplate.html",
 		"templates/guestHeader.html"}...)
-	http.ServeFile(w, r, "register.html")
 }
 
 func activate(w http.ResponseWriter, r *http.Request) {
@@ -491,25 +488,44 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 
 func forum(w http.ResponseWriter, r *http.Request) {
 
-	var forums interface{}
 	// goplaychess.com/forum?forumId=2
 	forumId := r.URL.Query().Get("forumid")
 	threadId := r.URL.Query().Get("threadid")
-	var parsedForums *template.Template
 
 	if forumId == "" && threadId == "" { // show main forum
-		forums = goforum.GetForums()
-		parsedForums = template.Must(template.ParseFiles("forum.html"))
-	} else if threadId == "" { //  show all threads in a section
-		forums = goforum.GetThreads(forumId)
-		parsedForums = template.Must(template.ParseFiles("threads.html"))
-	} else { // show all posts in a thread
-		forums = goforum.GetPosts(threadId)
-		parsedForums = template.Must(template.ParseFiles("posts.html"))
-	}
+		p := struct {
+			PageTitle string
+			Forums    []goforum.Forum
+		}{
+			"Forums",
+			goforum.GetForums(),
+		}
+		gostuff.ParseTemplates(p, w, "forum.html", []string{"templates/forumTemplate.html",
+			"templates/guestHeader.html"}...)
 
-	if err := parsedForums.Execute(w, &forums); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else if threadId == "" { //  show all threads in a section
+
+		p := struct {
+			PageTitle string
+			Threads   goforum.ThreadSection
+		}{
+			"Threads",
+			goforum.GetThreads(forumId),
+		}
+		gostuff.ParseTemplates(p, w, "threads.html", []string{"templates/threadsTemplate.html",
+			"templates/guestHeader.html"}...)
+
+	} else { // show all posts in a thread
+
+		p := struct {
+			PageTitle string
+			Posts     []goforum.Post
+		}{
+			"Posts",
+			goforum.GetPosts(threadId),
+		}
+		gostuff.ParseTemplates(p, w, "posts.html", []string{"templates/postsTemplate.html",
+			"templates/guestHeader.html"}...)
 	}
 }
 
@@ -526,9 +542,8 @@ func createThread(w http.ResponseWriter, r *http.Request) {
 			r.URL.Query().Get("forumname"),
 			"Create Thread",
 		}
-		gostuff.ParseTemplates(p, "createthread.html", []string{"templates/createthreadTemplate.html",
+		gostuff.ParseTemplates(p, w, "createthread.html", []string{"templates/createthreadTemplate.html",
 			"templates/guestHeader.html"}...)
-		http.ServeFile(w, r, "createthread.html")
 	}
 }
 

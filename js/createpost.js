@@ -13,7 +13,7 @@ document.getElementById('createfirstpost').onclick = function(){
 			dataType: 'html',
 			data : {'forumname': forumname, 'title': title, 'message': message},
 			success : function(data) {
-				if(data === "<img src='img/ajax/not-available.png' /> Invalid credentials"){
+				if(data !== "createThread"){
 					$('#submit-result').html(data);	
 				}
 				else{

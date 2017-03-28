@@ -1,0 +1,24 @@
+{{template "guestHeader" .}}
+<h3>Go Play Chess Forums</h3>
+ <a href="/forum"><u>Forums</u></a> > <u>{{.Threads.Title}}</u><br><br>
+ <button id="createThread" value="{{.Threads.Title}}">Create new thread</button>
+{{ $length := len .Threads.Threads }} 
+{{ if eq $length 0 }}
+	<center>No threads have been found.</center>
+{{else}}
+	<table class="table1">
+		<tr>
+	<th>Title</th><th>Views</th><th>Replies</th><th>Total Posts</th><th colspan="2">Last Post</th>
+		</tr>
+		{{range .Threads.Threads }}
+			<tr> 
+			<td><a href="/forum?forumid={{.ForumID}}&threadid={{.ID}}">{{.Title}}</a></td><td>{{.Views}}</td><td>{{.Replies}}</td>
+			<td>{{.LastPost}}</td><td>{{.Date}}</td>
+			</tr>	
+		{{end}}
+	</table>
+{{ end }}
+</div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
+<script src="js/forum.js"></script>
+</body>
+</html>

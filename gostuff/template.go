@@ -3,6 +3,7 @@ package gostuff
 import (
 	"html/template"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -16,7 +17,7 @@ func OneTimeParseTemplates() {
 	}{
 		"Free Online Chess",
 	}
-	ParseTemplates(tempArgs, "index.html", []string{"templates/indexTemplate.html",
+	ParseTemplates(tempArgs, nil, "index.html", []string{"templates/indexTemplate.html",
 		"templates/guestHeader.html"}...)
 
 	tempArgs = struct {
@@ -24,7 +25,7 @@ func OneTimeParseTemplates() {
 	}{
 		"Help",
 	}
-	ParseTemplates(tempArgs, "help.html", []string{"templates/helpTemplate.html",
+	ParseTemplates(tempArgs, nil, "help.html", []string{"templates/helpTemplate.html",
 		"templates/guestHeader.html"}...)
 
 	tempArgs = struct {
@@ -32,33 +33,41 @@ func OneTimeParseTemplates() {
 	}{
 		"Screenshots",
 	}
-	ParseTemplates(tempArgs, "screenshots.html", []string{"templates/screenshotsTemplate.html",
+	ParseTemplates(tempArgs, nil, "screenshots.html", []string{"templates/screenshotsTemplate.html",
 		"templates/guestHeader.html"}...)
 }
 
 func parseNewsCache() {
 	var allNewProviders AllNewsProviders
 	allNewProviders.ReadAllNews()
-	ParseTemplates(allNewProviders, "news.html", []string{"templates/newsTemplate.html",
+	ParseTemplates(allNewProviders, nil, "news.html", []string{"templates/newsTemplate.html",
 		"templates/guestHeader.html"}...)
 }
 
 // @templateArgs Template arguments that will be parsed
+// @writer http.ResponseWriter or nil, if nil a file will be created and served
 // @outputPath the output file of the parsed template
 // @templatePath relative location to template that is to be parsed
-func ParseTemplates(templateArgs interface{}, outputPath string, templatePaths ...string) {
+func ParseTemplates(templateArgs interface{}, writer http.ResponseWriter, outputPath string,
+	templatePaths ...string) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	var t = template.Must(template.ParseFiles(templatePaths...))
 
-	f, err := os.Create(outputPath)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	err = t.Execute(f, templateArgs)
-	if err != nil {
-		log.Println(err)
-		return
+	if writer == nil {
+		f, err := os.Create(outputPath)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		err = t.Execute(f, templateArgs)
+		if err != nil {
+			log.Println(err)
+		}
+	} else {
+		err := t.Execute(writer, templateArgs)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }

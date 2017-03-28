@@ -1,0 +1,21 @@
+{{template "guestHeader" .}}
+<h3>Go Play Chess Forums</h3>
+{{ $length := len .Forums }} 
+{{ if eq $length 0 }}
+	<center>No forums have been found.</center>
+{{else}}
+	<table class="table1">
+		<tr>
+	<th colspan="2">Title</th><th>Threads</th><th>Posts</th><th colspan="2">Last Post</th>
+		</tr>
+		{{range .Forums }}
+			<tr> 
+			<td><a href="/forum?forumid={{.ID}}">{{.Title}}</a></td><td>{{.Description}}</td><td>{{.TotalThreads}}</td>
+			<td>{{.TotalPosts}}</td><td>{{.RecentUser}}</td><td>{{.RecentDate}}</td>
+			</tr>	
+		{{end}}
+	</table>
+{{ end }}
+</div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
+</body>
+</html>

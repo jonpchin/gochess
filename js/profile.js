@@ -192,6 +192,9 @@ function setupRatingChart(){
 					formatType: 'long'
 				});
 				formatter.format(data, 1); // Apply formatter to second column
+				formatter.format(data, 2);
+				formatter.format(data, 3);
+				formatter.format(data, 4);
 
 				var formatter_medium = new google.visualization.DateFormat({formatType: 'long'});
 				formatter_medium.format(data, 0);
