@@ -4,7 +4,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 <br><br>
 <br>
-![Alt text](/img/screenshots/lobbyresize.png?raw=true "Chess Lobby")
+![Alt text](/img/screenshots/lobbyResize.png?raw=true "Chess Lobby")
 <br>
 ![Alt text](/img/screenshots/gameResize.png?raw=true "Chess Room")
 <br><br>
