@@ -1,12 +1,13 @@
 {{template "guestHeader" .}}
 <h3>Go Play Chess Forums - {{.PageTitle}}</h3>
+ <a href="/forum"><u>Forums</u></a> > <u>{{.PageTitle}}</u><br><br>
 {{ $length := len .Posts }} 
 {{ if eq $length 0 }}
 	<center>No posts have been found.</center>
 {{else}}
 	<table class="table1">
 		<tr>
-	<th colspan="2">{{.Title}}</th>
+	<th colspan="2">{{(index .Posts 0).Title}}</th>
 		</tr>
 		{{range .Posts }}
 			<tr> 

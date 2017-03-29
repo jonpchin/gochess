@@ -34,7 +34,7 @@ func GetThreads(forumId string) (threadSection ThreadSection) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
-	rows, err := db.Query("SELECT * FROM threads")
+	rows, err := db.Query("SELECT * FROM threads WHERE forumId=?", forumId)
 	if err != nil {
 		log.Println(err)
 	}
@@ -52,11 +52,11 @@ func GetThreads(forumId string) (threadSection ThreadSection) {
 		}
 		threadSection.Threads = append(threadSection.Threads, thread)
 	}
-	threadSection.Title = getForumTitle(forumId)
+	threadSection.Title = GetForumTitle(forumId)
 	return threadSection
 }
 
-func getForumTitle(forumId string) string {
+func GetForumTitle(forumId string) string {
 
 	var forumTitle string
 	err := db.QueryRow("SELECT title from forums where id=?", forumId).Scan(&forumTitle)
@@ -94,12 +94,11 @@ func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
 				post.Date = date
 
 				thread.Posts = append(thread.Posts, post)
-
 				updated, forumId := updateForumCount(thread.ForumTitle, post.Username)
+
 				if updated {
 					thread.ForumID = forumId
-					pass := thread.createThread()
-					if pass {
+					if thread.createThread() {
 						w.Write([]byte("createThread"))
 					} else {
 						w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to create thread"))
@@ -172,6 +171,7 @@ func (thread *Thread) createThread() bool {
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Println(err)
+		return false
 	} else {
 		thread.ID = id
 		thread.Posts[0].ThreadID = id

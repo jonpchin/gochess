@@ -19,8 +19,8 @@ type Post struct {
 func GetPosts(threadId string) (posts []Post) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
 	rows, err := db.Query("SELECT * FROM posts WHERE threadId=?", threadId)
+
 	if err != nil {
 		log.Println(err)
 	}
@@ -36,6 +36,7 @@ func GetPosts(threadId string) (posts []Post) {
 		if err != nil {
 			log.Println(err)
 		}
+		posts = append(posts, post)
 	}
 	return posts
 }

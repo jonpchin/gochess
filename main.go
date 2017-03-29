@@ -492,41 +492,51 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	forumId := r.URL.Query().Get("forumid")
 	threadId := r.URL.Query().Get("threadid")
 
+	var output string
+	var templatePath string
+	var p interface{}
+
 	if forumId == "" && threadId == "" { // show main forum
-		p := struct {
+		p = struct {
 			PageTitle string
 			Forums    []goforum.Forum
 		}{
 			"Forums",
 			goforum.GetForums(),
 		}
-		gostuff.ParseTemplates(p, w, "forum.html", []string{"templates/forumTemplate.html",
-			"templates/guestHeader.html"}...)
+
+		output = "forum.html"
+		templatePath = "templates/forumTemplate.html"
 
 	} else if threadId == "" { //  show all threads in a section
 
-		p := struct {
+		p = struct {
 			PageTitle string
 			Threads   goforum.ThreadSection
 		}{
 			"Threads",
 			goforum.GetThreads(forumId),
 		}
-		gostuff.ParseTemplates(p, w, "threads.html", []string{"templates/threadsTemplate.html",
-			"templates/guestHeader.html"}...)
+
+		output = "threads.html"
+		templatePath = "templates/threadsTemplate.html"
 
 	} else { // show all posts in a thread
 
-		p := struct {
+		p = struct {
 			PageTitle string
 			Posts     []goforum.Post
 		}{
-			"Posts",
+			goforum.GetForumTitle(forumId),
 			goforum.GetPosts(threadId),
 		}
-		gostuff.ParseTemplates(p, w, "posts.html", []string{"templates/postsTemplate.html",
-			"templates/guestHeader.html"}...)
+
+		output = "posts.html"
+		templatePath = "templates/postsTemplate.html"
 	}
+
+	gostuff.ParseTemplates(p, w, output, []string{templatePath,
+		"templates/guestHeader.html"}...)
 }
 
 func createThread(w http.ResponseWriter, r *http.Request) {
