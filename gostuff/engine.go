@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/malbrecht/chess"
 	"github.com/malbrecht/chess/engine/uci"
@@ -29,17 +30,50 @@ func StartEngine(args []string) *uci.Engine {
 			log.Println(err)
 		}
 	}
-	board, err := chess.ParseFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	return engine
+}
+
+// Start position is "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+// Returns false if there was an error or true if a best move was found
+func engineSearchDepth(fen string, engine *uci.Engine, depth int) (bool, chess.Move) {
+
+	board, err := chess.ParseFen(fen)
+	var chessMove chess.Move
+
+	if err != nil {
+		return false, chessMove
+	}
+
 	engine.SetPosition(board)
 
-	for info := range engine.SearchDepth(4) {
-		if err := info.Err(); err != nil {
-			log.Fatal(err)
-		} else if move, ok := info.BestMove(); ok {
-			log.Print("the best move is", move)
-		} else {
-			log.Print(info.Pv(), info.Stats())
+	for info := range engine.SearchDepth(depth) {
+		if move, ok := info.BestMove(); ok {
+			return true, move
+		} else if err := info.Err(); err != nil {
+			return false, chessMove
 		}
 	}
-	return engine
+	return false, chessMove
+}
+
+// Returns false if there was an error or true if a best move was found
+func engineSearchTime(fen string, engine *uci.Engine, t time.Duration) (bool, chess.Move) {
+
+	board, err := chess.ParseFen(fen)
+	var chessMove chess.Move
+
+	if err != nil {
+		return false, chessMove
+	}
+
+	engine.SetPosition(board)
+
+	for info := range engine.SearchTime(t) {
+		if move, ok := info.BestMove(); ok {
+			return true, move
+		} else if err := info.Err(); err != nil {
+			return false, chessMove
+		}
+	}
+	return false, chessMove
 }
