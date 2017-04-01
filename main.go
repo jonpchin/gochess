@@ -315,10 +315,6 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "private, max-age=432000")
-		var memberHome = template.Must(template.ParseFiles(
-			"memberHome.html",
-			"templates/memberHeader.html",
-		))
 
 		username, _ := r.Cookie("username")
 		p := struct {
@@ -329,9 +325,8 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 			"Welcome",
 		}
 
-		if err := memberHome.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		gostuff.ParseTemplates(p, w, "memberHome.html", []string{"templates/memberHomeTemplate.html",
+			"templates/memberHeader.html"}...)
 	}
 }
 
