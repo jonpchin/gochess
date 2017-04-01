@@ -101,7 +101,7 @@ func (c *Connection) LobbyConnect() {
 						}
 					}
 					if found == false {
-						if err := websocket.JSON.Send(c.websocket, player); err != nil {
+						if err := websocket.JSON.Send(c.websocket, &player); err != nil {
 							log.Println(err)
 						}
 					}
@@ -138,52 +138,8 @@ func (c *Connection) LobbyConnect() {
 					break
 				}
 
-				//verify.go
-				if checkTime(match.TimeControl) == false {
-					fmt.Println("An invalid time control has been selected.")
+				if match.assignMatchRatingType() == false {
 					break
-				}
-
-				//fetching rating from back end
-				errRate, bullet, blitz, standard, correspondence := GetRating(match.Name)
-				if errRate != "" {
-					fmt.Println("Cannot get rating lobby.go match_seek")
-					break
-				}
-				switch match.TimeControl {
-				case 1:
-					match.Rating = bullet
-					match.GameType = "bullet"
-				case 2:
-					match.Rating = bullet
-					match.GameType = "bullet"
-				case 3:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 4:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 5:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 10:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 15:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 20:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 30:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 45:
-					match.Rating = standard
-					match.GameType = "standard"
-				default: //for 1440, 2880, 4320 or 5760 minute game defaults to correspondence
-					match.Rating = correspondence
-					match.GameType = "correspondence"
 				}
 
 				// if a seek matches an existing one do not post another seek
@@ -313,52 +269,8 @@ func (c *Connection) LobbyConnect() {
 					break
 				}
 
-				//verify.go
-				if checkTime(match.TimeControl) == false {
-					fmt.Println("An invalid time control has been selected.")
+				if match.assignMatchRatingType() == false {
 					break
-				}
-
-				//fetching rating from back end
-				errMessage, bullet, blitz, standard, correspondence := GetRating(match.Name)
-				if errMessage != "" {
-					fmt.Println("Cannot get rating lobby.go private_match")
-					break
-				}
-				switch match.TimeControl {
-				case 1:
-					match.Rating = bullet
-					match.GameType = "bullet"
-				case 2:
-					match.Rating = bullet
-					match.GameType = "bullet"
-				case 3:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 4:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 5:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 10:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 15:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 20:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 30:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 45:
-					match.Rating = standard
-					match.GameType = "standard"
-				default: //for 1440, 2880, 4320 or 5760 minute game defaults to standard
-					match.Rating = correspondence
-					match.GameType = "correspondence"
 				}
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
@@ -543,4 +455,59 @@ func startPendingMatch(seekerName string, matchID int) bool {
 
 	// a match was succesfully started so do not proceed in sending a new seek
 	return false
+}
+
+// Assigns a match as bullet, blitz, standard or correspondence type,
+// Also checks if time control is a valid option returns false
+// if there was an error
+func (match *SeekMatch) assignMatchRatingType() bool {
+	//verify.go
+	if checkTime(match.TimeControl) == false {
+		fmt.Println("An invalid time control has been selected.")
+		return false
+	}
+
+	//fetching rating from back end
+	errRate, bullet, blitz, standard, correspondence := GetRating(match.Name)
+	if errRate != "" {
+		fmt.Println("Cannot get rating lobby.go match_seek")
+		return false
+	}
+
+	switch match.TimeControl {
+	case 1:
+		match.Rating = bullet
+		match.GameType = "bullet"
+	case 2:
+		match.Rating = bullet
+		match.GameType = "bullet"
+	case 3:
+		match.Rating = blitz
+		match.GameType = "blitz"
+	case 4:
+		match.Rating = blitz
+		match.GameType = "blitz"
+	case 5:
+		match.Rating = blitz
+		match.GameType = "blitz"
+	case 10:
+		match.Rating = blitz
+		match.GameType = "blitz"
+	case 15:
+		match.Rating = standard
+		match.GameType = "standard"
+	case 20:
+		match.Rating = standard
+		match.GameType = "standard"
+	case 30:
+		match.Rating = standard
+		match.GameType = "standard"
+	case 45:
+		match.Rating = standard
+		match.GameType = "standard"
+	default: //for 1440, 2880, 4320 or 5760 minute game defaults to correspondence
+		match.Rating = correspondence
+		match.GameType = "correspondence"
+	}
+	return true
 }
