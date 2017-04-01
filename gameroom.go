@@ -502,52 +502,8 @@ func (c *Connection) ChessConnect() {
 					break
 				}
 
-				//verify.go
-				if checkTime(match.TimeControl) == false {
-					fmt.Println("An invalid time control has been selected.")
+				if match.assignMatchRatingType() == false {
 					break
-				}
-
-				//fetching rating from back end
-				errMessage, bullet, blitz, standard, correspondence := GetRating(match.Name)
-				if errMessage != "" {
-					log.Println("Cannot get rating in rematch")
-					break
-				}
-				switch match.TimeControl {
-				case 1:
-					match.Rating = bullet
-					match.GameType = "bullet"
-				case 2:
-					match.Rating = bullet
-					match.GameType = "bullet"
-				case 3:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 4:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 5:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 10:
-					match.Rating = blitz
-					match.GameType = "blitz"
-				case 15:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 20:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 30:
-					match.Rating = standard
-					match.GameType = "standard"
-				case 45:
-					match.Rating = standard
-					match.GameType = "standard"
-				default: //for 1440, 2880, 4320 or 5760 minute game defaults to correspondence
-					match.Rating = correspondence
-					match.GameType = "correspondence"
 				}
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
