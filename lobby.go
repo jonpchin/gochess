@@ -40,31 +40,9 @@ func (c *Connection) LobbyConnect() {
 			switch t.Type {
 
 			case "chat_all":
-
-				if len(reply) > 225 {
-					log.Printf("User: %s IP %s has exeeded the 225 character limit by %d byte units.\n", t.Name, c.clientIP, len(reply))
+				if t.sendLobbyChatToAll(reply, &start, &counter, c.clientIP, log) == false {
 					return
 				}
-				//keeps track of messages are sent in a given interval
-				counter++
-
-				if counter > 4 {
-					elapsed := time.Since(start)
-					if elapsed < time.Second*10 {
-						log.Printf("User: %s IP: %s was spamming chat.\n", t.Name, c.clientIP)
-						return
-					}
-					start = time.Now()
-					counter = 0
-				}
-				go func() {
-					for name, cs := range Chat.Lobby {
-						if err := websocket.Message.Send(cs, reply); err != nil {
-							// we could not send the message to a peer
-							log.Println("Could not send message to ", name, err)
-						}
-					}
-				}()
 			case "fetch_matches":
 				//send in array instead of sending individual
 				for _, value := range Pending.Matches {
@@ -317,6 +295,38 @@ func (c *Connection) LobbyConnect() {
 			return
 		}
 	}
+}
+
+// Send chat to all users in the lobby
+// Return false if word count and message limit is exceeded
+func (t *Online) sendLobbyChatToAll(reply string, start *time.Time, counter *int,
+	ip string, log *log.Logger) bool {
+	if len(reply) > 225 {
+		log.Printf("User: %s IP %s has exeeded the 225 character limit by %d byte units.\n",
+			t.Name, ip, len(reply))
+		return false
+	}
+	//keeps track of messages are sent in a given interval
+	*counter++
+
+	if *counter > 4 {
+		elapsed := time.Since(*start)
+		if elapsed < time.Second*10 {
+			log.Printf("User: %s IP: %s was spamming chat.\n", t.Name, ip)
+			return false
+		}
+		*start = time.Now()
+		*counter = 0
+	}
+	go func() {
+		for name, cs := range Chat.Lobby {
+			if err := websocket.Message.Send(cs, reply); err != nil {
+				// we could not send the message to a peer
+				log.Println("Could not send message to ", name, err)
+			}
+		}
+	}()
+	return true
 }
 
 // if a pending match is accepted start game for both players that are waiting
