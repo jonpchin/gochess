@@ -1,21 +1,44 @@
-{{template "guestHeader" .}}
-<h3>Go Play Chess Forums - {{.PageTitle}}</h3>
- <a href="/forum"><u>Forums</u></a> > <u>{{.PageTitle}}</u><br><br>
-{{ $length := len .Posts }} 
+{{if .Authorized}}
+	{{template "memberHeader"}}
+{{else}}
+	{{template "guestHeader"}}
+{{end}}
+{{ $length := len .Posts }}
+{{ if gt $length 0 }} 
+ <a href="/forum"><u>Forums</u></a> >  <a href="{{.ForumUrl}}"><u>{{.PageTitle}}</u></a> > <u>{{(index .Posts 0).Title}}</u><br><br>
+<center><h3>{{(index .Posts 0).Title}}</h3></center>
+<span id="title" value="{{(index .Posts 0).Title}}"></span>
+{{else}}
+<a href="/forum"><u>Forums</u></a> >  <a href="{{.ForumUrl}}"><u>{{.PageTitle}}</u></a>
+{{end}}
 {{ if eq $length 0 }}
 	<center>No posts have been found.</center>
 {{else}}
-	<table class="table1">
-		<tr>
-	<th colspan="2">{{(index .Posts 0).Title}}</th>
-		</tr>
+	<table id="postCenterTable" class="tableCenter">
 		{{range .Posts }}
+			<tr>
+			<th>{{.Username}} <span class="right">{{.Date}} #{{.OrderID}}</span></th>
+			</tr>
 			<tr> 
-			<td>{{.Username}} {{.Date}} {{.OrderID}}</td><td>{{.Body}}</td>
+			<td>{{.Body}}</td>
 			</tr>	
-		{{end}}
+		{{end}}	
 	</table>
 {{ end }}
+{{if .Authorized}}
+<center><br><textarea id="message" rows="7" value="" cols="150"></textarea>
+<br><br><button id="createpost" value="">Add Post</button></center>
+{{else}}
+<center><br>Please login to post.<br></center>
+{{end}}
+<input type=hidden id="user" value="{{.User}}">
+<input type=hidden id="forumname" value="{{.PageTitle}}">
+<input type="hidden" id="firstPost" value="No" />
+<input type="hidden" id="totalPosts" value="{{$length}}" />
+<input type="hidden" id="threadId" value="{{.ThreadId}}" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../third-party-js/jquery-2.1.4.min.js">\x3C/script>')</script>
+<script src="../js/createpost.js"></script>
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
 </body>
 </html>

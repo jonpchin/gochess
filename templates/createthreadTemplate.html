@@ -1,14 +1,21 @@
-{{template "guestHeader" .}}
+{{if .Authorized}}
+	{{template "memberHeader"}}
+{{else}}
+	{{template "guestHeader"}}
+{{end}}
 <div>
 <h3>Go Play Chess Forums</h3>
-<a href="/forum"><u>Forums</u></a> > <u>{{.ForumName}}</u> > <span id="thread-title"></span>
+<a href="/forum"><u>Forums</u></a> > <a href="/forum?forumid={{.ForumUrl}}"><u>{{.ForumName}}</u></a> > <span id="thread-title"></span>
 <br><br>
-<input type=hidden id="forumname" value="{{.ForumName}}">
-<input type=hidden id="user" value="{{.User}}">
-<p>Title:<input type="text" id="title" maxlength="100" id="value"></p>
+<center><p>Title:<input type="text" id="title" maxlength="100" id="value"></p>
 Message:<br><textarea id="message" rows="7" cols="150" id="value"></textarea>
-<br><button id="createfirstpost">Create the thread</button>
-<p><span id="submit-result"></span></p>	
+<br><button id="createpost">Create the thread</button></center>
+<p><span id="submit-result"></span></p>
+<input type=hidden id="user" value="{{.User}}">
+<input type=hidden id="forumname" value="{{.ForumName}}">
+<input type=hidden id="firstPost" value="Yes">
+<input type=hidden id="totalPosts" value="0">
+<input type="hidden" id="threadId" value="{{.ThreadId}}" />	
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="../third-party-js/jquery-2.1.4.min.js">\x3C/script>')</script>

@@ -2,6 +2,7 @@ package goforum
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -50,4 +51,14 @@ func GetForums() (forums []Forum) {
 		forums = append(forums, forum)
 	}
 	return forums
+}
+
+// Returns forumId from forumId, if none is found it returns "0" as forumId
+func GetForumIdFromName(forumName string) string {
+	forumId := "0"
+	err := db.QueryRow("SELECT id from forums where title=?", forumName).Scan(&forumId)
+	if err != nil {
+		fmt.Println("Could not fetch forumId from forumName", forumName, err)
+	}
+	return forumId
 }

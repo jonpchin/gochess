@@ -6,6 +6,9 @@ body{
 #center{
 	text-align:center;
 }
+.right{
+    float:right;
+}
 #right{
 	float:right;
 }
@@ -48,6 +51,26 @@ button:disabled {
   background-color: green;
   color: white;
 }
+
+table.tableCenter {
+    width:80%;
+    margin-left:10%; 
+    margin-right:10%;
+    border: 3px solid green;
+    border-collapse: collapse;
+}
+
+ table.tableCenter th {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid green;
+ }
+
+ table.tableCenter td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid green;
+ }
 
 table.table2 {
 	width: 42%;
@@ -94,14 +117,18 @@ table.table2 {
 }
 
 
-table.table1 th, table.table2 th, table.table3 th, table.table4 th, table.table5 th, table.table6 th, table.table7 th, table.table8 th, table.table9 th {
+table.table1 th, table.table2 th, table.table3 th, table.table4 th, 
+table.table5 th, table.table6 th, table.table7 th, table.table8 th, 
+table.table9 th {
     background-color: #4CAF50;
     color: white;
 	padding: 8px;
     text-align: left;
     border-bottom: 1px solid green;
 }
-table.table1 td, table.table2 td, table.table3 td, table.table4 td, table.table5 td, table.table6 td, table.table7 td, table.table8 td, table.table9 td{
+table.table1 td, table.table2 td, table.table3 td, table.table4 td,
+table.table5 td, table.table6 td, table.table7 td, table.table8 td,
+table.table9 td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid green;

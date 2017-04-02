@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/jonpchin/gochess/gostuff"
@@ -25,6 +26,7 @@ type Thread struct {
 	Views      int    // Number of views the thread has
 	Replies    int    // Number of replies the thread has
 	LastPost   string // The user who last made a post
+	Locked     string // No posts can be made on a locked thread, options: Yes or No
 	Date       string // Date when the thread was created
 	Posts      []Post // List of posts in the Thread
 }
@@ -45,7 +47,7 @@ func GetThreads(forumId string) (threadSection ThreadSection) {
 	for rows.Next() {
 
 		err = rows.Scan(&thread.ID, &thread.ForumID, &thread.Username, &thread.Title,
-			&thread.Views, &thread.Replies, &thread.LastPost, &thread.Date)
+			&thread.Views, &thread.Replies, &thread.LastPost, &thread.Locked, &thread.Date)
 
 		if err != nil {
 			log.Println(err)
@@ -67,46 +69,90 @@ func GetForumTitle(forumId string) string {
 }
 
 // Creates the first post in a thread, must be logged in to do this
-func SendFirstForumPost(w http.ResponseWriter, r *http.Request) {
+func SendForumPost(w http.ResponseWriter, r *http.Request) {
 	username, err := r.Cookie("username")
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
-				var thread Thread
-				date := time.Now().Format("20060102150405")
-				thread.ForumTitle = template.HTMLEscapeString(r.FormValue("forumname"))
-				thread.Username = username.Value
-				threadTitle := template.HTMLEscapeString(r.FormValue("title"))
-				thread.Title = threadTitle
-				thread.Views = 0
-				thread.Replies = 0
-				thread.LastPost = username.Value
-				thread.Date = date
+				log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
-				var post Post
-				// First post of thread always starts with ID zero
-				post.OrderID = 0
-				post.Body = template.HTMLEscapeString(r.FormValue("message"))
-				post.Username = username.Value
-				post.Title = threadTitle
-				post.Date = date
+				firstPost := template.HTMLEscapeString(r.FormValue("firstPost"))
+				tempThreadId := template.HTMLEscapeString(r.FormValue("threadId"))
+				var threadId int64
+				threadId = 0
+				if tempThreadId != "" {
+					threadId, err = strconv.ParseInt(tempThreadId, 10, 64)
 
-				thread.Posts = append(thread.Posts, post)
-				updated, forumId := updateForumCount(thread.ForumTitle, post.Username)
-
-				if updated {
-					thread.ForumID = forumId
-					if thread.createThread() {
-						w.Write([]byte("createThread"))
-					} else {
-						w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to create thread"))
+					if err != nil {
+						log.Println(err)
 					}
-					return
+				}
+
+				threadTitle := template.HTMLEscapeString(r.FormValue("title"))
+				message := template.HTMLEscapeString(r.FormValue("message"))
+				totalPosts := template.HTMLEscapeString(r.FormValue("totalPosts"))
+				date := time.Now().Format("20060102150405")
+
+				if firstPost == "Yes" {
+
+					var thread Thread
+
+					thread.ForumTitle = template.HTMLEscapeString(r.FormValue("forumname"))
+					thread.Username = username.Value
+					thread.Title = threadTitle
+					thread.Views = 0
+					thread.Replies = 0
+					thread.LastPost = username.Value
+					thread.Date = date
+
+					var post Post
+					// First post of thread always starts with ID zero
+					post.OrderID = 0
+					post.Body = message
+					post.Username = username.Value
+					post.Title = threadTitle
+					post.Date = date
+
+					thread.Posts = append(thread.Posts, post)
+					updated, forumId := updateForumCount(thread.ForumTitle, post.Username)
+
+					if updated {
+						thread.ForumID = forumId
+						if thread.createThread() {
+							w.Write([]byte("createPost"))
+						} else {
+							w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to create new thread"))
+						}
+						return
+					} else {
+						w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to update forum count"))
+						return
+					}
 				} else {
-					w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to update forum count"))
-					return
+
+					var post Post
+
+					newTotalPosts, err := strconv.Atoi(totalPosts)
+					if err != nil {
+						log.Println(err)
+					}
+
+					post.ThreadID = threadId
+					post.OrderID = newTotalPosts
+					post.Body = message
+					post.Username = username.Value
+					post.Title = threadTitle
+					post.Date = date
+
+					if post.createPost() {
+						w.Write([]byte("createPost"))
+						return
+					} else {
+						w.Write([]byte("<img src='img/ajax/not-available.png' /> Failed to create post"))
+						return
+					}
 				}
 			}
 		}

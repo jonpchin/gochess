@@ -62,7 +62,7 @@ func main() {
 	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/createthread", createThread)
-	http.HandleFunc("/sendFirstForumPost", goforum.SendFirstForumPost)
+	http.HandleFunc("/sendForumPost", goforum.SendForumPost)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -488,19 +488,31 @@ func runJsTests(w http.ResponseWriter, r *http.Request) {
 
 func forum(w http.ResponseWriter, r *http.Request) {
 
-	// goplaychess.com/forum?forumId=2
+	// goplaychess.com/forum?forumid=2
 	forumId := r.URL.Query().Get("forumid")
 	threadId := r.URL.Query().Get("threadid")
+	forumUrl := "/forum?forumid=" + forumId
 
 	var output string
 	var templatePath string
 	var p interface{}
 
+	var authorized = false
+	var user = ""
+
+	if isAuthorizedNo404(w, r) {
+		authorized = true
+		username, _ := r.Cookie("username")
+		user = username.Value
+	}
+
 	if forumId == "" && threadId == "" { // show main forum
 		p = struct {
-			PageTitle string
-			Forums    []goforum.Forum
+			Authorized bool
+			PageTitle  string
+			Forums     []goforum.Forum
 		}{
+			authorized,
 			"Forums",
 			goforum.GetForums(),
 		}
@@ -511,10 +523,14 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	} else if threadId == "" { //  show all threads in a section
 
 		p = struct {
-			PageTitle string
-			Threads   goforum.ThreadSection
+			Authorized bool
+			PageTitle  string
+			ThreadId   string
+			Threads    goforum.ThreadSection
 		}{
+			authorized,
 			"Threads",
+			threadId,
 			goforum.GetThreads(forumId),
 		}
 
@@ -524,10 +540,18 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	} else { // show all posts in a thread
 
 		p = struct {
-			PageTitle string
-			Posts     []goforum.Post
+			User       string
+			Authorized bool
+			PageTitle  string
+			ThreadId   string
+			ForumUrl   string
+			Posts      []goforum.Post
 		}{
+			user,
+			authorized,
 			goforum.GetForumTitle(forumId),
+			threadId,
+			forumUrl,
 			goforum.GetPosts(threadId),
 		}
 
@@ -535,25 +559,33 @@ func forum(w http.ResponseWriter, r *http.Request) {
 		templatePath = "templates/postsTemplate.html"
 	}
 
-	gostuff.ParseTemplates(p, w, output, []string{templatePath,
-		"templates/guestHeader.html"}...)
+	gostuff.ParseTemplates(p, w, output, []string{templatePath, "templates/guestHeader.html",
+		"templates/memberHeader.html"}...)
 }
 
 func createThread(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
 		username, _ := r.Cookie("username")
+		forumName := r.URL.Query().Get("forumname")
+
 		p := struct {
-			User      string
-			ForumName string
-			PageTitle string
+			User       string
+			Authorized bool
+			ForumName  string
+			ForumUrl   string
+			ThreadId   string
+			PageTitle  string
 		}{
 			username.Value,
-			r.URL.Query().Get("forumname"),
+			isAuthorizedNo404(w, r),
+			forumName,
+			goforum.GetForumIdFromName(forumName),
+			"", // Thread ID will be computed later
 			"Create Thread",
 		}
 		gostuff.ParseTemplates(p, w, "createthread.html", []string{"templates/createthreadTemplate.html",
-			"templates/guestHeader.html"}...)
+			"templates/guestHeader.html", "templates/memberHeader.html"}...)
 	}
 }
 
@@ -578,6 +610,20 @@ func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
 	}
 	w.WriteHeader(404)
 	http.ServeFile(w, r, "404.html")
+	return false
+}
+
+// Checks authorization with no 404 if it fails
+func isAuthorizedNo404(w http.ResponseWriter, r *http.Request) bool {
+	username, err := r.Cookie("username")
+	if err == nil {
+		sessionID, err := r.Cookie("sessionID")
+		if err == nil {
+			if gostuff.SessionManager[username.Value] == sessionID.Value {
+				return true
+			}
+		}
+	}
 	return false
 }
 
