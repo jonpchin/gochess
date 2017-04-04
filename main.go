@@ -135,6 +135,7 @@ func main() {
 			gostuff.ExportDatabase(false)
 			//gostuff.CompressDatabase()
 			goforum.ConnectForumDb()
+			//goforum.CanUserPost("Yoda")
 		}
 		//gostuff.SpawnProcess()
 
