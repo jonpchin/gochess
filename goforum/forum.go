@@ -27,11 +27,6 @@ func ConnectForumDb() {
 	db = gostuff.GetDb()
 }
 
-type NullTime struct {
-	Time  time.Time
-	Valid bool // Valid is true if Time is not NULL
-}
-
 func GetForums() (forums []Forum) {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
