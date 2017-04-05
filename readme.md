@@ -46,6 +46,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>4. Friends list</p>
 <p>5. Inbox system</p>
 <p>6. Update help, documentation and screenshots</p>
+<p>7. Post game analysis with Stockfish engine</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
