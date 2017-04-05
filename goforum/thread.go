@@ -78,6 +78,11 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 
 				log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
+				if CanUserPost(username.Value) == false {
+					w.Write([]byte("Please wait 30 seconds before posting again."))
+					return
+				}
+
 				firstPost := template.HTMLEscapeString(r.FormValue("firstPost"))
 				tempThreadId := template.HTMLEscapeString(r.FormValue("threadId"))
 				var threadId int64

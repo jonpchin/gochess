@@ -80,6 +80,7 @@ func CanUserPost(username string) bool {
 
 	timeFormat := "2006-01-02 15:04:05"
 
+	// If not valid that means there is no existing timestamp in the database
 	if lastpost.Valid {
 
 		then, err := time.Parse(timeFormat, lastpost.String)
@@ -91,10 +92,11 @@ func CanUserPost(username string) bool {
 		duration := time.Now().Sub(then)
 
 		var timeZoneDiff float64
+		// UTC-5 is Eastern US time
 		timeZoneDiff = 14400.0
 
 		timeDiff := duration.Seconds() - timeZoneDiff
-		log.Println(timeDiff)
+		//log.Println(timeDiff)
 		if timeDiff < 30 {
 			log.Println("Please wait 30 seconds before posting another post user:", username)
 			return false
