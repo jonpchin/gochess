@@ -66,7 +66,7 @@ func GetForumIdFromName(forumName string) string {
 
 // Checks if 30 seconds has passed since a user has last post, returns true
 // if the user is allowed to post
-func CanUserPost(username string) bool {
+func canUserPost(username string) bool {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
