@@ -5,10 +5,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
 	"github.com/jonpchin/gochess/gostuff"
+)
+
+var (
+	isWindows = false
 )
 
 type Forum struct {
@@ -26,6 +31,9 @@ var db *sql.DB
 
 func ConnectForumDb() {
 	db = gostuff.GetDb()
+	if runtime.GOOS == "windows" {
+		isWindows = true
+	}
 }
 
 func GetForums() (forums []Forum) {
@@ -94,8 +102,12 @@ func canUserPost(username string) (bool, string) {
 		duration := time.Now().Sub(then)
 
 		var timeZoneDiff float64
-		// UTC-5 is Eastern US time
-		timeZoneDiff = 14400.0
+		if isWindows {
+			// UTC-5 is Eastern US time
+			timeZoneDiff = 14400.0
+		} else {
+			timeZoneDiff = 0
+		}
 
 		timeDiff := duration.Seconds() - timeZoneDiff
 
