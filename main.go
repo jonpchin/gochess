@@ -376,8 +376,6 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 		country := gostuff.GetCountry(name)
 
-		var playerProfile = template.Must(template.ParseFiles("profile.html"))
-
 		//rounding floats
 		bulletN := gostuff.Round(bulletRating)
 		blitzN := gostuff.Round(blitzRating)
@@ -397,14 +395,42 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 			opponent = gostuff.PrivateChat[inputName]
 		}
 
-		p := gostuff.ProfileGames{User: inputName, Bullet: bulletN, Blitz: blitzN, Standard: standardN,
-			Correspondence: correspondenceN, BulletRD: bulletR, BlitzRD: blitzR, StandardRD: standardR,
-			CorrespondenceRD: correspondenceR, Games: all, GameID: gameID, Opponent: opponent,
-			Days: days, Country: country}
-
-		if err := playerProfile.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		p := struct {
+			User             string
+			PageTitle        string // Title of the web page
+			Bullet           float64
+			Blitz            float64
+			Standard         float64
+			Correspondence   float64
+			BulletRD         float64
+			BlitzRD          float64
+			StandardRD       float64
+			CorrespondenceRD float64
+			Games            []gostuff.GoGame
+			GameID           int
+			Opponent         string
+			Days             string
+			Country          string
+		}{
+			inputName,
+			"Profile",
+			bulletN,
+			blitzN,
+			standardN,
+			correspondenceN,
+			bulletR,
+			blitzR,
+			standardR,
+			correspondenceR,
+			all,
+			gameID,
+			opponent,
+			days,
+			country,
 		}
+
+		gostuff.ParseTemplates(p, w, "profile.html", []string{"templates/profileTemplate.html",
+			"templates/memberHeader.html"}...)
 	}
 }
 
@@ -464,19 +490,26 @@ func engine(w http.ResponseWriter, r *http.Request) {
 func saved(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
+
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		var all []gostuff.GoGame
-
 		name := r.URL.Query().Get("user")
 		all = gostuff.GetSaved(name)
 
-		var saved = template.Must(template.ParseFiles("saved.html"))
-
-		p := gostuff.ProfileGames{User: name, Games: all, Days: days}
-
-		if err := saved.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		p := struct {
+			User      string
+			PageTitle string // Title of the web page
+			Games     []gostuff.GoGame
+			Days      string
+		}{
+			name,
+			"Saved Games",
+			all,
+			days,
 		}
+
+		gostuff.ParseTemplates(p, w, "saved.html", []string{"templates/savedTemplate.html",
+			"templates/memberHeader.html"}...)
 	}
 }
 
@@ -529,7 +562,7 @@ func forum(w http.ResponseWriter, r *http.Request) {
 			Threads    goforum.ThreadSection
 		}{
 			authorized,
-			"Threads",
+			goforum.GetForumTitle(forumId),
 			threadId,
 			goforum.GetThreads(forumId),
 		}

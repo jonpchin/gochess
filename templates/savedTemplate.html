@@ -1,23 +1,4 @@
-<!DOCTYPE html><html lang="en"> 
-<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go Play Chess - Saved</title>
-<link href="css/design.css" rel="stylesheet" type = "text/css"/>
-<link rel='shortcut icon' href='img/favicon.ico' type='image/x-icon'/>
-</head>
-<body>
-<div>
-	<ul id="nav">
-	<li><a href="/memberHome">Main</a></li>
-	<li><a href="/server/lobby">Lobby</a></li>
-	<li><a href="/chess/memberChess">Chess</a></li>
-	<li><a href="/database">Database</a></li>
-	<li><a href="/profile">Profile</a></li>
-	<li><a href="/settings">Settings</a></li>
-	<li><a href="/highscores">Scores</a></li>
-	<li><a href="/engine">Engine</a></li>
-	<li><a href="/logout">Logout</a></li>
-	</ul>
-</div> 
+{{template "memberHeader" .}}
 <p>This is {{.User}}'s adjourned game page. Your opponent must be in the lobby or chess 
 room not playing a chess game to resume an adjourned game.</p>
 {{ $length := len .Games }} 

@@ -77,9 +77,10 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 			if gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+				canPost, seconds := canUserPost(username.Value)
 
-				if canUserPost(username.Value) == false {
-					w.Write([]byte("Please wait 30 seconds before posting again."))
+				if canPost == false {
+					w.Write([]byte("Please wait " + seconds + " seconds before posting again."))
 					return
 				}
 

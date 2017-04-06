@@ -1,7 +1,7 @@
 {{if .Authorized}}
-	{{template "memberHeader"}}
+	{{template "memberHeader" .}}
 {{else}}
-	{{template "guestHeader"}}
+	{{template "guestHeader" .}}
 {{end}}
 <h3>Go Play Chess Forums</h3>
  <a href="/forum"><u>Forums</u></a> > <u>{{.Threads.Title}}</u><br><br>

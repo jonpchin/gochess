@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/jonpchin/gochess/gostuff"
@@ -65,8 +66,9 @@ func GetForumIdFromName(forumName string) string {
 }
 
 // Checks if 30 seconds has passed since a user has last post, returns true
-// if the user is allowed to post
-func canUserPost(username string) bool {
+// if the user is allowed to post, also returns number of seconds
+// user has to wait before posting again
+func canUserPost(username string) (bool, string) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
@@ -75,7 +77,7 @@ func canUserPost(username string) bool {
 	err := db.QueryRow("SELECT lastpost from userinfo WHERE username=?", username).Scan(&lastpost)
 	if err != nil {
 		log.Println(err)
-		return false
+		return false, "30"
 	}
 
 	timeFormat := "2006-01-02 15:04:05"
@@ -85,8 +87,8 @@ func canUserPost(username string) bool {
 
 		then, err := time.Parse(timeFormat, lastpost.String)
 		if err != nil {
-			fmt.Println(err)
-			return false
+			log.Println(err)
+			return false, "30"
 		}
 
 		duration := time.Now().Sub(then)
@@ -96,15 +98,16 @@ func canUserPost(username string) bool {
 		timeZoneDiff = 14400.0
 
 		timeDiff := duration.Seconds() - timeZoneDiff
-		//log.Println(timeDiff)
+
 		if timeDiff < 30 {
-			log.Println("Please wait 30 seconds before posting another post user:", username)
-			return false
+			diff := strconv.Itoa(int(30 - timeDiff))
+			log.Println("Please wait "+diff+" seconds before posting another post user:", username)
+			return false, diff
 		}
 	}
 
 	updateLastPostTime(time.Now().Format(timeFormat), username)
-	return true
+	return true, "0"
 }
 
 func updateLastPostTime(dateTime string, username string) {
