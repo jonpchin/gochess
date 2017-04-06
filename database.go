@@ -14,25 +14,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//stores information about players games extracted from database when player clicks there profile
-type ProfileGames struct {
-	User             string
-	SessionID        string
-	Bullet           float64
-	Blitz            float64
-	Standard         float64
-	Correspondence   float64
-	BulletRD         float64
-	BlitzRD          float64
-	StandardRD       float64
-	CorrespondenceRD float64
-	Games            []GoGame
-	GameID           int
-	Opponent         string
-	Days             string
-	Country          string
-}
-
 //an individual game
 type GoGame struct {
 	ID           int
