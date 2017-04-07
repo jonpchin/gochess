@@ -38,9 +38,7 @@ func ConnectForumDb() {
 
 func GetForums() (forums []Forum) {
 
-	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer problems.Close()
-	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	rows, err := db.Query("SELECT * FROM forums")
 	if err != nil {

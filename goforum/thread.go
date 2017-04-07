@@ -232,3 +232,21 @@ func (thread *Thread) createThread() bool {
 	// A newly created thread only has 1 post
 	return thread.Posts[0].createPost()
 }
+
+// Returns true if thread is locked
+func IsLocked(threadId string) bool {
+
+	var locked string
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	err := db.QueryRow("SELECT locked from threads where id=?", threadId).Scan(&locked)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	if locked == "Yes" {
+		return true
+	}
+
+	return false
+}

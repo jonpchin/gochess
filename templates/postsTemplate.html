@@ -26,11 +26,16 @@
 	</table>
 {{ end }}
 {{if .Authorized}}
-<center><br><textarea id="message" rows="7" value="" cols="150"></textarea>
-<br><br><button id="createpost" value="">Add Post</button></center>
+	{{if .Locked}}
+		<center><br>Thread Locked<br></center>
+	{{else}}
+		<center><br><textarea id="message" rows="7" value="" cols="150"></textarea>
+		<br><br><button id="createpost" value="">Add Post</button></center>
+	{{end}}
 {{else}}
 <center><br>Please <a href="/login"><u>login</u></a> to post.<br></center>
 {{end}}
+
 <input type=hidden id="user" value="{{.User}}">
 <input type=hidden id="forumname" value="{{.PageTitle}}">
 <input type="hidden" id="firstPost" value="No" />

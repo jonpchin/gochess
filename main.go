@@ -132,7 +132,7 @@ func main() {
 			//}
 			// pass in true to export template(No grandmaster) without data in the tables
 
-			gostuff.ExportDatabase(true)
+			//gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
 			goforum.ConnectForumDb()
 		}
@@ -574,6 +574,7 @@ func forum(w http.ResponseWriter, r *http.Request) {
 
 		p = struct {
 			User       string
+			Locked     bool
 			Authorized bool
 			PageTitle  string
 			ThreadId   string
@@ -581,6 +582,7 @@ func forum(w http.ResponseWriter, r *http.Request) {
 			Posts      []goforum.Post
 		}{
 			user,
+			goforum.IsLocked(threadId),
 			authorized,
 			goforum.GetForumTitle(forumId),
 			threadId,
