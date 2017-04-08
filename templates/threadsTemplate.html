@@ -21,6 +21,13 @@
 			<td><a href="/forum?forumid={{.ForumID}}&threadid={{.ID}}">{{.Title}}</a>
 			{{if eq .Locked "Yes"}}
 				<img src="img/icons/lock.png" alt="locked">
+				{{if $.CanLock}}
+					<button id="unlockThread" value="">Unlock Thread</button>
+				{{end}}
+			{{else}}
+				{{if $.CanLock}}
+					<button id="lockThread" value="">Lock Thread</button>
+				{{end}}
 			{{end}}
 			</td><td>{{.Views}}</td><td>{{.Replies}}</td>
 			<td>{{.LastPost}}</td><td>{{.Date}}</td>

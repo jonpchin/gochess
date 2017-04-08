@@ -532,12 +532,19 @@ func forum(w http.ResponseWriter, r *http.Request) {
 
 	var authorized = false
 	var user = ""
-
+	// If true allows one to be able to lock thread
+	canLock := false
+	
 	if isAuthorizedNo404(w, r) {
 		authorized = true
 		username, _ := r.Cookie("username")
 		user = username.Value
+
+		if gostuff.IsAdmin(user) || gostuff.IsMod(user) {
+			canLock = true
+		}
 	}
+	
 
 	if forumId == "" && threadId == "" { // show main forum
 		p = struct {
@@ -557,11 +564,13 @@ func forum(w http.ResponseWriter, r *http.Request) {
 
 		p = struct {
 			Authorized bool
+			CanLock    bool
 			PageTitle  string
 			ThreadId   string
 			Threads    goforum.ThreadSection
 		}{
 			authorized,
+			canLock,
 			goforum.GetForumTitle(forumId),
 			threadId,
 			goforum.GetThreads(forumId),
