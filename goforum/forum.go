@@ -61,6 +61,49 @@ func GetForums() (forums []Forum) {
 	return forums
 }
 
+func GetForumTitle(forumId string) string {
+
+	var forumTitle string
+	err := db.QueryRow("SELECT title from forums where id=?", forumId).Scan(&forumTitle)
+	if err != nil {
+		fmt.Println("Could not fetch forum title", err)
+	}
+	return forumTitle
+}
+
+// Returns true if succesfully updated forum count, also returns forumId of the forumName
+func updateForumCount(forumName string, name string) (bool, int) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	var id int
+	var totalthreads int
+	var totalposts int
+
+	err := db.QueryRow("SELECT id, totalthreads, totalposts from forums where title=?", forumName).Scan(
+		&id, &totalthreads, &totalposts)
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+
+	stmt, err := db.Prepare("UPDATE forums SET totalthreads=?, totalposts=?, recentuser=?, date=? WHERE id=?")
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+
+	totalthreads += 1
+	totalposts += 1
+
+	_, err = stmt.Exec(totalthreads, totalposts, name, time.Now(), id)
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+	return true, id
+}
+
 // Returns forumId from forumId, if none is found it returns "0" as forumId
 func GetForumIdFromName(forumName string) string {
 	forumId := "0"

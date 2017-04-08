@@ -63,6 +63,8 @@ func main() {
 	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/createthread", createThread)
 	http.HandleFunc("/sendForumPost", goforum.SendForumPost)
+	http.HandleFunc("/lockThread", goforum.LockThread)
+	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
@@ -534,7 +536,7 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	var user = ""
 	// If true allows one to be able to lock thread
 	canLock := false
-	
+
 	if isAuthorizedNo404(w, r) {
 		authorized = true
 		username, _ := r.Cookie("username")
@@ -544,7 +546,6 @@ func forum(w http.ResponseWriter, r *http.Request) {
 			canLock = true
 		}
 	}
-	
 
 	if forumId == "" && threadId == "" { // show main forum
 		p = struct {
@@ -583,6 +584,7 @@ func forum(w http.ResponseWriter, r *http.Request) {
 
 		p = struct {
 			User       string
+			CanLock    bool
 			Locked     bool
 			Authorized bool
 			PageTitle  string
@@ -591,6 +593,7 @@ func forum(w http.ResponseWriter, r *http.Request) {
 			Posts      []goforum.Post
 		}{
 			user,
+			canLock,
 			goforum.IsLocked(threadId),
 			authorized,
 			goforum.GetForumTitle(forumId),

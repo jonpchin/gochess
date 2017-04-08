@@ -22,7 +22,7 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 //displays player data when mouse hovers over
 func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -79,7 +79,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 
 func ResumeGame(w http.ResponseWriter, r *http.Request) {
 
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -128,7 +128,7 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 // fetches all data of a chess game by the ID
 func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -186,7 +186,7 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -274,7 +274,7 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 
 // fetches players rating bullet history from database
 func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -289,7 +289,7 @@ func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
 
 // fetches players blitz history rating from database
 func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -304,7 +304,7 @@ func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 
 // fetches players standard rating history from database
 func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -319,7 +319,7 @@ func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 
 // fetches players rating blitz history from database
 func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}
@@ -333,7 +333,7 @@ func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
 }
 
 // returns true if user is an registered user that is logged in
-func validateCredentials(w http.ResponseWriter, r *http.Request) bool {
+func ValidateCredentials(w http.ResponseWriter, r *http.Request) bool {
 	username, err := r.Cookie("username")
 	if err != nil || len(username.Value) < 3 || len(username.Value) > 12 {
 		w.Write([]byte("Could not authenticate user"))
@@ -355,7 +355,7 @@ func validateCredentials(w http.ResponseWriter, r *http.Request) bool {
 
 // checks if a player is in a game
 func CheckInGame(w http.ResponseWriter, r *http.Request) {
-	valid := validateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 	if valid == false {
 		return
 	}

@@ -1,7 +1,6 @@
 package goforum
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -56,16 +55,6 @@ func GetThreads(forumId string) (threadSection ThreadSection) {
 	}
 	threadSection.Title = GetForumTitle(forumId)
 	return threadSection
-}
-
-func GetForumTitle(forumId string) string {
-
-	var forumTitle string
-	err := db.QueryRow("SELECT title from forums where id=?", forumId).Scan(&forumTitle)
-	if err != nil {
-		fmt.Println("Could not fetch forum title", err)
-	}
-	return forumTitle
 }
 
 // Creates the first post in a thread, must be logged in to do this
@@ -166,39 +155,6 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("<img src='img/ajax/not-available.png' /> Invalid credentials"))
 }
 
-// Returns true if succesfully updated forum count, also returns forumId of the forumName
-func updateForumCount(forumName string, name string) (bool, int) {
-
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
-	var id int
-	var totalthreads int
-	var totalposts int
-
-	err := db.QueryRow("SELECT id, totalthreads, totalposts from forums where title=?", forumName).Scan(
-		&id, &totalthreads, &totalposts)
-	if err != nil {
-		log.Println(err)
-		return false, 0
-	}
-
-	stmt, err := db.Prepare("UPDATE forums SET totalthreads=?, totalposts=?, recentuser=?, date=? WHERE id=?")
-	if err != nil {
-		log.Println(err)
-		return false, 0
-	}
-
-	totalthreads += 1
-	totalposts += 1
-
-	_, err = stmt.Exec(totalthreads, totalposts, name, time.Now(), id)
-	if err != nil {
-		log.Println(err)
-		return false, 0
-	}
-	return true, id
-}
-
 // Creates new thread with message and title
 // Returns false if failed to create a new thread
 func (thread *Thread) createThread() bool {
@@ -249,4 +205,40 @@ func IsLocked(threadId string) bool {
 	}
 
 	return false
+}
+
+func LockThread(w http.ResponseWriter, r *http.Request) {
+	valid := gostuff.ValidateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	id := template.HTMLEscapeString(r.FormValue("id"))
+	updateThreadLock("Yes", id)
+}
+
+func UnlockThread(w http.ResponseWriter, r *http.Request) {
+	valid := gostuff.ValidateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	id := template.HTMLEscapeString(r.FormValue("id"))
+	updateThreadLock("No", id)
+}
+
+// Updates the lock thread based on the lock string
+// id is the id of the thread to update
+func updateThreadLock(lock string, id string) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	stmt, err := db.Prepare("UPDATE threads SET locked=? WHERE id=?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = stmt.Exec(lock, id)
+	if err != nil {
+		log.Println(err)
+	}
 }

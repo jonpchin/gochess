@@ -22,11 +22,11 @@
 			{{if eq .Locked "Yes"}}
 				<img src="img/icons/lock.png" alt="locked">
 				{{if $.CanLock}}
-					<button id="unlockThread" value="">Unlock Thread</button>
+					<button id="{{.ID}}" value="{{.ID}}" onclick="updateThreadLock(this)">Unlock Thread</button>
 				{{end}}
 			{{else}}
 				{{if $.CanLock}}
-					<button id="lockThread" value="">Lock Thread</button>
+					<button id="{{.ID}}" value="{{.ID}}" onclick="updateThreadLock(this)">Lock Thread</button>
 				{{end}}
 			{{end}}
 			</td><td>{{.Views}}</td><td>{{.Replies}}</td>
@@ -36,6 +36,8 @@
 	</table>
 {{ end }}
 </div><br><footer> Go Play Chess © 2016<br> Where gophers play chess. </footer>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../third-party-js/jquery-2.1.4.min.js">\x3C/script>')</script>
 <script src="js/forum.js"></script>
 </body>
 </html>
