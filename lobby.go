@@ -106,7 +106,7 @@ func (c *Connection) LobbyConnect() {
 				}
 
 				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayersInGame(t.Name, match.Opponent) == true {
+				if isPlayersInGame(t.Name, match.Opponent) {
 					fmt.Println("Player is already in a game!")
 					t.Type = "alert"
 					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
@@ -193,7 +193,7 @@ func (c *Connection) LobbyConnect() {
 				}
 
 				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayersInGame(match.Name, match.Opponent) == true {
+				if isPlayersInGame(match.Name, match.Opponent) {
 					log.Println("Player already has a game. ")
 					//alerting player
 					t.Type = "alert"
@@ -214,7 +214,7 @@ func (c *Connection) LobbyConnect() {
 					break
 				}
 				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayersInGame(match.Name, match.Opponent) == true {
+				if isPlayersInGame(match.Name, match.Opponent) {
 					fmt.Println("Player already has a game.")
 					//alerting player
 					t.Type = "alert"

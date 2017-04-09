@@ -80,7 +80,7 @@ func (c *Connection) ChessConnect() {
 				//printBoard(game.ID)
 
 				//checkin if there is a pending draw and if so it removes it
-				if chessgame.PendingDraw == true {
+				if chessgame.PendingDraw {
 					chessgame.PendingDraw = false
 
 					t.Type = "cancel_draw"
@@ -411,7 +411,7 @@ func (c *Connection) ChessConnect() {
 				//gets length of all the moves in the game
 				totalMoves := (len(chessgame.GameMoves) + 1) / 2
 
-				if checkMate == true {
+				if checkMate {
 					log.Println(mater, "has checkmated", mated, "in", totalMoves, "moves.")
 				} else {
 					log.Println("No Checkmate for player, could be bug or cheat attempt by", mater, "on move", totalMoves, "against", mated)
@@ -667,7 +667,7 @@ func (c *Connection) ChessConnect() {
 				chessgame := All.Games[game.ID]
 
 				//checking to see if the side whose turn it is to move is in stalemate
-				if table.whiteTurn == true {
+				if table.whiteTurn {
 					if table.isWhiteStaleMate() || table.noMaterial() ||
 						chessgame.threeRep() || table.fiftyMoves(game.ID) {
 						log.Println("forced draw_game")

@@ -38,7 +38,7 @@ func ExportDatabase(isTemplate bool) {
 // zips up exported database
 func CompressDatabase() {
 	result := compress("./backup/gochess.zip", []string{"./backup/gochess.sql"})
-	if result == true {
+	if result {
 		fmt.Println("Exported database file succesfully compressed!")
 	}
 }
