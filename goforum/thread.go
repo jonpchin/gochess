@@ -142,6 +142,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 					post.Date = date
 
 					if post.createPost() {
+						updateThreadReplies(post.ThreadID)
 						w.Write([]byte("createPost"))
 						return
 					} else {

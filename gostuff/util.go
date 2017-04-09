@@ -172,3 +172,9 @@ func IsFloatEqual(a, b float64) bool {
 	}
 	return false
 }
+
+func timeTrack(start time.Time, name string) {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	elapsed := time.Since(start)
+	log.Printf("%s took %s", name, elapsed)
+}

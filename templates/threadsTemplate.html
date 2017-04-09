@@ -4,10 +4,11 @@
 	{{template "guestHeader" .}}
 {{end}}
 <h3>Go Play Chess Forums</h3>
- <a href="/forum"><u>Forums</u></a> > <u>{{.Threads.Title}}</u><br><br>
+ <a href="/forum"><u>Forums</u></a> > <u>{{.Threads.Title}}</u> >
  {{if .Authorized}}
- <center><button id="createThread" value="{{.Threads.Title}}">Create new thread</button></center>
+<button id="createThread" value="{{.Threads.Title}}">Create new thread</button>
  {{end}}
+ <br><br>
 {{ $length := len .Threads.Threads }} 
 {{ if eq $length 0 }}
 	<center>No threads have been found.</center>
