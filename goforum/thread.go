@@ -209,8 +209,8 @@ func IsLocked(threadId string) bool {
 }
 
 func LockThread(w http.ResponseWriter, r *http.Request) {
-	valid := gostuff.ValidateCredentials(w, r)
-	if valid == false {
+
+	if gostuff.ValidateCredentials(w, r) == false {
 		return
 	}
 	id := template.HTMLEscapeString(r.FormValue("id"))
@@ -218,8 +218,8 @@ func LockThread(w http.ResponseWriter, r *http.Request) {
 }
 
 func UnlockThread(w http.ResponseWriter, r *http.Request) {
-	valid := gostuff.ValidateCredentials(w, r)
-	if valid == false {
+
+	if gostuff.ValidateCredentials(w, r) == false {
 		return
 	}
 	id := template.HTMLEscapeString(r.FormValue("id"))

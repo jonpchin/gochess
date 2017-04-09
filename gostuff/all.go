@@ -43,7 +43,7 @@ func (table *Table) blackPawn(x int8, y int8) bool {
 		}
 		table.undoMove(x, y, x+1, y-1, "bP", capturedPiece)
 	}
-	if table.blackPass[y] == true { //checking if black can enpassent with this pawn
+	if table.blackPass[y] { //checking if black can enpassent with this pawn
 		if y+1 <= 7 && x+1 <= 7 && table.ChessBoard[x][y+1] == "wP" { //checking if white pawn exist on the right
 
 			capturedPiece := table.makeMove(x, y, x+1, y+1, "bP")
@@ -108,7 +108,7 @@ func (table *Table) whitePawn(x int8, y int8) bool { //x is row y is col
 		table.undoMove(x, y, x-1, y+1, "wP", capturedPiece)
 	}
 
-	if table.whitePass[y] == true { //checking if white can enpassent with this pawn
+	if table.whitePass[y] { //checking if white can enpassent with this pawn
 
 		if y+1 <= 7 && x-1 >= 0 && table.ChessBoard[x][y+1] == "bP" { //checking if black pawn exist on the right
 

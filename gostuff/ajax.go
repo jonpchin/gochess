@@ -95,7 +95,7 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 	var success bool
 	var game ChessGame
 	if user.Value == white {
-		if isPlayerInLobby(black) == true && !checkTable(black) {
+		if isPlayerInLobby(black) && !checkTable(black) {
 			success = game.fetchSavedGame(id, user.Value)
 			if success == false {
 				w.Write([]byte("false"))
@@ -109,7 +109,7 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else if user.Value == black {
-		if isPlayerInLobby(white) == true && !checkTable(white) {
+		if isPlayerInLobby(white) && !checkTable(white) {
 			success = game.fetchSavedGame(id, user.Value)
 			if success == false {
 				w.Write([]byte("false"))
