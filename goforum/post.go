@@ -38,6 +38,7 @@ func GetPosts(threadId string) (posts []Post) {
 		}
 		posts = append(posts, post)
 	}
+	updateThreadViewCount(post.ThreadID)
 	return posts
 }
 

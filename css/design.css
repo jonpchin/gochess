@@ -60,17 +60,39 @@ table.tableCenter {
     border-collapse: collapse;
 }
 
- table.tableCenter th {
+table.tableCenter th {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid green;
- }
+}
 
- table.tableCenter td {
+table.tableCenter td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid green;
- }
+}
+
+table.greenTopCenter{
+    width:80%;
+    margin-left:10%; 
+    margin-right:10%;
+    border: 1px solid green;
+    border-collapse: collapse;
+}
+
+table.greenTopCenter th{
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid green;
+    background-color: #4CAF50;
+    color: white;
+}
+
+table.greenTopCenter td{
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid green;
+}
 
 table.table2 {
 	width: 42%;
@@ -134,7 +156,11 @@ table.table9 td {
     border-bottom: 1px solid green;
 }
 
-tr:hover{background-color:#C1FFC1}
+table.table2 tr:hover, table.table3 tr:hover, 
+table.table4 tr:hover, table.table5 tr:hover , table.table6 tr:hover
+, table.table7 tr:hover, table.table8 tr:hover, table.table9 tr:hover{
+    background-color:#C1FFC1
+}
 
 @media (max-width: 900px) and (orientation: portrait) {
 	#content {

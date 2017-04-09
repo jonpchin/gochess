@@ -242,3 +242,18 @@ func updateThreadLock(lock string, id string) {
 		log.Println(err)
 	}
 }
+
+func updateThreadViewCount(threadId int64) {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	stmt, err := db.Prepare("UPDATE threads SET views=views+1 WHERE id=?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = stmt.Exec(threadId)
+	if err != nil {
+		log.Println(err)
+	}
+}

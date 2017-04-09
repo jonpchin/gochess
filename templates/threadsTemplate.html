@@ -6,13 +6,13 @@
 <h3>Go Play Chess Forums</h3>
  <a href="/forum"><u>Forums</u></a> > <u>{{.Threads.Title}}</u><br><br>
  {{if .Authorized}}
- <button id="createThread" value="{{.Threads.Title}}">Create new thread</button>
+ <center><button id="createThread" value="{{.Threads.Title}}">Create new thread</button></center>
  {{end}}
 {{ $length := len .Threads.Threads }} 
 {{ if eq $length 0 }}
 	<center>No threads have been found.</center>
 {{else}}
-	<table class="table1">
+	<table class="greenTopCenter">
 		<tr>
 	<th>Title</th><th>Views</th><th>Replies</th><th>Last Post</th><th>Date</th>
 		</tr>

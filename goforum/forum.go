@@ -77,26 +77,21 @@ func updateForumCount(forumName string, name string) (bool, int) {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	var id int
-	var totalthreads int
-	var totalposts int
 
-	err := db.QueryRow("SELECT id, totalthreads, totalposts from forums where title=?", forumName).Scan(
-		&id, &totalthreads, &totalposts)
+	err := db.QueryRow("SELECT id from forums where title=?", forumName).Scan(&id)
 	if err != nil {
 		log.Println(err)
 		return false, 0
 	}
 
-	stmt, err := db.Prepare("UPDATE forums SET totalthreads=?, totalposts=?, recentuser=?, date=? WHERE id=?")
+	stmt, err := db.Prepare(`UPDATE forums SET totalthreads=totalthreads+1, totalposts=totalposts+1
+		, recentuser=?, date=? WHERE id=?`)
 	if err != nil {
 		log.Println(err)
 		return false, 0
 	}
 
-	totalthreads += 1
-	totalposts += 1
-
-	_, err = stmt.Exec(totalthreads, totalposts, name, time.Now(), id)
+	_, err = stmt.Exec(name, time.Now(), id)
 	if err != nil {
 		log.Println(err)
 		return false, 0

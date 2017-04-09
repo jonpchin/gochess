@@ -29,7 +29,3 @@ function updateThreadLock(data){
         });
     }
 }
-
-function lockThread(data){
-    
-}
