@@ -85,6 +85,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 
+				forumTitle := template.HTMLEscapeString(r.FormValue("forumname"))
 				threadTitle := template.HTMLEscapeString(r.FormValue("title"))
 				message := template.HTMLEscapeString(r.FormValue("message"))
 				totalPosts := template.HTMLEscapeString(r.FormValue("totalPosts"))
@@ -94,7 +95,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 
 					var thread Thread
 
-					thread.ForumTitle = template.HTMLEscapeString(r.FormValue("forumname"))
+					thread.ForumTitle = forumTitle
 					thread.Username = username.Value
 					thread.Title = threadTitle
 					thread.Views = 0
@@ -143,6 +144,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 
 					if post.createPost() {
 						updateThreadReplies(post.ThreadID)
+						updateForumPostCount(getForumId(forumTitle))
 						w.Write([]byte("createPost"))
 						return
 					} else {

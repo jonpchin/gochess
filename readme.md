@@ -38,15 +38,15 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>18. Rating history timeline on player's profile using Google Charts.</p>
 <p>19. Players can play against cinnamon chess engine and stockfish chess engine (web workers).</p>
 <p>20. Web server runs in Windows and Linux.</p>
+<p>21. Forum</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Chess TV where live games are randomly broadcasted.</p>
-<p>2. Forums</p>
-<p>3. Admin control</p>
-<p>4. Friends list</p>
-<p>5. Inbox system</p>
-<p>6. Update help, documentation and screenshots</p>
-<p>7. Post game analysis with Stockfish engine</p>
+<p>2. Admin control</p>
+<p>3. Friends list</p>
+<p>4. Inbox system</p>
+<p>5. Update help, documentation and screenshots</p>
+<p>6. Post game analysis with Stockfish engine</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

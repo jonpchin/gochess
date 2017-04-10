@@ -1,6 +1,7 @@
 package gostuff
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -12,7 +13,7 @@ import (
 
 // Run starts an engine executable, with the given arguments.
 // Returns the engine, make sure to call Quit() on the engine to clean up
-func StartEngine(args []string) *uci.Engine {
+func startEngine(args []string) *uci.Engine {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
@@ -31,6 +32,17 @@ func StartEngine(args []string) *uci.Engine {
 		}
 	}
 	return engine
+}
+
+// isCheckOrMate returns whether the side to move is in check and/or has been mated.
+// Mate without check means stalemate.
+func isCheckMate(fen string) (check, mate bool) {
+
+	board, err := chess.ParseFen(fen)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return board.IsCheckOrMate()
 }
 
 // Start position is "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -76,4 +88,9 @@ func engineSearchTime(fen string, engine *uci.Engine, t time.Duration) (bool, ch
 		}
 	}
 	return false, chessMove
+}
+
+func Quit(engine *uci.Engine) {
+	engine.Stop()
+	engine.Quit()
 }

@@ -107,14 +107,15 @@ var onDrop = function(source, target, piece) {
 	if (move === null) return 'snapback';
 
 	//used to store players own move, moves array is stored in memberchess.js
-	totalFEN.push(game.fen());
+	var gameFen = game.fen();
+	totalFEN.push(gameFen);
 	var pgn = game.pgn();
 	totalPGN.push(pgn);
 	
 	totalStatus.push(gameStatus);
  	moveCounter++;
   
-	sendMove(source, target, pawnPromotion);
+	sendMove(source, target, pawnPromotion, gameFen);
 	//VERY IMPORTANT: updateStatus() must come after sendMove() or checkmate signal 
 	// will be sent before the move which will cause a race bug in the chess verify
 	var gameStatus = updateStatus();
@@ -136,7 +137,7 @@ var onSnapEnd = function() {
 // returns status of current game
 var updateStatus = function() {
 	var status = '';
-	
+
 	var moveColor = 'White';
 	if (game.turn() === 'b') {
 	  moveColor = 'Black';
@@ -147,7 +148,7 @@ var updateStatus = function() {
 	if (game.in_checkmate() === true) {
 		status = 'Game over, ' + moveColor + ' is in checkmate.';
 		if(WhiteSide === user){ // prevents game over duplication being sent to server
-			finishGame(moveColor); //function call located in memberchess.js
+			finishGame(moveColor, game.fen()); //function call located in memberchess.js
 		}	
 	}
 	else if (game.in_draw() === true) { // draw, todo: need to message server when this is triggered

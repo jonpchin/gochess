@@ -634,16 +634,17 @@ window.onload = function() {
 		}
 	}
 };
-function finishGame(color){ //color is the color player that is checkmated
+function finishGame(color, gameFen){ //color is the color player that is checkmated
  	//prevents sending null sock.send() when going over a game
 	if(reviewGame){
 		return;
 	}
 	var message = {
-			Type: "game_over",
-			Name: user,	
-			ID: matchID,
-			Status: color
+		Type:   "game_over",
+		Name:   user,	
+		ID:     matchID,
+		Fen:    gameFen,
+		Status: color
 	}
 	sock.send(JSON.stringify(message));
 }
@@ -659,14 +660,15 @@ function drawGame(){
 }
 
 //this function is called from boardsetup.js
-function sendMove(src, dest, pawnPromotion){
+function sendMove(src, dest, pawnPromotion, gameFen){
 		
 	var message = {
-		Type: "send_move",
-		Name: user,	
-		ID: matchID,
-		Source: src,
-		Target: dest,
+		Type:      "send_move",
+		Name:      user,	
+		ID:        matchID,
+		Source:    src,
+		Target:    dest,
+		Fen:       gameFen,
 		Promotion: pawnPromotion
 	}
     sock.send(JSON.stringify(message));

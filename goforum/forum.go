@@ -71,18 +71,23 @@ func GetForumTitle(forumId string) string {
 	return forumTitle
 }
 
-// Returns true if succesfully updated forum count, also returns forumId of the forumName
-func updateForumCount(forumName string, name string) (bool, int) {
-
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+func getForumId(forumName string) int {
 
 	var id int
 
 	err := db.QueryRow("SELECT id from forums where title=?", forumName).Scan(&id)
 	if err != nil {
 		log.Println(err)
-		return false, 0
+		return 0 // Invalid id
 	}
+	return id
+}
+
+// Returns true if succesfully updated forum count, also returns forumId of the forumName
+func updateForumCount(forumName string, name string) (bool, int) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	id := getForumId(forumName)
 
 	stmt, err := db.Prepare(`UPDATE forums SET totalthreads=totalthreads+1, totalposts=totalposts+1
 		, recentuser=?, date=? WHERE id=?`)
@@ -172,5 +177,21 @@ func updateLastPostTime(dateTime string, username string) {
 	if err != nil {
 		log.Println(err)
 		return
+	}
+}
+
+func updateForumPostCount(forumId int) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	stmt, err := db.Prepare("UPDATE forums SET totalposts=totalposts+1 WHERE id=?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = stmt.Exec(forumId)
+	if err != nil {
+		log.Println(err)
 	}
 }
