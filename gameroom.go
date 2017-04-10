@@ -113,6 +113,7 @@ func (c *Connection) ChessConnect() {
 				move.S = game.Source
 				move.T = game.Target
 				move.P = game.Promotion
+
 				//append move to back end storage for retrieval from database later
 				chessgame.GameMoves = append(chessgame.GameMoves, move)
 
@@ -393,6 +394,17 @@ func (c *Connection) ChessConnect() {
 
 				chessgame := All.Games[game.ID]
 				table := Verify.AllTables[game.ID]
+
+				check, mate := isCheckMate(game.Fen)
+				if check && mate {
+					fmt.Println("Verified its mate")
+				} else if check {
+					fmt.Println("It's only a check, no mate.")
+				} else if mate {
+					fmt.Println("It is a stalemate.")
+				} else {
+					fmt.Println("It's not mate, check or stalemate.")
+				}
 
 				if game.Status == "White" {
 					checkMate = table.isWhiteInMate()

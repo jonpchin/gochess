@@ -33,6 +33,7 @@ type GameMove struct {
 	ID        int
 	Source    string
 	Target    string
+	Fen       string // FEN string of the board with the move played
 	Promotion string
 }
 
@@ -46,9 +47,10 @@ type SpectateGame struct {
 
 //only holds source and destination, as well as pawn promotion
 type Move struct {
-	S string
-	T string
-	P string
+	S   string
+	T   string
+	P   string
+	Fen string // FEN string of the board with the move played
 }
 
 type Nrating struct {
@@ -60,6 +62,7 @@ type Nrating struct {
 type Fin struct { //used to hold the result when a player is mated
 	Type   string
 	ID     int
+	Fen    string // FEN string of the board with the move played
 	Status string
 }
 
