@@ -134,7 +134,7 @@ func main() {
 			//}
 			// pass in true to export template(No grandmaster) without data in the tables
 
-			//gostuff.ExportDatabase(true)
+			gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
 			goforum.ConnectForumDb()
 		}
