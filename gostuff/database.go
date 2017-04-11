@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -551,7 +552,7 @@ func CheckUserNameInDb(username string) bool {
 	var name string
 	//checking if name exists
 	_ = db.QueryRow("SELECT username FROM userinfo WHERE username=?", username).Scan(&name)
-	if username == name { // already exists
+	if strings.EqualFold(username, name) { // already exists, case insensitive comparison
 		return true
 	} else {
 		return false

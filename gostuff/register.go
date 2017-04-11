@@ -120,7 +120,7 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 
 	_, err = stmt.Exec(userInfo.Username, key, userInfo.Email, date, date, userInfo.IpAddress, "NO", 0)
 	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> Can't execute database.", err
+		return "<img src='img/ajax/not-available.png' /> Username is already taken.", err
 	}
 
 	log.Printf("Account %s was created in userinfo table.\n", userInfo.Username)
