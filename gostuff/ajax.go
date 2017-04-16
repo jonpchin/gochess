@@ -279,7 +279,7 @@ func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	bullet, isHistory := GetRatingHistory(user, "bullet")
+	bullet, isHistory, _ := GetRatingHistory(user, "bullet")
 	if isHistory {
 		w.Write([]byte(bullet))
 	} else {
@@ -294,7 +294,7 @@ func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	blitz, isHistory := GetRatingHistory(user, "blitz")
+	blitz, isHistory, _ := GetRatingHistory(user, "blitz")
 	if isHistory {
 		w.Write([]byte(blitz))
 	} else {
@@ -309,7 +309,7 @@ func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	standard, isHistory := GetRatingHistory(user, "standard")
+	standard, isHistory, _ := GetRatingHistory(user, "standard")
 	if isHistory {
 		w.Write([]byte(standard))
 	} else {
@@ -324,7 +324,7 @@ func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	correspondence, isHistory := GetRatingHistory(user, "correspondence")
+	correspondence, isHistory, _ := GetRatingHistory(user, "correspondence")
 	if isHistory {
 		w.Write([]byte(correspondence))
 	} else {
