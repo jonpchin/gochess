@@ -678,21 +678,26 @@ func (c *Connection) ChessConnect() {
 				table := Verify.AllTables[game.ID]
 				chessgame := All.Games[game.ID]
 
-				//checking to see if the side whose turn it is to move is in stalemate
-				if table.whiteTurn {
-					if table.isWhiteStaleMate() || table.noMaterial() ||
-						chessgame.threeRep() || table.fiftyMoves(game.ID) {
-						log.Println("forced draw_game")
-					} else {
-						break
-					}
+				check, mate := isCheckMate(game.Fen)
+				if mate && !check {
+					log.Println("It is a stalemate.")
 				} else {
-
-					if table.isBlackStaleMate() || table.noMaterial() ||
-						chessgame.threeRep() || table.fiftyMoves(game.ID) {
-						log.Println("forced draw_game")
+					//checking to see if the side whose turn it is to move is in stalemate
+					if table.whiteTurn {
+						if table.isWhiteStaleMate() || table.noMaterial() ||
+							chessgame.threeRep() || table.fiftyMoves(game.ID) {
+							log.Println("forced draw_game")
+						} else {
+							break
+						}
 					} else {
-						break
+
+						if table.isBlackStaleMate() || table.noMaterial() ||
+							chessgame.threeRep() || table.fiftyMoves(game.ID) {
+							log.Println("forced draw_game")
+						} else {
+							break
+						}
 					}
 				}
 
