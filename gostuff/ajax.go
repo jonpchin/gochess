@@ -22,7 +22,8 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 //displays player data when mouse hovers over
 func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -78,7 +79,8 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 
 func ResumeGame(w http.ResponseWriter, r *http.Request) {
 
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -126,7 +128,8 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 // fetches all data of a chess game by the ID
 func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -183,8 +186,8 @@ func FetchGameByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
-
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 
@@ -271,16 +274,13 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 
 // fetches players rating bullet history from database
 func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
-
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	bullet, err := GetRatingHistory(user, "bullet")
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
-	if err != nil {
-		log.Println(err)
+	bullet, isHistory := GetRatingHistory(user, "bullet")
+	if isHistory {
 		w.Write([]byte(bullet))
 	} else {
 		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
@@ -289,16 +289,13 @@ func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
 
 // fetches players blitz history rating from database
 func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
-
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	blitz, err := GetRatingHistory(user, "blitz")
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
-	if err != nil {
-		log.Println(err)
+	blitz, isHistory := GetRatingHistory(user, "blitz")
+	if isHistory {
 		w.Write([]byte(blitz))
 	} else {
 		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
@@ -307,16 +304,13 @@ func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
 
 // fetches players standard rating history from database
 func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
-
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	standard, err := GetRatingHistory(user, "standard")
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
-	if err != nil {
-		log.Println(err)
+	standard, isHistory := GetRatingHistory(user, "standard")
+	if isHistory {
 		w.Write([]byte(standard))
 	} else {
 		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
@@ -325,16 +319,13 @@ func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
 
 // fetches players rating blitz history from database
 func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
-
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))
-	correspondence, err := GetRatingHistory(user, "correspondence")
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-
-	if err != nil {
-		log.Println(err)
+	correspondence, isHistory := GetRatingHistory(user, "correspondence")
+	if isHistory {
 		w.Write([]byte(correspondence))
 	} else {
 		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
@@ -364,8 +355,8 @@ func ValidateCredentials(w http.ResponseWriter, r *http.Request) bool {
 
 // checks if a player is in a game
 func CheckInGame(w http.ResponseWriter, r *http.Request) {
-
-	if ValidateCredentials(w, r) == false {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
 		return
 	}
 	user := template.HTMLEscapeString(r.FormValue("user"))

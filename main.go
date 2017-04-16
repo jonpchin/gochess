@@ -160,20 +160,16 @@ func main() {
 	//	engine := gostuff.StartEngine(nil)
 	//	engine.Quit()
 	//}()
-	srvHttps := &http.Server{Addr: ":443"}
-	srvHttp := &http.Server{Addr: ":80", Handler: http.HandlerFunc(redir)}
 
-	gostuff.SrvHttps = srvHttps
-	gostuff.SrvHttp = srvHttp
 	go func() {
-		if err := srvHttps.ListenAndServeTLS(certPath, keyPath); err != nil {
+		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
 		}
 	}()
 
 	//	gostuff.ConvertAllPGN()
 	fmt.Println("Web server is now running.")
-	if err := srvHttp.ListenAndServe(); err != nil {
+	if err := http.ListenAndServe(":80", http.HandlerFunc(redir)); err != nil {
 		fmt.Printf("ListenAndServe error: %v\n", err)
 	}
 }

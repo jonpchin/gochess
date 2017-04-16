@@ -249,12 +249,12 @@ func executeGame(page1 *agouti.Page, page2 *agouti.Page, user1 string, user2 str
 		}
 	}
 
-	history, err := gostuff.GetRatingHistory(user1, "blitz")
-	if err != nil || history == "" {
+	history, result := gostuff.GetRatingHistory(user1, "blitz")
+	if result == false || history == "" {
 		t.Fatal("Could not GetRatingHistory for blitz", user1, err)
 	}
-	history, err = gostuff.GetRatingHistory(user2, "blitz")
-	if err != nil || history == "" {
+	history, result = gostuff.GetRatingHistory(user2, "blitz")
+	if result == false || history == "" {
 		t.Fatal("Could not GetRatingHistory 2 for blitz", user2, err)
 	}
 

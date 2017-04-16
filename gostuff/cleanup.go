@@ -4,16 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
 	"golang.org/x/net/websocket"
-)
-
-var (
-	SrvHttps *http.Server // HTTPS server
-	SrvHttp  *http.Server // HTTP server
 )
 
 //this function gets executed on ctrl-c
@@ -51,11 +45,6 @@ func Cleanup() {
 		}
 	}
 	fmt.Println("All games are saved. Web server is shutting down in 1 second.")
-}
-
-func ShutDown() {
-	SrvHttps.Shutdown(nil)
-	SrvHttp.Shutdown(nil)
 }
 
 //used when web server is shutting down to save all current games into database
