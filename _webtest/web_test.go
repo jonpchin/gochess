@@ -3,9 +3,9 @@ package webtest
 import (
 	"bufio"
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -27,7 +27,7 @@ func TestLoginDev(t *testing.T) {
 
 	// make sure MySQL connection is alive before proceeding
 	if gostuff.CheckDBConnection(dbFile) == false {
-		t.Fatal("Failed to connect to MySQL in Travis CI")
+		t.Fatal("Failed to connect to MySQL in Travis CI in localhost")
 	}
 
 	var err error
@@ -76,11 +76,6 @@ func TestLoginDev(t *testing.T) {
 	time.Sleep(time.Second)
 	user1 := "can"
 
-	history, result := gostuff.GetRatingHistory(user1, "blitz")
-	if result || history != "" {
-		t.Fatal("GetRatingHistory should be blank but it isn't for", user1)
-	}
-
 	// Player should have zero games on Travis
 	if gostuff.IsEnvironmentTravis() {
 		storage := gostuff.GetGames(user1)
@@ -109,6 +104,16 @@ func TestLoginDev(t *testing.T) {
 		t.Fatal("Failed to navigate lobby at localhost:", err)
 	}
 
+	user2 := "ben"
+
+	success := testResumeGame(user1, user2, page1)
+
+	if success != "false" {
+		t.Fatal("resumeGame Ajax failed:", success)
+	}
+
+	time.Sleep(time.Second)
+
 	err = page1.FindByID("sendSeek").Click()
 	if err != nil {
 		t.Fatal("Couldn't submit:", err)
@@ -128,7 +133,6 @@ func TestLoginDev(t *testing.T) {
 		t.Fatal("Failed to navigate login at localhost:", err)
 	}
 
-	user2 := "ben"
 	err = page2.FindByID("user").Fill(user2)
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
@@ -156,159 +160,12 @@ func TestLoginDev(t *testing.T) {
 	time.Sleep(time.Second)
 	var whitePlayer string
 	page2.RunScript("return WhiteSide;", map[string]interface{}{}, &whitePlayer)
-	var jsResult string
 
 	if user1 == whitePlayer {
-		page1.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
-		page2.RunScript("sendMove('c7', 'c5');", map[string]interface{}{}, &jsResult)
-		page1.RunScript("sendMove('g1', 'f3');", map[string]interface{}{}, &jsResult)
-		page1.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
-
-		// check to make sure the position is what it should be
-		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
-			t.Error("board does not match user1", jsResult)
-		}
-
-		// now try to resign the game
-		err = page1.FindByID("resignButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't resign user1:", err)
-		}
-		err = page1.ConfirmPopup()
-		if err != nil {
-			t.Fatal("Couldn't confirm resign popup user1:", err)
-		}
-
-		// Gives time to save to database
-		time.Sleep(2 * time.Second)
-		// Player should have one games on Travis
-		if gostuff.IsEnvironmentTravis() {
-			storage := gostuff.GetGames(user1)
-			if len(storage) != 1 || storage[0].Status != "White Resigned" ||
-				storage[0].Rated != "Yes" || storage[0].TimeControl != 5 {
-				if len(storage) > 0 {
-					t.Fatal("GetGames does not match the expected output for ", user1, storage[0].Status,
-						storage[0].Rated, storage[0].TimeControl)
-				} else {
-					t.Fatal("GetGames does not match the expected output for ", user1, len(storage))
-				}
-			}
-		}
-
-		history, result := gostuff.GetRatingHistory(user1, "blitz")
-		if result == false || history == "" {
-			t.Fatal("Could not GetRatingHistory for blitz", user1, result)
-		}
-		history, result = gostuff.GetRatingHistory(user2, "blitz")
-		if result == false || history == "" {
-			t.Fatal("Could not GetRatingHistory 2 for blitz", user2, result)
-		}
-
-		history, result = gostuff.GetRatingHistory(user1, "standard")
-		if result || history != "" {
-			t.Fatal("There should be no GetRatingHistory for standard", user1, result)
-		}
-
-		history, result = gostuff.GetRatingHistory(user1, "bullet")
-		if result || history != "" {
-			t.Fatal("There should be no GetRatingHistory for bullet", user1, result)
-		}
-		history, result = gostuff.GetRatingHistory(user1, "correspondence")
-		if result || history != "" {
-			t.Fatal("There should be no GetRatingHistory for correspondence", user1, result)
-		}
-
-		err = page1.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 1:", err)
-		}
-		err = page2.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 1:", err)
-		}
-		err = page1.FindByID("abortButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find abort button  user 1:", err)
-		}
-		err = page2.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 1:", err)
-		}
-		err = page1.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 2:", err)
-		}
-		err = page1.FindByID("drawButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find draw button  user 1:", err)
-		}
-		err = page2.FindByID("drawButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find draw button  user 2:", err)
-		}
-		// TODO: Check if game really ended and check if the other player really won
-		// Still need to test abort failure, abort sucess, draw, and checkmate
-
-		time.Sleep(2 * time.Second)
-
-		// Player should have two games on Travis
-		if gostuff.IsEnvironmentTravis() {
-			storage := gostuff.GetGames(user1)
-			if len(storage) != 2 || storage[1].Status != "Agreed Draw" ||
-				storage[1].Rated != "Yes" || storage[1].TimeControl != 5 {
-				if len(storage) > 1 {
-					t.Fatal("GetGames 2 does not match the expected output for ", user1, storage[1].Status,
-						storage[1].Rated, storage[1].TimeControl)
-				} else {
-					t.Fatal("GetGames 2 does not match the expected output for ", user1)
-				}
-			}
-		}
-
+		executeGame(page1, page2, user1, user2, t)
 	} else if user2 == whitePlayer {
-		page2.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
-		page1.RunScript("sendMove('c7', 'c5');", map[string]interface{}{}, &jsResult)
-		page2.RunScript("sendMove('g1', 'f3');", map[string]interface{}{}, &jsResult)
-		page2.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
-		if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
-			t.Error("board does not match user2")
-		}
-		err = page2.FindByID("resignButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't resign user2:", err)
-		}
-		err = page2.ConfirmPopup()
-		if err != nil {
-			t.Fatal("Couldn't confirm resign popup user2:", err)
-		}
-		err = page2.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 2:", err)
-		}
-		err = page1.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 1:", err)
-		}
-		err = page1.FindByID("abortButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find abort button  user 1:", err)
-		}
-		err = page1.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 1:", err)
-		}
-		err = page2.FindByID("rematchButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find rematch button  user 2:", err)
-		}
-		err = page1.FindByID("drawButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find draw button  user 1:", err)
-		}
-		err = page2.FindByID("drawButton").Click()
-		if err != nil {
-			t.Fatal("Couldn't find draw button  user 2:", err)
-		}
+		executeGame(page2, page1, user2, user1, t)
+
 	} else {
 		// then navigate to chess page and try to terminate any possible games that are left over
 		if err := page2.Navigate("https://localhost/chess/memberChess"); err != nil {
@@ -320,12 +177,168 @@ func TestLoginDev(t *testing.T) {
 		}
 		t.Fatal("No user matched as whitePlayer")
 	}
+
+	page1.Destroy()
+	page2.Destroy()
 	time.Sleep(time.Second)
 	if err := driver.Stop(); err != nil {
 		t.Error("Failed to close pages and stop WebDriver:", err)
 	}
 }
 
+func testResumeGame(user1 string, user2 string, page1 *agouti.Page) string {
+
+	success := "true"
+
+	err := page1.RunScript(`
+		var result = "true";
+		$.ajax({
+			url: '../resumeGame',
+			type: 'post',
+			dataType: 'html',
+			data : { 'id': "1", 'white': "`+user1+`", 'black': "`+user2+`"},
+			async: false,
+			success:function(data) {
+				result = data; 
+			}
+		});
+		return result;`, map[string]interface{}{}, &success)
+	if err != nil {
+		fmt.Println("Can't run ajax script", err)
+	}
+	return success
+}
+
+func executeGame(page1 *agouti.Page, page2 *agouti.Page, user1 string, user2 string, t *testing.T) {
+
+	var jsResult string
+
+	page1.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
+	page2.RunScript("sendMove('c7', 'c5');", map[string]interface{}{}, &jsResult)
+	page1.RunScript("sendMove('g1', 'f3');", map[string]interface{}{}, &jsResult)
+	page1.RunScript("return board.fen();", map[string]interface{}{}, &jsResult)
+
+	// check to make sure the position is what it should be
+	if jsResult != "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R" {
+		t.Error("board does not match user1", jsResult)
+	}
+
+	// now try to resign the game
+	err := page1.FindByID("resignButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't resign:", user1, err)
+	}
+	err = page1.ConfirmPopup()
+	if err != nil {
+		t.Fatal("Couldn't confirm resign popup:", user1, err)
+	}
+
+	// Gives time to save to database
+	time.Sleep(2 * time.Second)
+	// Player should have one games on Travis
+	if gostuff.IsEnvironmentTravis() {
+		storage := gostuff.GetGames(user1)
+		if len(storage) != 1 || storage[0].Status != "White Resigned" ||
+			storage[0].Rated != "Yes" || storage[0].TimeControl != 5 {
+			if len(storage) > 0 {
+				t.Fatal("GetGames does not match the expected output for ", user1, storage[0].Status,
+					storage[0].Rated, storage[0].TimeControl)
+			} else {
+				t.Fatal("GetGames does not match the expected output for ", user1, len(storage))
+			}
+		}
+	}
+
+	history, err := gostuff.GetRatingHistory(user1, "blitz")
+	if err != nil || history == "" {
+		t.Fatal("Could not GetRatingHistory for blitz", user1, err)
+	}
+	history, err = gostuff.GetRatingHistory(user2, "blitz")
+	if err != nil || history == "" {
+		t.Fatal("Could not GetRatingHistory 2 for blitz", user2, err)
+	}
+
+	err = page1.FindByID("rematchButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find rematch button :", user1, err)
+	}
+	err = page2.FindByID("rematchButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find rematch button :", user1, err)
+	}
+	err = page1.FindByID("abortButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find abort button :", user1, err)
+	}
+	err = page2.FindByID("rematchButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find rematch button  :", user1, err)
+	}
+	err = page1.FindByID("rematchButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find rematch button :", user2, err)
+	}
+	err = page1.FindByID("drawButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find draw button  :", user1, err)
+	}
+	err = page2.FindByID("drawButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't find draw button :", user2, err)
+	}
+	// TODO: Check if game really ended and check if the other player really won
+	// Still need to test abort failure, abort sucess, draw, and checkmate
+
+	time.Sleep(2 * time.Second)
+
+	// Player should have two games on Travis
+	if gostuff.IsEnvironmentTravis() {
+		storage := gostuff.GetGames(user1)
+		if len(storage) != 2 || storage[1].Status != "Agreed Draw" ||
+			storage[1].Rated != "Yes" || storage[1].TimeControl != 5 {
+			if len(storage) > 1 {
+				t.Fatal("GetGames 2 does not match the expected output for ", user1, storage[1].Status,
+					storage[1].Rated, storage[1].TimeControl)
+			} else {
+				t.Fatal("GetGames 2 does not match the expected output for ", user1)
+			}
+		}
+	}
+
+	page1.RunScript("sendMove('e2', 'e4');", map[string]interface{}{}, &jsResult)
+	page2.RunScript("sendMove('c7', 'c6');", map[string]interface{}{}, &jsResult)
+	gostuff.Cleanup()
+
+	if err := page1.Navigate("https://localhost/server/lobby"); err != nil {
+		t.Fatal("Failed to navigate lobby at localhost:", err)
+	}
+	if err := page2.Navigate("https://localhost/saved?user=" + user2); err != nil {
+		t.Fatal("Failed to navigate saved at localhost:", user2, err)
+	}
+
+	success := testResumeGame(user1, user2, page1)
+
+	if success != "false" {
+		t.Fatal("resumeGame Ajax failed:", user1, user2, success)
+	}
+	page1.RunScript("sendMove('e4', 'e5');", map[string]interface{}{}, &jsResult)
+	page2.RunScript("sendMove('c6', 'c5');", map[string]interface{}{}, &jsResult)
+
+	if jsResult != "rnbqkbnr/pp1ppppp/8/2p1P3/8/8/PPPP1PPP/RNBQKBNR" {
+		t.Error("board does not match", user1, user2, jsResult)
+	}
+
+	err = page1.FindByID("resignButton").Click()
+	if err != nil {
+		t.Fatal("Couldn't resign:", user1, err)
+	}
+	err = page1.ConfirmPopup()
+	if err != nil {
+		t.Fatal("Couldn't confirm resign popup:", user1, err)
+	}
+}
+
+/*
 func TestLoginProduction(t *testing.T) {
 
 	driver := agouti.ChromeDriver()
@@ -551,12 +564,14 @@ func TestLoginProduction(t *testing.T) {
 		}
 		t.Fatal("No user matched as whitePlayer", whitePlayer)
 	}
+	page1.Destroy()
+	page2.Destroy()
 	time.Sleep(time.Second)
 	if err := driver.Stop(); err != nil {
 		t.Error("Failed to close pages and stop WebDriver:", err)
 	}
 }
-
+*/
 // returns pass of user's account
 func readPass(user string) string {
 	config, err := os.Open("data/" + user + ".txt")

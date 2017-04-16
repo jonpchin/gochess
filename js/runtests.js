@@ -16,23 +16,6 @@ function testGetPlayerData(){
     });
 }
 
-function testResumeGame(){
-    $('#resume-game').html('<img src="../img/ajax/loading.gif" />');
-    $.ajax({
-  		url: 'resumeGame',
-   		type: 'post',
-		dataType: 'html',
-   		data : { 'id': "1", 'white': "Jon", 'black': "Carl"},
-   		success : function(data) {
-            if(data === "false"){
-                $('#resume-game').html('<img src="../img/ajax/available.png" />');
-            }else{
-                $('#resume-game').html('<img src="../img/ajax/not-available.png" />');
-            }
-   		}	
-    });
-}
-
 function testFetchGameById1(){
     $('#fetch-game-by-id-1').html('<img src="../img/ajax/loading.gif" />');
     $.ajax({
@@ -203,7 +186,6 @@ function testCheckInGame(){
 
 function runAjaxUnitTests(){
     testGetPlayerData();
-    testResumeGame();
     testFetchGameById1();
     testFetchGameById2();
     testFetchGameByECO();

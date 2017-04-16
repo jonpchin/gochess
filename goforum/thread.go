@@ -88,6 +88,11 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 				forumTitle := template.HTMLEscapeString(r.FormValue("forumname"))
 				threadTitle := template.HTMLEscapeString(r.FormValue("title"))
 				message := template.HTMLEscapeString(r.FormValue("message"))
+				if len(message) > 800 {
+					w.Write([]byte(`<img src='img/ajax/not-available.png' /> 
+						Length of forum post is greater then 800 characters`))
+					return
+				}
 				totalPosts := template.HTMLEscapeString(r.FormValue("totalPosts"))
 				date := time.Now().Format("20060102150405")
 
@@ -215,8 +220,8 @@ func LockThread(w http.ResponseWriter, r *http.Request) {
 	if gostuff.ValidateCredentials(w, r) == false {
 		return
 	}
-	id := template.HTMLEscapeString(r.FormValue("id"))
-	updateThreadLock("Yes", id)
+
+	updateThreadLock("Yes", template.HTMLEscapeString(r.FormValue("id")))
 }
 
 func UnlockThread(w http.ResponseWriter, r *http.Request) {
@@ -224,8 +229,8 @@ func UnlockThread(w http.ResponseWriter, r *http.Request) {
 	if gostuff.ValidateCredentials(w, r) == false {
 		return
 	}
-	id := template.HTMLEscapeString(r.FormValue("id"))
-	updateThreadLock("No", id)
+
+	updateThreadLock("No", template.HTMLEscapeString(r.FormValue("id")))
 }
 
 // Updates the lock thread based on the lock string
