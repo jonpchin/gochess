@@ -529,18 +529,21 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 
 // gets rating history of player based on type, returns JSON string of ratings with their date time
 // returns false if there was an error
-func GetRatingHistory(name string, gametype string) (string, error) {
+func GetRatingHistory(name string, gametype string) (string, bool) {
 
-	var ratingHistory sql.NullString
+	var ratingHistory string
+
 	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
-
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
-		return "", err
-	} else if err != nil { // Then there is no history but there is a name
-		return "", err
+		log.Println("No name found in ratinghistory for ", name)
+		return "", false
+	} else if ratingHistory == "" { // Then there is no history but there is a name
+		return "", false
+	} else if err != nil { //
+		log.Println(err)
+		return "", false
 	}
-
-	return ratingHistory.String, nil
+	return ratingHistory, true
 }
 
 // returns true if username already exists, this function assumes database is already pinged
