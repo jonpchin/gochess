@@ -33,9 +33,7 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 	var ratingHistory string
 	flag := true
 
-	// TODO: Replace SQL string concatention, gametype is already filtered to only bullet
-	// blitz or standard but still should attempt to avoid SQL injection,
-	// parameterized SQL statements put quotations and gametype can't have quotations to work properly
+	// TODO: Reuse function from database.go
 	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
 		log.Println("No name found in ratinghistory for ", name)
