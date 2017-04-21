@@ -1,7 +1,6 @@
 package gostuff
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"os"
@@ -30,19 +29,13 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 		return false
 	}
 
-	var ratingHistory string
 	flag := true
+	ratingHistory, failed, err := GetRatingHistory(name, gametype)
 
-	// TODO: Reuse function from database.go
-	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
-	if err == sql.ErrNoRows { // this will occur if there is no name exist
-		log.Println("No name found in ratinghistory for ", name)
+	if failed == false {
 		return false
 	} else if ratingHistory == "" { // Then there is no history so insert instead of update
 		flag = false
-	} else if err != nil {
-		log.Println(err)
-		return false
 	}
 
 	// used to append current game rating history into rating history memory

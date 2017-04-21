@@ -532,6 +532,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 // returns false if there was an error
 func GetRatingHistory(name string, gametype string) (string, bool, error) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	var ratingHistory string
 
 	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
