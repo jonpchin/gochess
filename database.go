@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -533,7 +532,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 func GetRatingHistory(name string, gametype string) (string, bool, error) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	var ratingHistory string
+	var ratingHistory *sql.NullString
 
 	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
@@ -541,11 +540,8 @@ func GetRatingHistory(name string, gametype string) (string, bool, error) {
 		return "", false, err
 	} else if err != nil { //
 		log.Println(err)
-		return "", false, err
-	} else if ratingHistory == "" { // Then there is no history but there is a name
-		return "", false, errors.New("No rating history")
 	}
-	return ratingHistory, true, nil
+	return ratingHistory.String, true, nil
 }
 
 // returns true if username already exists, this function assumes database is already pinged
