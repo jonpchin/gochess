@@ -532,7 +532,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 func GetRatingHistory(name string, gametype string) (string, bool, error) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	var ratingHistory *sql.NullString
+	var ratingHistory sql.NullString
 
 	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
