@@ -49,6 +49,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>6. Post game analysis with Stockfish engine</p>
 <p>7. Statistics page</p>
 <p>8. History limit</p>
+<p>9. More charts</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
