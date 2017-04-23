@@ -126,7 +126,7 @@ func canUserPost(username string) (bool, string) {
 	// If not valid that means there is no existing timestamp in the database
 	if lastpost.Valid {
 		timeInSeconds := 30
-		isElapse, timeDiff := gostuff.HasTimeElapsed(lastpost.String, timeInSeconds, timeFormat)
+		isElapse, timeDiff := gostuff.HasTimeElapsed(lastpost.String, timeInSeconds, timeFormat, false)
 		if isElapse == false {
 			diff := strconv.Itoa(int(timeInSeconds - timeDiff))
 			log.Println("Please wait "+diff+" seconds before posting another post user:", username)

@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	days = "30" // Number of days used to remove old games, forgot and activate tokens
+	days = "180" // Number of days used to remove old games, forgot, game history and activate tokens
 )
 
 type justFilesFilesystem struct {
