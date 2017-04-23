@@ -132,15 +132,15 @@ func removeHistoryFromPlayer(name string, days int, gametype string) bool {
 
 			hours := days * 24
 			timeFormat := "20060102150405"
-			var newRatingHistoryMemory []RatingDate
+
 			for i, game := range ratingHistoryMemory {
-				isElpase, _ := HasTimeElapsed(game.DateTime, hours, timeFormat)
+				isElpase, _ := HasTimeElapsed(game.DateTime, hours, timeFormat, true)
 				if isElpase == false { // Use function to get difference of today and game.Datetime
-					// TODO: Optimize by sorting date and deleting everything once after index
-					newRatingHistoryMemory = append(ratingHistoryMemory[:i], ratingHistoryMemory[i+1:]...)
+					ratingHistoryMemory = ratingHistoryMemory[i:]
+					break
 				}
 			}
-			updatedRatingHistory, err := json.Marshal(newRatingHistoryMemory)
+			updatedRatingHistory, err := json.Marshal(ratingHistoryMemory)
 			if err != nil {
 				log.Println("removeHistoryFromPlayer problem marshalling ", err)
 				return false

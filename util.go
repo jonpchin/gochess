@@ -176,7 +176,8 @@ func IsFloatEqual(a, b float64) bool {
 // Returns true if the number of seconds is greater then the difference of targetTime - (this moment)
 // Also returns time difference of targetTime and now, returns zero could mean there was an error
 // timeFormat is the time format targetTime is in
-func HasTimeElapsed(targetTime string, seconds int, timeFormat string) (bool, int) {
+// useHour is true to get difference in hours for rating history and false for forum spam control
+func HasTimeElapsed(targetTime string, seconds int, timeFormat string, useHour bool) (bool, int) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
@@ -199,8 +200,8 @@ func HasTimeElapsed(targetTime string, seconds int, timeFormat string) (bool, in
 	}
 
 	var timeDiff int
-	// If greater then 300 seconds its not forum control but rating history being managed
-	if seconds > 300 {
+	// If greater then 120 seconds its not forum control but rating history being managed
+	if useHour {
 		timeDiff = int(duration.Hours())
 	} else {
 		timeDiff = int(duration.Seconds() - timeZoneDiff)
