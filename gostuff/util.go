@@ -177,7 +177,8 @@ func IsFloatEqual(a, b float64) bool {
 // Also returns time difference of targetTime and now, returns zero could mean there was an error
 // timeFormat is the time format targetTime is in
 // useHour is true to get difference in hours for rating history and false for forum spam control
-func HasTimeElapsed(targetTime string, seconds int, timeFormat string, useHour bool) (bool, int) {
+// timeCompare can be in hours or seconds depending on useHour
+func HasTimeElapsed(targetTime string, timeCompare int, timeFormat string, useHour bool) (bool, int) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
@@ -208,7 +209,7 @@ func HasTimeElapsed(targetTime string, seconds int, timeFormat string, useHour b
 	}
 
 	// A certain number of seconds need to pass since target time
-	if timeDiff < seconds {
+	if timeDiff < timeCompare {
 		return false, timeDiff
 	}
 	return true, 0

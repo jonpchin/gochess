@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
+	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
 )
@@ -66,6 +67,7 @@ func main() {
 	http.HandleFunc("/lockThread", goforum.LockThread)
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
+	http.HandleFunc("/drawchart", plot.DrawChart)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -137,7 +139,7 @@ func main() {
 			gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
 			goforum.ConnectForumDb()
-			gostuff.RemoveGameHistory(days)
+			//gostuff.RemoveGameHistory(days)
 		}
 		//gostuff.SpawnProcess()
 

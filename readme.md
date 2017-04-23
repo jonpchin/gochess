@@ -39,6 +39,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>19. Players can play against cinnamon chess engine and stockfish chess engine (web workers).</p>
 <p>20. Web server runs in Windows and Linux.</p>
 <p>21. Forum</p>
+<p>22. Daily news feed, contains mostly tech articles but it can be configured to get other types of news.</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Chess TV where live games are randomly broadcasted.</p>

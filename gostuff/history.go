@@ -47,7 +47,7 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 
 		//unmarshall JSON string into ratingHistoryMemory which is a memory model
 		if err := json.Unmarshal([]byte(ratingHistory), &ratingHistoryMemory); err != nil {
-			log.Println("Just receieved a message I couldn't decode:", ratingHistory, "test", err)
+			log.Println("Just receieved a message I couldn't decode:", ratingHistory, err)
 			return false
 		}
 	}
