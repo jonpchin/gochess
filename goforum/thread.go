@@ -77,6 +77,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 				tempThreadId := template.HTMLEscapeString(r.FormValue("threadId"))
 				var threadId int64
 				threadId = 0
+
 				if tempThreadId != "" {
 					threadId, err = strconv.ParseInt(tempThreadId, 10, 64)
 
@@ -88,6 +89,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 				forumTitle := template.HTMLEscapeString(r.FormValue("forumname"))
 				threadTitle := template.HTMLEscapeString(r.FormValue("title"))
 				message := template.HTMLEscapeString(r.FormValue("message"))
+
 				if len(message) > 800 {
 					w.Write([]byte(`<img src='img/ajax/not-available.png' /> 
 						Length of forum post is greater then 800 characters`))

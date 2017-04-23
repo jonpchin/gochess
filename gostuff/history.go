@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -35,9 +36,6 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 	if pass == false {
 		log.Println(err)
 		return false
-	} else if err != nil {
-		log.Println(err)
-		return false
 	} else if ratingHistory == "" {
 		flag = false
 	}
@@ -66,6 +64,11 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 		return false
 	}
 
+	return modifyRatingHistory(name, gametype, updatedRatingHistory)
+}
+
+// Updates rating history based on game type for user, returns false if there was an error
+func modifyRatingHistory(name string, gametype string, updatedRatingHistory []byte) bool {
 	stmt, err := db.Prepare("UPDATE ratinghistory SET " + gametype + "=? WHERE username=?")
 	if err != nil {
 		log.Println(err)
@@ -77,17 +80,78 @@ func updateRatingHistory(name string, gametype string, rating float64) bool {
 		log.Println(err)
 		return false
 	}
-
 	return true
 }
 
 // Removes game history after a certain number of days
 func RemoveGameHistory(days string) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	rows, err := db.Query("SELECT username FROM ratinghistory")
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	var name string
+	daysConverted, err := strconv.Atoi(days)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for rows.Next() {
+
+		err = rows.Scan(&name)
+		if err != nil {
+			log.Println(err)
+		}
+		removeHistoryFromPlayer(name, daysConverted, "bullet")
+		removeHistoryFromPlayer(name, daysConverted, "blitz")
+		removeHistoryFromPlayer(name, daysConverted, "standard")
+		removeHistoryFromPlayer(name, daysConverted, "correspondence")
+	}
 }
 
 // Removes game history older then a certain amount of days for a player
 // Returns true if no errors
-func removeHistoryFromPlayer(player string, days string) bool {
-	return true
+func removeHistoryFromPlayer(name string, days int, gametype string) bool {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	ratingHistory, pass, err := GetRatingHistory(name, gametype)
+
+	if pass {
+		// If there is no ratingHistory then there is nothing to remove
+		if ratingHistory != "" {
+			var ratingHistoryMemory []RatingDate
+
+			if err := json.Unmarshal([]byte(ratingHistory), &ratingHistoryMemory); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", ratingHistory, "test", err)
+				return false
+			}
+
+			hours := days * 24
+			timeFormat := "20060102150405"
+			var newRatingHistoryMemory []RatingDate
+			for i, game := range ratingHistoryMemory {
+				isElpase, _ := HasTimeElapsed(game.DateTime, hours, timeFormat)
+				if isElpase == false { // Use function to get difference of today and game.Datetime
+					// TODO: Optimize by sorting date and deleting everything once after index
+					newRatingHistoryMemory = append(ratingHistoryMemory[:i], ratingHistoryMemory[i+1:]...)
+				}
+			}
+			updatedRatingHistory, err := json.Marshal(newRatingHistoryMemory)
+			if err != nil {
+				log.Println("removeHistoryFromPlayer problem marshalling ", err)
+				return false
+			}
+			modifyRatingHistory(name, gametype, updatedRatingHistory)
+		}
+
+		return true
+	} else {
+		log.Println(err)
+	}
+
+	return false
 }

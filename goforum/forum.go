@@ -5,15 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"strconv"
 	"time"
 
 	"github.com/jonpchin/gochess/gostuff"
-)
-
-var (
-	isWindows = false
 )
 
 type Forum struct {
@@ -31,9 +26,6 @@ var db *sql.DB
 
 func ConnectForumDb() {
 	db = gostuff.GetDb()
-	if runtime.GOOS == "windows" {
-		isWindows = true
-	}
 }
 
 func GetForums() (forums []Forum) {
@@ -133,32 +125,14 @@ func canUserPost(username string) (bool, string) {
 
 	// If not valid that means there is no existing timestamp in the database
 	if lastpost.Valid {
-
-		then, err := time.Parse(timeFormat, lastpost.String)
-		if err != nil {
-			log.Println(err)
-			return false, "30"
-		}
-
-		duration := time.Now().Sub(then)
-
-		var timeZoneDiff float64
-		if isWindows {
-			// UTC-5 is Eastern US time
-			timeZoneDiff = 14400.0
-		} else {
-			timeZoneDiff = 0
-		}
-
-		timeDiff := duration.Seconds() - timeZoneDiff
-
-		if timeDiff < 30 {
-			diff := strconv.Itoa(int(30 - timeDiff))
+		timeInSeconds := 30
+		isElapse, timeDiff := gostuff.HasTimeElapsed(lastpost.String, timeInSeconds, timeFormat)
+		if isElapse == false {
+			diff := strconv.Itoa(int(timeInSeconds - timeDiff))
 			log.Println("Please wait "+diff+" seconds before posting another post user:", username)
 			return false, diff
 		}
 	}
-
 	updateLastPostTime(time.Now().Format(timeFormat), username)
 	return true, "0"
 }

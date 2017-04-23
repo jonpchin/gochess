@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	days = "180" // Number of days used to remove old games, forgot and activate tokens
+	days = "30" // Number of days used to remove old games, forgot and activate tokens
 )
 
 type justFilesFilesystem struct {
@@ -137,6 +137,7 @@ func main() {
 			gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
 			goforum.ConnectForumDb()
+			gostuff.RemoveGameHistory(days)
 		}
 		//gostuff.SpawnProcess()
 
