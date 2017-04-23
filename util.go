@@ -173,6 +173,46 @@ func IsFloatEqual(a, b float64) bool {
 	return false
 }
 
+// Returns true if the number of seconds is greater then the difference of targetTime - (this moment)
+// Also returns time difference of targetTime and now, returns zero could mean there was an error
+// timeFormat is the time format targetTime is in
+func HasTimeElapsed(targetTime string, seconds int, timeFormat string) (bool, int) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	// If not valid that means there is no existing timestamp in the database
+	then, err := time.Parse(timeFormat, targetTime)
+	if err != nil {
+		log.Println(err)
+		return false, 0
+	}
+
+	duration := time.Now().Sub(then)
+
+	var timeZoneDiff float64
+
+	if isWindows {
+		// UTC-5 is Eastern US time
+		timeZoneDiff = 14400.0
+	} else {
+		timeZoneDiff = 0
+	}
+
+	var timeDiff int
+	// If greater then 300 seconds its not forum control but rating history being managed
+	if seconds > 300 {
+		timeDiff = int(duration.Hours())
+	} else {
+		timeDiff = int(duration.Seconds() - timeZoneDiff)
+	}
+
+	// A certain number of seconds need to pass since target time
+	if timeDiff < seconds {
+		return false, timeDiff
+	}
+	return true, 0
+}
+
 func timeTrack(start time.Time, name string) {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	elapsed := time.Since(start)

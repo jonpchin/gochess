@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -39,10 +40,18 @@ type GoGame struct {
 	CountryBlack string
 }
 
+var (
+	isWindows = false
+)
+
 var db *sql.DB
 
 //returns false if database setup failed, backup directory is passed in
 func DbSetup(backup string) bool {
+
+	if runtime.GOOS == "windows" {
+		isWindows = true
+	}
 
 	//Checks if backup folder for database export exists
 	exists, err := isDirOrFileExists(backup)
@@ -528,7 +537,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 }
 
 // gets rating history of player based on type, returns JSON string of ratings with their date time
-// returns false if there was an error
+// returns false if there was an error, an error could just mean there is no rating history
 func GetRatingHistory(name string, gametype string) (string, bool, error) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
@@ -538,7 +547,7 @@ func GetRatingHistory(name string, gametype string) (string, bool, error) {
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
 		log.Println("No name found in ratinghistory for ", name)
 		return "", false, err
-	} else if err != nil { //
+	} else if err != nil { // Name found but no rating history
 		log.Println(err)
 	}
 	return ratingHistory.String, true, nil
