@@ -20,10 +20,18 @@ func DrawChart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	const (
+		bullet         = "bullet"
+		blitz          = "blitz"
+		standard       = "standard"
+		correspondence = "correspondence"
+	)
+
 	username, _ := r.Cookie("username")
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
-	ratingList := []string{"bullet", "blitz", "standard", "correspondence"}
+	ratingList := []string{bullet, blitz, standard, correspondence}
+	timeFormat := "20060102150405"
 
 	// Index of these double arrays follows same order as ratingList
 	var allRatingDates [][]time.Time
@@ -46,8 +54,6 @@ func DrawChart(w http.ResponseWriter, r *http.Request) {
 				log.Println("Just receieved a message I couldn't decode:", ratingHistory, err)
 				return
 			}
-
-			timeFormat := "20060102150405"
 
 			for _, value := range ratingMemory {
 				dateTime, err := time.Parse(timeFormat, value.DateTime)
@@ -82,22 +88,22 @@ func DrawChart(w http.ResponseWriter, r *http.Request) {
 		},
 		Series: []chart.Series{
 			chart.TimeSeries{
-				Name:    "Bullet",
+				Name:    bullet,
 				XValues: allRatingDates[0],
 				YValues: allRatings[0],
 			},
 			chart.TimeSeries{
-				Name:    "Blitz",
+				Name:    blitz,
 				XValues: allRatingDates[1],
 				YValues: allRatings[1],
 			},
 			chart.TimeSeries{
-				Name:    "Standard",
+				Name:    standard,
 				XValues: allRatingDates[2],
 				YValues: allRatings[2],
 			},
 			chart.TimeSeries{
-				Name:    "Correspondence",
+				Name:    correspondence,
 				XValues: allRatingDates[3],
 				YValues: allRatings[3],
 			},
