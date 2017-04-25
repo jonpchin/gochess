@@ -12,6 +12,20 @@ import (
 	chart "github.com/wcharczuk/go-chart"
 )
 
+var (
+	UseGoogleCharts = false // Toggle to enable Google Charts or DrawChart()
+)
+
+func SetupCharts() {
+	if UseGoogleCharts {
+		gostuff.ReplaceString("var useGoogleCharts = false;", "var useGoogleCharts = true;",
+			"js/profile.js")
+	} else {
+		gostuff.ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
+			"js/profile.js")
+	}
+}
+
 func DrawChart(w http.ResponseWriter, r *http.Request) {
 
 	valid := gostuff.ValidateCredentials(w, r)
@@ -120,4 +134,5 @@ func DrawChart(w http.ResponseWriter, r *http.Request) {
 	defer output.Close()
 	fileWriter := bufio.NewWriter(output)
 	graph.Render(chart.PNG, fileWriter)
+	w.Write([]byte("pass"))
 }

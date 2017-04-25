@@ -1,3 +1,5 @@
+var useGoogleCharts = false;
+
 //used to pass in the json string of the chess moves so player can review them
 function reviewGame(moves, white, black, whiteRating, blackRating, time, result, date, countryWhite, countryBlack){
 	window.location = "/chess/memberChess?moves=" + moves + "&white=" + white + "&black=" + black + 
@@ -72,20 +74,13 @@ function getCorrespondenceHistory(lookupName){
 
 function setupRatingChart(){
 	
-	var url = parseUrl();
-	var lookupName = url.name;
-	var name = lookupName;
-	if(typeof lookupName !== "undefined"){
-		// then do nothing here
-	}else{ // this means the player is looking at his/her own profile
-		name  = document.getElementById('user').value;
-	}
+	var lookupName = getLookupName();
 
 	// the code here will be executed when all three ajax requests resolve.
 	// bullet blitz, standard, correspondence are lists of length 3 containing the response text,
 	// status, and jqXHR object for each of the three ajax calls respectively.
-	$.when(getBulletHistory(name), getBlitzHistory(name), getStandardHistory(name), 
-		getCorrespondenceHistory(name)).done(function(bullet, blitz, standard, correspondence){
+	$.when(getBulletHistory(lookupName), getBlitzHistory(lookupName), getStandardHistory(lookupName), 
+		getCorrespondenceHistory(lookupName)).done(function(bullet, blitz, standard, correspondence){
 		
 		var ratingHistory = [];
 		var showChart = false;
@@ -214,7 +209,34 @@ function setupRatingChart(){
 		}
 	});
 }
-setupRatingChart();
+
+function getLookupName(){
+	var url = parseUrl();
+	var lookupName = url.name;
+	if(typeof lookupName !== "undefined"){
+		// then do nothing here
+	}else{ // this means the player is looking at his/her own profile
+		lookupName  = document.getElementById('user').value;
+	}
+	return lookupName;
+}
+
+if (useGoogleCharts) {
+	setupRatingChart();
+}else{
+
+	var lookupName = getLookupName();
+
+	$.ajax({
+        url: 'drawchart',
+        type: 'post',
+        dataType: 'html',
+        data : { 'user': lookupName},
+        success : function(data) {		
+            document.getElementById('drawcharts').src = "/img/plots/" + lookupName + ".png"
+        }	
+    });
+}
 
 function parseUrl() { //fetches all variables in url and returns them in a json struct
 	var query = location.search.substr(1);

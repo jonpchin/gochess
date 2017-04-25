@@ -119,7 +119,7 @@ func main() {
 		// this is only temporarily until all the tables are imported
 		if proceed && gostuff.IsEnvironmentTravis() == false &&
 			gostuff.IsEnvironmentAppVeyor() == false {
-
+			plot.SetupCharts()
 			//setting up cron job
 			gostuff.StartCron()
 
@@ -402,6 +402,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 		p := struct {
 			User             string
+			IsGoogleCharts   bool
 			PageTitle        string // Title of the web page
 			Bullet           float64
 			Blitz            float64
@@ -418,6 +419,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 			Country          string
 		}{
 			inputName,
+			plot.UseGoogleCharts,
 			"Profile",
 			bulletN,
 			blitzN,

@@ -1,12 +1,16 @@
 {{template "memberHeader" .}}
 {{.User}} <img id="countryFlag" src="img/flags/{{.Country}}.png"  alt="Country flag">
 <input type="hidden" id="user" value="{{.User}}" />
+{{ if .IsGoogleCharts }}
 <div id="googleLinechart"></div>
+{{else}}
+	<p><img id="drawcharts" src="img/icons/user.png" alt="Draw Charts"></p>
+{{end}}
 {{ if ge .GameID 0 }}
 	<p><img src="../img/icons/playing.png" alt="Playing Game">
-	<a href="/chess/memberChess?spectate&id={{.GameID}}">{{.User}} vs. {{.Opponent}}</a><p>
+	<a href="/chess/memberChess?spectate&id={{.GameID}}">{{.User}} vs. {{.Opponent}}</a></p>
 {{ end }}	
-<p><a href="/saved?user={{.User}}">View adjourned games</a><p>
+<p><a href="/saved?user={{.User}}">View adjourned games</a></p>
 {{ $length := len .Games }} 
 {{ if eq $length 0 }}
     <center>No active games within the past {{.Days}} days have been found.</center>
@@ -36,7 +40,9 @@
 <p>CorrespondenceRD : {{.CorrespondenceRD}}</p>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="../third-party-js/jquery-2.1.4.min.js">\x3C/script>')</script>
-<script type="text/javascript" src="//gstatic.com/charts/loader.js"></script>
+{{ if .IsGoogleCharts }}
+	<script type="text/javascript" src="//gstatic.com/charts/loader.js"></script>
+{{ end }}
 <script src="js/profile.js"></script>
 </body>
 </html>
