@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
+	"github.com/jonpchin/gochess/mud"
 	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
@@ -139,6 +140,7 @@ func main() {
 			gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
 			goforum.ConnectForumDb()
+			mud.ConnectMudDb()
 			//gostuff.RemoveGameHistory(days)
 		}
 		//gostuff.SpawnProcess()

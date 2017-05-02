@@ -11,6 +11,7 @@
 Go Play Chess - Free Online Real time chess web server using websockets - Creator: Jonathan Chin<br><br>
 12/10/2015 - Start date of project.<br><br>
 5/31/2016 This project is officially open source. - All commit history has been cleared as some of the git history contained sensitive data. 
+4/30/2017 I've decided to add a MUD. Chess and MUD's don't usually go together but by having them on the same web server and domain allows me to save server costs. More details will be revealed soon.
 <br><br>If you are interesting in contributing please open a new issue here:
 https://github.com/jonpchin/GoChess/issues
 In the issue state what you want to work on and I'll add you as a contributor. 
@@ -65,3 +66,51 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>9. gopkg.in/gomail.v2 </p>
 <p>10. golang.org/x/crypto/scrypt </p>
 <p>And many more...</p>
+
+
+MUD
+
+Classes:
+
+1. Warrior
+2. Barbarian 
+3. Monk
+4. Mage
+5. Thief
+6. Ranger
+7. Swordmaster
+8. Illusionist
+9. Priest
+10. Dark Knight
+11. Witch
+12. Paladin
+13. Alchemist
+14. Jester
+
+Breakdown of classes and description:
+
+1. <b>Warriors</b>:
+Warriors are well rounded fighter that can use a variety of powerful armor and weaponry. 
+Warriors can learn some basic magic.
+
+2. <b>Barbarian</b>: 
+Barbarians are ancient warrior who uses brute strength and raw fury
+to excel in combat. After many generations of fierce training they have become resistant to magic.
+
+3. <b>Monk</b>:
+Monks are masters at martial arts and they can use their spirtual powers to heal and purge disease.
+
+4. <b>Mage</b>:
+Mages are spell casters who wield powerful spells. They can do great damage but are physically weak
+as a trade off.
+
+5. <b>Thief</b>:
+
+Races
+1. Human
+2. Dwarf
+3. Elf
+4. Troll
+5. Ogre
+6. Hobbit
+7. Vampire
