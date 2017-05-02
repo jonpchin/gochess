@@ -31,7 +31,7 @@ func (c *Connection) ChessConnect() {
 			break
 		}
 
-		var t Online
+		var t MessageType
 		message := []byte(reply)
 		if err := json.Unmarshal(message, &t); err != nil {
 			log.Println("Just receieved a message I couldn't decode:", string(reply), err)

@@ -57,7 +57,7 @@ var Chat = struct {
 
 // stores information of players that are online
 // used to identify what kind of message it for incoming socket messages for JSON and check authentication
-type Online struct {
+type MessageType struct {
 	Type string
 	Name string
 }
@@ -128,7 +128,7 @@ func broadCast(user string) {
 
 	delete(Chat.Lobby, user)
 
-	var on Online
+	var on MessageType
 	on.Type = "broadcast"
 	on.Name = user
 	for _, cs := range Chat.Lobby {

@@ -29,7 +29,7 @@ func (c *Connection) LobbyConnect() {
 			break
 		}
 
-		var t Online
+		var t MessageType
 		message := []byte(reply)
 		if err := json.Unmarshal(message, &t); err != nil {
 			log.Println("Just receieved a message I couldn't decode:", string(reply), err)
@@ -54,7 +54,7 @@ func (c *Connection) LobbyConnect() {
 			case "fetch_players":
 
 				//send in array instead of sending individual
-				var player Online
+				var player MessageType
 				player.Type = "fetch_players"
 				var uniquePlayers []string
 
@@ -299,7 +299,7 @@ func (c *Connection) LobbyConnect() {
 
 // Send chat to all users in the lobby
 // Return false if word count and message limit is exceeded
-func (t *Online) sendLobbyChatToAll(reply string, start *time.Time, counter *int,
+func (t *MessageType) sendLobbyChatToAll(reply string, start *time.Time, counter *int,
 	ip string, log *log.Logger) bool {
 	if len(reply) > 225 {
 		log.Printf("User: %s IP %s has exeeded the 225 character limit by %d byte units.\n",
