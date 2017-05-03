@@ -31,7 +31,7 @@ script:
 - sudo ./main &
 - go test ./testing
 - go test ./_travis
-- wget http://chromedriver.storage.googleapis.com/2.27/chromedriver_linux64.zip
+- wget http://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip
 - sudo unzip chromedriver_linux64.zip -d /usr/lib/chromium-browser/
 - "export PATH=$PATH:/usr/lib/chromium-browser/"
 - "export DISPLAY=:99.0"
