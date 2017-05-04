@@ -1,0 +1,5 @@
+package mud
+
+func placeObject() {
+
+}
