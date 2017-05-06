@@ -196,9 +196,8 @@ func UpdateNewsFromConfig() {
 // makes image url that are http into https if its valid
 // in a NewsProvider, othwerise convert back to http if https times out
 func (newsProvider *NewsProvider) convertToHttps() {
-	logFile, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer logFile.Close()
-	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
+
+	//log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	for index, article := range newsProvider.Articles {
 
@@ -208,11 +207,12 @@ func (newsProvider *NewsProvider) convertToHttps() {
 				"http://", "https://", 1)
 
 			client := TimeOutHttp(5)
-			response, err := client.Get(newsProvider.Articles[index].UrlToImage)
-			if response == nil {
-				log.Println("convertToHttps URL time out for ",
-					newsProvider.Articles[index].UrlToImage, err)
-			}
+			client.Get(newsProvider.Articles[index].UrlToImage)
+			// Below is commented out to reduce logging spam
+			//if response == nil {
+			//log.Println("convertToHttps URL time out for ",
+			//newsProvider.Articles[index].UrlToImage, err)
+			//}
 		}
 	}
 }
