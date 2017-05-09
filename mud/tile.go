@@ -4,8 +4,8 @@ package mud
 // A single movement such as going north, east, south, west, up, down
 // will cause a player to move to a different tile
 type Tile struct {
-	X           int      // x coordinate
-	Y           int      // y coordinate
+	Row         int      // x coordinate
+	Col         int      // y coordinate
 	Name        string   // Name of the room an adventurer will see when they enter the room
 	Description string   // Description of room will adventurer will see when they enter the room
 	Floor       int      // The floor the tile is located
@@ -22,6 +22,7 @@ type Area struct {
 
 type TileChar string
 
+// asterisk character is reserved for adventurer (self)
 const (
 	unused     TileChar = " "
 	floor      TileChar = "."
@@ -31,6 +32,11 @@ const (
 	openDoor   TileChar = "-"
 	upStairs   TileChar = "<"
 	downStairs TileChar = ">"
+	forest     TileChar = "$"
+	water      TileChar = "%"
+	cloud      TileChar = "@"
+	mountain   TileChar = "^"
+	whirlpool  TileChar = "!"
 )
 
 type Direction int

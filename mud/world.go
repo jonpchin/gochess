@@ -8,10 +8,21 @@ type World struct {
 var world World
 
 func CreateWorld() {
-	for i := 0; i < 10; i += 1 {
+
+	const (
+		low       = 3
+		high      = 10
+		floorLow  = 3
+		floorHigh = 30
+	)
+	numOfFloors := getRandomIntRange(low, high)
+
+	for i := 0; i < numOfFloors; i += 1 {
 		var floor Floor
-		floor.width = 10
-		floor.length = 10
+		floor.Width = getRandomIntRange(floorLow, floorHigh)
+		floor.Length = getRandomIntRange(floorLow, floorHigh)
+		floor.initFloor()
+		floor.makeRooms(i)
 		world.Floors[i] = floor
 	}
 
