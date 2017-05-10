@@ -66,10 +66,34 @@ function generateDaggers(){
 		document.write("<br>");
 	}
 }
+
+function generateDungeonDescription(){
+	for(var i=0; i<1000; ++i){
+		document.write(generator$descriptions$dungeons());
+		document.write("<br>");
+	}
+}
+
+function generateNameOfPlaces(){
+	for(var i=0; i<1000; ++i){
+		document.write(generator$places$dungeons());
+		document.write("<br>");
+	}
+}
+
+function generateTileAreas(){
+	for(var i=0; i<1000; ++i){
+		document.write(generator$places$realms());
+		document.write("<br>");
+	}
+}
 //generateBelts();
 //generateBoots();
 //generateChests();
 //generateHelmets();
 //generateLegs();
 //generateShields();
-generateDaggers();
+//generateDaggers();
+//generateDungeonDescription();
+//generateNameOfPlaces();
+generateTileAreas();

@@ -6,6 +6,11 @@ type Room struct {
 	Tiles [][]Tile // A room has x by y tiles
 }
 
+type Coordinate struct {
+	Row int
+	Col int
+}
+
 func (floor *Floor) makeRooms(floorLevel int) {
 
 	const (
@@ -36,6 +41,9 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, firstRoom bool) {
 	width := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
 	length := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
 
+	var topLeft Coordinate
+	var bottomRight Coordinate
+
 	// x is top left and bottom bottomRight
 	// O is where x and y coordinate is located
 	//
@@ -44,18 +52,39 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, firstRoom bool) {
 	// .
 	// . . . C . ..x
 	//       O
+	if dir == NORTH {
 
-	if dir == north {
+		topLeft.Row = (row - 1) - length
+		topLeft.Col = col - (width / 2)
+		bottomRight.Row = row - 1
+		bottomRight.Col = col + (width / 2)
 
-		if floor.isRoomUsed((row-1)-length, col-(width/2), row-1, col+(width/2)) {
+		if floor.isRoomUsed(topLeft, bottomRight) {
 
+		} else {
+			floor.createTilesInRoom(topLeft, bottomRight)
 		}
 
-	} else if dir == east {
+		//   x
+		//   .
+		//   .
+		// O C
+		//   .
+		//   .
+		//   . . . . . . .x
+	} else if dir == EAST {
 
-	} else if dir == south {
+		topLeft.Row = row - (length / 2)
+		topLeft.Col = col + 1
+		bottomRight.Row = row + (length / 2)
+		bottomRight.Col = col + 1 + width
 
-	} else if dir == west {
+		if floor.isRoomUsed(topLeft, bottomRight) {
+
+		}
+	} else if dir == SOUTH {
+
+	} else if dir == WEST {
 
 	} else {
 		fmt.Println("Error invalid direction for makeRoom", row, col, dir, firstRoom)
@@ -63,10 +92,10 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, firstRoom bool) {
 }
 
 // If the room is already occupied return true
-func (floor *Floor) isRoomUsed(topLeftX, topLeftY, bottomRightX, bottomRightY int) bool {
-	for i := topLeftY; i < bottomRightY; i += 1 {
-		for j := topLeftX; j < bottomRightX; j += 1 {
-			if floor.isValidCoordinate(i, j) && floor.Plan[i][j] != unused {
+func (floor *Floor) isRoomUsed(topLeft, bottomRight Coordinate) bool {
+	for i := topLeft.Row; i < bottomRight.Row; i += 1 {
+		for j := topLeft.Col; j < bottomRight.Col; j += 1 {
+			if floor.isValidCoordinate(i, j) && floor.Plan[i][j].TileType != UNUSED {
 				return true
 			}
 		}
@@ -85,13 +114,28 @@ func (floor *Floor) isValidCoordinate(row, col int) bool {
 }
 
 // Builds all the tiles in the room
-func createTilesInRoom() {
-
+func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate) {
+	var area Area
+	area = getRandomArea()
+	for i := topLeft.Row; i < bottomRight.Row; i += 1 {
+		for j := topLeft.Col; j < bottomRight.Col; j += 1 {
+			if floor.isValidCoordinate(i, j) {
+				floor.Plan[i][j].createTile(floor.Level, area)
+			}
+		}
+	}
 }
 
 // Create tile with all its meata data such as name, description, x, y etc
-func (tile *Tile) createTile() {
-
+func (tile *Tile) createTile(floorLevel int, area Area) {
+	tile.Name = getRandomTileName()
+	tile.Description = getRandomTileDescription()
+	tile.Floor = floorLevel
+	tile.Area = area
+	//tile.Room =
+	// TODO Randomly pick a TileChar but usually its a common type such as floor or trees
+	// Need to make the edges walls and not override the door
+	tile.TileType = FLOOR
 }
 
 // Selects a random tile on the wall of a room

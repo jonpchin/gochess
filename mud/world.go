@@ -21,7 +21,7 @@ func CreateWorld() {
 		var floor Floor
 		floor.Width = getRandomIntRange(floorLow, floorHigh)
 		floor.Length = getRandomIntRange(floorLow, floorHigh)
-		floor.initFloor()
+		floor.initFloorTileType()
 		floor.makeRooms(i)
 		world.Floors[i] = floor
 	}

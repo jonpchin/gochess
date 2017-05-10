@@ -69,15 +69,15 @@ func getRandomDirection() Direction {
 	}
 	switch result {
 	case 0:
-		return north
+		return NORTH
 	case 1:
-		return east
+		return EAST
 	case 2:
-		return south
+		return SOUTH
 	case 3:
-		return west
+		return WEST
 	default:
 		fmt.Println("Invalid direction, this should be impossible")
 	}
-	return north
+	return NORTH
 }

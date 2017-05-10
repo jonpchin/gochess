@@ -24,28 +24,28 @@ type TileChar string
 
 // asterisk character is reserved for adventurer (self)
 const (
-	unused     TileChar = " "
-	floor      TileChar = "."
-	corridor   TileChar = ","
-	wall       TileChar = "#"
-	closedDoor TileChar = "+"
-	openDoor   TileChar = "-"
-	upStairs   TileChar = "<"
-	downStairs TileChar = ">"
-	forest     TileChar = "$"
-	water      TileChar = "%"
-	cloud      TileChar = "@"
-	mountain   TileChar = "^"
-	whirlpool  TileChar = "!"
+	UNUSED     TileChar = " "
+	FLOOR      TileChar = "."
+	CORRIDOR   TileChar = ","
+	WALL       TileChar = "#"
+	CLOSEDOOR  TileChar = "+"
+	OPENDOOR   TileChar = "-"
+	UPSTAIRS   TileChar = "<"
+	DOWNSTAIRS TileChar = ">"
+	FOREST     TileChar = "$"
+	WATER      TileChar = "%"
+	CLOUD      TileChar = "@"
+	MOUNTAIN   TileChar = "^"
+	WHIRLPOOL  TileChar = "!"
 )
 
 type Direction int
 
 const (
-	north Direction = iota
-	east
-	south
-	west
+	NORTH Direction = iota
+	EAST
+	SOUTH
+	WEST
 )
 
 func getTile() {
@@ -54,4 +54,17 @@ func getTile() {
 
 func setTile() {
 
+}
+
+func getRandomTileName() string {
+	return "Default Tile Name" // Replace this later
+}
+
+func getRandomTileDescription() string {
+	return "Default Tile Description" // Replace this later
+}
+func getRandomArea() Area {
+	var area Area
+	area.Name = "Default Area"
+	return area // Replace this later
 }
