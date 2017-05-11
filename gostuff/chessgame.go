@@ -47,9 +47,9 @@ type SpectateGame struct {
 
 //only holds source and destination, as well as pawn promotion
 type Move struct {
-	S   string
-	T   string
-	P   string
+	S   string // Source move
+	T   string // Destination move
+	P   string // Promotion piece
 	Fen string // FEN string of the board with the move played
 }
 

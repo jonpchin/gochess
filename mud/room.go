@@ -7,8 +7,9 @@ type Room struct {
 }
 
 type Coordinate struct {
-	Row int
-	Col int
+	Row   int // X
+	Col   int // Y
+	Level int // Z or level of floor
 }
 
 func (floor *Floor) makeRooms(floorLevel int) {
