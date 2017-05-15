@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"math/rand"
+	"os"
 	"time"
 )
 
@@ -80,4 +82,25 @@ func getRandomDirection() Direction {
 		fmt.Println("Invalid direction, this should be impossible")
 	}
 	return NORTH
+}
+
+func (floor *Floor) getRandomRoomOnFloor() Room {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	randNum, err := secureRandomInt(int64(len(floor.Rooms) - 1))
+	if err != nil {
+		log.Println(err)
+	}
+	return floor.Rooms[randNum]
+}
+
+// Selects a random tile on the wall of a room
+func (floor *Floor) getRandomTileOnWall() Tile {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	room := floor.getRandomRoomOnFloor()
+	randNum, err := secureRandomIntRange(0, int64(len(room.Tiles)-1))
+	if err != nil {
+		log.Println(err)
+	}
+	return room.Wall[randNum]
 }

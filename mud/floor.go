@@ -19,7 +19,7 @@ type Floor struct {
 func (floor *Floor) initFloorTileType() {
 	for i := 0; i < floor.Length; i += 1 {
 		for j := 0; j < floor.Width; j += 1 {
-			floor.Plan[i][j].TileType = UNUSED
+			floor.Plan[i][j].TileType = tileChars[UNUSED]
 		}
 	}
 }

@@ -8,6 +8,8 @@ type Player struct {
 	Status    []string // List of afflictions or buffs affecting player
 	Bleed     int      // Amount of health the player will lose every tick
 	Level     int
+	Location  Coordinate
+	Area      Area
 }
 
 type PlayerStats struct {
