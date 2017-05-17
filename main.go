@@ -154,6 +154,7 @@ func main() {
 			gostuff.Cleanup()
 			os.Exit(1)
 		}()
+		fmt.Println("dagger is: ", mud.GetRandomDaggerName())
 		//gostuff.CheckNullInTable("rating")
 	}()
 	//gostuff.FetchNewsSources()

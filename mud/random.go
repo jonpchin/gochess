@@ -1,10 +1,10 @@
 package mud
 
 import (
+	"bufio"
 	crypto "crypto/rand"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"math/big"
 	"math/rand"
@@ -30,15 +30,17 @@ func getRandomIntRange(min, max int) int {
 // Takes in an int64
 // Returns 0 for the integer if there was an error as well as the error
 func secureRandomInt(max int64) (int64, error) {
-	var reader io.Reader
+
 	if max < 0 {
 		return 0, errors.New("maxInclusive is less then zero")
 	}
 	maxInt := big.NewInt(max)
-	result, err := crypto.Int(reader, maxInt)
+
+	result, err := crypto.Int(crypto.Reader, maxInt)
 	if err != nil {
 		return 0, err
 	}
+
 	return result.Int64(), nil
 }
 
@@ -46,7 +48,7 @@ func secureRandomInt(max int64) (int64, error) {
 // Takes in an int64
 // Returns 0 for the integer if there was an error as well as the error
 func secureRandomIntRange(min, max int64) (int64, error) {
-	var reader io.Reader
+
 	if max < 0 {
 		return 0, errors.New("maxInclusive is less then zero")
 	}
@@ -55,7 +57,7 @@ func secureRandomIntRange(min, max int64) (int64, error) {
 
 	// Sets maxInt = maxInt + min
 	maxInt.Add(maxInt, big.NewInt(min))
-	result, err := crypto.Int(reader, maxInt)
+	result, err := crypto.Int(crypto.Reader, maxInt)
 
 	if err != nil {
 		return 0, err
@@ -103,4 +105,47 @@ func (floor *Floor) getRandomTileOnWall() Tile {
 		log.Println(err)
 	}
 	return room.Wall[randNum]
+}
+
+// Returns a random dagger name
+func GetRandomDaggerName() string {
+
+	const daggerNamePath = "mud/equipment/generated/weapons/daggers.txt"
+	daggerName, err := os.Open(daggerNamePath)
+	defer daggerName.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomDaggerName 0", err)
+	}
+
+	scanner := bufio.NewScanner(daggerName)
+	var counter int64
+	counter = 0
+
+	for scanner.Scan() {
+		counter++
+	}
+	maxNum, err := secureRandomInt(counter)
+
+	if err != nil {
+		fmt.Println("random.go getRandomDaggerName 0", err)
+	}
+
+	_, err = daggerName.Seek(0, 0)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	scanner = bufio.NewScanner(daggerName)
+	counter = 0
+	dagger := ""
+
+	for scanner.Scan() {
+		counter++
+		if counter == maxNum {
+
+			dagger = scanner.Text()
+		}
+	}
+	return dagger
 }
