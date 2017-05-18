@@ -107,18 +107,9 @@ func (floor *Floor) getRandomTileOnWall() Tile {
 	return room.Wall[randNum]
 }
 
-// Returns a random dagger name
-func GetRandomDaggerName() string {
+func getRandomItemFromPath(file *os.File) string {
 
-	const daggerNamePath = "mud/equipment/generated/weapons/daggers.txt"
-	daggerName, err := os.Open(daggerNamePath)
-	defer daggerName.Close()
-
-	if err != nil {
-		fmt.Println("random.go getRandomDaggerName 0", err)
-	}
-
-	scanner := bufio.NewScanner(daggerName)
+	scanner := bufio.NewScanner(file)
 	var counter int64
 	counter = 0
 
@@ -128,24 +119,37 @@ func GetRandomDaggerName() string {
 	maxNum, err := secureRandomInt(counter)
 
 	if err != nil {
-		fmt.Println("random.go getRandomDaggerName 0", err)
+		fmt.Println("random.go getRandomFromPath 0", err)
 	}
 
-	_, err = daggerName.Seek(0, 0)
+	_, err = file.Seek(0, 0)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	scanner = bufio.NewScanner(daggerName)
+	scanner = bufio.NewScanner(file)
 	counter = 0
-	dagger := ""
+	item := ""
 
 	for scanner.Scan() {
 		counter++
 		if counter == maxNum {
 
-			dagger = scanner.Text()
+			item = scanner.Text()
 		}
 	}
-	return dagger
+	return item
+}
+
+// Returns a random dagger name
+func GetRandomDaggerName() string {
+
+	const daggerPath = "mud/equipment/generated/weapons/daggers.txt"
+	dagger, err := os.Open(daggerPath)
+	defer dagger.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomDaggerName 0", err)
+	}
+	return getRandomItemFromPath(dagger)
 }
