@@ -69,6 +69,7 @@ func main() {
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	http.HandleFunc("/drawchart", plot.DrawChart)
+	http.HandleFunc("/mudserver/mud", mudConsole)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -93,6 +94,7 @@ func main() {
 	http.Handle("/data/", http.FileServer(currentDir))
 	http.Handle("/sound/", http.FileServer(currentDir))
 
+	http.Handle("/mudserver", websocket.Handler(mud.EnterMud))
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
 
@@ -154,7 +156,7 @@ func main() {
 			gostuff.Cleanup()
 			os.Exit(1)
 		}()
-		fmt.Println("dagger is: ", mud.GetRandomDaggerName())
+		//fmt.Println("dagger is: ", mud.GetRandomDaggerName())
 		//gostuff.CheckNullInTable("rating")
 	}()
 	//gostuff.FetchNewsSources()
@@ -254,16 +256,15 @@ func activate(w http.ResponseWriter, r *http.Request) {
 }
 func forgot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	var formTemplate = template.Must(template.ParseFiles("forgot.html"))
-
 	d := struct {
 		CaptchaId string
+		PageTitle string
 	}{
 		captcha.New(),
+		"Forgot",
 	}
-	if err := formTemplate.Execute(w, &d); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	gostuff.ParseTemplates(d, w, "forgot.html", []string{"templates/forgotTemplate.html",
+		"templates/guestHeader.html"}...)
 }
 
 func resetpass(w http.ResponseWriter, r *http.Request) {
@@ -462,8 +463,19 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func settings(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		http.ServeFile(w, r, "settings.html")
+		w.Header().Set("Cache-Control", "private, max-age=432000")
+
+		username, _ := r.Cookie("username")
+		p := struct {
+			User      string
+			PageTitle string // Title of the web page
+		}{
+			username.Value,
+			"Settings",
+		}
+
+		gostuff.ParseTemplates(p, w, "settings.html", []string{"templates/settingsTemplate.html",
+			"templates/memberHeader.html"}...)
 	}
 }
 
@@ -641,6 +653,20 @@ func createThread(w http.ResponseWriter, r *http.Request) {
 		}
 		gostuff.ParseTemplates(p, w, "createthread.html", []string{"templates/createthreadTemplate.html",
 			"templates/guestHeader.html", "templates/memberHeader.html"}...)
+	}
+}
+
+func mudConsole(w http.ResponseWriter, r *http.Request) {
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		var engine = template.Must(template.ParseFiles("mud.html"))
+		username, _ := r.Cookie("username")
+
+		p := gostuff.Person{User: username.Value}
+
+		if err := engine.Execute(w, &p); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 

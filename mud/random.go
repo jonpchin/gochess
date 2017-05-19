@@ -153,3 +153,63 @@ func GetRandomDaggerName() string {
 	}
 	return getRandomItemFromPath(dagger)
 }
+
+func getRandomBeltsName() string {
+
+	const beltsPath = "mud/equipment/generated/armor/belts.txt"
+	belts, err := os.Open(beltsPath)
+	defer belts.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomBeltsName 0", err)
+	}
+	return getRandomItemFromPath(belts)
+}
+
+func getRandomBootsName() string {
+
+	const bootsPath = "mud/equipment/generated/armor/boots.txt"
+	boots, err := os.Open(bootsPath)
+	defer boots.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomBeltsName 0", err)
+	}
+	return getRandomItemFromPath(boots)
+}
+
+func getRandomLegsName() string {
+
+	const legsPath = "mud/equipment/generated/armor/legs.txt"
+	legs, err := os.Open(legsPath)
+	defer legs.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomLegsName 0", err)
+	}
+	return getRandomItemFromPath(legs)
+}
+
+func getRandomShieldsName() string {
+
+	const shieldsPath = "mud/equipment/generated/armor/shields.txt"
+	shields, err := os.Open(shieldsPath)
+	defer shields.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomShieldsName 0", err)
+	}
+	return getRandomItemFromPath(shields)
+}
+
+func getRandomTorsosName() string {
+
+	const torsoPath = "mud/equipment/generated/armor/torso.txt"
+	torso, err := os.Open(torsoPath)
+	defer torso.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomTorsosName 0", err)
+	}
+	return getRandomItemFromPath(torso)
+}
