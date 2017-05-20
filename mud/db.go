@@ -20,7 +20,7 @@ func lookupName(username string) {
 }
 
 // Returns true if MUD name exists
-func checkIfNameExists(username string) bool {
+func checkNameExist(username string) bool {
 	var name string
 	//checking if name exists
 	_ = db.QueryRow("SELECT username FROM mud WHERE username=?", username).Scan(&name)
@@ -31,5 +31,5 @@ func checkIfNameExists(username string) bool {
 	}
 }
 
-func promptNewUsername() {
+func promptNewname() {
 }

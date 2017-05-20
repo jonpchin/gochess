@@ -36,233 +36,106 @@ func (c *Connection) LobbyConnect() {
 			break
 		}
 
-		if c.username == t.Name {
-			switch t.Type {
+		switch t.Type {
 
-			case "chat_all":
-				if t.sendLobbyChatToAll(reply, &start, &counter, c.clientIP, log) == false {
-					return
+		case "chat_all":
+			if t.sendLobbyChatToAll(reply, &start, &counter, c.clientIP, log) == false {
+				return
+			}
+		case "fetch_matches":
+			//send in array instead of sending individual
+			for _, value := range Pending.Matches {
+				if err := websocket.JSON.Send(c.websocket, &value); err != nil {
+					log.Println(err)
 				}
-			case "fetch_matches":
-				//send in array instead of sending individual
-				for _, value := range Pending.Matches {
-					if err := websocket.JSON.Send(c.websocket, &value); err != nil {
+			}
+
+		case "fetch_players":
+
+			//send in array instead of sending individual
+			var player MessageType
+			player.Type = "fetch_players"
+			var uniquePlayers []string
+
+			// show all players in the lobby and those that are playing a game
+			for key, _ := range Chat.Lobby {
+				player.Name = key
+				uniquePlayers = append(uniquePlayers, player.Name)
+				if err := websocket.JSON.Send(c.websocket, player); err != nil {
+					log.Println(err)
+				}
+			}
+			for key, _ := range Active.Clients {
+
+				player.Name = key
+				found := false
+
+				// this will prevent duplicates if player is in lobby and chess room at the same time
+				for _, name := range uniquePlayers {
+					if player.Name == name {
+						found = true
+						break
+					}
+				}
+				if found == false {
+					if err := websocket.JSON.Send(c.websocket, &player); err != nil {
 						log.Println(err)
 					}
 				}
+			}
 
-			case "fetch_players":
+		case "match_seek":
 
-				//send in array instead of sending individual
-				var player MessageType
-				player.Type = "fetch_players"
-				var uniquePlayers []string
-
-				// show all players in the lobby and those that are playing a game
-				for key, _ := range Chat.Lobby {
-					player.Name = key
-					uniquePlayers = append(uniquePlayers, player.Name)
-					if err := websocket.JSON.Send(c.websocket, player); err != nil {
-						log.Println(err)
-					}
+			//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
+			if c.totalMatches >= 3 {
+				t.Type = "maxThree"
+				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+					// we could not send the message to a peer
+					log.Println("Could not send message to ", c.username, err)
 				}
-				for key, _ := range Active.Clients {
+				break //notify user that only three matches pending max are allowed
+			} else {
+				c.totalMatches++
+			}
 
-					player.Name = key
-					found := false
+			var match SeekMatch
+			if err := json.Unmarshal(message, &match); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
 
-					// this will prevent duplicates if player is in lobby and chess room at the same time
-					for _, name := range uniquePlayers {
-						if player.Name == name {
-							found = true
-							break
-						}
-					}
-					if found == false {
-						if err := websocket.JSON.Send(c.websocket, &player); err != nil {
-							log.Println(err)
-						}
-					}
+			//check if player already has a game started, if there is a game in progress alert player
+			if isPlayersInGame(c.username, match.Opponent) {
+				fmt.Println("Player is already in a game!")
+				t.Type = "alert"
+				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+					// we could not send the message to a peer
+					log.Println("Could not send message to ", c.username, err)
 				}
+				break
+			}
 
-			case "match_seek":
+			if match.assignMatchRatingType() == false {
+				break
+			}
 
-				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
-				if c.totalMatches >= 3 {
-					t.Type = "maxThree"
-					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
-						// we could not send the message to a peer
-						log.Println("Could not send message to ", t.Name, err)
-					}
-					break //notify user that only three matches pending max are allowed
-				} else {
-					c.totalMatches++
+			// if a seek matches an existing one do not post another seek
+			var proceed = true
+
+			// If this seek matches an already existing seek in pending matches then start the seek right away
+			// only verify if target's criteria matches seeker's crieria as startPendingMatch checks if
+			// the seeker's criteria matches the target's criteria
+			for matchID, targetMatch := range Pending.Matches {
+				if match.TimeControl == targetMatch.TimeControl &&
+					targetMatch.Rating >= match.MinRating && targetMatch.Rating <= match.MaxRating &&
+					match.Rated == targetMatch.Rated &&
+					match.Name != targetMatch.Name { // a player should not be able to play himself
+
+					proceed = startPendingMatch(match.Name, matchID)
 				}
+			}
 
-				var match SeekMatch
-				if err := json.Unmarshal(message, &match); err != nil {
-					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
-					break
-				}
-
-				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayersInGame(t.Name, match.Opponent) {
-					fmt.Println("Player is already in a game!")
-					t.Type = "alert"
-					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
-						// we could not send the message to a peer
-						log.Println("Could not send message to ", t.Name, err)
-					}
-					break
-				}
-
-				if match.assignMatchRatingType() == false {
-					break
-				}
-
-				// if a seek matches an existing one do not post another seek
-				var proceed = true
-
-				// If this seek matches an already existing seek in pending matches then start the seek right away
-				// only verify if target's criteria matches seeker's crieria as startPendingMatch checks if
-				// the seeker's criteria matches the target's criteria
-				for matchID, targetMatch := range Pending.Matches {
-					if match.TimeControl == targetMatch.TimeControl &&
-						targetMatch.Rating >= match.MinRating && targetMatch.Rating <= match.MaxRating &&
-						match.Rated == targetMatch.Rated &&
-						match.Name != targetMatch.Name { // a player should not be able to play himself
-
-						proceed = startPendingMatch(match.Name, matchID)
-					}
-				}
-
-				if proceed {
-					var start int = 0
-					for {
-						if _, ok := Pending.Matches[start]; ok {
-							start++
-						} else {
-							break
-						}
-					}
-
-					match.MatchID = start
-					//used in backend to keep track of all pending games waiting for a player to accept
-					Pending.Matches[start] = &match
-
-					go func() {
-						for name, cs := range Chat.Lobby {
-							if err := websocket.JSON.Send(cs, &match); err != nil {
-								// we could not send the message to a peer
-								log.Println("Could not send message to ", name, err)
-							}
-						}
-					}()
-				}
-
-			case "cancel_match":
-
-				var match SeekMatch
-				if err := json.Unmarshal(message, &match); err != nil {
-					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
-					break
-				}
-
-				delete(Pending.Matches, match.MatchID)
-
-				//deletes pending match counter
-				c.totalMatches--
-				//check if its a private match, if so then delete it and break out
-				if match.Opponent != "" {
-					fmt.Println("Private match deleted")
-					break //no need to continue as this is a private match
-				}
-
-				go func() {
-					for _, cs := range Chat.Lobby {
-						websocket.Message.Send(cs, reply)
-					}
-				}()
-
-			case "accept_match":
-
-				var match SeekMatch
-				if err := json.Unmarshal(message, &match); err != nil {
-					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
-					break
-				}
-
-				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayersInGame(match.Name, match.Opponent) {
-					log.Println("Player already has a game. ")
-					//alerting player
-					t.Type = "alert"
-					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
-						// we could not send the message to a peer
-						log.Println("Could not send message to ", t.Name, err)
-					}
-					break
-				}
-
-				startPendingMatch(match.Name, match.MatchID)
-
-			case "private_match":
-
-				var match SeekMatch
-				if err := json.Unmarshal(message, &match); err != nil {
-					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
-					break
-				}
-				//check if player already has a game started, if there is a game in progress alert player
-				if isPlayersInGame(match.Name, match.Opponent) {
-					fmt.Println("Player already has a game.")
-					//alerting player
-					t.Type = "alert"
-					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
-						// we could not send the message to a peer
-						log.Println("Could not send message to ", t.Name, err)
-					}
-					break
-				}
-
-				//check length of name to make sure its 3-12 characters long
-				if len(match.Opponent) < 3 || len(match.Opponent) > 12 {
-					fmt.Println("Username is too long or too short")
-					break
-				}
-				//a player should not be able to match himself
-				if t.Name == match.Opponent {
-					fmt.Println("You can't match yourself!")
-					break
-				}
-
-				//check if opponent is in the lobby or not
-				if _, ok := Chat.Lobby[match.Opponent]; !ok {
-					//alerting player
-					t.Type = "absent"
-					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
-						// we could not send the message to a peer
-						log.Println("Could not send message to ", t.Name, err)
-					}
-					break
-				}
-
-				if match.assignMatchRatingType() == false {
-					break
-				}
-
-				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
-				if c.totalMatches >= 3 {
-					t.Type = "maxThree"
-					if err := websocket.JSON.Send(Chat.Lobby[t.Name], &t); err != nil {
-						// we could not send the message to a peer
-						log.Println("Could not send message to ", t.Name, err)
-					}
-					break //notify user that only three matches pending max are allowed
-				} else {
-					c.totalMatches++
-				}
-
+			if proceed {
 				var start int = 0
 				for {
 					if _, ok := Pending.Matches[start]; ok {
@@ -273,26 +146,148 @@ func (c *Connection) LobbyConnect() {
 				}
 
 				match.MatchID = start
-				//used in backend to keep track of all pending seeks waiting for a player to accept
+				//used in backend to keep track of all pending games waiting for a player to accept
 				Pending.Matches[start] = &match
 
 				go func() {
-					for name, _ := range Chat.Lobby {
-						if name == match.Opponent || name == match.Name { //send to self and opponent
-							if err := websocket.JSON.Send(Chat.Lobby[name], &match); err != nil {
-								// we could not send the message to a peer
-								log.Println("Could not send message to ", name, err)
-							}
+					for name, cs := range Chat.Lobby {
+						if err := websocket.JSON.Send(cs, &match); err != nil {
+							// we could not send the message to a peer
+							log.Println("Could not send message to ", name, err)
 						}
 					}
 				}()
-
-			default:
-				log.Println("I'm not familiar with type ", t.Type, " sent by ", t.Name)
 			}
-		} else {
-			log.Printf("IP %s Invalid websocket authentication in lobby.\n", c.clientIP)
-			return
+
+		case "cancel_match":
+
+			var match SeekMatch
+			if err := json.Unmarshal(message, &match); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
+
+			delete(Pending.Matches, match.MatchID)
+
+			//deletes pending match counter
+			c.totalMatches--
+			//check if its a private match, if so then delete it and break out
+			if match.Opponent != "" {
+				fmt.Println("Private match deleted")
+				break //no need to continue as this is a private match
+			}
+
+			go func() {
+				for _, cs := range Chat.Lobby {
+					websocket.Message.Send(cs, reply)
+				}
+			}()
+
+		case "accept_match":
+
+			var match SeekMatch
+			if err := json.Unmarshal(message, &match); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
+
+			//check if player already has a game started, if there is a game in progress alert player
+			if isPlayersInGame(match.Name, match.Opponent) {
+				log.Println("Player already has a game. ")
+				//alerting player
+				t.Type = "alert"
+				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+					// we could not send the message to a peer
+					log.Println("Could not send message to ", c.username, err)
+				}
+				break
+			}
+
+			startPendingMatch(match.Name, match.MatchID)
+
+		case "private_match":
+
+			var match SeekMatch
+			if err := json.Unmarshal(message, &match); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
+			//check if player already has a game started, if there is a game in progress alert player
+			if isPlayersInGame(match.Name, match.Opponent) {
+				fmt.Println("Player already has a game.")
+				//alerting player
+				t.Type = "alert"
+				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+					// we could not send the message to a peer
+					log.Println("Could not send message to ", c.username, err)
+				}
+				break
+			}
+
+			//check length of name to make sure its 3-12 characters long
+			if len(match.Opponent) < 3 || len(match.Opponent) > 12 {
+				fmt.Println("Username is too long or too short")
+				break
+			}
+			//a player should not be able to match himself
+			if c.username == match.Opponent {
+				fmt.Println("You can't match yourself!")
+				break
+			}
+
+			//check if opponent is in the lobby or not
+			if _, ok := Chat.Lobby[match.Opponent]; !ok {
+				//alerting player
+				t.Type = "absent"
+				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+					// we could not send the message to a peer
+					log.Println("Could not send message to ", c.username, err)
+				}
+				break
+			}
+
+			if match.assignMatchRatingType() == false {
+				break
+			}
+
+			//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
+			if c.totalMatches >= 3 {
+				t.Type = "maxThree"
+				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+					// we could not send the message to a peer
+					log.Println("Could not send message to ", c.username, err)
+				}
+				break //notify user that only three matches pending max are allowed
+			} else {
+				c.totalMatches++
+			}
+
+			var start int = 0
+			for {
+				if _, ok := Pending.Matches[start]; ok {
+					start++
+				} else {
+					break
+				}
+			}
+
+			match.MatchID = start
+			//used in backend to keep track of all pending seeks waiting for a player to accept
+			Pending.Matches[start] = &match
+
+			go func() {
+				for name, _ := range Chat.Lobby {
+					if name == match.Opponent || name == match.Name { //send to self and opponent
+						if err := websocket.JSON.Send(Chat.Lobby[name], &match); err != nil {
+							// we could not send the message to a peer
+							log.Println("Could not send message to ", name, err)
+						}
+					}
+				}
+			}()
+
+		default:
+			log.Println("I'm not familiar with type ", t.Type, " sent by ", c.username)
 		}
 	}
 }

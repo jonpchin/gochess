@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	UseGoogleCharts = false // Toggle to enable Google Charts or DrawChart()
+	UseGoogleCharts = true // Toggle to enable Google Charts or DrawChart()
 )
 
 func SetupCharts() {

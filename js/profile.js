@@ -1,4 +1,4 @@
-var useGoogleCharts = false;
+var useGoogleCharts = true;
 
 //used to pass in the json string of the chess moves so player can review them
 function reviewGame(moves, white, black, whiteRating, blackRating, time, result, date, countryWhite, countryBlack){
