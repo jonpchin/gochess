@@ -1,11 +1,5 @@
 package mud
 
-import (
-	"sync"
-
-	"golang.org/x/net/websocket"
-)
-
 type Player struct {
 	Name      string
 	Inventory []interface{} // What the player is carrying
@@ -29,8 +23,3 @@ type PlayerStats struct {
 	Intelligence int
 	Wisdom       int
 }
-
-var All = struct {
-	sync.RWMutex
-	Players map[string]*websocket.Conn
-}{Players: make(map[string]*websocket.Conn)}

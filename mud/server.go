@@ -20,15 +20,15 @@ func (c *MudConnection) MudConnect() {
 		var reply string
 
 		if err := websocket.Message.Receive(c.websocket, &reply); err != nil {
+			fmt.Println("error 1", err)
 			//fmt.Println("A user has drop web socket connection ", err)
 			break
 		}
-
 		var t gostuff.MessageType
 		message := []byte(reply)
 
 		if err := json.Unmarshal(message, &t); err != nil {
-			log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+			fmt.Println("Just receieved a message I couldn't decode:", string(reply), err)
 			break
 		}
 
@@ -37,9 +37,13 @@ func (c *MudConnection) MudConnect() {
 		case "connect_mud":
 			if checkNameExist(c.username) {
 				//enterWorld(c.username)
+
 			} else {
-				t.Type = "askName"
-				c.sendJSONWebSocket(All.Players, &t)
+				t.Type = "ask_name"
+				err := websocket.JSON.Send(MudServer.Lobby[c.username], &t)
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
@@ -47,9 +51,14 @@ func (c *MudConnection) MudConnect() {
 	}
 }
 
+// Sends message to only one person
+func (c *MudConnection) sendJSONWebSocket(message *gostuff.MessageType) {
+
+}
+
 // targets could be a list of players or a map of players
 // message is a struct that needs to be encoded to JSON before sending
-func (c *MudConnection) sendJSONWebSocket(targets interface{}, message interface{}) {
+func (c *MudConnection) broadCastJSONWebSocket(targets interface{}, message interface{}) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
@@ -66,6 +75,7 @@ func (c *MudConnection) sendJSONWebSocket(targets interface{}, message interface
 			strct := listOfPlayers.MapIndex(key)
 			fmt.Println(key.Interface(), strct.Interface())
 		}
+
 	default:
 		log.Println("No reflection type in sendJSONWebSocket")
 	}

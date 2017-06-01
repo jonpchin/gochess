@@ -18,7 +18,6 @@ func EnterMud(ws *websocket.Conn) {
 
 				Client := &MudConnection{username.Value, ws, ip, ""}
 
-				//only difference between lobby and chatroom is the two lines below
 				MudServer.Lobby[username.Value] = ws
 				Client.MudConnect()
 			}
