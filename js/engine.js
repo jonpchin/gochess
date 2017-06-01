@@ -340,7 +340,7 @@ var stockfish;
 function startStockFish(){
 	
 	newGameButton.click();
-	stockfish = new Worker("../third-party-js/stockfish.js");
+	stockfish = new Worker("../third-party/js/stockfish.js");
 
 	stockfish.onmessage = function(event) {
 		//NOTE: Web Workers wrap the response in an object.
