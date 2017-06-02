@@ -9,6 +9,13 @@ var codeMirror = CodeMirror.fromTextArea(document.getElementById('textbox'), {
     lineWrapping: true,
     readOnly: true
 });
+
+// Game state encapsulates all information relevant to the client
+var GameState = {
+    status: "connect", // Determines what kind of message gets sent over the websocket
+    name: ""          // Player's adventurer name
+};
+
 window.onload = function() {
     
     // Removes blank space at the start
@@ -22,7 +29,6 @@ window.onload = function() {
 			Type: "connect_mud"
 		}
 	    sock.send(JSON.stringify(message));
-
     }
 
     sock.onclose = function(e) {
@@ -34,9 +40,9 @@ window.onload = function() {
 
         if (json.Type === "ask_name"){
             // There seems to be a default tab spacing
-            displayToTextBox("");
             displayToTextBox("Welcome to Go Play Chess MUD!");
             displayToTextBox("What is your name?", "forestgreen");
+            GameState.status="ask_name";
         }
      }
 };
@@ -46,7 +52,7 @@ function displayToTextBox(message, textColor){
     // Default text black as the default color unless the background is white,
     // then the text would default to white
     if(textColor){
-       console.log("Font color is set!");
+       //console.log("Font color is set!");
     }else{
         // TODO: Check the background color and set the default text color appropriately
         textColor="#000000";
@@ -57,7 +63,32 @@ function displayToTextBox(message, textColor){
 }
 
 document.getElementById('sendButton').onclick = function(){
-    displayToTextBox(document.getElementById('message').value, "grey");
+    var message = document.getElementById('message').value
+    displayToTextBox(message);
+    determineMessageType(message);
+}
+
+// Sends name that is prompted to user
+function sendName(name){
+    var message = {
+        Type: "send_name",
+        Name: name
+    }
+    sock.send(JSON.stringify(message));
+}
+
+function determineMessageType(message){
+    var status = GameState.status;
+    
+    switch(status){
+        case "connect":
+            break;
+        case "ask_name":
+            sendName(message);
+            break;
+        default:
+            console.log("No matching game status");
+    }
 }
 // If enter is pressed auto submit
 $('#message').keypress(function(event) {

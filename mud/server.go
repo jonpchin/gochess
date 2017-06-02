@@ -35,15 +35,23 @@ func (c *MudConnection) MudConnect() {
 		switch t.Type {
 
 		case "connect_mud":
-			if checkNameExist(c.username) {
+			if isNameExistForPlayer(c.username) {
 				//enterWorld(c.username)
-
+				fmt.Println("Name already exists for player", c.username)
 			} else {
 				t.Type = "ask_name"
 				err := websocket.JSON.Send(MudServer.Lobby[c.username], &t)
 				if err != nil {
 					fmt.Println(err)
 				}
+			}
+		case "send_name":
+			if isNameTaken(t.Name) {
+				//enterWorld(c.username)
+				fmt.Println("Name already exists for", t.Name)
+			} else {
+				fmt.Println("Registering name for player", t.Name)
+				registerName(t.Name, c.username)
 			}
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)

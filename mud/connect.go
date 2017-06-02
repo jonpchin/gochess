@@ -19,6 +19,8 @@ func EnterMud(ws *websocket.Conn) {
 				Client := &MudConnection{username.Value, ws, ip, ""}
 
 				MudServer.Lobby[username.Value] = ws
+				// Ensures username is registered in mud table
+				lookupName(username.Value)
 				Client.MudConnect()
 			}
 		}
