@@ -24,7 +24,26 @@ window.onload = function() {
     $("#message").focus();
     
     sock.onopen = function() {
-		
+	    displayToTextBox(`                                                                                                        dddddddd
+        GGGGGGGGGGGGG                      MMMMMMMM               MMMMMMMM                              d::::::d
+     GGG::::::::::::G                      M:::::::M             M:::::::M                              d::::::d
+   GG:::::::::::::::G                      M::::::::M           M::::::::M                              d::::::d
+  G:::::GGGGGGGG::::G                      M:::::::::M         M:::::::::M                              d:::::d 
+ G:::::G       GGGGGG   ooooooooooo        M::::::::::M       M::::::::::Muuuuuu    uuuuuu      ddddddddd:::::d 
+G:::::G               oo:::::::::::oo      M:::::::::::M     M:::::::::::Mu::::u    u::::u    dd::::::::::::::d 
+G:::::G              o:::::::::::::::o     M:::::::M::::M   M::::M:::::::Mu::::u    u::::u   d::::::::::::::::d 
+G:::::G    GGGGGGGGGGo:::::ooooo:::::o     M::::::M M::::M M::::M M::::::Mu::::u    u::::u  d:::::::ddddd:::::d 
+G:::::G    G::::::::Go::::o     o::::o     M::::::M  M::::M::::M  M::::::Mu::::u    u::::u  d::::::d    d:::::d 
+G:::::G    GGGGG::::Go::::o     o::::o     M::::::M   M:::::::M   M::::::Mu::::u    u::::u  d:::::d     d:::::d 
+G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u    u::::u  d:::::d     d:::::d 
+ G:::::G       G::::Go::::o     o::::o     M::::::M     MMMMM     M::::::Mu:::::uuuu:::::u  d:::::d     d:::::d 
+  G:::::GGGGGGGG::::Go:::::ooooo:::::o     M::::::M               M::::::Mu:::::::::::::::uud::::::ddddd::::::dd
+   GG:::::::::::::::Go:::::::::::::::o     M::::::M               M::::::M u:::::::::::::::u d:::::::::::::::::d
+     GGG::::::GGG:::G oo:::::::::::oo      M::::::M               M::::::M  uu::::::::uu:::u  d:::::::::ddd::::d
+        GGGGGG   GGGG   ooooooooooo        MMMMMMMM               MMMMMMMM    uuuuuuuu  uuuu   ddddddddd   ddddd `)
+        displayToTextBox("");
+        displayToTextBox("");
+        displayToTextBox("Welcome to Go MUD!");
 		var message = {
 			Type: "connect_mud"
 		}
@@ -40,7 +59,6 @@ window.onload = function() {
 
         if (json.Type === "ask_name"){
             // There seems to be a default tab spacing
-            displayToTextBox("Welcome to Go Play Chess MUD!");
             displayToTextBox("What is your name?", "forestgreen");
             GameState.status="ask_name";
         }
