@@ -81,7 +81,7 @@ Classes:
 7. Swordmaster
 8. Illusionist
 9. Priest
-10. Dark Knight
+10. Necromancer
 11. Witch
 12. Paladin
 13. Alchemist

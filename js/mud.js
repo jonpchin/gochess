@@ -57,10 +57,13 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
      sock.onmessage = function(e) {
         json = JSON.parse(e.data);
 
-        if (json.Type === "ask_name"){
-            // There seems to be a default tab spacing
-            displayToTextBox("What is your name?", "forestgreen");
-            GameState.status="ask_name";
+        switch(json.Type){
+            case "ask_name":
+                // There seems to be a default tab spacing
+                displayToTextBox("What is your name?", "forestgreen");
+                GameState.status="ask_name";
+                break;
+            default:
         }
      }
 };
@@ -95,6 +98,15 @@ function sendName(name){
     sock.send(JSON.stringify(message));
 }
 
+// Sends the class the player will be as a new adventurer
+function registerClass(mudClass){
+    var message = {
+        Type: "register_class",
+        Class: mudClass
+    }
+    sock.send(JSON.stringify(message));
+}
+
 function determineMessageType(message){
     var status = GameState.status;
     
@@ -103,6 +115,9 @@ function determineMessageType(message){
             break;
         case "ask_name":
             sendName(message);
+            break;
+        case "register_class":
+            registerClass(mesage);
             break;
         default:
             console.log("No matching game status");

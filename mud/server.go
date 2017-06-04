@@ -53,6 +53,13 @@ func (c *MudConnection) MudConnect() {
 				fmt.Println("Registering name for player", t.Name)
 				registerName(t.Name, c.username)
 			}
+		case "register_class":
+			var player Player
+			if err := json.Unmarshal(message, &player); err != nil {
+				fmt.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
+			registerClass(player.Class, c.username)
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
 		}

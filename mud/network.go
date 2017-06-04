@@ -16,5 +16,7 @@ type MudConnection struct {
 // Active users connected to MUD
 var MudServer = struct {
 	sync.RWMutex
-	Lobby map[string]*websocket.Conn
-}{Lobby: make(map[string]*websocket.Conn)}
+	Lobby   map[string]*websocket.Conn
+	Players map[string]*Player // Active users connected to MUD
+}{Lobby: make(map[string]*websocket.Conn),
+	Players: make(map[string]*Player)}

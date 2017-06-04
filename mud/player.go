@@ -1,7 +1,14 @@
 package mud
 
+import (
+	"strings"
+)
+
 type Player struct {
-	Name      string
+	Type      string // Message type
+	Username  string // Go Play Chess account
+	Name      string // Mud account name
+	Class     string
 	Inventory []interface{} // What the player is carrying
 	Equipment Equipment
 	Stats     PlayerStats
@@ -22,4 +29,22 @@ type PlayerStats struct {
 	Dexterity    int
 	Intelligence int
 	Wisdom       int
+}
+
+// Checks if class the person entered is a substring of a valid class and returns the full class name
+// If not a valid class it will return blank string
+func isValidClass(class string) (bool, string) {
+	var classes = []string{"warrior", "barbarian", "monk", "mage", "thief", "ranger", "swordmaster", "illusionist",
+		"priest", "necromancer", "witch", "paladin", "alchemist", "jester"}
+	class = strings.ToLower(class)
+	for _, value := range classes {
+		if strings.Contains(class, value) {
+			return true, value
+		}
+	}
+	return false, ""
+}
+
+func registerClass(class string, username string) {
+
 }
