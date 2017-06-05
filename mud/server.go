@@ -59,7 +59,12 @@ func (c *MudConnection) MudConnect() {
 				fmt.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
-			registerClass(player.Class, c.username)
+
+			if registerClass(player.Class, c.username) {
+
+			} else {
+
+			}
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
 		}

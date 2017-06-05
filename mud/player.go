@@ -44,7 +44,3 @@ func isValidClass(class string) (bool, string) {
 	}
 	return false, ""
 }
-
-func registerClass(class string, username string) {
-
-}

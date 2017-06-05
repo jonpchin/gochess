@@ -58,8 +58,9 @@ var Chat = struct {
 // stores information of players that are online
 // used to identify what kind of message it for incoming socket messages for JSON and check authentication
 type MessageType struct {
-	Type string
-	Name string
+	Type    string
+	Name    string
+	Message string
 }
 
 //websocket handler for lobby
