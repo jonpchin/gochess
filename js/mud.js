@@ -81,6 +81,7 @@ function displayToTextBox(message, textColor){
     var lastLine = codeMirror.lastLine();
     codeMirror.replaceRange(message + "\n", CodeMirror.Pos(lastLine));
     codeMirror.markText({line:lastLine-1,ch:0},{line:lastLine-1,ch:lastLine.length},{css:"color: " + textColor});
+    codeMirror.scrollTo(0, codeMirror.getScrollInfo().height);
 }
 
 document.getElementById('sendButton').onclick = function(){
