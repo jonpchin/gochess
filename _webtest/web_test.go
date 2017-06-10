@@ -1,12 +1,8 @@
 package webtest
 
 import (
-	"bufio"
 	"database/sql"
 	"fmt"
-	"log"
-	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -334,6 +330,8 @@ func executeGame(host string, page1 *agouti.Page, page2 *agouti.Page, user1 stri
 	}
 }
 
+/*
+// Disable production testing until production uses only private seeks and public seeks
 func TestLoginProduction(t *testing.T) {
 
 	driver := agouti.ChromeDriver()
@@ -433,3 +431,4 @@ func readPass(user string) string {
 
 	return scanner.Text()
 }
+*/
