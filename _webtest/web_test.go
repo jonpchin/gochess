@@ -1,8 +1,11 @@
 package webtest
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -418,7 +421,7 @@ func TestLoginProduction(t *testing.T) {
 		t.Error("Failed to close pages and stop WebDriver:", err)
 	}
 }
-
+*/
 // returns pass of user's account
 func readPass(user string) string {
 	config, err := os.Open("data/" + user + ".txt")
@@ -431,4 +434,3 @@ func readPass(user string) string {
 
 	return scanner.Text()
 }
-*/
