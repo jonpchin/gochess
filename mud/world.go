@@ -7,6 +7,11 @@ type World struct {
 
 var world World
 
+func (player *Player) enterWorld() {
+
+	player.loadPlayerData(player.Username)
+}
+
 func CreateWorld() {
 
 	const (

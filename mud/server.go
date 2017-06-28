@@ -36,7 +36,9 @@ func (c *MudConnection) MudConnect() {
 
 		case "connect_mud":
 			if isNameExistForPlayer(c.username) {
-				//enterWorld(c.username)
+				var player Player
+				player.Username = c.username
+				player.enterWorld()
 				fmt.Println("Name already exists for player", c.username)
 			} else {
 				t.Type = "ask_name"
@@ -63,7 +65,7 @@ func (c *MudConnection) MudConnect() {
 			if registerClass(player.Class, c.username) {
 
 			} else {
-
+				fmt.Println(c.username, "selected an invalid class of", player.Class)
 			}
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
@@ -99,5 +101,4 @@ func (c *MudConnection) broadCastJSONWebSocket(targets interface{}, message inte
 	default:
 		log.Println("No reflection type in sendJSONWebSocket")
 	}
-
 }
