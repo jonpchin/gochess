@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -364,5 +365,49 @@ func CheckInGame(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("inGame"))
 	} else {
 		w.Write([]byte("Safe"))
+	}
+}
+
+// Show logs only to admins
+func FetchLogs(w http.ResponseWriter, r *http.Request) {
+	valid := ValidateCredentials(w, r)
+	if valid == false {
+		return
+	}
+	username, err := r.Cookie("username")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if IsAdmin(username.Value) == false {
+		return
+	}
+
+	logType := template.HTMLEscapeString(r.FormValue("logType"))
+
+	if logType == "chat" {
+		data, err := ioutil.ReadFile("logs/chat.txt")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		} else {
+			w.Write(data)
+		}
+
+	} else if logType == "errors" {
+		data, err := ioutil.ReadFile("logs/errors.txt")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		} else {
+			w.Write(data)
+		}
+	} else if logType == "main" {
+		data, err := ioutil.ReadFile("logs/mainLog.txt")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		} else {
+			w.Write(data)
+		}
+	} else {
+		w.Write([]byte("Invalid log type showLogs"))
 	}
 }

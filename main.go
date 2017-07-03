@@ -61,12 +61,14 @@ func main() {
 	http.HandleFunc("/highscores", highscores)
 	http.HandleFunc("/engine", engine)
 	http.HandleFunc("/news", news)
+	http.HandleFunc("/logs", logs)
 	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/createthread", createThread)
 	http.HandleFunc("/sendForumPost", goforum.SendForumPost)
 	http.HandleFunc("/lockThread", goforum.LockThread)
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
+	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	http.HandleFunc("/drawchart", plot.DrawChart)
 	http.HandleFunc("/mudserver/mud", mudConsole)
@@ -654,6 +656,20 @@ func createThread(w http.ResponseWriter, r *http.Request) {
 		}
 		gostuff.ParseTemplates(p, w, "createthread.html", []string{"templates/createthreadTemplate.html",
 			"templates/guestHeader.html", "templates/memberHeader.html"}...)
+	}
+}
+
+func logs(w http.ResponseWriter, r *http.Request) {
+
+	if isAuthorized(w, r) {
+		username, _ := r.Cookie("username")
+		if gostuff.IsAdmin(username.Value) {
+			w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+			http.ServeFile(w, r, "logs.html")
+		} else {
+			w.WriteHeader(404)
+			http.ServeFile(w, r, "404.html")
+		}
 	}
 }
 
