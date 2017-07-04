@@ -38,7 +38,7 @@ func (c *MudConnection) MudConnect() {
 			if isNameExistForPlayer(c.username) {
 				var player Player
 				player.Username = c.username
-				player.enterWorld()
+				player.enterWorld(LOAD_PLAYER)
 				fmt.Println("Name already exists for player", c.username)
 			} else {
 				t.Type = "ask_name"
@@ -52,6 +52,9 @@ func (c *MudConnection) MudConnect() {
 				//enterWorld(c.username)
 				fmt.Println("Name already exists for", t.Name)
 			} else {
+				var player Player
+				player.Name = t.Name
+				MudServer.Players[player.Name] = &player
 				fmt.Println("Registering name for player", t.Name)
 				registerName(t.Name, c.username)
 			}
@@ -63,7 +66,10 @@ func (c *MudConnection) MudConnect() {
 			}
 
 			if registerClass(player.Class, c.username) {
-
+				var player Player
+				player.Username = c.username
+				player.save()
+				player.enterWorld(SKIP_LOAD)
 			} else {
 				fmt.Println(c.username, "selected an invalid class of", player.Class)
 			}

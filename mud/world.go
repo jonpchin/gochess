@@ -7,9 +7,16 @@ type World struct {
 
 var world World
 
-func (player *Player) enterWorld() {
+const (
+	LOAD_PLAYER = true
+	SKIP_LOAD   = false
+)
 
-	player.loadPlayerData(player.Username)
+func (player *Player) enterWorld(loadPlayer bool) {
+
+	if loadPlayer {
+		player.loadPlayerData(player.Username)
+	}
 }
 
 func CreateWorld() {
@@ -30,5 +37,4 @@ func CreateWorld() {
 		floor.makeRooms(i)
 		world.Floors[i] = floor
 	}
-
 }

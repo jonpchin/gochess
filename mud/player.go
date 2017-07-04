@@ -1,6 +1,7 @@
 package mud
 
 import (
+	"fmt"
 	"log"
 	"strings"
 )
@@ -51,6 +52,7 @@ func isValidClass(class string) (bool, string) {
 
 func (player *Player) loadPlayerData(username string) {
 
+	// status will be a csv which will be stored in an array
 	var status string
 
 	err := db.QueryRow(`SELECT name, class, race, gender, status, level, experience 
@@ -59,5 +61,26 @@ func (player *Player) loadPlayerData(username string) {
 	if err != nil {
 		log.Println(err)
 		return
+	}
+}
+
+func (player *Player) save() {
+
+	stmt, err := db.Prepare("UPDATE mud SET class=?, race=?, gender=?, status=?, level=?, experience=? WHERE username=?")
+	defer stmt.Close()
+
+	status := ""
+
+	for _, value := range player.Status {
+		status = status + "," + value
+	}
+
+	// Removing leading and trailing commas
+	strings.Trim(status, ",")
+
+	_, err = stmt.Exec(&player.Name, &player.Class, &player.Race, &player.Gender,
+		&status, &player.Level, &player.Experience)
+	if err != nil {
+		fmt.Println(err)
 	}
 }
