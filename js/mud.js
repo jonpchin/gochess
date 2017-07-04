@@ -115,7 +115,9 @@ function determineMessageType(message){
         case "connect":
             break;
         case "ask_name":
-            sendName(message);
+            //sendName(message);
+            savePlayerData(status, message);
+            askClass();
             break;
         case "register_class":
             registerClass(mesage);
@@ -124,6 +126,11 @@ function determineMessageType(message){
             console.log("No matching game status");
     }
 }
+
+function savePlayerData(type, message){
+    
+}
+
 // If enter is pressed auto submit
 $('#message').keypress(function(event) {
     if (event.which === 13) {  

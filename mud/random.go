@@ -3,7 +3,6 @@ package mud
 import (
 	"bufio"
 	crypto "crypto/rand"
-	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -31,8 +30,8 @@ func getRandomIntRange(min, max int) int {
 // Returns 0 for the integer if there was an error as well as the error
 func secureRandomInt(max int64) (int64, error) {
 
-	if max < 0 {
-		return 0, errors.New("maxInclusive is less then zero")
+	if max <= 0 {
+		return 0, nil
 	}
 	maxInt := big.NewInt(max)
 
@@ -45,12 +44,12 @@ func secureRandomInt(max int64) (int64, error) {
 }
 
 // Generates a randomly secure integer (int64) from minInclusive to maxInclusive
-// Takes in an int64
+// Takes in an int64, must be greater then zero or panic will occur
 // Returns 0 for the integer if there was an error as well as the error
 func secureRandomIntRange(min, max int64) (int64, error) {
 
-	if max < 0 {
-		return 0, errors.New("maxInclusive is less then zero")
+	if max <= 0 {
+		return 0, nil
 	}
 
 	maxInt := big.NewInt(max - min)
@@ -88,10 +87,14 @@ func getRandomDirection() Direction {
 
 func (floor *Floor) getRandomRoomOnFloor() Room {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	randNum, err := secureRandomInt(int64(len(floor.Rooms) - 1))
+
+	// Crypto int cannot take a max int of zero
+	randNum, err := secureRandomInt(int64(len(floor.Rooms)))
+
 	if err != nil {
 		log.Println(err)
 	}
+
 	return floor.Rooms[randNum]
 }
 
@@ -100,10 +103,11 @@ func (floor *Floor) getRandomTileOnWall() Tile {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	room := floor.getRandomRoomOnFloor()
-	randNum, err := secureRandomIntRange(0, int64(len(room.Tiles)-1))
+	randNum, err := secureRandomIntRange(0, int64(len(room.Wall)))
 	if err != nil {
 		log.Println(err)
 	}
+
 	return room.Wall[randNum]
 }
 

@@ -133,10 +133,10 @@ func (floor *Floor) isRoomUsed(topLeft, bottomRight Coordinate) bool {
 }
 
 func (floor *Floor) isValidCoordinate(row, col int) bool {
-	if row < 0 || row > floor.Length {
+	if row < 0 || row >= floor.Length {
 		return false
 	}
-	if col < 0 || col > floor.Width {
+	if col < 0 || col >= floor.Width {
 		return false
 	}
 	return true
@@ -147,6 +147,7 @@ func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainTy
 	var area Area
 	area = getRandomArea()
 	var room Room
+	room.Wall = make([]Tile, 1)
 	for i := topLeft.Row; i <= bottomRight.Row; i += 1 {
 		for j := topLeft.Col; j <= bottomRight.Col; j += 1 {
 			if floor.isValidCoordinate(i, j) {

@@ -17,7 +17,12 @@ type Floor struct {
 // V Length
 // Initializes floor tiletype to unused tile characters
 func (floor *Floor) initFloorTileType() {
+
+	floor.Plan = make([][]Tile, floor.Length)
+
 	for i := 0; i < floor.Length; i += 1 {
+		floor.Plan[i] = make([]Tile, floor.Width)
+
 		for j := 0; j < floor.Width; j += 1 {
 			floor.Plan[i][j].TileType = tileChars[UNUSED]
 		}

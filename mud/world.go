@@ -28,6 +28,7 @@ func CreateWorld() {
 		floorHigh = 30
 	)
 	numOfFloors := getRandomIntRange(low, high)
+	world.Floors = make([]Floor, numOfFloors)
 
 	for i := 0; i < numOfFloors; i += 1 {
 		var floor Floor

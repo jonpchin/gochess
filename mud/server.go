@@ -68,6 +68,7 @@ func (c *MudConnection) MudConnect() {
 			if registerClass(player.Class, c.username) {
 				var player Player
 				player.Username = c.username
+				player.Location = HOME_BASE
 				player.save()
 				player.enterWorld(SKIP_LOAD)
 			} else {

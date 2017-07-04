@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// Default location new players start is their home base
+var HOME_BASE = Coordinate{Row: 10, Col: 10, Level: 5}
+
 type Player struct {
 	Type       string // Message type
 	Username   string // Go Play Chess account
