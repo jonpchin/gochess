@@ -47,7 +47,7 @@ setupOpening();
 
 function setupOpening(){
     
-    $.getJSON('/data/openings.json', function(data) {         
+    $.getJSON('/data/openings.json', function(data) {        
         for (var key in data) {
             // skip loop if the property is from prototype
             if (!data.hasOwnProperty(key)){
@@ -61,6 +61,7 @@ function setupOpening(){
         }
     });
 }
+
 
 // loads game based on the JSON string in data that is passed in
 function loadGame(gameData){

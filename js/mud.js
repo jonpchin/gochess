@@ -127,8 +127,20 @@ function determineMessageType(message){
     }
 }
 
+function askClass(){
+    displayToTextBox("Select your class. Options are: " + Mud.Classes.join(", "), "forestgreen");
+} 
+
 function savePlayerData(type, message){
     
+    switch(type){
+        case "ask_name":
+            break;
+        case "register_class":
+            break;
+        default:
+
+    }
 }
 
 // If enter is pressed auto submit

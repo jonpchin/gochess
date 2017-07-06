@@ -10,7 +10,7 @@
 		"intelligence": 4,
 		"wisdom": 4,
 		"kingdom": "all",
-		"skills": [
+		"skills": {
 			"kick": 1,
 			"dagger": 1,
 			"sword": 1,
@@ -34,7 +34,7 @@
 			"chase": 30,
 			"fencing": 40,
 			"charge": 50
-		]
+		},
 		"spells": [
 			"locate",
 			"night vision",
@@ -52,7 +52,7 @@
 		"intelligence": 2,
 		"wisdom": 2,
 		"kingdom": "all",
-		"skills": [
+		"skills": {
 			"kick": 1,
 			"dagger": 1,
 			"sword": 1,
@@ -76,7 +76,7 @@
 			"chase": 30,
 			"berserk": 40,
 			"fury": 50
-		],
+		},
 		"spells": [
 		
 		]

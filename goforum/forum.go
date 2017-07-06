@@ -24,7 +24,7 @@ type Forum struct {
 
 var db *sql.DB
 
-func ConnectForumDb() {
+func ConnectDb() {
 	db = gostuff.GetDb()
 }
 

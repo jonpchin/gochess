@@ -9,7 +9,7 @@ import (
 
 var db *sql.DB
 
-func ConnectMudDb() {
+func ConnectDb() {
 	db = gostuff.GetDb()
 }
 
