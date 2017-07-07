@@ -58,10 +58,14 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
         json = JSON.parse(e.data);
 
         switch(json.Type){
-            case "ask_name":
+            case "get_player_data":
                 // There seems to be a default tab spacing
                 displayToTextBox("What is your name?", "forestgreen");
-                GameState.status="ask_name";
+                GameState.status="check_name";
+                break;
+            case "name_available":
+                GameState.status="save_name";
+                determineMessageType(json.Name); // Saving player name and asking for class
                 break;
             default:
         }
@@ -90,20 +94,19 @@ document.getElementById('sendButton').onclick = function(){
     determineMessageType(message);
 }
 
-// Sends name that is prompted to user
-function sendName(name){
+// Checks if name is available
+function checkName(name){
     var message = {
-        Type: "send_name",
+        Type: "check_name",
         Name: name
     }
     sock.send(JSON.stringify(message));
 }
 
-// Sends the class the player will be as a new adventurer
-function registerClass(mudClass){
+function enterWorldFirstTime(){
     var message = {
-        Type: "register_class",
-        Class: mudClass
+        Type: "enter_world_first_time",
+        MudPlayer: JSON.stringify(Mud.Player)
     }
     sock.send(JSON.stringify(message));
 }
@@ -114,14 +117,31 @@ function determineMessageType(message){
     switch(status){
         case "connect":
             break;
-        case "ask_name":
-            //sendName(message);
+        case "check_name":
+            checkName(message);
+            break;
+        case "save_name":
             savePlayerData(status, message);
             askClass();
             break;
         case "register_class":
-            registerClass(mesage);
+            if(isValidClass(message) === false){
+                displayToTextBox("That is not a valid class. Please try again.");
+                askClass();
+            }else{
+                savePlayerData(status, message);
+                askRace();
+            }
             break;
+        case "save_race":
+            if(isValidRace(message) === false){
+                displayToTextBox("That is not a valid race. Please try again.");
+                askRace();
+            }else{
+                savePlayerData(status, message);
+                console.log("reached checkpoint");
+                enterWorldFirstTime();
+            }
         default:
             console.log("No matching game status");
     }
@@ -129,24 +149,55 @@ function determineMessageType(message){
 
 function askClass(){
     displayToTextBox("Select your class. Options are: " + Mud.Classes.join(", "), "forestgreen");
+    GameState.status="register_class";
 } 
 
+function askRace(){
+    displayToTextBox("Select your race. Options are: " + Mud.Races.join(", "), "forestgreen");
+    GameState.status="save_race";
+}
+
+function isValidClass(mudClass){
+    for(var i=0; i<Mud.Classes.length; ++i){
+        if(Mud.Classes[i].toLowerCase() === mudClass.toLowerCase()){
+            return true;
+        }
+    }
+    return false;
+}
+
+function isValidRace(mudRace){
+    for(var i=0; i<Mud.Races.length; ++i){
+        if(Mud.Races[i].toLowerCase() === mudRace.toLowerCase()){
+            return true;
+        }
+    }
+    return false;
+}
 function savePlayerData(type, message){
     
     switch(type){
-        case "ask_name":
+        case "save_name":
+            Mud.Player.Name = message;
             break;
         case "register_class":
+            Mud.Player.Class = message;
+            break;
+        case "save_race":
+            Mud.Player.Race = message;
             break;
         default:
-
+            console.log(type, "is not a valid savePlayerData type");
     }
 }
 
 // If enter is pressed auto submit
 $('#message').keypress(function(event) {
-    if (event.which === 13) {  
-	   $('#sendButton').click();	
+    if (event.which === 13) {
+        $('#sendButton').click();	
+        if (document.getElementById('forget').checked) {  
+            document.getElementById('message').value = "";
+        }
     }
 });
 

@@ -41,22 +41,20 @@ func (c *MudConnection) MudConnect() {
 				player.enterWorld(LOAD_PLAYER)
 				fmt.Println("Name already exists for player", c.username)
 			} else {
-				t.Type = "ask_name"
+				t.Type = "get_player_data"
 				err := websocket.JSON.Send(MudServer.Lobby[c.username], &t)
 				if err != nil {
 					fmt.Println(err)
 				}
 			}
-		case "send_name":
+		case "check_name":
 			if isNameTaken(t.Name) {
-				//enterWorld(c.username)
 				fmt.Println("Name already exists for", t.Name)
+				t.Type = "name_taken"
+				c.sendJSONWebSocket(&t)
 			} else {
-				var player Player
-				player.Name = t.Name
-				MudServer.Players[player.Name] = &player
-				fmt.Println("Registering name for player", t.Name)
-				registerName(t.Name, c.username)
+				t.Type = "name_available"
+				c.sendJSONWebSocket(&t)
 			}
 		case "register_class":
 			var player Player
@@ -74,6 +72,11 @@ func (c *MudConnection) MudConnect() {
 			} else {
 				fmt.Println(c.username, "selected an invalid class of", player.Class)
 			}
+		case "enter_world_first_time":
+			var player Player
+			player.Name = t.Name
+			MudServer.Players[player.Name] = &player
+			registerName(t.Name, c.username)
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
 		}
@@ -83,6 +86,11 @@ func (c *MudConnection) MudConnect() {
 // Sends message to only one person
 func (c *MudConnection) sendJSONWebSocket(message *gostuff.MessageType) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	if err := websocket.JSON.Send(c.websocket, message); err != nil {
+		log.Println(err)
+	}
 }
 
 // targets could be a list of players or a map of players
