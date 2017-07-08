@@ -12,11 +12,12 @@ const (
 	SKIP_LOAD   = false
 )
 
-func (player *Player) enterWorld(loadPlayer bool) {
+func (player *Player) enterWorld(loadPlayer bool, connection *MudConnection) {
 
 	if loadPlayer {
 		player.loadPlayerData(player.Username)
 	}
+	player.sendPlayerDataToClient(connection)
 }
 
 func CreateWorld() {

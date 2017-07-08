@@ -1,6 +1,7 @@
 package mud
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -86,4 +87,13 @@ func (player *Player) save() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+// Sends player data to client
+func (player *Player) sendPlayerDataToClient(connection *MudConnection) {
+	playerMessage, err := json.Marshal(player)
+	if err != nil {
+		fmt.Println("sendPlayerDataToClient", err)
+	}
+	connection.sendJSONWebSocket(playerMessage)
 }

@@ -67,6 +67,8 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 GameState.status="save_name";
                 determineMessageType(json.Name); // Saving player name and asking for class
                 break;
+            case "update_player":
+                // TODO: Unmarshal player data that was sent from server into client memory
             default:
         }
      }

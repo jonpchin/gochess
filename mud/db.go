@@ -71,18 +71,3 @@ func registerUsername(username string) {
 		fmt.Println(err)
 	}
 }
-
-func registerClass(class string, username string) bool {
-	valid, fullClass := isValidClass(class)
-	if valid {
-		stmt, err := db.Prepare("UPDATE mud SET class=? WHERE username=?")
-		defer stmt.Close()
-
-		_, err = stmt.Exec(fullClass, username)
-		if err != nil {
-			fmt.Println(err)
-		}
-		return true
-	}
-	return false
-}
