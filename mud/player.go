@@ -2,7 +2,9 @@ package mud
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -16,7 +18,7 @@ type Player struct {
 	Class      string
 	Race       string
 	Gender     string
-	Inventory  []interface{} // What the player is carrying
+	Inventory  []string // What the player is carrying
 	Equipment  Equipment
 	Stats      PlayerStats
 	Status     []string // List of afflictions or buffs affecting player
@@ -89,6 +91,40 @@ func (player *Player) save() {
 }
 
 // Update player stats based on race and class
-func (player *Player) updateByRaceClass() {
-
+func (player *Player) updateByRaceClass(jsonFile string) {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	message, err := ioutil.ReadFile(jsonFile)
+	fmt.Println(message)
+	if err != nil {
+		log.Println(err)
+	}
 }
+
+/*
+func (equipment *Equipment) UnmarshalJSON(data []byte) error {
+
+	var v []interface{}
+    if err := json.Unmarshal(data, &v); err != nil {
+        fmt.Printf("Error whilde decoding %v\n", err)
+        return err
+    }
+    equipment.Timestamp = int64(v[0].(float64))
+    tp.Latitude, _ = strconv.ParseFloat(v[1].(string), 64)
+    tp.Longitude, _ = strconv.ParseFloat(v[2].(string), 64)
+    tp.Altitude = int(v[3].(float64))
+    tp.Value1 = v[4].(float64)
+    tp.Value2 = int16(v[5].(float64))
+    tp.Value3 = int16(v[6].(float64))
+
+    return nil
+}
+
+func (playerStats *PlayerStats) UnmarshalJSON(data []byte) error {
+}
+
+func (coordinate *Coordinate) UnmarshalJSON(data []byte) error {
+}
+
+func (area *Area) UnmarshalJSON(data []byte) error {
+}
+*/

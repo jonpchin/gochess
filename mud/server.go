@@ -64,7 +64,7 @@ func (c *MudConnection) MudConnect() {
 			}
 
 			player.Type = "update_player"
-			player.updateByRaceClass()
+			//player.updateByRaceClass()
 			player.Location = HOME_BASE
 			player.Inventory = nil
 

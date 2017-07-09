@@ -144,6 +144,7 @@ func main() {
 
 			gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
+			gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			mud.ConnectDb()
 			mud.CreateWorld()

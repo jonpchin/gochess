@@ -35,11 +35,11 @@
 			"fencing": 40,
 			"charge": 50
 		},
-		"spells": [
-			"locate",
-			"night vision",
-			"cure"
-		]
+		"spells": {
+			"locate": 1,
+			"night vision": 5,
+			"cure": 10
+		}
 	},
 	"Barbarian": { 
 		"description": "Barbarians are ancient warrior who uses brute strength and raw fury to excel in combat. After many generations of fierce training they have become resistant to magic.",
@@ -77,9 +77,9 @@
 			"berserk": 40,
 			"fury": 50
 		},
-		"spells": [
+		"spells": {
 		
-		]
+		}
 	},
 	"Monk": {
 		"description": "Excels in hand combat and spiritual healing",
@@ -100,9 +100,9 @@
 			"kai": 20
 			
 		},
-		"spells": [
+		"spells": {
 			"purify": 20,
 			"telepathy": 40
-		]
+		}
 	}
 }    

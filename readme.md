@@ -68,8 +68,12 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>10. golang.org/x/crypto/scrypt </p>
 <p>And many more...</p>
 
+<br>
+<b>Other Dependencies</b>:
+<p>1. jsonlint</p>
+<br>
 
-MUD
+<b>MUD</b>
 
 Classes:
 
