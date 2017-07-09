@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -219,4 +222,75 @@ func timeTrack(start time.Time, name string) {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	elapsed := time.Since(start)
 	log.Printf("%s took %s", name, elapsed)
+}
+
+// Validates all json files in project
+func ValidateJSONFiles() {
+	// windows use double backslash for path
+	RecurseDirectory("data", validateJSONFile, "*.json")
+	RecurseDirectory("mud/equipment", validateJSONFile, "*.json")
+}
+
+// Checks if a single JSON file is valid and if its not print the error message to console
+func validateJSONFile(file string) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	var output []byte
+	var err error
+
+	if runtime.GOOS == "windows" {
+		output, err = exec.Command("jsonlint", "-q", "-c", file).CombinedOutput()
+	} else {
+		output, err = exec.Command("/bin/bash", "-c", "jsonlint -q -c "+file).Output()
+	}
+
+	if err != nil {
+		log.Println(err)
+	}
+	if string(output) != "" {
+		log.Println(string(output))
+	}
+}
+
+// Recursives through directory and calls the function pointer fp on each file
+// Pattern is the file pattern to apply the function to for example
+// *json would apply the fp on all files recursively in the directory
+func RecurseDirectory(searchDir string, fp func(string), pattern string) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	fileList := []string{}
+	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
+		fileList = append(fileList, path)
+		return nil
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, file := range fileList {
+		isDir := isDirectory(file)
+		if isDir == false {
+			isMatch, err := filepath.Match(pattern, filepath.Base(file))
+			if err != nil {
+				log.Println(err)
+			} else if isMatch {
+				fp(file)
+			}
+		}
+	}
+}
+
+//return trues if path is a directory
+func isDirectory(path string) bool {
+	f, err := os.Open(path)
+	if err != nil {
+		fmt.Println("isDirectory 1", err)
+		return false
+	}
+	stat, err := f.Stat()
+	if err != nil {
+		fmt.Println("isDirectory 2", err)
+	}
+	return stat.IsDir()
 }
