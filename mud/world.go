@@ -17,7 +17,8 @@ func (player *Player) enterWorld(loadPlayer bool, connection *MudConnection) {
 	if loadPlayer {
 		player.loadPlayerData(player.Username)
 	}
-	player.sendPlayerDataToClient(connection)
+	// Send player data to client
+	connection.sendJSONWebSocket(&player)
 }
 
 func CreateWorld() {

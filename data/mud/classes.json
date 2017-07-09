@@ -82,19 +82,27 @@
 		]
 	},
 	"Monk": {
-		"description": "Helmet molded by lava",
-		"weight": 2,
-		"armor": 3,
-		"value": 250,
-		"fire resist": 3,
-		"rareness": 2,
-		"class": [
-			"warrior",
-			"barbarian",
-			"dark knight",
-			"paladin",
-			"ranger",
-			"swordmaster"
+		"description": "Excels in hand combat and spiritual healing",
+		"health": 100,
+		"mana": 50,
+		"energy": 90,
+		"strength": 9,
+		"speed": 7,
+		"dexterity": 7,
+		"intelligence": 3,
+		"wisdom": 3,
+		"kingdom": "all",
+		"skills": {
+			"pray": 1,
+			"recall": 1,
+			"detect trap": 15,
+			"disarm trap": 15,
+			"kai": 20
+			
+		},
+		"spells": [
+			"purify": 20,
+			"telepathy": 40
 		]
 	}
 }    

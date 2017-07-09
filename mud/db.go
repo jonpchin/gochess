@@ -20,8 +20,6 @@ func lookupName(username string) {
 	_ = db.QueryRow("SELECT username FROM mud WHERE username=?", username).Scan(&name)
 	if name == "" { // already exists, case insensitive comparison
 		registerUsername(username)
-	} else {
-		fmt.Println("Username is already present for", username)
 	}
 }
 
@@ -55,7 +53,7 @@ func registerName(name string, username string) {
 
 	_, err = stmt.Exec(name, username)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("registerName 1", err)
 	}
 }
 
@@ -68,6 +66,6 @@ func registerUsername(username string) {
 
 	_, err = stmt.Exec(username)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("registerUsername 1", err)
 	}
 }

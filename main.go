@@ -92,6 +92,7 @@ func main() {
 	http.Handle("/css/", cacheControl(http.FileServer(currentDir), "259200"))
 	http.Handle("/img/", http.FileServer(currentDir))
 	http.Handle("/js/", cacheControl(http.FileServer(currentDir), "86400"))
+	http.Handle("/mudjs/", cacheControl(http.FileServer(currentDir), "86400"))
 	http.Handle("/third-party/", cacheControl(http.FileServer(currentDir), "432000"))
 	http.Handle("/data/", http.FileServer(currentDir))
 	http.Handle("/sound/", http.FileServer(currentDir))

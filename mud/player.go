@@ -1,7 +1,6 @@
 package mud
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -70,7 +69,7 @@ func (player *Player) loadPlayerData(username string) {
 
 func (player *Player) save() {
 
-	stmt, err := db.Prepare("UPDATE mud SET class=?, race=?, gender=?, status=?, level=?, experience=? WHERE username=?")
+	stmt, err := db.Prepare("UPDATE mud SET name=?, class=?, race=?, gender=?, status=?, level=?, experience=? WHERE username=?")
 	defer stmt.Close()
 
 	status := ""
@@ -83,17 +82,13 @@ func (player *Player) save() {
 	strings.Trim(status, ",")
 
 	_, err = stmt.Exec(&player.Name, &player.Class, &player.Race, &player.Gender,
-		&status, &player.Level, &player.Experience)
+		&status, &player.Level, &player.Experience, &player.Username)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("save 1", err)
 	}
 }
 
-// Sends player data to client
-func (player *Player) sendPlayerDataToClient(connection *MudConnection) {
-	playerMessage, err := json.Marshal(player)
-	if err != nil {
-		fmt.Println("sendPlayerDataToClient", err)
-	}
-	connection.sendJSONWebSocket(playerMessage)
+// Update player stats based on race and class
+func (player *Player) updateByRaceClass() {
+
 }

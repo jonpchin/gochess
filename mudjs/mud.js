@@ -69,7 +69,11 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 break;
             case "update_player":
                 // TODO: Unmarshal player data that was sent from server into client memory
+                console.log(json);
+                updatePlayer(json);
+                break;
             default:
+                console.log("No such socket type");
         }
      }
 };
@@ -141,11 +145,11 @@ function determineMessageType(message){
                 askRace();
             }else{
                 savePlayerData(status, message);
-                console.log("reached checkpoint");
                 enterWorldFirstTime();
             }
+            break;
         default:
-            console.log("No matching game status");
+            console.log("No matching message type for", status);
     }
 }
 

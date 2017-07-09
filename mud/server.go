@@ -62,8 +62,11 @@ func (c *MudConnection) MudConnect() {
 				fmt.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
+
 			player.Type = "update_player"
+			player.updateByRaceClass()
 			player.Location = HOME_BASE
+			player.Inventory = nil
 
 			MudServer.Players[player.Name] = &player
 			registerName(player.Name, c.username)

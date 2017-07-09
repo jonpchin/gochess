@@ -13,16 +13,18 @@ Mud.Player = {
 	Stats:  {
 		Health: 50,
 		Mana: 50,
+		Energy: 50,
 		Strength: 10,
 		Speed: 10,
-		Wisdom: 10,
-		Intelligence: 10
+		Dexterity: 10,
+		Intelligence: 10,
+		Wisdom: 10
 	}, 
 	Status: "healthy", 
 	Bleed: 0,  
 	Level: 1, 
 	Experience: 0,
-	Location: "Kingdom of Dale",
+	Location: [],
 	Area: "Cain's Hideout",
 }
 
@@ -59,4 +61,28 @@ function getRaces(){
         }
     });
     return races;
+}
+
+// Update the player data in memory
+function updatePlayer(player){
+	console.log("start updatePlayer");
+	console.log(Mud.Player);
+	Mud.Player.Name      = player.Name;
+	Mud.Player.Class     = player.Class;
+	Mud.Player.Race      = player.Race;
+	Mud.Player.Gender    = player.Gender;
+	Mud.Player.Inventory = player.Inventory.split(',');
+	Mud.Player.Equipment = player.Equipment.split(',');
+
+	var stats = JSON.parse(Mud.Player.Stats);
+
+	Mud.Player.Stats.Health    = stats.Health;
+	Mud.Player.Stats.Mana      = stats.Mana;
+	Mud.Player.Stats.Energy    = stats.Energy;
+	Mud.Player.Stats.Strength  = stats.Strength;
+	Mud.Player.Stats.Speed     = stats.Speed;
+	Mud.Player.Stats.Dexterity = stats.Dexterity;
+	Mud.Player.Stats.Intelligence = stats.Intelligence;
+	Mud.Player.Stats.Wisdom = stats.Wisdom;
+	console.log(Mud.Player);
 }
