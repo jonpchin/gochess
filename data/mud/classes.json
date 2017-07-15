@@ -1,5 +1,5 @@
 {
-	"Warrior": {
+	"warrior": {
 		"description": "Warriors are well rounded fighter that can use a variety of powerful armor and weaponry. Warriors can learn some basic magic.",
 		"health": 120,
 		"mana": 30,
@@ -41,7 +41,7 @@
 			"cure": 10
 		}
 	},
-	"Barbarian": { 
+	"barbarian": { 
 		"description": "Barbarians are ancient warrior who uses brute strength and raw fury to excel in combat. After many generations of fierce training they have become resistant to magic.",
 		"health": 150,
 		"mana": 0,
@@ -81,7 +81,7 @@
 		
 		}
 	},
-	"Monk": {
+	"monk": {
 		"description": "Excels in hand combat and spiritual healing",
 		"health": 100,
 		"mana": 50,

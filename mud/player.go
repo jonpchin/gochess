@@ -41,6 +41,13 @@ type PlayerStats struct {
 	Wisdom       int
 }
 
+// Default actions for all players
+type PlayerActions interface {
+	kill(string)
+	say(string)
+	look(string)
+}
+
 // Checks if class the person entered is a substring of a valid class and returns the full class name
 // If not a valid class it will return blank string
 func isValidClass(class string) (bool, string) {
@@ -108,7 +115,7 @@ func (equipment *Equipment) UnmarshalJSON(data []byte) error {
         fmt.Printf("Error whilde decoding %v\n", err)
         return err
     }
-    equipment.Timestamp = int64(v[0].(float64))
+    tp.Timestamp = int64(v[0].(float64))
     tp.Latitude, _ = strconv.ParseFloat(v[1].(string), 64)
     tp.Longitude, _ = strconv.ParseFloat(v[2].(string), 64)
     tp.Altitude = int(v[3].(float64))

@@ -1,27 +1,27 @@
 {
-	"Human": {
+	"human": {
 		"description": "Humans are balanced and well rounded creatures."
 	},
-	"Dwarf": {
+	"dwarf": {
 		"description": "Short human like beings that live in the mountains and experts in mining."
 	},
-	"Elf": {
+	"elf": {
 		"description": "Living in forests the pointy ear creatures train with the bow day and night."
 	},
 	
-	"Troll": {
+	"troll": {
 		"description": "Dumb but strong."
 	},
 	
-	"Ogre": {
+	"ogre": {
 		"description": "Large merciless creatures that eats humans."
 	},
 	
-	"Hobbit": {
+	"hobbit": {
 		"description": "Small and quick human."
 	},
 	
-	"Vampire": {
+	"vampire": {
 		"description": "Master of dark magic but weak against sunlight."
 	}
 }

@@ -1,15 +1,15 @@
 
-Mud = {}
 Mud.Classes = getClasses();
 Mud.Races = getRaces();
 Mud.Player = {
+	Type: "none",
 	Username: document.getElementById('user').value, // Go Play Chess account
 	Name: "",     // Mud account name
 	Class: "",
 	Race: "",
 	Gender: "",
 	Inventory: [],
-	Equipment: [],
+	Equipment: Mud.Equipment,
 	Stats:  {
 		Health: 50,
 		Mana: 50,
@@ -20,12 +20,16 @@ Mud.Player = {
 		Intelligence: 10,
 		Wisdom: 10
 	}, 
-	Status: "healthy", 
+	Status: ["healthy"], 
 	Bleed: 0,  
 	Level: 1, 
 	Experience: 0,
-	Location: [],
-	Area: "Cain's Hideout",
+	Location: Mud.Coordinate,
+	Area: Mud.Area
+}
+
+Mud.Area = {
+	Name: "Cain's Hideout"
 }
 
 // Since this function is async if one wants to call this on load a sleep will need to be made
@@ -65,24 +69,14 @@ function getRaces(){
 
 // Update the player data in memory
 function updatePlayer(player){
-	console.log("start updatePlayer");
-	console.log(Mud.Player);
+
 	Mud.Player.Name      = player.Name;
 	Mud.Player.Class     = player.Class;
 	Mud.Player.Race      = player.Race;
 	Mud.Player.Gender    = player.Gender;
-	Mud.Player.Inventory = player.Inventory.split(',');
-	Mud.Player.Equipment = player.Equipment.split(',');
+	Mud.Player.Inventory = player.Inventory;	
+	Mud.Player.Equipment = player.Equipment;
+	Mud.Player.Stats   = player.Stats;
 
-	var stats = JSON.parse(Mud.Player.Stats);
-
-	Mud.Player.Stats.Health    = stats.Health;
-	Mud.Player.Stats.Mana      = stats.Mana;
-	Mud.Player.Stats.Energy    = stats.Energy;
-	Mud.Player.Stats.Strength  = stats.Strength;
-	Mud.Player.Stats.Speed     = stats.Speed;
-	Mud.Player.Stats.Dexterity = stats.Dexterity;
-	Mud.Player.Stats.Intelligence = stats.Intelligence;
-	Mud.Player.Stats.Wisdom = stats.Wisdom;
 	console.log(Mud.Player);
 }

@@ -58,8 +58,13 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
         json = JSON.parse(e.data);
 
         switch(json.Type){
-            case "get_player_data":
+            case "ask_name":
                 // There seems to be a default tab spacing
+                displayToTextBox("What is your name?", "forestgreen");
+                GameState.status="check_name";
+                break;
+            case "name_taken":
+                displayToTextBox("That name is already taken.", "red");
                 displayToTextBox("What is your name?", "forestgreen");
                 GameState.status="check_name";
                 break;
@@ -73,7 +78,7 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 updatePlayer(json);
                 break;
             default:
-                console.log("No such socket type");
+                console.log("No such socket type", json.Type);
         }
      }
 };
@@ -110,11 +115,8 @@ function checkName(name){
 }
 
 function enterWorldFirstTime(){
-    var message = {
-        Type: "enter_world_first_time",
-        MudPlayer: JSON.stringify(Mud.Player)
-    }
-    sock.send(JSON.stringify(message));
+    Mud.Player.Type = "enter_world_first_time";
+    sock.send(JSON.stringify(Mud.Player));
 }
 
 function determineMessageType(message){

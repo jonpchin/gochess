@@ -20,15 +20,13 @@ func (c *MudConnection) MudConnect() {
 		var reply string
 
 		if err := websocket.Message.Receive(c.websocket, &reply); err != nil {
-			fmt.Println("error 1", err)
-			//fmt.Println("A user has drop web socket connection ", err)
 			break
 		}
 		var t gostuff.MessageType
 		message := []byte(reply)
 
 		if err := json.Unmarshal(message, &t); err != nil {
-			fmt.Println("Just receieved a message I couldn't decode:", string(reply), err)
+			log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 			break
 		}
 
@@ -38,18 +36,17 @@ func (c *MudConnection) MudConnect() {
 			if isNameExistForPlayer(c.username) {
 				var player Player
 				player.Username = c.username
-				player.enterWorld(LOAD_PLAYER, c)
-				fmt.Println("Name already exists for player", c.username)
+				player.enterWorld(LOAD_PLAYER, c) // Name already exists for player
+				fmt.Println("Player already exists", c.username)
 			} else {
-				t.Type = "get_player_data"
+				t.Type = "ask_name"
 				err := websocket.JSON.Send(MudServer.Lobby[c.username], &t)
 				if err != nil {
-					fmt.Println(err)
+					log.Println(err)
 				}
 			}
 		case "check_name":
 			if isNameTaken(t.Name) {
-				fmt.Println("Name already exists for", t.Name)
 				t.Type = "name_taken"
 				c.sendJSONWebSocket(&t)
 			} else {
@@ -59,7 +56,7 @@ func (c *MudConnection) MudConnect() {
 		case "enter_world_first_time":
 			var player Player
 			if err := json.Unmarshal(message, &player); err != nil {
-				fmt.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
 
