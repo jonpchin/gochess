@@ -23,6 +23,7 @@ func EnterMud(ws *websocket.Conn) {
 				lookupName(username.Value)
 				var player Player
 				player.Username = username.Value
+				player.SessionID = sessionID.Value
 				MudServer.Players[username.Value] = &player
 				Client.MudConnect()
 			}

@@ -11,13 +11,34 @@ import (
 // Default location new players start is their home base
 var HOME_BASE = Coordinate{Row: 10, Col: 10, Level: 5}
 
-type Player struct {
+// Same as Player but without sensitive sessionID
+// This struct will be used to send to other players
+type PlayerPublic struct {
 	Type       string // Message type
 	Username   string // Go Play Chess account
 	Name       string // Mud account name
 	Class      string
 	Race       string
-	Gender     string
+	Gender     string   // M or F
+	Inventory  []string // What the player is carrying
+	Equipment  Equipment
+	Stats      PlayerStats
+	Status     []string // List of afflictions or buffs affecting player
+	Bleed      int      // Amount of health the player will lose every tick
+	Level      int
+	Experience int
+	Location   Coordinate
+	Area       Area
+}
+
+type Player struct {
+	Type       string // Message type
+	Username   string // Go Play Chess account
+	SessionID  string // Encrypted session token
+	Name       string // Mud account name
+	Class      string
+	Race       string
+	Gender     string   // M or F
 	Inventory  []string // What the player is carrying
 	Equipment  Equipment
 	Stats      PlayerStats
@@ -66,6 +87,7 @@ func (player *Player) loadPlayerData(username string) {
 
 	// status will be a csv which will be stored in an array
 	var status string
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	err := db.QueryRow(`SELECT name, class, race, gender, status, level, experience 
 		FROM mud where username=?`, username).Scan(&player.Name, &player.Class, &player.Race, &player.Gender,
@@ -74,11 +96,22 @@ func (player *Player) loadPlayerData(username string) {
 		log.Println(err)
 		return
 	}
+
+	err = db.QueryRow(`SELECT area, x, y, z FROM location where name=?`,
+		player.Name).Scan(&player.Location.Row, &player.Location.Col, &player.Location.Level)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func (player *Player) save() {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	stmt, err := db.Prepare("UPDATE mud SET name=?, class=?, race=?, gender=?, status=?, level=?, experience=? WHERE username=?")
+	if err != nil {
+		log.Println(err)
+	}
 	defer stmt.Close()
 
 	status := ""
@@ -93,7 +126,18 @@ func (player *Player) save() {
 	_, err = stmt.Exec(&player.Name, &player.Class, &player.Race, &player.Gender,
 		&status, &player.Level, &player.Experience, &player.Username)
 	if err != nil {
-		fmt.Println("save 1", err)
+		log.Println(err)
+	}
+
+	stmt, err = db.Prepare("UPDATE location SET area=?, x=?, y=?, z=?, WHERE name=?")
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = stmt.Exec(&player.Area.Name, &player.Location.Row, &player.Location.Col, &player.Location.Level,
+		&player.Name)
+	if err != nil {
+		log.Println(err)
 	}
 }
 
@@ -105,6 +149,19 @@ func (player *Player) updateByRaceClass(jsonFile string) {
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+// Ensure player is not trying to impersonate someone else or change name without permission
+// Returns true if player's username, name and sessionID are all valid
+func (player *Player) isCredValid(username, name, sessionID string) bool {
+	if player.Username != username {
+		return false
+	} else if player.Name != name {
+		return false
+	} else if player.SessionID != sessionID {
+		return false
+	}
+	return true
 }
 
 /*

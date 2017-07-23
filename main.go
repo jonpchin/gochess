@@ -681,8 +681,15 @@ func mudConsole(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		var engine = template.Must(template.ParseFiles("mud.html"))
 		username, _ := r.Cookie("username")
+		sessionID, _ := r.Cookie("sessionID")
 
-		p := gostuff.Person{User: username.Value}
+		p := struct {
+			User      string
+			SessionID string
+		}{
+			username.Value,
+			sessionID.Value,
+		}
 
 		if err := engine.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

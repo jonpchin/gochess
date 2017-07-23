@@ -36,6 +36,7 @@ func (c *MudConnection) MudConnect() {
 			if isNameExistForPlayer(c.username) {
 				var player Player
 				player.Username = c.username
+				player.Type = "enter_world"
 				player.enterWorld(LOAD_PLAYER, c) // Name already exists for player
 				fmt.Println("Player already exists", c.username)
 			} else {
@@ -59,6 +60,9 @@ func (c *MudConnection) MudConnect() {
 				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
+
+			// Check to make sure player is not pretending to be someone else or changing name without permission
+			MudServer.Players[player.Username].isCredValid(player.Username, player.Name, player.SessionID)
 
 			player.Type = "update_player"
 			//player.updateByRaceClass()

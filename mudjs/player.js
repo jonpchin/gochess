@@ -5,6 +5,7 @@ Mud.Player = {
 	Type: "none",
 	Username: document.getElementById('user').value, // Go Play Chess account
 	Name: "",     // Mud account name
+	SessionID: document.getElementById('sessionID').value // Session Token
 	Class: "",
 	Race: "",
 	Gender: "",

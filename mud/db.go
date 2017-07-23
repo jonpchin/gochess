@@ -3,6 +3,8 @@ package mud
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/jonpchin/gochess/gostuff"
 )
@@ -46,14 +48,24 @@ func isNameTaken(name string) bool {
 	return true
 }
 
+// Update name into mud and insert name into location with default coordinates
 func registerName(name string, username string) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	stmt, err := db.Prepare("UPDATE mud SET name=? WHERE username=?")
 	defer stmt.Close()
 
 	_, err = stmt.Exec(name, username)
 	if err != nil {
-		fmt.Println("registerName 1", err)
+		log.Println(err)
+	}
+
+	stmt, err = db.Prepare("INSERT mud SET username=?, area=?, x=?, y=?, z=?")
+	defer stmt.Close()
+
+	_, err = stmt.Exec(username, "Cain's Hideout", 5, 5, 5)
+	if err != nil {
+		log.Println(err)
 	}
 }
 

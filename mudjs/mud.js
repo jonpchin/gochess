@@ -77,6 +77,8 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 console.log(json);
                 updatePlayer(json);
                 break;
+            case "enter_world":
+                break;
             default:
                 console.log("No such socket type", json.Type);
         }
