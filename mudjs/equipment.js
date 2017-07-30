@@ -30,8 +30,3 @@ Mud.Object = {
     Resistance:      0
 }
 
-Mud.Coordinate = {
-    Row: 5,
-    Col: 5,
-    Level: 5
-}

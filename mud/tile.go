@@ -27,7 +27,7 @@ type Area struct {
 	Name string
 }
 
-// asterisk character is reserved for adventurer (self)
+// asterisk character is reserved for adventurer (self), characters shoulds should be no longer then length one
 const (
 	UNUSED     = iota // " "
 	FLOOR             // "."

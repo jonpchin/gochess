@@ -80,6 +80,9 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 break;
             case "enter_world":
                 break;
+            case "look":
+                displayMap(json.Map);
+                break;
             default:
                 console.log("No such socket type", json.Type);
         }
@@ -102,6 +105,22 @@ function displayToTextBox(message, textColor){
     codeMirror.scrollTo(0, codeMirror.getScrollInfo().height);
 }
 
+// Displays to textbox without appending the newline, used for printing out the map
+function displayToTextBoxNoNewLine(message, textColor){
+
+    // Default text black as the default color unless the background is white,
+    // then the text would default to white
+    if(textColor){
+       //console.log("Font color is set!");
+    }else{
+        // TODO: Check the background color and set the default text color appropriately
+        textColor="#000000";
+    }
+    var lastLine = codeMirror.lastLine();
+    codeMirror.replaceRange(message, CodeMirror.Pos(lastLine));
+    codeMirror.markText({line:lastLine-1,ch:lastLine.length-1},{line:lastLine-1,ch:lastLine.length},{css:"color: " + textColor});
+}
+
 document.getElementById('sendButton').onclick = function(){
     var message = document.getElementById('message').value
     displayToTextBox(message);
@@ -121,8 +140,21 @@ function enterWorldFirstTime(){
     Mud.Player.Type = "enter_world_first_time";
     sock.send(JSON.stringify(Mud.Player));
     GameState.ingame = true;
-    displayToTextBox("Welcome " + Mud.PLayer.Name + "! To get started type on your first quest type quest.", "blue");
-    displayMap();
+}
+
+
+function fetchMap(){
+    
+    var credentials = {
+        Username: Mud.Player.Username,
+        Name: Mud.Player.Name,
+        SessionID: Mud.Player.SessionID
+    }
+    var message = {
+        Type: "fetch_map",
+        Creds: credentials
+    }
+    sock.send(JSON.stringify(message));
 }
 
 function searchCommands(command){
@@ -150,6 +182,9 @@ function determineMessageType(message){
         switch(searchCommands(message).toLowerCase()){
             case "":
                 displayToTextBox("I do not understand.");
+                break;
+            case "look":
+                fetchMap();
                 break;
             case "north":
                 displayToTextBox("You walk north.");

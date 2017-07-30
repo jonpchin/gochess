@@ -31,6 +31,8 @@ type PlayerPublic struct {
 	Area       Area
 }
 
+// Map will always be square and limited to odd number so MapVision 5 is 11x11, MapVision 4 is 9x9
+// Largest allowed MapVision will be 10 or 21x21 unless provided by a class skill, default is MapVision 5
 type Player struct {
 	Type       string // Message type
 	Username   string // Go Play Chess account
@@ -44,10 +46,27 @@ type Player struct {
 	Stats      PlayerStats
 	Status     []string // List of afflictions or buffs affecting player
 	Bleed      int      // Amount of health the player will lose every tick
+	Map        string   // Shows the section of the map where a player's vision is limited too
 	Level      int
 	Experience int
 	Location   Coordinate
 	Area       Area
+}
+
+// Contains string of MapVision of player and the details of the room he is in
+// Used when player "looks"
+type PlayerMap struct {
+	Type        string
+	Creds       Credentials
+	Map         string
+	Coordinates Coordinate
+	CurrentTile Tile
+}
+
+type Credentials struct {
+	Username  string
+	Name      string
+	SessionID string
 }
 
 type PlayerStats struct {
@@ -97,12 +116,32 @@ func (player *Player) loadPlayerData(username string) {
 		return
 	}
 
-	err = db.QueryRow(`SELECT area, x, y, z FROM location where name=?`,
-		player.Name).Scan(&player.Location.Row, &player.Location.Col, &player.Location.Level)
+	var playerMap string
+
+	err = db.QueryRow(`SELECT area, x, y, z, map FROM location where name=?`,
+		player.Name).Scan(&player.Area.Name, &player.Location.Row, &player.Location.Col,
+		&player.Location.Level, &playerMap)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+}
+
+// Sets the player map to be sent to the client
+func (playerMap *PlayerMap) setPlayerMap() {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	err := db.QueryRow(`SELECT x, y, z, map FROM location where name=?`,
+		playerMap.Creds.Name).Scan(&playerMap.Coordinates.Row, &playerMap.Coordinates.Col,
+		&playerMap.Coordinates.Level,
+		&playerMap.Map)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	playerMap.CurrentTile = world.Floors[playerMap.Coordinates.Level].Plan[playerMap.Coordinates.Row][playerMap.Coordinates.Col]
 }
 
 func (player *Player) save() {
@@ -129,13 +168,13 @@ func (player *Player) save() {
 		log.Println(err)
 	}
 
-	stmt, err = db.Prepare("UPDATE location SET area=?, x=?, y=?, z=?, WHERE name=?")
+	stmt, err = db.Prepare("UPDATE location SET area=?, x=?, y=?, z=?, map=?, WHERE name=?")
 	if err != nil {
 		log.Println(err)
 	}
 
 	_, err = stmt.Exec(&player.Area.Name, &player.Location.Row, &player.Location.Col, &player.Location.Level,
-		&player.Name)
+		&player.Map, &player.Name)
 	if err != nil {
 		log.Println(err)
 	}

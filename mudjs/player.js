@@ -1,4 +1,3 @@
-
 Mud.Classes = getClasses();
 Mud.Races = getRaces();
 Mud.Player = {
@@ -22,16 +21,21 @@ Mud.Player = {
 		Wisdom: 10
 	}, 
 	Status: ["healthy"], 
-	Bleed: 0,  
+	Map: "", // Contains 2D array of strings, odd number is always square so MapVision 5 is 11x11
+	Bleed: 0,
 	Level: 1, 
 	Experience: 0,
 	Location: Mud.Coordinate,
 	Area: Mud.Area
 }
 
-Mud.Area = {
-	Name: "Cain's Hideout"
-}
+// Map of mud name to Mud.Player
+Mud.Server = [];
+Mud.Server[Mud.Player.Name] = Mud.Player;
+
+Mud.Server.Stats = {
+	HiddenPlayers: 0
+};
 
 // Since this function is async if one wants to call this on load a sleep will need to be made
 // or a non async getClasses needs to be made

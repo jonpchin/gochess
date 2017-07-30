@@ -83,6 +83,23 @@ func (c *MudConnection) MudConnect() {
 			registerName(player.Name, c.username)
 			player.save()
 			player.enterWorld(SKIP_LOAD, c)
+		case "fetch_map":
+
+			var playerMap PlayerMap
+			if err := json.Unmarshal(message, &playerMap); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
+
+			if MudServer.Players[playerMap.Creds.Username].isCredValid(
+				playerMap.Creds.Username, playerMap.Creds.Name, playerMap.Creds.SessionID) == false {
+				log.Println("Invalid credentials")
+				break
+			}
+
+			playerMap.Type = "update_map"
+			playerMap.setPlayerMap()
+			c.sendJSONWebSocket(&playerMap)
 		default:
 			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
 		}
