@@ -1,6 +1,8 @@
 {
-	"north",
-	"east",
-	"south",
-	"west",
-}    
+	"commands": [
+		"north",
+		"east",
+		"south",
+		"west"
+	]
+}
