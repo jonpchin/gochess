@@ -13,7 +13,8 @@ var codeMirror = CodeMirror.fromTextArea(document.getElementById('textbox'), {
 // Game state encapsulates all information relevant to the client
 var GameState = {
     status: "connect", // Determines what kind of message gets sent over the websocket
-    name: ""          // Player's adventurer name
+    name: "",          // Player's adventurer name
+    ingame: false      // If true then player is in the MUD world
 };
 
 window.onload = function() {
@@ -119,42 +120,89 @@ function checkName(name){
 function enterWorldFirstTime(){
     Mud.Player.Type = "enter_world_first_time";
     sock.send(JSON.stringify(Mud.Player));
+    GameState.ingame = true;
+    displayToTextBox("Welcome " + Mud.PLayer.Name + "! To get started type on your first quest type quest.", "blue");
+    displayMap();
+}
+
+function searchCommands(command){
+
+    $.getJSON('../data/mud/commands.json', function(data) {        
+        
+        for (var key in data) {
+            // skip loop if the property is from prototype
+            if (!data.hasOwnProperty(key)){
+                continue;
+            }
+            if(command.startsWith(key)){
+                return key;
+            }
+        }
+    });
+    return "";
 }
 
 function determineMessageType(message){
     var status = GameState.status;
     
-    switch(status){
-        case "connect":
-            break;
-        case "check_name":
-            checkName(message);
-            break;
-        case "save_name":
-            savePlayerData(status, message);
-            askClass();
-            break;
-        case "register_class":
-            if(isValidClass(message) === false){
-                displayToTextBox("That is not a valid class. Please try again.");
+    if (GameState.ingame){
+        // Searches command for matching starting substring, all commands are lowercase
+        switch(searchCommands(message).toLowerCase()){
+            case "":
+                displayToTextBox("I do not understand.");
+                break;
+            case "north":
+                displayToTextBox("You walk north.");
+                break;
+            case "east":
+                displayToTextBox("You walk east.");
+                break;
+            case "south":
+                displayToTextBox("You walk south.");
+                break;
+            case "west":
+                displayToTextBox("You walk west.");
+                break;
+            default:
+                // This means its a command in commands.json but its not registered in the switch statement
+                displayToTextBox("That does not make sense.");
+                break;
+        }
+    }else{
+         switch(status){
+            case "connect":
+                break;
+            case "check_name":
+                checkName(message);
+                break;
+            case "save_name":
+                savePlayerData(status, message);
                 askClass();
-            }else{
-                savePlayerData(status, message);
-                askRace();
-            }
-            break;
-        case "save_race":
-            if(isValidRace(message) === false){
-                displayToTextBox("That is not a valid race. Please try again.");
-                askRace();
-            }else{
-                savePlayerData(status, message);
-                enterWorldFirstTime();
-            }
-            break;
-        default:
-            console.log("No matching message type for", status);
+                break;
+            case "register_class":
+                if(isValidClass(message) === false){
+                    displayToTextBox("That is not a valid class. Please try again.");
+                    askClass();
+                }else{
+                    savePlayerData(status, message);
+                    askRace();
+                }
+                break;
+            case "save_race":
+                if(isValidRace(message) === false){
+                    displayToTextBox("That is not a valid race. Please try again.");
+                    askRace();
+                }else{
+                    savePlayerData(status, message);
+                    enterWorldFirstTime();
+                }
+                break;
+            default:
+                console.log("No matching message type for", status);
+        }
     }
+
+   
 }
 
 function askClass(){

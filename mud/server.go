@@ -35,8 +35,16 @@ func (c *MudConnection) MudConnect() {
 		case "connect_mud":
 			if isNameExistForPlayer(c.username) {
 				var player Player
-				player.Username = c.username
+				if err := json.Unmarshal(message, &player); err != nil {
+					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+					break
+				}
 				player.Type = "enter_world"
+				// Check to make sure player is not pretending to be someone else or changing name without permission
+				if MudServer.Players[player.Username].isCredValid(player.Username, player.Name, player.SessionID) == false {
+					log.Println("Invalid credentials")
+					break
+				}
 				player.enterWorld(LOAD_PLAYER, c) // Name already exists for player
 				fmt.Println("Player already exists", c.username)
 			} else {
@@ -61,8 +69,10 @@ func (c *MudConnection) MudConnect() {
 				break
 			}
 
-			// Check to make sure player is not pretending to be someone else or changing name without permission
-			MudServer.Players[player.Username].isCredValid(player.Username, player.Name, player.SessionID)
+			if MudServer.Players[player.Username].isCredValidFirstTime(player.Username, player.SessionID) == false {
+				log.Println("Invalid credentials")
+				break
+			}
 
 			player.Type = "update_player"
 			//player.updateByRaceClass()

@@ -154,11 +154,28 @@ func (player *Player) updateByRaceClass(jsonFile string) {
 // Ensure player is not trying to impersonate someone else or change name without permission
 // Returns true if player's username, name and sessionID are all valid
 func (player *Player) isCredValid(username, name, sessionID string) bool {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	if player.Username != username {
+		log.Println("player.Username:", player.Username, "username:", username)
 		return false
 	} else if player.Name != name {
+		log.Println("player.Name:", player.Name, "name:", name)
 		return false
 	} else if player.SessionID != sessionID {
+		log.Println("player.SessionID:", player.SessionID, "sessionID:", sessionID)
+		return false
+	}
+	return true
+}
+
+// First time logging only compares username and sessionID
+func (player *Player) isCredValidFirstTime(username, sessionID string) bool {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	if player.Username != username {
+		log.Println("player.Username:", player.Username, "username:", username)
+		return false
+	} else if player.SessionID != sessionID {
+		log.Println("player.SessionID:", player.SessionID, "sessionID:", sessionID)
 		return false
 	}
 	return true
