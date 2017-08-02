@@ -148,6 +148,7 @@ func main() {
 			goforum.ConnectDb()
 			mud.ConnectDb()
 			mud.CreateWorld()
+			mud.PrintWorldToFile()
 			//weather.FetchWeather()
 			//gostuff.RemoveGameHistory(days)
 		}

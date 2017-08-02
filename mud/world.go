@@ -1,5 +1,10 @@
 package mud
 
+import (
+	"io/ioutil"
+	"strconv"
+)
+
 // A dungeon consists of floors which can be transversed through stairs
 type World struct {
 	Floors []Floor
@@ -40,4 +45,24 @@ func CreateWorld() {
 		floor.makeRooms(i)
 		world.Floors[i] = floor
 	}
+}
+
+// Prints the world with each floor as floor_#.txt in ASCII format
+func PrintWorldToFile() {
+	for index, floor := range world.Floors {
+		floor.writeFloorToFile(index)
+	}
+}
+
+func (floor *Floor) writeFloorToFile(index int) {
+
+	floorData := ""
+	for i := 0; i < len(floor.Plan); i += 1 {
+		for j := 0; j < len(floor.Plan[i]); j += 1 {
+			floorData += floor.Plan[i][j].TileType
+		}
+		floorData += "\n"
+	}
+
+	ioutil.WriteFile("mud/world/floor_"+strconv.Itoa(index)+".txt", []byte(floorData), 0666)
 }

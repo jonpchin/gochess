@@ -80,7 +80,7 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 break;
             case "enter_world":
                 break;
-            case "look":
+            case "update_map":
                 displayMap(json.Map);
                 break;
             default:
@@ -140,6 +140,7 @@ function enterWorldFirstTime(){
     Mud.Player.Type = "enter_world_first_time";
     sock.send(JSON.stringify(Mud.Player));
     GameState.ingame = true;
+    displayToTextBox("Welcome " + Mud.PLayer.Name + "! To get started type on your first quest type quest.", "blue");
 }
 
 
