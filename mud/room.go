@@ -1,6 +1,10 @@
 package mud
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
 type Room struct {
 	Tiles []Tile // List of all tiles in room
@@ -16,37 +20,73 @@ type Coordinate struct {
 func (floor *Floor) makeRooms(floorLevel int) {
 
 	const (
-		roomsLow  = 50
-		roomsHigh = 200
+		roomsLow  = 200
+		roomsHigh = 1000
+
+		roomDimensionLow   = 7
+		roomsDimensionHigh = 40
+
+		lowDistance  = 5
+		highDistance = 10
 	)
+
+	rand.Seed(time.Now().UnixNano())
+	distanceBetweenRooms := rand.Intn(highDistance) + lowDistance
 
 	numRooms := getRandomIntRange(roomsLow, roomsHigh)
 
+	width := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
+	length := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
+
 	// Place the first room in the center
-	floor.makeRoom(floor.Width/2, floor.Length/2, getRandomDirection(), tileChars[FLOOR])
+	floor.makeRoom(floor.Width/2, floor.Length/2, getRandomDirection(), tileChars[FLOOR],
+		width, length, distanceBetweenRooms)
+
 	// TODO: If failed to make a room decrement i
 	for i := 1; i < numRooms; i += 1 {
-		tile := floor.getRandomTileOnWall()
-		floor.makeRoom(tile.Row/2, tile.Col/2, getRandomDirection(), getCommonTerrainType())
+		room := floor.getRandomRoomOnFloor()
+		tile := room.getRandomTileOnWall()
+		rand.Seed(time.Now().UnixNano())
+		width = rand.Intn(roomsDimensionHigh) + roomDimensionLow
+		length = rand.Intn(roomsDimensionHigh) + roomDimensionLow
+
+		if floor.isRoomWithinFloorDimensions(tile.Row, tile.Col, width, length) {
+			direction := getRandomDirection()
+			if floor.makeRoom(tile.Row, tile.Col, direction, getCommonTerrainType(),
+				width, length, distanceBetweenRooms) {
+				tile.createWallFeature()
+				// For now just assign tileType later use entire tile when it has more metadata
+				floor.Plan[tile.Row][tile.Col].TileType = tile.TileType
+				floor.createCorridorInDirection(tile, direction, distanceBetweenRooms)
+			}
+		}
 	}
+}
+
+// Returns true if room is within floor dimensions
+func (floor *Floor) isRoomWithinFloorDimensions(row, col, width, length int) bool {
+
+	if row-width < 0 || col-length < 0 {
+		return false
+	}
+
+	if row+width > floor.Width || col+length > floor.Length {
+		return false
+	}
+	return true
 }
 
 // x and y is the tile location which connects the current rooms
 // to the next room. Direction will be used to check, terrainType is a tileChar
 // such as floor, cloud, moutain, etc, except special terrain such as unused, door and whirlpool
 // Returns true if a room is succesfully created
-func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string) bool {
-
-	const (
-		roomDimensionLow   = 7
-		roomsDimensionHigh = 40
-	)
-
-	width := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
-	length := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
+func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string,
+	width int, length int, distanceBetweenRooms int) bool {
 
 	var topLeft Coordinate
 	var bottomRight Coordinate
+	topLeft.Level = floor.Level
+	bottomRight.Level = floor.Level
 
 	// x is top left and bottom bottomRight
 	// O is where x and y coordinate is located
@@ -58,9 +98,9 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string
 	//       O
 	if dir == NORTH {
 
-		topLeft.Row = (row - 1) - length
+		topLeft.Row = (row - distanceBetweenRooms) - length
 		topLeft.Col = col - (width / 2)
-		bottomRight.Row = row - 1
+		bottomRight.Row = row - distanceBetweenRooms
 		bottomRight.Col = col + (width / 2)
 
 		//   x
@@ -73,9 +113,9 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string
 	} else if dir == EAST {
 
 		topLeft.Row = row - (length / 2)
-		topLeft.Col = col + 1
+		topLeft.Col = col + distanceBetweenRooms
 		bottomRight.Row = row + (length / 2)
-		bottomRight.Col = col + 1 + width
+		bottomRight.Col = col + distanceBetweenRooms + width
 
 		//       O
 		// . . . C . ..x
@@ -85,9 +125,9 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string
 		// .
 	} else if dir == SOUTH {
 
-		topLeft.Row = row - 1
+		topLeft.Row = row - distanceBetweenRooms
 		topLeft.Col = col - (width / 2)
-		bottomRight.Row = row + 1 + length
+		bottomRight.Row = row + distanceBetweenRooms + length
 		bottomRight.Col = col + (width / 2)
 
 		//                  .
@@ -101,23 +141,19 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string
 	} else if dir == WEST {
 
 		topLeft.Row = row - (length / 2)
-		topLeft.Col = col - 1 - (width / 2)
+		topLeft.Col = col - distanceBetweenRooms - width
 		bottomRight.Row = row + (length / 2)
-		bottomRight.Col = col - 1
+		bottomRight.Col = col - distanceBetweenRooms
 
 	} else {
 		fmt.Println("Error invalid direction for makeRoom", row, col, dir)
 	}
 
-	isCreated := false
-
 	if floor.isRoomUsed(topLeft, bottomRight) {
-
-	} else {
-		floor.createTilesInRoom(topLeft, bottomRight, terrainType)
-		isCreated = true
+		return false
 	}
-	return isCreated
+
+	return floor.createTilesInRoom(topLeft, bottomRight, terrainType)
 }
 
 // If the room is already occupied return true
@@ -134,31 +170,38 @@ func (floor *Floor) isRoomUsed(topLeft, bottomRight Coordinate) bool {
 
 func (floor *Floor) isValidCoordinate(row, col int) bool {
 	if row < 0 || row >= floor.Length {
+		fmt.Println("row is ", row, floor.Length)
 		return false
 	}
 	if col < 0 || col >= floor.Width {
+		fmt.Println("col is ", col, floor.Width)
 		return false
 	}
 	return true
 }
 
-// Builds all the tiles in the room
-func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainType string) {
+// Builds all the tiles in the room, returns true if sucessfully built
+func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainType string) bool {
 	var area Area
 	area = getRandomArea()
 	var room Room
-	room.Wall = make([]Tile, 1)
+
 	for i := topLeft.Row; i <= bottomRight.Row; i += 1 {
 		for j := topLeft.Col; j <= bottomRight.Col; j += 1 {
 			if floor.isValidCoordinate(i, j) {
-
+				var coordinate Coordinate
+				coordinate.Row = i
+				coordinate.Col = j
+				coordinate.Level = floor.Level
 				// Adds the edge tiles to the wall list of each room
 				if i == topLeft.Row || i == bottomRight.Row ||
 					j == topLeft.Col || j == bottomRight.Col {
+
+					floor.Plan[i][j].createTile(floor.Level, area, tileChars[WALL], coordinate)
 					room.Wall = append(room.Wall, floor.Plan[i][j])
-					floor.Plan[i][j].createTile(floor.Level, area, tileChars[WALL])
+
 				} else {
-					floor.Plan[i][j].createTile(floor.Level, area, terrainType)
+					floor.Plan[i][j].createTile(floor.Level, area, terrainType, coordinate)
 				}
 
 				// Adds all the tiles in the room
@@ -166,17 +209,11 @@ func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainTy
 			}
 		}
 	}
-	floor.Rooms = append(floor.Rooms, room)
-}
 
-// Create tile with all its meata data such as name, description, x, y etc
-func (tile *Tile) createTile(floorLevel int, area Area, tileCharType string) {
-	tile.Name = getRandomTileName()
-	tile.Description = getRandomTileDescription()
-	tile.Floor = floorLevel
-	tile.Area = area
-	//tile.Room =
-	// TODO Randomly pick a TileChar but usually its a common type such as floor or trees
-	// Need to make the edges walls and not override the door
-	tile.TileType = getRandomTileChar()
+	if len(room.Wall) < 8 || len(room.Tiles) < 9 {
+		return false
+	}
+
+	floor.Rooms = append(floor.Rooms, room)
+	return true
 }

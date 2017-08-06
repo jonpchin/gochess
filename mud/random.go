@@ -4,16 +4,27 @@ import (
 	"bufio"
 	crypto "crypto/rand"
 	"fmt"
-	"log"
 	"math/big"
 	"math/rand"
 	"os"
 	"time"
 )
 
+func generateRandomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
 // Calling getRandomInt(100) will return a random number 0 to 100 inclusive
 // If max is less then zero, then zero will be returned
 func getRandomInt(max int) int {
+	rand.Seed(time.Now().UnixNano())
 	if max >= 0 {
 		return rand.Intn(max)
 	}
@@ -66,10 +77,10 @@ func secureRandomIntRange(min, max int64) (int64, error) {
 
 // Returns a radom direction. Returns north if there was an error
 func getRandomDirection() Direction {
-	result, err := secureRandomInt(3)
-	if err != nil {
-		fmt.Println("Can't get random integer for direction", err)
-	}
+
+	rand.Seed(time.Now().UnixNano())
+	result := rand.Intn(4)
+
 	switch result {
 	case 0:
 		return NORTH
@@ -86,28 +97,19 @@ func getRandomDirection() Direction {
 }
 
 func (floor *Floor) getRandomRoomOnFloor() Room {
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	// Crypto int cannot take a max int of zero
-	randNum, err := secureRandomInt(int64(len(floor.Rooms)))
-
-	if err != nil {
-		log.Println(err)
-	}
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(len(floor.Rooms))
 
 	return floor.Rooms[randNum]
 }
 
 // Selects a random tile on the wall of a room
-func (floor *Floor) getRandomTileOnWall() Tile {
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+func (room *Room) getRandomTileOnWall() Tile {
 
-	room := floor.getRandomRoomOnFloor()
-	randNum, err := secureRandomIntRange(0, int64(len(room.Wall)))
-	if err != nil {
-		log.Println(err)
-	}
-
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(len(room.Wall))
 	return room.Wall[randNum]
 }
 

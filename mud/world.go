@@ -29,10 +29,10 @@ func (player *Player) enterWorld(loadPlayer bool, connection *MudConnection) {
 func CreateWorld() {
 
 	const (
-		low       = 3
-		high      = 10
-		floorLow  = 3
-		floorHigh = 30
+		low       = 2
+		high      = 4
+		floorLow  = 300
+		floorHigh = 500
 	)
 	numOfFloors := getRandomIntRange(low, high)
 	world.Floors = make([]Floor, numOfFloors)
@@ -41,6 +41,7 @@ func CreateWorld() {
 		var floor Floor
 		floor.Width = getRandomIntRange(floorLow, floorHigh)
 		floor.Length = getRandomIntRange(floorLow, floorHigh)
+		floor.Level = i
 		floor.initFloorTileType()
 		floor.makeRooms(i)
 		world.Floors[i] = floor

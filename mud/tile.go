@@ -1,8 +1,8 @@
 package mud
 
 import (
-	"log"
-	"os"
+	"math/rand"
+	"time"
 )
 
 // A tile is the smallest unit on the map
@@ -31,7 +31,7 @@ type Area struct {
 const (
 	UNUSED     = iota // " "
 	FLOOR             // "."
-	CORRIDOR          // ","
+	CORRIDOR          // "="
 	WALL              // "#"
 	CLOSEDOOR         // "+"
 	OPENDOOR          // "-"
@@ -42,12 +42,13 @@ const (
 	CLOUD             // "@"
 	MOUNTAIN          // "^"
 	WHIRLPOOL         // "!"
+	UNKNOWN           // ","
 )
 
 var tileChars = []string{
 	" ",
 	".",
-	",",
+	"=",
 	"#",
 	"+",
 	"-",
@@ -58,15 +59,16 @@ var tileChars = []string{
 	"@",
 	"^",
 	"!",
+	",",
 }
 
 // These types of terrain are most common
 var commonTerrainTypes = []string{
 	tileChars[FLOOR],
-	tileChars[CORRIDOR],
+	//tileChars[CORRIDOR],
 	tileChars[FOREST],
-	tileChars[WATER],
-	tileChars[CLOUD],
+	//tileChars[WATER],
+	//tileChars[CLOUD],
 }
 
 type Direction int
@@ -100,19 +102,29 @@ func getRandomArea() Area {
 }
 
 func getRandomTileChar() string {
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	randNum, err := secureRandomInt(int64(len(tileChars) - 1))
-	if err != nil {
-		log.Println(err)
-	}
+
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(len(tileChars) - 1)
 	return tileChars[randNum]
 }
 
 func getCommonTerrainType() string {
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	randNum, err := secureRandomInt(int64(len(commonTerrainTypes) - 1))
-	if err != nil {
-		log.Println(err)
-	}
-	return tileChars[randNum]
+
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(len(commonTerrainTypes) - 1)
+	return commonTerrainTypes[randNum]
+}
+
+// Create tile with all its meata data such as name, description, x, y etc
+func (tile *Tile) createTile(floorLevel int, area Area, tileCharType string, coordinate Coordinate) {
+	tile.Name = getRandomTileName()
+	tile.Description = getRandomTileDescription()
+	tile.Area = area
+	tile.Row = coordinate.Row
+	tile.Col = coordinate.Col
+	tile.Floor = floorLevel
+	//tile.Room =
+	// TODO Randomly pick a TileChar but usually its a common type such as floor or trees
+	// Need to make the edges walls and not override the door
+	tile.TileType = tileCharType
 }

@@ -25,6 +25,8 @@ func (floor *Floor) initFloorTileType() {
 
 		for j := 0; j < floor.Width; j += 1 {
 			floor.Plan[i][j].TileType = tileChars[UNUSED]
+			floor.Plan[i][j].Row = i
+			floor.Plan[i][j].Col = j
 		}
 	}
 }
