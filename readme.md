@@ -110,6 +110,32 @@ Mages are spell casters who wield powerful spells. They can do great damage but 
 as a trade off.
 
 5. <b>Thief</b>:
+Makes a living by robbing others.
+
+6. <b>Ranger</b>:
+Cunning forestmen who lay traps.
+
+7.  <b>Swordmaster</b>:
+Swordmasters train with the blade day and night until they become experts.
+
+8.  <b>Illusionist</b>:
+Manipulates space and time
+
+9.  <b>Priest</b>:
+Holy magic casters
+
+10. <b>Necromancer</b>:
+Can raise people from the dead
+
+11. <b>Witch</b>:
+Uses dark voodo magic and can create healing potions
+
+12. <b>Paladin</b>:
+Holy warriors who can use holy magic
+13. <b>Alchemist</b>:
+Able to manipulate bodily fluid's and create rare elements
+14. <b>Jester</b>:
+The utlimate prankster
 
 Races
 1. Human
