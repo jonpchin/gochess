@@ -107,8 +107,8 @@ func main() {
 	//parse console arguments to determine OS environment to use localhost or goplaychess.com
 	//default is localhost if no argument is passed
 	if len(os.Args) > 1 {
-		certPath = "secret/combine2017.crt"
-		keyPath = "secret/go2017.key"
+		certPath = "secret/fullchain.pem" //chain.pem and cert.pem combined
+		keyPath = "secret/privkey.pem"
 	} else if gostuff.IsEnvironmentTravis() {
 		certPath = "_travis/data/device.crt"
 		keyPath = "_travis/data/device.key"
