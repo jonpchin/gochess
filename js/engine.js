@@ -47,11 +47,6 @@ var greySquare = function(square) {
 
 var updateStatus = function(moveString) {
 
-	if (game.in_checkmate()){
-		alert('Game over, ' + moveColor + ' is in checkmate.');
-		return;
-	}
-
 	if(document.getElementById("cinnamonRadioButton").checked === true){
 		cinnamonEngineGo()
 	}else{ // then send move to stockfish
@@ -60,16 +55,31 @@ var updateStatus = function(moveString) {
 	}
 	var status = '';
 
+	status = checkGameStatus(getMoveColor());
+
+	statusEl.html(status);
+	fenEl.html(game.fen());
+	pgnEl.html(game.pgn());
+
+	return status;
+};
+
+function getMoveColor(){
 	var moveColor = 'White';
 	if (game.turn() === 'b') {
 		moveColor = 'Black';
 	}
+	return moveColor;
+}
 
-	// checkmate?
+function checkGameStatus(moveColor){
+	var status = "";
 	if (game.in_checkmate() === true) {
 		status = 'Game over, ' + moveColor + ' is in checkmate.';
+		sendNotification(status);
 	} else if (game.in_draw() === true) { // draw?
 		status = 'Game over, drawn position';
+		sendNotification(status);
 	} else { // game still on
 		status = moveColor + ' to move';
 
@@ -78,12 +88,7 @@ var updateStatus = function(moveString) {
 			status += ', ' + moveColor + ' is in check';
 		}
 	}
-	statusEl.html(status);
-	fenEl.html(game.fen());
-	pgnEl.html(game.pgn());
-
-	return status;
-};
+}
 
 var onSnapEnd = function() {
 	board.position(game.fen());
@@ -102,10 +107,11 @@ function cinnamonEngineGo(){
 		to: to,
 		promotion: 'q' // NOTE: always promote to a queen for example simplicity
 	});
-
+	
 	totalFEN.push(game.fen());
 	totalPGN.push(game.pgn());
 	++moveCounter;
+	checkGameStatus(getMoveColor());
 }
 
 // updates the board with the move stock fish had in mine
@@ -122,6 +128,7 @@ function stockFishEngineGo(src, tar){
 	totalFEN.push(game.fen());
 	totalPGN.push(game.pgn());
 	++moveCounter;	
+	checkGameStatus(getMoveColor());
 }
 
 var onMouseoverSquare = function(square, piece) {
@@ -316,6 +323,33 @@ function getCookie(cname) { //gets cookies value
         if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
     }
     return "";
+}
+
+function sendNotification(message) {
+	
+	// check if the browser supports notifications
+	if (!("Notification" in window)) {
+		alert("This browser does not support system notifications");
+	}
+  
+	// check whether notification permissions have already been granted
+	else if (Notification.permission === "granted") {
+		// create a notification
+		var notification = new Notification(message);
+	}
+  
+	// Otherwise, ask the user for permission
+	else if (Notification.permission !== 'denied') {
+		Notification.requestPermission(function (permission) {
+		// If the user accepts, create a notification
+		if (permission === "granted") {
+			var notification = new Notification(message);
+		}
+		});
+	}
+	else{
+		document.getElementById('textbox').innerHTML += (message + '\n');
+	}
 }
 
 function detectMobile(){ //tries to detect if user is using a mobile device

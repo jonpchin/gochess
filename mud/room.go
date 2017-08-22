@@ -170,11 +170,9 @@ func (floor *Floor) isRoomUsed(topLeft, bottomRight Coordinate) bool {
 
 func (floor *Floor) isValidCoordinate(row, col int) bool {
 	if row < 0 || row >= floor.Length {
-		fmt.Println("row is ", row, floor.Length)
 		return false
 	}
 	if col < 0 || col >= floor.Width {
-		fmt.Println("col is ", col, floor.Width)
 		return false
 	}
 	return true

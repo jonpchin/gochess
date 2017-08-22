@@ -52,7 +52,8 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>5. Update help, documentation and screenshots</p>
 <p>6. Post game analysis with Stockfish engine</p>
 <p>7. Statistics page</p>
-<p>7. Store zipped source files and databas backup in Google Drive or Dropbox.</p>
+<p>8. Store zipped source files and databas backup in Google Drive or Dropbox.</p>
+<p>9. Add web notification when game is over.</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
