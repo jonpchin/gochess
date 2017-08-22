@@ -325,6 +325,20 @@ function getCookie(cname) { //gets cookies value
     return "";
 }
 
+// Ask user to support notifications
+function askNotificationPermission(){
+	
+	if (!Notification) {
+		alert('Desktop notifications not available in your browser. Try Chromium.'); 
+		return;
+	}
+
+	if (Notification.permission !== "granted"){
+		Notification.requestPermission();
+	}	
+}
+askNotificationPermission();
+
 function sendNotification(message) {
 	
 	// check if the browser supports notifications
@@ -341,10 +355,10 @@ function sendNotification(message) {
 	// Otherwise, ask the user for permission
 	else if (Notification.permission !== 'denied') {
 		Notification.requestPermission(function (permission) {
-		// If the user accepts, create a notification
-		if (permission === "granted") {
-			var notification = new Notification(message);
-		}
+			// If the user accepts, create a notification
+			if (permission === "granted") {
+				var notification = new Notification(message);
+			}
 		});
 	}
 	else{
