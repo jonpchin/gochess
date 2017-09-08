@@ -28,10 +28,43 @@ type UserInfo struct {
 //processes the users input when signing up
 func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
+	userInfo, isValid := IsValidRegistration(w, r)
+	if isValid {
+		problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
+		defer problems.Close()
+		log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
+
+		message, err := userInfo.Register(r.Host)
+		if err == nil {
+
+			message, err := userInfo.registerRating()
+			if err == nil {
+				//sends email to user
+				go Sendmail(userInfo.Email, userInfo.Token, userInfo.Username, r.Host)
+
+				message = "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello " +
+					userInfo.Username + "! Please check email for instructions to verify your account."
+				//if reached here just notify user to check his email and continue on with the account creation
+				w.Write([]byte(message))
+			} else {
+				w.Write([]byte(message))
+				log.Println(err)
+			}
+		} else {
+			w.Write([]byte(message))
+			log.Println(err)
+		}
+	}
+}
+
+func IsValidRegistration(w http.ResponseWriter, r *http.Request) (UserInfo, bool) {
+
+	var userInfo UserInfo
+
 	if r.Method != "POST" {
 		w.WriteHeader(404)
 		http.ServeFile(w, r, "404.html")
-		return
+		return userInfo, false
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -39,7 +72,7 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("<script>document.getElementById('captchaSolution').value = '';</script><img src='img/ajax/not-available.png' /> Wrong captcha solution"))
 
 	} else {
-		var userInfo UserInfo
+
 		userInfo.Username = template.HTMLEscapeString(r.FormValue("username"))
 		userInfo.Password = template.HTMLEscapeString(r.FormValue("pass"))
 		confirm := template.HTMLEscapeString(r.FormValue("confirm"))
@@ -57,28 +90,11 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 		} else if len(userInfo.Email) < 5 || len(userInfo.Email) > 30 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please choose an email between 5 and 30 characters long"))
-
 		} else {
-
-			problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-			defer problems.Close()
-			log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
-
-			message, err := userInfo.Register(r.Host)
-			if err == nil {
-				//sends email to user
-				go Sendmail(userInfo.Email, userInfo.Token, userInfo.Username, r.Host)
-
-				message = "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello " +
-					userInfo.Username + "! Please check email for instructions to verify your account."
-				//if reached here just notify user to check his email and continue on with the account creation
-				w.Write([]byte(message))
-			} else {
-				w.Write([]byte(message))
-				log.Println(err)
-			}
+			return userInfo, true
 		}
 	}
+	return userInfo, false
 }
 
 // After all credentials are validated adds users info to database
@@ -137,8 +153,27 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 		return "<img src='img/ajax/not-available.png' /> Can't execute token activation", err
 	}
 
+	if host == "localhost" { // handle corner case for localhost testing
+		stmt, err = db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
+		if err != nil {
+			return "<img src='img/ajax/not-available.png' /> Can't prepare to set country.", err
+		}
+
+		_, err = stmt.Exec("globe", userInfo.Username)
+		if err != nil {
+			return "<img src='img/ajax/not-available.png' /> Can't execute to set country.", err
+		}
+	} else {
+		// updates players country in database when they register for the first time
+		setCountry(userInfo.Username, userInfo.IpAddress)
+	}
+	return "", nil
+}
+
+func (userInfo *UserInfo) registerRating() (string, error) {
+
 	//setting up player's rating
-	stmt, err = db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, correspondence=?, bulletRD=?, blitzRD=?, standardRD=?, correspondenceRD=?")
+	stmt, err := db.Prepare("INSERT rating SET username=?, bullet=?, blitz=?, standard=?, correspondence=?, bulletRD=?, blitzRD=?, standardRD=?, correspondenceRD=?")
 	if err != nil {
 		return "<img src='img/ajax/not-available.png' /> Can't prepare to update player's rating.", err
 	}
@@ -159,20 +194,6 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 		return "<img src='img/ajax/not-available.png' /> Can't execute into rating history", err
 	}
 
-	if host == "localhost" { // handle corner case for localhost testing
-		stmt, err = db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Can't prepare to set country.", err
-		}
-
-		_, err = stmt.Exec("globe", userInfo.Username)
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Can't execute to set country.", err
-		}
-	} else {
-		// updates players country in database when they register for the first time
-		setCountry(userInfo.Username, userInfo.IpAddress)
-	}
 	return "", nil
 }
 

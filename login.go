@@ -65,7 +65,6 @@ func (userinfo *UserInfo) Login(method string, url string, agent string, host st
 
 		//check if database connection is open
 		if db.Ping() != nil {
-			log.Println()
 			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.",
 				errors.New("DATABASE DOWN!")
 		}
