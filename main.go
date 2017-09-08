@@ -12,7 +12,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
-	"github.com/jonpchin/gochess/mud"
 	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
@@ -70,8 +69,8 @@ func main() {
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
-	http.HandleFunc("/drawchart", plot.DrawChart)
-	http.HandleFunc("/mudserver/mud", mudConsole)
+	//http.HandleFunc("/drawchart", plot.DrawChart)
+	//http.HandleFunc("/mudserver/mud", mudConsole)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -97,7 +96,7 @@ func main() {
 	http.Handle("/data/", http.FileServer(currentDir))
 	http.Handle("/sound/", http.FileServer(currentDir))
 
-	http.Handle("/mudserver", websocket.Handler(mud.EnterMud))
+	//http.Handle("/mudserver", websocket.Handler(mud.EnterMud))
 	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
 	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
 
@@ -125,13 +124,13 @@ func main() {
 		// this is only temporarily until all the tables are imported
 		if proceed && gostuff.IsEnvironmentTravis() == false &&
 			gostuff.IsEnvironmentAppVeyor() == false {
-			plot.SetupCharts()
+			//plot.SetupCharts()
 			//setting up cron job
 			gostuff.StartCron()
 
-			gostuff.RemoveOldGames(days)
-			gostuff.RemoveOldActivate(days)
-			gostuff.RemoveOldForgot(days)
+			//gostuff.RemoveOldGames(days)
+			//gostuff.RemoveOldActivate(days)
+			//gostuff.RemoveOldForgot(days)
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
 			gostuff.UpdateTotalGrandmasterGames()
@@ -142,15 +141,15 @@ func main() {
 			//}
 			// pass in true to export template(No grandmaster) without data in the tables
 
-			gostuff.ExportDatabase(true)
+			//gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
-			gostuff.ValidateJSONFiles()
+			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			//mud.ConnectDb()
 			//mud.CreateWorld()
 			//mud.PrintWorldToFile()
 			//weather.FetchWeather()
-			//gostuff.RemoveGameHistory(days)
+			gostuff.RemoveGameHistory(days)
 		}
 		//gostuff.SpawnProcess()
 
