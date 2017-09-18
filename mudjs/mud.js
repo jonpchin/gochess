@@ -46,7 +46,9 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
         displayToTextBox("");
         displayToTextBox("Welcome to Go MUD!");
 		var message = {
-			Type: "connect_mud"
+            Type: "connect_mud",
+            Username: Mud.Player.Username,
+            SessionID:  Mud.Player.SessionID
 		}
 	    sock.send(JSON.stringify(message));
     }
@@ -79,6 +81,7 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 updatePlayer(json);
                 break;
             case "enter_world":
+                displayToTextBox(json.Map);
                 break;
             case "update_map":
                 displayMap(json.Map);

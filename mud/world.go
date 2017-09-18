@@ -20,7 +20,8 @@ const (
 func (player *Player) enterWorld(loadPlayer bool, connection *MudConnection) {
 
 	if loadPlayer {
-		player.loadPlayerData(player.Username)
+		player.loadPlayerData()
+		player.loadMap()
 	}
 	// Send player data to client
 	connection.sendJSONWebSocket(&player)
@@ -46,6 +47,11 @@ func CreateWorld() {
 		floor.makeRooms(i)
 		world.Floors[i] = floor
 	}
+}
+
+// Loads entire world from file to memory
+func loadWorldFile() {
+
 }
 
 // Prints the world with each floor as floor_#.txt in ASCII format

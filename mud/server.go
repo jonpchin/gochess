@@ -7,10 +7,15 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/jonpchin/gochess/gostuff"
-
 	"golang.org/x/net/websocket"
 )
+
+type Authentication struct {
+	Type      string
+	Username  string // Go Play Chess account
+	Name      string // Mud account (optional)
+	SessionID string
+}
 
 func (c *MudConnection) MudConnect() {
 
@@ -22,55 +27,53 @@ func (c *MudConnection) MudConnect() {
 		if err := websocket.Message.Receive(c.websocket, &reply); err != nil {
 			break
 		}
-		var t gostuff.MessageType
+		var a Authentication
 		message := []byte(reply)
 
-		if err := json.Unmarshal(message, &t); err != nil {
+		if err := json.Unmarshal(message, &a); err != nil {
 			log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 			break
 		}
 
-		switch t.Type {
+		// Check to make sure player is not pretending to be someone else or changing name without permission
+		if MudServer.Players[a.Username].isCredValid(a.Username, a.SessionID) == false {
+			log.Println("Invalid credentials")
+			break
+		}
+
+		switch a.Type {
 
 		case "connect_mud":
-			if isNameExistForPlayer(c.username) {
-				var player Player
-				if err := json.Unmarshal(message, &player); err != nil {
-					log.Println("Just receieved a message I couldn't decode:", string(reply), err)
-					break
-				}
-				player.Type = "enter_world"
-				// Check to make sure player is not pretending to be someone else or changing name without permission
-				if MudServer.Players[player.Username].isCredValid(player.Username, player.Name, player.SessionID) == false {
-					log.Println("Invalid credentials")
-					break
-				}
-				player.enterWorld(LOAD_PLAYER, c) // Name already exists for player
-				fmt.Println("Player already exists", c.username)
-			} else {
-				t.Type = "ask_name"
-				err := websocket.JSON.Send(MudServer.Lobby[c.username], &t)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-		case "check_name":
-			if isNameTaken(t.Name) {
-				t.Type = "name_taken"
-				c.sendJSONWebSocket(&t)
-			} else {
-				t.Type = "name_available"
-				c.sendJSONWebSocket(&t)
-			}
-		case "enter_world_first_time":
+
 			var player Player
 			if err := json.Unmarshal(message, &player); err != nil {
 				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
 
-			if MudServer.Players[player.Username].isCredValidFirstTime(player.Username, player.SessionID) == false {
-				log.Println("Invalid credentials")
+			if isNameExistForPlayer(c.username) {
+				player.Type = "enter_world"
+				player.enterWorld(LOAD_PLAYER, c) // Name already exists for player
+				fmt.Println("Player already exists", c.username)
+			} else {
+				a.Type = "ask_name"
+				err := websocket.JSON.Send(MudServer.Lobby[c.username], &a)
+				if err != nil {
+					log.Println(err)
+				}
+			}
+		case "check_name":
+			if isNameTaken(a.Name) {
+				a.Type = "name_taken"
+				c.sendJSONWebSocket(&a)
+			} else {
+				a.Type = "name_available"
+				c.sendJSONWebSocket(&a)
+			}
+		case "enter_world_first_time":
+			var player Player
+			if err := json.Unmarshal(message, &player); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
 
@@ -91,17 +94,11 @@ func (c *MudConnection) MudConnect() {
 				break
 			}
 
-			if MudServer.Players[playerMap.Creds.Username].isCredValid(
-				playerMap.Creds.Username, playerMap.Creds.Name, playerMap.Creds.SessionID) == false {
-				log.Println("Invalid credentials")
-				break
-			}
-
 			playerMap.Type = "update_map"
 			playerMap.setPlayerMap()
 			c.sendJSONWebSocket(&playerMap)
 		default:
-			log.Println("I'm not familiar with type in MUD", t.Type, " sent by ", t.Name)
+			log.Println("I'm not familiar with type in MUD", a.Type, " sent by ", a.Name)
 		}
 	}
 }

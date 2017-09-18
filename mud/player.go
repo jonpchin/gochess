@@ -102,25 +102,31 @@ func isValidClass(class string) (bool, string) {
 	return false, ""
 }
 
-func (player *Player) loadPlayerData(username string) {
+func (player *Player) loadMap() {
+
+	// only show a portion of the map to the user
+	//mapView := ""
+	// default view for map is 5
+	//viewDistance := 5
+}
+
+func (player *Player) loadPlayerData() {
 
 	// status will be a csv which will be stored in an array
 	var status string
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	err := db.QueryRow(`SELECT name, class, race, gender, status, level, experience 
-		FROM mud where username=?`, username).Scan(&player.Name, &player.Class, &player.Race, &player.Gender,
+		FROM mud where username=?`, player.Username).Scan(&player.Name, &player.Class, &player.Race, &player.Gender,
 		&status, &player.Level, &player.Experience)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	var playerMap string
-
-	err = db.QueryRow(`SELECT area, x, y, z, map FROM location where name=?`,
+	err = db.QueryRow(`SELECT area, x, y, z FROM location where name=?`,
 		player.Name).Scan(&player.Area.Name, &player.Location.Row, &player.Location.Col,
-		&player.Location.Level, &playerMap)
+		&player.Location.Level)
 	if err != nil {
 		log.Println(err)
 		return
@@ -132,10 +138,9 @@ func (playerMap *PlayerMap) setPlayerMap() {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
-	err := db.QueryRow(`SELECT x, y, z, map FROM location where name=?`,
+	err := db.QueryRow(`SELECT x, y, z FROM location where name=?`,
 		playerMap.Creds.Name).Scan(&playerMap.Coordinates.Row, &playerMap.Coordinates.Col,
-		&playerMap.Coordinates.Level,
-		&playerMap.Map)
+		&playerMap.Coordinates.Level)
 	if err != nil {
 		log.Println(err)
 		return
@@ -191,14 +196,11 @@ func (player *Player) updateByRaceClass(jsonFile string) {
 }
 
 // Ensure player is not trying to impersonate someone else or change name without permission
-// Returns true if player's username, name and sessionID are all valid
-func (player *Player) isCredValid(username, name, sessionID string) bool {
+// Returns true if player's username and sessionID are all valid
+func (player *Player) isCredValid(username, sessionID string) bool {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	if player.Username != username {
 		log.Println("player.Username:", player.Username, "username:", username)
-		return false
-	} else if player.Name != name {
-		log.Println("player.Name:", player.Name, "name:", name)
 		return false
 	} else if player.SessionID != sessionID {
 		log.Println("player.SessionID:", player.SessionID, "sessionID:", sessionID)

@@ -20,7 +20,7 @@ type Coordinate struct {
 func (floor *Floor) makeRooms(floorLevel int) {
 
 	const (
-		roomsLow  = 200
+		roomsLow  = 800
 		roomsHigh = 1000
 
 		roomDimensionLow   = 7

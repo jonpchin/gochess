@@ -126,7 +126,7 @@ func main() {
 			gostuff.IsEnvironmentAppVeyor() == false {
 			//plot.SetupCharts()
 			//setting up cron job
-			gostuff.StartCron()
+			//gostuff.StartCron()
 
 			//gostuff.RemoveOldGames(days)
 			//gostuff.RemoveOldActivate(days)
