@@ -15,7 +15,7 @@ func GetAllClosedCommits() {
 	opts := &github.SearchOptions{Sort: "created", Order: "asc"}
 
 	page := 1
-	query := "repo:jonpchin/GoChess"
+	query := "repo:jonpchin/gochess"
 
 	results, _, err := client.Search.Issues(context, query, opts)
 	if err != nil {
@@ -32,7 +32,7 @@ func GetAllClosedCommits() {
 	for *results.Total > 0 {
 		*results.Total -= 30
 		page += 1
-		query := "repo:jonpchin/GoChess"
+		query := "repo:jonpchin/gochess"
 
 		results, _, err := client.Search.Issues(context, query, opts)
 		if err != nil {

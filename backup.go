@@ -55,14 +55,14 @@ func importDatabase() bool {
 		return false
 	}
 	if runtime.GOOS == "windows" {
-		_, err := exec.Command("cmd.exe", "/C", "cd config && bash importGoChess.sh").Output()
+		_, err := exec.Command("cmd.exe", "/C", "cd config && bash importgochess.sh").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")
 			return false
 		}
 	} else {
-		_, err := exec.Command("/bin/bash", "-c", "cd config && bash importGoChess.sh").Output()
+		_, err := exec.Command("/bin/bash", "-c", "cd config && bash importgochess.sh").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")
