@@ -2,7 +2,7 @@ secret/
 logs/
 scripts/
 games/
-/GoChess.exe
+/gochess.exe
 /main.exe
 /.vscode
 /debug

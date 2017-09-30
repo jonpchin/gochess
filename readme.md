@@ -1,4 +1,4 @@
-![Alt text](https://travis-ci.org/jonpchin/GoChess.svg?branch=master "Travis CI Go Play Chess Image")
+![Alt text](https://travis-ci.org/jonpchin/gochess.svg?branch=master "Travis CI Go Play Chess Image")
 [![Build status](https://ci.appveyor.com/api/projects/status/96kvdw3mr190y854?svg=true)](https://ci.appveyor.com/project/jonpchin/gochess)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jonpchin/gochess)](https://goreportcard.com/report/github.com/jonpchin/gochess)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
@@ -15,7 +15,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <br><br>
 4/30/2017 I've decided to add a MUD. Chess and MUD's don't usually go together but by having them on the same web server and domain allows me to save server costs. More details will be revealed soon.
 <br><br>If you are interesting in contributing please open a new issue here:
-https://github.com/jonpchin/GoChess/issues
+https://github.com/jonpchin/gochess/issues
 In the issue state what you want to work on and I'll add you as a contributor. 
 If you are open to doing anything I can assign you one of the open tasks in the back log.
 Once your changes are ready, make a pull request and I"ll review it.
