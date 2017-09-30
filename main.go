@@ -174,7 +174,7 @@ func main() {
 	//	engine := gostuff.StartEngine(nil)
 	//	engine.Quit()
 	//}()
-
+	gostuff.GetAllClosedCommits()
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
