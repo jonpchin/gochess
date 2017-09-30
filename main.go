@@ -13,6 +13,7 @@ import (
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
 	"github.com/jonpchin/gochess/plot"
+	"github.com/jonpchin/gochess/notes"
 
 	"golang.org/x/net/websocket"
 )
@@ -174,7 +175,7 @@ func main() {
 	//	engine := gostuff.StartEngine(nil)
 	//	engine.Quit()
 	//}()
-	gostuff.GetAllClosedCommits()
+	notes.GetAllClosedCommits()
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
