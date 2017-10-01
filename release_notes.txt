@@ -1,0 +1,55 @@
+2017-09-30
+Back end clock not syncing
+Allow players to view other live games in real time
+Allow unrated games
+Add browser cache expire in header
+Rematch is missing rated info
+Export database to a backup directory
+Import database gochess from SQL file if no gochess database exists
+Display to player on profile he has no games played if zero games are displayed
+Resume game does not display game type of blitz, standard, bullet in profile when game is finished
+Pressing the enter key triggers the login button
+Integration of an automation build tool
+Allow player to choose what piece to promote pawn too
+Allow grandmaster games to be viewed from the database
+Integrate a daemon to initiate the application instead of using screen
+Make clock sync with millisecond precision
+Zip or archive database export file to save disk space
+Allow database imports and exports be compatible on Linux  machines
+User analytics for owner
+Fix JS review game bug
+Upgrade Golang 1.6 to 1.7 in development and production environment
+Piece promotion bug
+Pass in localhost or goplaychess.com through command line parsing
+Replace error messages with log.Lshortfile
+PGN chess notation is not displaying when reviewing old games
+Pawn promotion does not work when reviewing old games
+Previous and next buttons don't work during a game
+Clocks do not sync for spectators
+Fix Travis build
+Have pgn and status update after each move when reviewing game
+Allow players to change board color instead of using default
+Upgrade AWS Storage size to be able to store 2 million chess games
+Allow random grandmaster game to be searched based on ECO 
+Renew goplaychess.com domain name
+Automate compression of JS files and FTP to production environment with a single script
+Automatically resize images if necessary on startup if they don't meet set requirements
+Update images in readme and screenshots
+Add country flags to user name when playing a game and in profile
+Setup selenium to test load balancing
+Search all seeks when a player sends out a seek to see if there is a match
+Resolve lobby which disconnects user after a server restart and can be fixed by clearing cache
+Allow git pull/sync without keeping history and override local changes in production
+Use a third party package for chess validator
+Broken image for 404.html at /chess/**
+Games restoring
+Add remember password feature
+Move unit tests to _unittest folder
+Chess Engine
+Add forum
+Make database, profile, lobby and engine mobile friendly
+Renew security certificate
+Reset timer for correspondence games
+Startup MySQL service if its off
+Automate generating database schema into version control and share on Github
+Fix flag displaying as one's own flag instead of other flags on profile
