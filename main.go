@@ -13,7 +13,6 @@ import (
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
 	"github.com/jonpchin/gochess/plot"
-	"github.com/jonpchin/gochess/notes"
 
 	"golang.org/x/net/websocket"
 )
@@ -175,7 +174,7 @@ func main() {
 	//	engine := gostuff.StartEngine(nil)
 	//	engine.Quit()
 	//}()
-	notes.GetAllClosedCommits()
+	//notes.GetAllClosedCommits()
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)
@@ -414,6 +413,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 		p := struct {
 			User             string
 			IsGoogleCharts   bool
+			IsFrappeCharts   bool
 			PageTitle        string // Title of the web page
 			Bullet           float64
 			Blitz            float64
@@ -431,6 +431,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 		}{
 			inputName,
 			plot.UseGoogleCharts,
+			plot.UseFrappeCharts,
 			"Profile",
 			bulletN,
 			blitzN,

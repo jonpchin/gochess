@@ -2,7 +2,9 @@
 {{.User}} <img id="countryFlag" src="img/flags/{{.Country}}.png"  alt="Country flag">
 <input type="hidden" id="user" value="{{.User}}" />
 {{ if .IsGoogleCharts }}
-<div id="googleLinechart"></div>
+	<div id="googleLinechart"></div>
+{{else if .IsFrappeCharts}}
+	<div id="frappe-chart"></div>
 {{else}}
 	<p><img id="drawcharts" src="img/icons/user.png" alt="Draw Charts"></p>
 {{end}}
@@ -42,6 +44,8 @@
 <script>window.jQuery || document.write('<script src="../third-party/js/jquery-2.1.4.min.js">\x3C/script>')</script>
 {{ if .IsGoogleCharts }}
 	<script type="text/javascript" src="//gstatic.com/charts/loader.js"></script>
+{{else if .IsFrappeCharts}}
+	<script type="text/javascript" src="../third-party/js/frappe-charts.min.js"></script>
 {{ end }}
 <script src="js/profile.js"></script>
 </body>

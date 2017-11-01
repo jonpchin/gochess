@@ -13,15 +13,25 @@ import (
 )
 
 var (
-	UseGoogleCharts = true // Toggle to enable Google Charts or DrawChart()
+	UseFrappeCharts = true  // Only one chart sould be toggled to true
+	UseGoogleCharts = false // if UseFrappeChart and UseGoogleCharts is false then use DrawChart
 )
 
 func SetupCharts() {
-	if UseGoogleCharts {
+	if UseFrappeCharts {
+		gostuff.ReplaceString("var useFrappeCharts = false;", "var useFrappeCharts = true;",
+			"js/profile.js")
+		gostuff.ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
+			"js/profile.js")
+	} else if UseGoogleCharts {
 		gostuff.ReplaceString("var useGoogleCharts = false;", "var useGoogleCharts = true;",
 			"js/profile.js")
-	} else {
+		gostuff.ReplaceString("var useFrappeCharts = true;", "var useFrappeCharts = false;",
+			"js/profile.js")
+	} else { // Then use drawchart
 		gostuff.ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
+			"js/profile.js")
+		gostuff.ReplaceString("var useFrappeCharts = true;", "var useFrappeCharts = false;",
 			"js/profile.js")
 	}
 }
