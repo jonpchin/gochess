@@ -112,7 +112,7 @@ func main() {
 		certPath = "_travis/data/device.crt"
 		keyPath = "_travis/data/device.key"
 	}
-
+	//gostuff.PrintMemoryStats()
 	//gostuff.OneTimeParseTemplates()
 
 	go func() {
@@ -126,7 +126,7 @@ func main() {
 			gostuff.IsEnvironmentAppVeyor() == false {
 			//plot.SetupCharts()
 			//setting up cron job
-			//gostuff.StartCron()
+			gostuff.StartCron()
 
 			//gostuff.RemoveOldGames(days)
 			//gostuff.RemoveOldActivate(days)
@@ -149,7 +149,7 @@ func main() {
 			//mud.CreateWorld()
 			//mud.PrintWorldToFile()
 			//weather.FetchWeather()
-			gostuff.RemoveGameHistory(days)
+			//gostuff.RemoveGameHistory(days)
 		}
 		//gostuff.SpawnProcess()
 

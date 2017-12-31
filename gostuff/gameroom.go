@@ -22,7 +22,7 @@ func (c *Connection) ChessConnect() {
 
 	defer logFile.Close()
 	log := log.New(logFile, "", log.LstdFlags|log.Lshortfile)
-
+	//PrintMemoryStats()
 	for {
 		var reply string
 
