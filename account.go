@@ -268,7 +268,7 @@ func (userInfo *UserInfo) forgot(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 
-	token := RandomString()
+	userInfo.Token = RandomString()
 	//check for duplicate entry in forgot table
 	var found string
 	_ = db.QueryRow("SELECT token FROM forgot WHERE username=?", userInfo.Username).Scan(&found)
@@ -288,7 +288,7 @@ func (userInfo *UserInfo) forgot(w http.ResponseWriter, r *http.Request) bool {
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(userInfo.Username, token, time.Now())
+	res, err := stmt.Exec(userInfo.Username, userInfo.Token, time.Now())
 	if err != nil {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> We are having trouble with our server. Report to admin Error 21"))
 		log.Println(err)

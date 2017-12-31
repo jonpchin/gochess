@@ -294,3 +294,20 @@ func isDirectory(path string) bool {
 	}
 	return stat.IsDir()
 }
+
+// Print out memory usage
+func PrintMemoryStats() {
+
+	var mem runtime.MemStats
+
+	log := log.New(os.Stdout, "", log.LstdFlags)
+	log.Println("Printing memory stats...")
+
+	runtime.ReadMemStats(&mem)
+	//bytes of allocated heap objects
+	log.Println("Alloc: ", mem.Alloc)
+	//cumulative bytes allocated for heap objects
+	log.Println("Total alloc: ", mem.TotalAlloc)
+	log.Println("Heap alloc:", mem.HeapAlloc)
+	log.Println("Heap system:", mem.HeapSys)
+}
