@@ -1,6 +1,13 @@
 package mud
 
-import "math"
+import (
+	"bufio"
+	"fmt"
+	"io/ioutil"
+	"math"
+	"os"
+	"strings"
+)
 
 // Converts map string to 2D array of string
 func convertMapToTiles(mapString string) [][]string {
@@ -23,4 +30,69 @@ func convertMapToTiles(mapString string) [][]string {
 		}
 	}
 	return tiles
+}
+
+// Trims newlines from MUD map file
+func trimNewlines(filename string) {
+
+	// "data/floor_1.txt"
+	file, err := os.Open(filename)
+	defer file.Close()
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Start reading from the file with a reader.
+	reader := bufio.NewReader(file)
+
+	result := ""
+	finalOutput := ""
+
+	for {
+		content, err := reader.ReadString('\n')
+
+		result = string(content)
+
+		if doesStringHaveMapChar(result) {
+			finalOutput += result
+		}
+
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+	}
+
+	err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func doesStringHaveMapChar(result string) bool {
+
+	var mapChars = []string{
+		".",
+		"=",
+		"#",
+		"+",
+		"-",
+		"<",
+		">",
+		"$",
+		"%",
+		"@",
+		"^",
+		"!",
+		",",
+	}
+
+	for _, mapChar := range mapChars {
+		if strings.ContainsAny(result, mapChar) {
+			return true
+		}
+	}
+	return false
 }
