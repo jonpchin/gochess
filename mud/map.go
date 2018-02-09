@@ -32,8 +32,8 @@ func convertMapToTiles(mapString string) [][]string {
 	return tiles
 }
 
-// Trims newlines from MUD map file
-func trimNewlines(filename string) {
+// Trims newlines from MUD map file and also removes leading and ending space for the sides
+func trimNewlinesAndSides(filename string) {
 
 	// "data/floor_1.txt"
 	file, err := os.Open(filename)
@@ -44,31 +44,54 @@ func trimNewlines(filename string) {
 		return
 	}
 
-	// Start reading from the file with a reader.
-	reader := bufio.NewReader(file)
-
 	result := ""
 	finalOutput := ""
+	start := 9999999
+	back := 9999999
 
-	for {
-		content, err := reader.ReadString('\n')
+	fscanner := bufio.NewScanner(file)
 
-		result = string(content)
+    for fscanner.Scan() {
 
-		if doesStringHaveMapChar(result) {
-			finalOutput += result
+        result = fscanner.Text()
+
+		if doesStringHaveMapChar(result){
+			for pos, char := range result{
+				if char != ' '{
+					if pos < start {
+						start = pos
+					}
+					break
+				}	
+			}
+			for pos, _ := range result{
+				// Start checking chars from back to see where spaces end
+				backIndex := len(result) - pos - 1
+				backChar := result[backIndex]
+				
+				if backChar != ' '{
+					if pos < back {
+						back = pos
+					}
+					break
+				}
+			}
+			finalOutput += (result + "\n")
 		}
 
-		if err != nil {
+        if err != nil {
 			fmt.Println(err)
-			break
-		}
-	}
+            break
+        }
+    }
 
-	err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
-	if err != nil {
+
+    err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
+	if err != nil{
 		fmt.Println(err)
 	}
+
+	trimLeadAndEnd(start, back, filename)
 }
 
 func doesStringHaveMapChar(result string) bool {
@@ -95,4 +118,41 @@ func doesStringHaveMapChar(result string) bool {
 		}
 	}
 	return false
+}
+
+// Trims leading and ending spaces of each line in a file
+func trimLeadAndEnd(start int, back int, filename string) {
+
+    file, err := os.Open(filename)
+    defer file.Close()
+
+    if err != nil {
+        fmt.Println(err)
+		return
+    }
+
+    fscanner := bufio.NewScanner(file)
+
+	result := ""
+	finalOutput := ""
+
+    for fscanner.Scan() {
+
+		result = fscanner.Text()
+
+		if(len(result) !=0 ){
+			temp := result[start:(len(result)-back)]
+			finalOutput += (temp + "\n")
+
+			if err != nil {
+				fmt.Println(err)
+				break
+			}
+		}
+		
+    }
+	err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
+	if err != nil{
+		fmt.Println(err)
+	}
 }

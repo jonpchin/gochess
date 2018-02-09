@@ -70,6 +70,7 @@ func (floor *Floor) writeFloorToFile(index int) {
 		}
 		floorData += "\n"
 	}
-
-	ioutil.WriteFile("mud/world/floor_"+strconv.Itoa(index)+".txt", []byte(floorData), 0666)
+	filename := "mud/world/floor_"+strconv.Itoa(index)+".txt" 
+	ioutil.WriteFile(filename, []byte(floorData), 0666)
+	trimNewlinesAndSides(filename)
 }
