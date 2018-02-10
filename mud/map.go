@@ -96,21 +96,8 @@ func trimNewlinesAndSides(filename string) {
 
 func doesStringHaveMapChar(result string) bool {
 
-	var mapChars = []string{
-		".",
-		"=",
-		"#",
-		"+",
-		"-",
-		"<",
-		">",
-		"$",
-		"%",
-		"@",
-		"^",
-		"!",
-		",",
-	}
+	// tileChar is tile.go and is array of all possible tiles strings
+	mapChars := excludeSpaceInTiles(tileChars)
 
 	for _, mapChar := range mapChars {
 		if strings.ContainsAny(result, mapChar) {
@@ -118,6 +105,17 @@ func doesStringHaveMapChar(result string) bool {
 		}
 	}
 	return false
+}
+
+//Returns array exxcluding space in tileChar array
+func excludeSpaceInTiles(tiles []string) []string{
+	var result []string
+	for _, value := range tiles {
+		if value != " " {
+			result = append(result, value)
+		}
+	}
+	return result
 }
 
 // Trims leading and ending spaces of each line in a file
@@ -140,7 +138,7 @@ func trimLeadAndEnd(start int, back int, filename string) {
 
 		result = fscanner.Text()
 
-		if(len(result) !=0 ){
+		if len(result) !=0  {
 			temp := result[start:(len(result)-back)]
 			finalOutput += (temp + "\n")
 
