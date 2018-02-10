@@ -6,7 +6,7 @@ type Floor struct {
 	Width  int      // Number of tiles wide
 	Length int      // Number of tiles vertically
 	Rooms  []Room   // List of rooms on the floor in no particular order
-	Plan   [][]Tile // 2D ASCI wilderness map
+	Plan   [][]Tile // 2D ASCII wilderness map
 	Level  int
 }
 
