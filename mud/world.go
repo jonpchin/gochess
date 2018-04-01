@@ -1,11 +1,15 @@
 package mud
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 )
 
 // A dungeon consists of floors which can be transversed through stairs
+// Order of Floor in Floors determines level, zero index is first floor,
+// 1st index is 2nd floor, etc
 type World struct {
 	Floors []Floor
 }
@@ -30,10 +34,10 @@ func (player *Player) enterWorld(loadPlayer bool, connection *MudConnection) {
 func CreateWorld() {
 
 	const (
-		low       = 2
-		high      = 4
-		floorLow  = 300
-		floorHigh = 500
+		low       = 1
+		high      = 2
+		floorLow  = 20
+		floorHigh = 100
 	)
 	numOfFloors := getRandomIntRange(low, high)
 	world.Floors = make([]Floor, numOfFloors)
@@ -54,6 +58,14 @@ func loadWorldFile() {
 
 }
 
+func SaveMetadataToFile() {
+	jsonWorld, _ := json.Marshal(world)
+	err := ioutil.WriteFile("mud/tile_metadata/output.json", jsonWorld, 0644)
+	if err != nil {
+		fmt.Println("SavedMetadataToFile", err)
+	}
+}
+
 // Prints the world with each floor as floor_#.txt in ASCII format
 func PrintWorldToFile() {
 	for index, floor := range world.Floors {
@@ -70,7 +82,7 @@ func (floor *Floor) writeFloorToFile(index int) {
 		}
 		floorData += "\n"
 	}
-	filename := "mud/world/floor_"+strconv.Itoa(index)+".txt" 
+	filename := "mud/world/floor_" + strconv.Itoa(index) + ".txt"
 	ioutil.WriteFile(filename, []byte(floorData), 0666)
 	trimNewlinesAndSides(filename)
 }

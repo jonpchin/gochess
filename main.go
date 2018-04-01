@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
+	"github.com/jonpchin/gochess/mud"
 	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
@@ -70,7 +71,7 @@ func main() {
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	//http.HandleFunc("/drawchart", plot.DrawChart)
-	//http.HandleFunc("/mudserver/mud", mudConsole)
+	http.HandleFunc("/mudserver/mud", mudConsole)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -145,9 +146,10 @@ func main() {
 			//gostuff.CompressDatabase()
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
-			//mud.ConnectDb()
-			//mud.CreateWorld()
-			//mud.PrintWorldToFile()
+			mud.ConnectDb()
+			mud.CreateWorld()
+			mud.SaveMetadataToFile()
+			mud.PrintWorldToFile()
 			//weather.FetchWeather()
 			//gostuff.RemoveGameHistory(days)
 		}

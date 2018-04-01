@@ -7,6 +7,7 @@ import (
 )
 
 type Room struct {
+	Name  string // name of room
 	Tiles []Tile // List of all tiles in room
 	Wall  []Tile // List of tiles that make the wall of the room
 }
@@ -39,7 +40,7 @@ func (floor *Floor) makeRooms(floorLevel int) {
 	length := getRandomIntRange(roomDimensionLow, roomsDimensionHigh)
 
 	// Place the first room in the center
-	floor.makeRoom(floor.Width/2, floor.Length/2, getRandomDirection(), tileChars[FLOOR],
+	floor.makeRoom(floor.Width/2, floor.Length/2, getRandomDirection(),
 		width, length, distanceBetweenRooms)
 
 	// TODO: If failed to make a room decrement i
@@ -52,7 +53,7 @@ func (floor *Floor) makeRooms(floorLevel int) {
 
 		if floor.isRoomWithinFloorDimensions(tile.Row, tile.Col, width, length) {
 			direction := getRandomDirection()
-			if floor.makeRoom(tile.Row, tile.Col, direction, getCommonTerrainType(),
+			if floor.makeRoom(tile.Row, tile.Col, direction,
 				width, length, distanceBetweenRooms) {
 				tile.createWallFeature()
 				// For now just assign tileType later use entire tile when it has more metadata
@@ -77,10 +78,9 @@ func (floor *Floor) isRoomWithinFloorDimensions(row, col, width, length int) boo
 }
 
 // x and y is the tile location which connects the current rooms
-// to the next room. Direction will be used to check, terrainType is a tileChar
-// such as floor, cloud, moutain, etc, except special terrain such as unused, door and whirlpool
+// to the next room. Direction will be used to check
 // Returns true if a room is succesfully created
-func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string,
+func (floor *Floor) makeRoom(row int, col int, dir Direction,
 	width int, length int, distanceBetweenRooms int) bool {
 
 	var topLeft Coordinate
@@ -153,7 +153,7 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction, terrainType string
 		return false
 	}
 
-	return floor.createTilesInRoom(topLeft, bottomRight, terrainType)
+	return floor.createTilesInRoom(topLeft, bottomRight, getCommonTerrainType())
 }
 
 // If the room is already occupied return true
@@ -179,9 +179,13 @@ func (floor *Floor) isValidCoordinate(row, col int) bool {
 }
 
 // Builds all the tiles in the room, returns true if sucessfully built
+// terrainType is a tileChar such as floor, cloud, moutain, etc, except
+// special terrain such as unused, door and whirlpool
 func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainType string) bool {
-	var area Area
-	area = getRandomArea()
+
+	area := getRandomArea()
+	roomName := getRandomRoomName() // All tiles in the room have the same name
+	tileDescription := getRandomTileDescription()
 	var room Room
 
 	for i := topLeft.Row; i <= bottomRight.Row; i += 1 {
@@ -191,15 +195,33 @@ func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainTy
 				coordinate.Row = i
 				coordinate.Col = j
 				coordinate.Level = floor.Level
+
+				var tile Tile
+				tile.Area = area
+				tile.Row = i
+				tile.Col = j
+				tile.Level = floor.Level
+
 				// Adds the edge tiles to the wall list of each room
 				if i == topLeft.Row || i == bottomRight.Row ||
 					j == topLeft.Col || j == bottomRight.Col {
 
-					floor.Plan[i][j].createTile(floor.Level, area, tileChars[WALL], coordinate)
+					tile.Name = "Wall of " + roomName
+					tile.Description = "A wall is here."
+					tile.TileType = tileChars[WALL]
+					floor.Plan[i][j].createTile(tile)
 					room.Wall = append(room.Wall, floor.Plan[i][j])
 
 				} else {
-					floor.Plan[i][j].createTile(floor.Level, area, terrainType, coordinate)
+
+					// Create tile
+					var tile Tile
+					tile.Name = roomName
+					tile.Description = tileDescription
+					// TODO Randomly pick a TileChar but usually its a common type such as floor or trees
+					// Need to make the edges walls and not override the door
+					tile.TileType = terrainType
+					floor.Plan[i][j].createTile(tile)
 				}
 
 				// Adds all the tiles in the room

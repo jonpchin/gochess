@@ -53,7 +53,8 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>6. Post game analysis with Stockfish engine</p>
 <p>7. Statistics page</p>
 <p>8. Store zipped source files and databas backup in Google Drive or Dropbox.</p>
-<p>9. Add release notes.</p>
+<p>9. Read write meta data of each tile to file when saving and loading memory map.</p>
+<p>10. Setup algorithm to pick starting player location and save player's map vision to database.</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:

@@ -147,8 +147,57 @@ func getRandomItemFromPath(file *os.File) string {
 	return item
 }
 
+func getRandomRoomName() string {
+	const roomPath = "mud/story/name.txt"
+	room, err := os.Open(roomPath)
+	defer room.Close()
+
+	if err != nil {
+		fmt.Println("random.go GetRandomRoomName 0", err)
+	}
+	return getRandomItemFromPath(room)
+}
+
+func getRandomTileDescription() string {
+	const descriptionPath = "mud/story/descriptions.txt"
+	description, err := os.Open(descriptionPath)
+	defer description.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomTileDescription 0", err)
+	}
+	return getRandomItemFromPath(description)
+}
+func getRandomArea() Area {
+	var area Area
+	const areaPath = "mud/story/areas.txt"
+	areaTemp, err := os.Open(areaPath)
+	defer areaTemp.Close()
+
+	if err != nil {
+		fmt.Println("random.go getRandomArea 0", err)
+	}
+
+	area.Name = getRandomItemFromPath(areaTemp)
+	return area // Replace this later
+}
+
+func getRandomTileChar() string {
+
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(len(tileChars) - 1)
+	return tileChars[randNum]
+}
+
+func getCommonTerrainType() string {
+
+	rand.Seed(time.Now().UnixNano())
+	randNum := rand.Intn(len(commonTerrainTypes) - 1)
+	return commonTerrainTypes[randNum]
+}
+
 // Returns a random dagger name
-func GetRandomDaggerName() string {
+func getRandomDaggerName() string {
 
 	const daggerPath = "mud/equipment/generated/weapons/daggers.txt"
 	dagger, err := os.Open(daggerPath)
