@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+// Used to keep track of the currently used line in a file for generating random data
+type LineTracker struct {
+	totalLines  int
+	currentLine int
+}
+
 func generateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
@@ -113,22 +119,33 @@ func (room *Room) getRandomTileOnWall() Tile {
 	return room.Wall[randNum]
 }
 
+func (lineTracker LineTracker) getRandomItemFromPath(file *os.File) string {
+	scanner := bufio.NewScanner(file)
+	counter := 0
+	item := ""
+
+	for scanner.Scan() {
+		item = scanner.Text()
+		if counter == lineTracker.currentLine {
+			break
+		}
+		counter++
+	}
+	return item
+}
+
 func getRandomItemFromPath(file *os.File) string {
 
 	scanner := bufio.NewScanner(file)
-	var counter int64
+	var counter int
 	counter = 0
 
 	for scanner.Scan() {
 		counter++
 	}
-	maxNum, err := secureRandomInt(counter)
+	maxNum := getRandomInt(counter)
 
-	if err != nil {
-		fmt.Println("random.go getRandomFromPath 0", err)
-	}
-
-	_, err = file.Seek(0, 0)
+	_, err := file.Seek(0, 0)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -148,7 +165,7 @@ func getRandomItemFromPath(file *os.File) string {
 }
 
 func getRandomRoomName() string {
-	const roomPath = "mud/story/name.txt"
+	const roomPath = "mud/story/names.txt"
 	room, err := os.Open(roomPath)
 	defer room.Close()
 

@@ -184,29 +184,21 @@ func (floor *Floor) isValidCoordinate(row, col int) bool {
 func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainType string) bool {
 
 	area := getRandomArea()
-	roomName := getRandomRoomName() // All tiles in the room have the same name
-	tileDescription := getRandomTileDescription()
+
 	var room Room
 
 	for i := topLeft.Row; i <= bottomRight.Row; i += 1 {
 		for j := topLeft.Col; j <= bottomRight.Col; j += 1 {
 			if floor.isValidCoordinate(i, j) {
-				var coordinate Coordinate
-				coordinate.Row = i
-				coordinate.Col = j
-				coordinate.Level = floor.Level
 
 				var tile Tile
 				tile.Area = area
-				tile.Row = i
-				tile.Col = j
-				tile.Level = floor.Level
 
 				// Adds the edge tiles to the wall list of each room
 				if i == topLeft.Row || i == bottomRight.Row ||
 					j == topLeft.Col || j == bottomRight.Col {
 
-					tile.Name = "Wall of " + roomName
+					tile.Name = "Wall of " + getRandomRoomName()
 					tile.Description = "A wall is here."
 					tile.TileType = tileChars[WALL]
 					floor.Plan[i][j].createTile(tile)
@@ -214,10 +206,8 @@ func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainTy
 
 				} else {
 
-					// Create tile
-					var tile Tile
-					tile.Name = roomName
-					tile.Description = tileDescription
+					tile.Name = getRandomRoomName()
+					tile.Description = getRandomTileDescription()
 					// TODO Randomly pick a TileChar but usually its a common type such as floor or trees
 					// Need to make the edges walls and not override the door
 					tile.TileType = terrainType

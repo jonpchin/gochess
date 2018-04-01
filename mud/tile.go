@@ -74,25 +74,11 @@ const (
 	WEST
 )
 
-func getTile() {
-
-}
-
-func setTile() {
-
-}
-
 // Create tile with all its meata data such as name, description, x, y etc
 func (tile *Tile) createTile(pTile Tile) {
 
-	tile.Name = pTile.Name // All tiles in the room have the same name
+	tile.Name = pTile.Name
 	tile.Description = pTile.Description
 	tile.Area = pTile.Area
-	tile.Row = pTile.Row
-	tile.Col = pTile.Col
-	tile.Level = pTile.Level
-	//tile.Room =
-	// TODO Randomly pick a TileChar but usually its a common type such as floor or trees
-	// Need to make the edges walls and not override the door
 	tile.TileType = pTile.TileType
 }

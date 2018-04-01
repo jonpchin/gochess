@@ -147,9 +147,11 @@ func main() {
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			mud.ConnectDb()
-			mud.CreateWorld()
-			mud.SaveMetadataToFile()
-			mud.PrintWorldToFile()
+			worldId := "0"
+			mud.LoadMapsIntoMemory(worldId)
+			//mud.CreateWorld()
+			//mud.SaveMetadataToFile(worldId)
+			mud.PrintWorldToFile(worldId)
 			//weather.FetchWeather()
 			//gostuff.RemoveGameHistory(days)
 		}
