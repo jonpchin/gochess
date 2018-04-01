@@ -62,7 +62,7 @@ func importDatabase() bool {
 			return false
 		}
 	} else {
-		_, err := exec.Command("/bin/bash", "-c", "cd config && bash importgochess.sh").Output()
+		_, err := exec.Command("/bin/bash", "-c", "bash config/importgochess.sh").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")

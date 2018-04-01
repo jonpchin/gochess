@@ -269,7 +269,7 @@ func RecurseDirectory(searchDir string, fp func(string), pattern string) {
 	}
 
 	for _, file := range fileList {
-		isDir := isDirectory(file)
+		isDir := IsDirectory(file)
 		if isDir == false {
 			isMatch, err := filepath.Match(pattern, filepath.Base(file))
 			if err != nil {
@@ -282,7 +282,7 @@ func RecurseDirectory(searchDir string, fp func(string), pattern string) {
 }
 
 //return trues if path is a directory
-func isDirectory(path string) bool {
+func IsDirectory(path string) bool {
 	f, err := os.Open(path)
 	if err != nil {
 		fmt.Println("isDirectory 1", err)
@@ -310,4 +310,13 @@ func PrintMemoryStats() {
 	log.Println("Total alloc: ", mem.TotalAlloc)
 	log.Println("Heap alloc:", mem.HeapAlloc)
 	log.Println("Heap system:", mem.HeapSys)
+}
+
+func CreateDirIfNotExist(dir string) {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
