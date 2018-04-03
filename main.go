@@ -12,7 +12,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
-	"github.com/jonpchin/gochess/mud"
 	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
@@ -146,12 +145,12 @@ func main() {
 			//gostuff.CompressDatabase()
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
-			mud.ConnectDb()
-			worldId := "0"
-			mud.LoadMapsIntoMemory(worldId)
+			//mud.ConnectDb()
+			//worldId := "0"
+			//mud.LoadMapsIntoMemory(worldId)
 			//mud.CreateWorld()
 			//mud.SaveMetadataToFile(worldId)
-			mud.PrintWorldToFile(worldId)
+			//mud.PrintWorldToFile(worldId)
 			//weather.FetchWeather()
 			//gostuff.RemoveGameHistory(days)
 		}
@@ -234,8 +233,15 @@ func news(w http.ResponseWriter, r *http.Request) {
 }
 
 func screenshots(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Cache-Control", "public, max-age=432000")
-	http.ServeFile(w, r, "screenshots.html")
+	d := struct {
+		PageTitle string
+	}{
+		"Screenshots",
+	}
+	gostuff.ParseTemplates(d, w, "screenshots.html", []string{"templates/screenshotsTemplate.html",
+		"templates/guestHeader.html"}...)
 }
 func register(w http.ResponseWriter, r *http.Request) {
 
@@ -320,13 +326,18 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		var memberChess = template.Must(template.ParseFiles("memberchess.html"))
-		username, _ := r.Cookie("username")
-		p := gostuff.Person{User: username.Value}
 
-		if err := memberChess.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		username, _ := r.Cookie("username")
+		p := struct {
+			User      string
+			PageTitle string // Title of the web page
+		}{
+			username.Value,
+			"Chess Room",
 		}
+
+		gostuff.ParseTemplates(p, w, "memberchess.html", []string{"templates/memberchessTemplate.html",
+			"templates/memberHeader2.html"}...)
 	}
 }
 

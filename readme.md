@@ -26,11 +26,11 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>3. Player ratings and matchmaking system </p>
 <p>4. Save and review games</p>
 <p>5. Server side validation of chess moves</p>
-<p>6. Security(HTTPS, WSS, CAPTCHA, input validation, password encryption)(partially shown on GitHub)</p>
+<p>6. Security (HTTPS, WSS, CAPTCHA, input validation, password encryption) (partially shown on GitHub)</p>
 <p>7. Cron jobs</p>
 <p>8. Logging(partially shown on GitHub)</p>
 <p>9. Graceful shutdown and recovery of active games</p>
-<p>10. Automated deployment of web server to production environment(not shown on GitHub)</p>
+<p>10. Automated deployment of web server to production environment (not shown on GitHub)</p>
 <p>11. Highscore board containing top bullet, blitz standard, and correspondence ratings.</p>
 <p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
 <p>13. Database of over 1.8 million chess games, most of which are master/grandmaster games.</p>

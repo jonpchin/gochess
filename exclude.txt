@@ -16,3 +16,4 @@ travis.yml
 logs
 exports
 /_webtest/debug.log
+news.html
