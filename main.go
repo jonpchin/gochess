@@ -301,7 +301,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		var lobby = template.Must(template.ParseFiles("lobby.html"))
+
 		var bulletRating, blitzRating, standardRating, correspondenceRating int16
 		var errMessage string
 		username, _ := r.Cookie("username")
@@ -313,12 +313,24 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Problem fetching rating lobby main.go")
 		}
 
-		p := gostuff.Person{User: username.Value, Bullet: bulletRating, Blitz: blitzRating,
-			Standard: standardRating, Correspondence: correspondenceRating}
-
-		if err := lobby.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		p := struct {
+			User           string
+			PageTitle      string // Title of the web page
+			Bullet         int16
+			Blitz          int16
+			Standard       int16
+			Correspondence int16
+		}{
+			username.Value,
+			"Chess Room",
+			bulletRating,
+			blitzRating,
+			standardRating,
+			correspondenceRating,
 		}
+
+		gostuff.ParseTemplates(p, w, "memberlobby.html", []string{"templates/memberlobbyTemplate.html",
+			"templates/memberHeader2.html"}...)
 	}
 }
 
