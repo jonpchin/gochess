@@ -37,6 +37,21 @@ func OneTimeParseTemplates() {
 		"templates/guestHeader.html"}...)
 }
 
+func Show404Page(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
+	var doesNotExist = template.Must(template.ParseFiles("404.html"))
+
+	p := struct {
+		Url string
+	}{
+		r.Host,
+	}
+
+	if err := doesNotExist.Execute(w, &p); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func parseNewsCache() {
 	var allNewProviders AllNewsProviders
 	allNewProviders.ReadAllNews()

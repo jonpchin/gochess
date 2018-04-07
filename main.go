@@ -29,10 +29,6 @@ type neuteredReaddirFile struct {
 	http.File
 }
 
-type fullPath struct {
-	Url string
-}
-
 func main() {
 
 	http.HandleFunc("/", mainPage)
@@ -193,14 +189,8 @@ func main() {
 
 func mainPage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		w.WriteHeader(404)
-		var doesNotExist = template.Must(template.ParseFiles("404.html"))
+		gostuff.Show404Page(w, r)
 
-		p := fullPath{Url: r.Host}
-
-		if err := doesNotExist.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
 	} else {
 		http.ServeFile(w, r, "index.html")
 	}
@@ -518,14 +508,20 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		var highscores = template.Must(template.ParseFiles("highscore.html"))
 
-		var p gostuff.ScoreBoard
-		p = gostuff.LeaderBoard.Scores
-
-		if err := highscores.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		username, _ := r.Cookie("username")
+		p := struct {
+			User      string
+			PageTitle string // Title of the web page
+			gostuff.ScoreBoard
+		}{
+			username.Value,
+			"Highscores",
+			gostuff.LeaderBoard.Scores,
 		}
+
+		gostuff.ParseTemplates(p, w, "highscores.html", []string{"templates/highscoresTemplate.html",
+			"templates/memberHeader.html"}...)
 	}
 }
 
@@ -692,15 +688,20 @@ func createThread(w http.ResponseWriter, r *http.Request) {
 }
 
 func logs(w http.ResponseWriter, r *http.Request) {
-
 	if isAuthorized(w, r) {
 		username, _ := r.Cookie("username")
 		if gostuff.IsAdmin(username.Value) {
 			w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-			http.ServeFile(w, r, "logs.html")
+			p := struct {
+				PageTitle string
+			}{
+				"Logs",
+			}
+			gostuff.ParseTemplates(p, w, "logs.html", []string{"templates/logsTemplate.html",
+				"templates/memberHeader.html"}...)
+
 		} else {
-			w.WriteHeader(404)
-			http.ServeFile(w, r, "404.html")
+			gostuff.Show404Page(w, r)
 		}
 	}
 }
@@ -745,8 +746,7 @@ func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
 			}
 		}
 	}
-	w.WriteHeader(404)
-	http.ServeFile(w, r, "404.html")
+	gostuff.Show404Page(w, r)
 	return false
 }
 
