@@ -29,8 +29,7 @@ type UserInfo struct {
 func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		w.WriteHeader(404)
-		http.ServeFile(w, r, "404.html")
+		Show404Page(w, r)
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

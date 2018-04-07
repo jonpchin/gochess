@@ -15,11 +15,12 @@ import (
 //checks database to see if username and token is correct and then updates the new password
 //with the encrypted password
 func ProcessResetPass(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method != "POST" {
-		w.WriteHeader(404)
-		http.ServeFile(w, r, "404.html")
+		Show404Page(w, r)
 		return
 	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if !captcha.VerifyString(r.FormValue("captchaId"), r.FormValue("captchaSolution")) {
 		w.Write([]byte("<img src='img/ajax/not-available.png' /> Wrong captcha solution! Please try again."))
@@ -126,8 +127,7 @@ func (userInfo *UserInfo) resetPass(w http.ResponseWriter, r *http.Request) {
 //activates user account and deletes entry from database
 func ProcessActivate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(404)
-		http.ServeFile(w, r, "404.html")
+		Show404Page(w, r)
 		return
 	}
 
@@ -215,8 +215,7 @@ func (userInfo *UserInfo) Activate(method string, url string, agent string) (str
 //connects to database and adds token to the forgot table
 func ProcessForgot(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(404)
-		http.ServeFile(w, r, "404.html")
+		Show404Page(w, r)
 		return
 	}
 

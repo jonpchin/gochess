@@ -31,8 +31,7 @@ type Person struct {
 //process user input when signing in
 func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		w.WriteHeader(404)
-		http.ServeFile(w, r, "404.html")
+		Show404Page(w, r)
 		return
 	}
 
