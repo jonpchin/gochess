@@ -14,10 +14,11 @@
 {{ if eq $length 0 }}
 	<center>No posts have been found.</center>
 {{else}}
+	<span id="playerData"></span>
 	<table id="postCenterTable" class="tableCenter">
 		{{range .Posts }}
 			<tr>
-			<th>{{.Username}} <span class="right">{{.Date}} #{{.OrderID}}</span></th>
+			<th><a href="/profile?name={{.Username}}" onmouseover="getPlayerData('{{.Username}}')">{{.Username}}</a> <span class="right">{{.Date}} #{{.OrderID}}</span></th>
 			</tr>
 			<tr> 
 			<td>{{.Body}}</td>

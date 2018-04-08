@@ -40,6 +40,19 @@ if (document.getElementById('createpost') != null){
 	}
 }
 
+function getPlayerData(lookUpName){
+	$('#playerData').html('<img src="../img/ajax/loading.gif" />');
+    $.ajax({
+  		url: 'server/getPlayerData',
+   		type: 'post',
+		dataType: 'html',
+   		data : { 'user': lookUpName},
+   		success : function(data) {			
+      		$('#playerData').html(data);	
+   		}	
+    });
+}
+
 function timeStamp(){ //returns timestamp
 	var currentdate = new Date(); 
 	var datetime =  + currentdate.getHours() + ":"  
