@@ -1,4 +1,4 @@
-2017-09-30
+2018-04-14
 Back end clock not syncing
 Allow players to view other live games in real time
 Allow unrated games
@@ -40,16 +40,16 @@ Setup selenium to test load balancing
 Search all seeks when a player sends out a seek to see if there is a match
 Resolve lobby which disconnects user after a server restart and can be fixed by clearing cache
 Allow git pull/sync without keeping history and override local changes in production
-Use a third party package for chess validator
 Broken image for 404.html at /chess/**
 Games restoring
-Add remember password feature
 Move unit tests to _unittest folder
 Chess Engine
 Add forum
 Make database, profile, lobby and engine mobile friendly
 Renew security certificate
 Reset timer for correspondence games
-Startup MySQL service if its off
-Automate generating database schema into version control and share on Github
 Fix flag displaying as one's own flag instead of other flags on profile
+Generate random wilderness map
+Automate letsencrypt cert renewal
+Make forum usernames clickable and link to profile page if logged in, also allow hover over AJAX
+Update github notes to not included closed tickets that were marked with "Wont do"

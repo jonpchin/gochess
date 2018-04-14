@@ -74,7 +74,8 @@ func GetAllClosedCommits() {
 	listOptions.Page = 1
 	opts := &github.SearchOptions{Sort: "created", Order: "asc", ListOptions: listOptions}
 
-	query := "repo:jonpchin/gochess state:closed"
+	// The - in front of label excludes all github issues that were closed but marked with Don't Do
+	query := "repo:jonpchin/gochess state:closed -label:\"Won't Do\""
 
 	results, _, err := client.Search.Issues(context, query, opts)
 	if err != nil {
