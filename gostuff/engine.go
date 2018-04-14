@@ -11,6 +11,81 @@ import (
 	"github.com/malbrecht/chess/engine/uci"
 )
 
+// malbrecht chess engine uses notation where a1 is 0, b1 is 1 c1 is 2...h8 is 63
+// while gochess notation uses standard chess notation such as e4, c5
+// engine notation is used to map gochess notation into malbrecht chess engine notation
+var engineBoard = [64]string{
+	"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
+	"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
+	"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3",
+	"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4",
+	"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
+	"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
+	"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
+	"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
+}
+
+const (
+	White = iota
+	Black
+)
+
+// Piece types
+const (
+	NoPiece = iota << 1 // 0
+	Pawn                // 2
+	Knight              // 4
+	Bishop              // 6
+	Rook                // 8
+	Queen               // 10
+	King                // 12
+)
+
+// Pieces
+const (
+	WP = White | Pawn
+	WN = White | Knight
+	WB = White | Bishop
+	WR = White | Rook
+	WQ = White | Queen
+	WK = White | King
+	BP = Black | Pawn
+	BN = Black | Knight
+	BB = Black | Bishop
+	BR = Black | Rook
+	BQ = Black | Queen
+	BK = Black | King
+)
+
+// Converts gochess square notation to engine square notation
+// Returns -1 if no notation matches
+func getEngineSquare(gochessNotation string) chess.Sq {
+
+	for index, square := range engineBoard {
+		if gochessNotation == square {
+			return chess.Sq(index)
+		}
+	}
+	return -1
+}
+
+func getPromotionPiece(piece string, color int) chess.Piece {
+	enginePiece := NoPiece
+	switch piece {
+	case "q":
+		enginePiece = Queen
+	case "r":
+		enginePiece = Rook
+	case "b":
+		enginePiece = Bishop
+	case "n":
+		enginePiece = Knight
+	default: // Can't promote to anything other then queen, rook, bishop or knight
+		fmt.Println("Invalid piece in getPromotionPiece", piece, color)
+	}
+	return chess.Piece(enginePiece | color)
+}
+
 // Run starts an engine executable, with the given arguments.
 // Returns the engine, make sure to call Quit() on the engine to clean up
 func startEngine(args []string) *uci.Engine {
