@@ -11,6 +11,8 @@ env:
 
 sudo: true
 dist: trusty
+addons:
+  chrome: stable
 
 before_install:
 - go get github.com/sclevine/agouti 
