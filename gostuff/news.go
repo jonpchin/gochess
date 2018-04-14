@@ -101,6 +101,9 @@ func FetchNewsSources() {
 func saveNewsToFile(filename string, url string) {
 
 	responseData := getHttpResponse(url)
+	if responseData == nil {
+		return
+	}
 	newsOutputPath := "privatedata/news/" + filename + ".json"
 	err := ioutil.WriteFile(newsOutputPath, responseData, 0666)
 	if err != nil {
@@ -116,11 +119,13 @@ func getHttpResponse(url string) []byte {
 	response, err := client.Get(url)
 	if err != nil {
 		fmt.Println("getHttpResponse 0", err)
+		return nil
 	}
 	defer response.Body.Close()
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("getHttpResponse 1", err)
+		return nil
 	}
 	return responseData
 }
@@ -134,6 +139,7 @@ func (allArticles *AllNewsProviders) ReadAllNews() {
 
 	if err != nil {
 		fmt.Println("news.go ReadAllNews 0", err)
+		return
 	}
 
 	allArticles.PageTitle = "News"
