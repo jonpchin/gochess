@@ -3,64 +3,96 @@ package gostuff
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/malbrecht/chess"
 )
 
-// Uses stockfish engine to analyze game, returns percentage of moves
+// FEN string of played move and best move suggested by engine
+type MoveAnalysis struct {
+	PlayedMove string
+	BestMove   string
+}
+
+type GameAnalysis struct {
+	Moves []MoveAnalysis // List of actually and best moves in FEN string
+	Depth int            // the depth searched
+}
+
+// Uses stockfish engine to analyze game, returns a GameAnalysis that can be marshalled and sent to front end
 // that match the engine for the given depth
-func AnalyzeGame(chessMoves []chess.Move, depth int) {
+func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 
 	engine := startEngine(nil)
-	defaultDepth := 3 // For now set the default depth to 3
 
 	// All standard chess games start with the same position
-	startPostion := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+	startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-	board, err := chess.ParseFen(startPostion)
+	gameAnalysis.Moves[0].PlayedMove = startPosition
+	gameAnalysis.Moves[0].BestMove = ""
+
+	board, err := chess.ParseFen(startPosition)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// total strong moves that match the chess engine
-	totalStrongMoves := 0
-	var updatedBoard *chess.Board
+	currentFen := board.Fen()
+	// Original board will keep FEN string of the position before the next move is made
+	originalBoard := board
 
-	for _, move := range chessMoves {
+	for index, move := range chessMoves {
 
 		board = board.MakeMove(move)
-		currentFen := board.Fen()
 
-		isOk, bestMove := engineSearchDepth(currentFen, engine, defaultDepth)
+		isOk, bestMove := engineSearchDepth(currentFen, engine, gameAnalysis.Depth)
+		currentFen = board.Fen()
 
 		if isOk == false {
-			fmt.Println("Error processing move in analyze games for board.Fen()", currentFen)
-			return
+			fmt.Println("Error processing move in analyze games for currentFen:", currentFen)
+			break
 		}
 
-		updatedBoard = board.MakeMove(bestMove)
-		if updatedBoard.Fen() == currentFen {
-			totalStrongMoves += 1
-		}
+		bestMoveBoard := originalBoard.MakeMove(bestMove)
+		originalBoard = board
+
+		gameAnalysis.Moves[index+1].PlayedMove = currentFen
+		gameAnalysis.Moves[index+1].BestMove = bestMoveBoard.Fen()
 	}
 
 	engine.Quit()
 }
 
+func GetEngineAnalysisByJsonFen(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetEngineAnalysisByPgnFen(w http.ResponseWriter, r *http.Request) {
+
+}
+
 // Gets all moves (in engine notation) for a given game id in the database
-// If there was an error in getting the games or if there is no games for the given id
-// then an empty slice is returned
-func getEngineMovesInGames(id string) []chess.Move {
+// by converting gochess move notation into malbrecht chess notation
+func GetEngineAnalysisById(w http.ResponseWriter, r *http.Request) {
+
+	valid := ValidateCredentials(w, r)
+	if valid == false {
+		return
+	}
+
+	// Get the gameID specified in the front end
+	id := template.HTMLEscapeString(r.FormValue("id"))
+	depth := template.HTMLEscapeString(r.FormValue("depth"))
 
 	var moves string
-	var engineMoves []chess.Move
 
 	err := db.QueryRow("SELECT moves FROM games WHERE id=?", id).Scan(&moves)
 	if err != nil {
 		log.Println(err)
-		return engineMoves
+		return
 	}
 
 	var gochessMoves []Move
@@ -69,9 +101,11 @@ func getEngineMovesInGames(id string) []chess.Move {
 	err = json.Unmarshal(temp, &gochessMoves)
 	if err != nil {
 		log.Println(err)
-		return engineMoves
+		return
 	}
 	color := 0 // 0 is black, 1 is white
+	var engineMoves []chess.Move
+
 	for index, move := range gochessMoves {
 		engineMoves[index].From = getEngineSquare(move.S)
 		engineMoves[index].To = getEngineSquare(move.T)
@@ -84,5 +118,13 @@ func getEngineMovesInGames(id string) []chess.Move {
 		engineMoves[index].Promotion = getPromotionPiece(move.P, color)
 	}
 
-	return engineMoves
+	var gameAnalysis GameAnalysis
+	convertedDepth, err := strconv.Atoi(depth)
+	if err != nil {
+		fmt.Println("Could not convert string to int in GetEngineAnalysisById", err)
+		return
+	}
+
+	gameAnalysis.Depth = convertedDepth
+	gameAnalysis.analyzeGame(engineMoves)
 }
