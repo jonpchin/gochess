@@ -31,8 +31,10 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 	// All standard chess games start with the same position
 	startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-	gameAnalysis.Moves[0].PlayedMove = startPosition
-	gameAnalysis.Moves[0].BestMove = ""
+	var moveAnalysis MoveAnalysis
+	moveAnalysis.PlayedMove = startPosition
+	moveAnalysis.BestMove = ""
+	gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
 
 	board, err := chess.ParseFen(startPosition)
 	if err != nil {
@@ -44,7 +46,7 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 	// Original board will keep FEN string of the position before the next move is made
 	originalBoard := board
 
-	for index, move := range chessMoves {
+	for _, move := range chessMoves {
 
 		board = board.MakeMove(move)
 
@@ -59,24 +61,27 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 		bestMoveBoard := originalBoard.MakeMove(bestMove)
 		originalBoard = board
 
-		gameAnalysis.Moves[index+1].PlayedMove = currentFen
-		gameAnalysis.Moves[index+1].BestMove = bestMoveBoard.Fen()
+		moveAnalysis.PlayedMove = currentFen
+		moveAnalysis.BestMove = bestMoveBoard.Fen()
+		gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
 	}
 
 	engine.Quit()
 }
 
-func GetEngineAnalysisByJsonFen(w http.ResponseWriter, r *http.Request) {
+// Convert JSON list of FEN strings into malbrecht chess notation for stock fish analysis
+func EngineAnalysisByJsonFen(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetEngineAnalysisByPgnFen(w http.ResponseWriter, r *http.Request) {
+// Convert PGN chess game into malbrecht chess notation for stock fish analysis
+func EngineAnalysisByPgnFen(w http.ResponseWriter, r *http.Request) {
 
 }
 
 // Gets all moves (in engine notation) for a given game id in the database
 // by converting gochess move notation into malbrecht chess notation
-func GetEngineAnalysisById(w http.ResponseWriter, r *http.Request) {
+func GameAnalysisById(w http.ResponseWriter, r *http.Request) {
 
 	valid := ValidateCredentials(w, r)
 	if valid == false {
@@ -105,17 +110,19 @@ func GetEngineAnalysisById(w http.ResponseWriter, r *http.Request) {
 	}
 	color := 0 // 0 is black, 1 is white
 	var engineMoves []chess.Move
+	var chessMove chess.Move
 
 	for index, move := range gochessMoves {
-		engineMoves[index].From = getEngineSquare(move.S)
-		engineMoves[index].To = getEngineSquare(move.T)
+		chessMove.From = getEngineSquare(move.S)
+		chessMove.To = getEngineSquare(move.T)
 
 		if index%2 == 0 { // then its black's move
 			color = 0
 		} else { // then its white's move
 			color = 1
 		}
-		engineMoves[index].Promotion = getPromotionPiece(move.P, color)
+		chessMove.Promotion = getPromotionPiece(move.P, color)
+		engineMoves = append(engineMoves, chessMove)
 	}
 
 	var gameAnalysis GameAnalysis
@@ -127,4 +134,12 @@ func GetEngineAnalysisById(w http.ResponseWriter, r *http.Request) {
 
 	gameAnalysis.Depth = convertedDepth
 	gameAnalysis.analyzeGame(engineMoves)
+
+	// JSON marshal and send game to front end
+	jsonGameAnalysis, err := json.Marshal(gameAnalysis)
+	if err != nil {
+		fmt.Println("Could not marshal gameAnalysis", err)
+		return
+	}
+	w.Write([]byte((jsonGameAnalysis)))
 }

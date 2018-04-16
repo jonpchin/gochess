@@ -26,11 +26,13 @@
 <textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea><br>
 <input type="radio" id="cinnamonRadioButton" name="engineSwitch" value="cinnamon" onclick="startCinnamon()"> Cinnamon
 <input type="radio" id="stockfishRadioButton" name="engineSwitch" value="stockfish" onclick="startStockFish()" checked> Stockfish
+<br>
+<input type="radio" id="nobackEndStockfishRadioButton" name="engineSwitch" value="backEndStockfish">Back end Stockfish
 <p>Think Time(Milliseconds): <input id="thinkTime" type="text" maxlength="68" size="10" value="1000"></p>
 </div>
 <span id="playernames"><div id="topPlay"><span id="top">Black:</span> <input id="toptime" size="14"  value="10:00" readonly="true"> </div> <div id="bottomPlay">
 <span id="bottom">White:</span> <input id="bottomtime" size="14" value="10:00" readonly="true">  </div>
-<br><br><button id="newGameButton">New Game</button></span>
+<br><br><button id="newGameButton">New Game</button><br><br><input id="hoverHighlight" type="checkbox">Hover Highlight</span>
 
 <div id="content">
 <div id="board"></div>
@@ -60,5 +62,6 @@
 <script src="../third-party/js/download.js"></script>
 <script src="../third-party/js/cinnamon_engine.js"></script>
 <script src="../js/engine.js"></script>
+<script src="../js/analyze.js"></script>
 </body>
 </html>

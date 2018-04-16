@@ -39,7 +39,7 @@ var greySquare = function(square) {
 	var squareEl = $('#board .square-' + square);
 
 	var background = '#a9a9a9';
-	if (squareEl.hasClass('black-3c85d') === true) {
+	if (squareEl.hasClass('black-3c85d')) {
 		background = '#696969';
 	}
 	squareEl.css('background', background);
@@ -47,9 +47,9 @@ var greySquare = function(square) {
 
 var updateStatus = function(moveString) {
 
-	if(document.getElementById("cinnamonRadioButton").checked === true){
+	if(document.getElementById("cinnamonRadioButton").checked){
 		cinnamonEngineGo()
-	}else{ // then send move to stockfish
+	}else if(document.getElementById("stockfishRadioButton").checked){ // then send move to stockfish
 		stockfish.postMessage("position startpos moves " + moveString);
 		stockfish.postMessage("go movetime " + document.getElementById('thinkTime').value);
 	}
@@ -196,8 +196,8 @@ var cfg = {
 	onDragStart: onDragStart,
 	onDrop: onDrop,
 	moveSpeed: 'slow',
-	onMouseoutSquare: onMouseoutSquare,
-	onMouseoverSquare: onMouseoverSquare,
+	onMouseoutSquare: null,
+	onMouseoverSquare: null,
 	onSnapEnd: onSnapEnd,
 	pieceTheme: '../img/chesspieces/'+ chessPieceTheme +'/{piece}.png'
 };
@@ -218,9 +218,9 @@ document.getElementById('forceMoveButton').onclick = function(){
 
 //checks to see which engine is turned on and makes a move for that engine
 function makeEngineMove(){
-	if(document.getElementById("cinnamonRadioButton").checked === true){
+	if(document.getElementById("cinnamonRadioButton").checked){
 		updateStatus("");
-	}else{
+	}else if(document.getElementById("stockfishRadioButton").checked){
 		var gameHistory = game.history({verbose: true});
 		var length = gameHistory.length;
 		var moveString = "";
@@ -283,7 +283,7 @@ document.getElementById('exportPGN').onclick = function(){
 	var blackRating = "????"
 	var timeGet = "???";
 	var gameDate = Date();
-	var whitePlayer = document.getElementById('user').value;;
+	var whitePlayer = document.getElementById('user').value;
 	var blackPlayer = "Cinnamon Computuer";
 	if(computer === 'w'){
 		whitePlayer =  "Cinnamon Computuer";
@@ -295,6 +295,16 @@ document.getElementById('exportPGN').onclick = function(){
 
 	// second parameter is file name
 	download(game.pgn(), whitePlayer + " vs. " + blackPlayer + ".pgn", "application/x-chess-pgn");
+}
+
+document.getElementById('hoverHighlight').onclick = function(){
+	if(document.getElementById('hoverHighlight').checked){
+		cfg.onMouseoutSquare = onMouseoutSquare;
+		cfg.onMouseoverSquare = onMouseoverSquare;
+	}else{
+		cfg.onMouseoutSquare = null;
+		cfg.onMouseoverSquare = null;
+	}
 }
 
 // action listener for board flip
@@ -403,12 +413,14 @@ function startStockFish(){
 
 // starts the engine that radio button is checked for
 function startCheckedEngine(){
-	if(document.getElementById("cinnamonRadioButton").checked === true){
+	if(document.getElementById("cinnamonRadioButton").checked){
 		startCinnamon();
-	}else{
+	}else if(document.getElementById("stockfishRadioButton").checked){
 		startStockFish();
+	}else{
+		// Back end stock fish engine
 	}
 }
 
 startCheckedEngine();
-detectMobile(); //calls function
+detectMobile();
