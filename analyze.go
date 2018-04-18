@@ -13,8 +13,14 @@ import (
 
 // FEN string of played move and best move suggested by engine
 type MoveAnalysis struct {
-	PlayedMove string
-	BestMove   string
+	PlayedMoveFen       string
+	BestMoveFen         string
+	PlayedMoveSrc       string //gochess notation
+	PlayedMoveTar       string //gochess notation
+	PlayedMovePromotion string //gochess notation
+	BestMoveSrc         string //gochess notation
+	BestMoveTar         string //gochess notation
+	BestMovePromotion   string //gochess notation
 }
 
 type GameAnalysis struct {
@@ -24,7 +30,7 @@ type GameAnalysis struct {
 
 // Uses stockfish engine to analyze game, returns a GameAnalysis that can be marshalled and sent to front end
 // that match the engine for the given depth
-func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
+func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMoves []Move) {
 
 	engine := startEngine(nil)
 
@@ -32,8 +38,8 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 	startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 	var moveAnalysis MoveAnalysis
-	moveAnalysis.PlayedMove = startPosition
-	moveAnalysis.BestMove = ""
+	moveAnalysis.PlayedMoveFen = startPosition
+	moveAnalysis.BestMoveFen = ""
 	gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
 
 	board, err := chess.ParseFen(startPosition)
@@ -46,7 +52,7 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 	// Original board will keep FEN string of the position before the next move is made
 	originalBoard := board
 
-	for _, move := range chessMoves {
+	for index, move := range chessMoves {
 
 		board = board.MakeMove(move)
 
@@ -61,8 +67,16 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move) {
 		bestMoveBoard := originalBoard.MakeMove(bestMove)
 		originalBoard = board
 
-		moveAnalysis.PlayedMove = currentFen
-		moveAnalysis.BestMove = bestMoveBoard.Fen()
+		moveAnalysis.PlayedMoveFen = currentFen
+		moveAnalysis.BestMoveFen = bestMoveBoard.Fen()
+
+		moveAnalysis.PlayedMoveSrc = gochessMoves[index].S
+		moveAnalysis.PlayedMoveTar = gochessMoves[index].T
+		moveAnalysis.PlayedMovePromotion = gochessMoves[index].P
+		moveAnalysis.BestMoveSrc = engineBoard[move.From]
+		moveAnalysis.BestMoveTar = engineBoard[move.To]
+		moveAnalysis.BestMovePromotion = engineBoard[move.Promotion]
+
 		gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
 	}
 
@@ -133,7 +147,7 @@ func GameAnalysisById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gameAnalysis.Depth = convertedDepth
-	gameAnalysis.analyzeGame(engineMoves)
+	gameAnalysis.analyzeGame(engineMoves, gochessMoves)
 
 	// JSON marshal and send game to front end
 	jsonGameAnalysis, err := json.Marshal(gameAnalysis)
