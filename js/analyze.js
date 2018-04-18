@@ -7,8 +7,16 @@ function analyzeGameById(gameID){
         dataType: 'html',
         data : { 'id': gameID, 'depth': defaultDepth},
         success : function(data) {			
-            // error messages will be less then 100 characters, games always more then 100 characters
-            console.log(data);
+            var game = JSON.parse(data);
+            console.log(game);
+            //var moves = game.Moves;
+            //console.log(moves);
+            //for(var i=0; i<moves.length; ++i){
+             //   var playedMove = moves[i].PlayedMove;
+             //   console.log(playedMove);
+             //   board.position(playedMove);
+            //    totalFEN.push(playedMove);
+            //}
         }	
     });
 }
