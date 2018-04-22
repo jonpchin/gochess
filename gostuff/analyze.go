@@ -73,9 +73,9 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMo
 		moveAnalysis.PlayedMoveSrc = gochessMoves[index].S
 		moveAnalysis.PlayedMoveTar = gochessMoves[index].T
 		moveAnalysis.PlayedMovePromotion = gochessMoves[index].P
-		moveAnalysis.BestMoveSrc = engineBoard[move.From]
-		moveAnalysis.BestMoveTar = engineBoard[move.To]
-		moveAnalysis.BestMovePromotion = engineBoard[move.Promotion]
+		moveAnalysis.BestMoveSrc = engineBoard[bestMove.From]
+		moveAnalysis.BestMoveTar = engineBoard[bestMove.To]
+		moveAnalysis.BestMovePromotion = string(bestMove.Promotion)
 
 		gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
 	}

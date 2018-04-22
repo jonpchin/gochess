@@ -37,7 +37,7 @@ var skipPromotion = false;
 
 //default piece pawn promotes to when it reaches the end of the board
 //q=queen, r=rook, b=bishop, n=knight
-var pawnPromotion = "q";
+var pawnPromotion = "";
 
 function defaultTheme(){
 	if (pieceTheme === ""){
@@ -120,7 +120,7 @@ var onDrop = function(source, target, piece) {
 	// will be sent before the move which will cause a race bug in the chess verify
 	var gameStatus = updateStatus();
 
-	setStatusAndPGN(gameStatus, pgn)
+	setStatusAndPGN(gameStatus, pgn);
 	
 	if(skipPromotion){
 		board.position(game.fen());
