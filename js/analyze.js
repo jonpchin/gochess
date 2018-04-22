@@ -26,8 +26,9 @@ function analyzeGameById(gameID){
                     to: moves[i].PlayedMoveTar,
                     promotion: moves[i].PlayedMovePromotion 
                 });
-
-                $('#engineTable').html(function() { //when a player chats or connects they will update online players list for everyone
+                
+                // Construct engine analysis table
+                $('#engineTable').html(function() {
                     return  $(this).html() + '<tr  onclick="goToMove(' + i + ');"><td>' + moves[i].PlayedMoveSrc + 
                         moves[i].PlayedMoveTar + moves[i].PlayedMovePromotion +'</td><td>' + 
                         moves[i].BestMoveSrc + moves[i].BestMoveTar + moves[i].BestMovePromotion
@@ -35,7 +36,6 @@ function analyzeGameById(gameID){
                 });
 			
                 if (move !== null){
-                    //used to store players own move, moves array is stored in memberchess.js
                     var gameFen = moves[i].PlayedMoveFen;
                     board.position(gameFen);
                     totalFEN.push(gameFen);
