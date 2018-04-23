@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/malbrecht/chess"
+	"github.com/malbrecht/chess/engine/uci"
 )
 
 // FEN string of played move and best move suggested by engine
@@ -83,6 +84,59 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMo
 	engine.Quit()
 }
 
+func (allGames allPgnGames) analyzePgnGames(chessMoves []chess.Move, engine *uci.Engine) {
+
+	// All standard chess games start with the same position
+	startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+	var moveAnalysis MoveAnalysis
+	var gameAnalysis GameAnalysis
+	moveAnalysis.PlayedMoveFen = startPosition
+	moveAnalysis.BestMoveFen = ""
+	gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
+
+	board, err := chess.ParseFen(startPosition)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	currentFen := board.Fen()
+	// Original board will keep FEN string of the position before the next move is made
+	originalBoard := board
+
+	for _, move := range chessMoves {
+
+		board = board.MakeMove(move)
+
+		isOk, bestMove := engineSearchDepth(currentFen, engine, gameAnalysis.Depth)
+		currentFen = board.Fen()
+
+		if isOk == false {
+			fmt.Println("Error processing move in analyze games for currentFen:", currentFen)
+			break
+		}
+
+		bestMoveBoard := originalBoard.MakeMove(bestMove)
+		originalBoard = board
+
+		moveAnalysis.PlayedMoveFen = currentFen
+		moveAnalysis.BestMoveFen = bestMoveBoard.Fen()
+
+		moveAnalysis.PlayedMoveSrc = getGochessSquare(bestMove.From)
+		moveAnalysis.PlayedMoveTar = getGochessSquare(bestMove.To)
+		moveAnalysis.PlayedMovePromotion = getGoChessPromotionPiece(bestMove.Promotion)
+
+		moveAnalysis.BestMoveSrc = engineBoard[bestMove.From]
+		moveAnalysis.BestMoveTar = engineBoard[bestMove.To]
+		moveAnalysis.BestMovePromotion = string(bestMove.Promotion)
+
+		gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
+	}
+
+	allGames = append(allGames, gameAnalysis)
+}
+
 // Convert JSON list of FEN strings into malbrecht chess notation for stock fish analysis
 func EngineAnalysisByJsonFen(w http.ResponseWriter, r *http.Request) {
 
@@ -104,11 +158,21 @@ func GameAnalysisById(w http.ResponseWriter, r *http.Request) {
 
 	// Get the gameID specified in the front end
 	id := template.HTMLEscapeString(r.FormValue("id"))
-	depth := template.HTMLEscapeString(r.FormValue("depth"))
+	depth, err := strconv.Atoi(template.HTMLEscapeString(r.FormValue("depth")))
+
+	if err != nil {
+		fmt.Println("Could not convert string to int in GetEngineAnalysisById", err)
+		return
+	}
+
+	if depth < 1 || depth > 7 {
+		fmt.Println("Depth is not in a valid range: ", depth)
+		return
+	}
 
 	var moves string
 
-	err := db.QueryRow("SELECT moves FROM games WHERE id=?", id).Scan(&moves)
+	err = db.QueryRow("SELECT moves FROM games WHERE id=?", id).Scan(&moves)
 	if err != nil {
 		log.Println(err)
 		return
@@ -140,13 +204,8 @@ func GameAnalysisById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var gameAnalysis GameAnalysis
-	convertedDepth, err := strconv.Atoi(depth)
-	if err != nil {
-		fmt.Println("Could not convert string to int in GetEngineAnalysisById", err)
-		return
-	}
 
-	gameAnalysis.Depth = convertedDepth
+	gameAnalysis.Depth = depth
 	gameAnalysis.analyzeGame(engineMoves, gochessMoves)
 
 	// JSON marshal and send game to front end

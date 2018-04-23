@@ -79,6 +79,7 @@ func main() {
 	http.HandleFunc("/fetchCorrespondenceHistory", gostuff.FetchCorrespondenceHistory)
 	http.HandleFunc("/checkInGame", gostuff.CheckInGame)
 	http.HandleFunc("/gameAnalysisById", gostuff.GameAnalysisById)
+	http.HandleFunc("/gameAnalysisByPgn", gostuff.GameAnalysisByPgn)
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 

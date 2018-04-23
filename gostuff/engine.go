@@ -69,6 +69,30 @@ func getEngineSquare(gochessNotation string) chess.Sq {
 	return -1
 }
 
+func getGochessSquare(engineNotation chess.Sq) string {
+	for index, square := range engineBoard {
+		if engineNotation == chess.Sq(index) {
+			return square
+		}
+	}
+	return ""
+}
+
+func getGoChessPromotionPiece(enginePiece chess.Piece) string {
+	if enginePiece == WN || enginePiece == BN {
+		return "n"
+	} else if enginePiece == WB || enginePiece == BB {
+		return "b"
+	} else if enginePiece == WQ || enginePiece == BQ {
+		return "q"
+	} else if enginePiece == WR || enginePiece == BR {
+		return "r"
+	} else {
+		return ""
+	}
+}
+
+// Engine promotion piece
 func getPromotionPiece(piece string, color int) chess.Piece {
 	enginePiece := NoPiece
 	switch piece {
