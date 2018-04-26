@@ -10,6 +10,7 @@ import (
 
 	"github.com/malbrecht/chess"
 	"github.com/malbrecht/chess/engine/uci"
+	pgn "gopkg.in/freeeve/pgn.v1"
 )
 
 // FEN string of played move and best move suggested by engine
@@ -84,7 +85,7 @@ func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMo
 	engine.Quit()
 }
 
-func (allGames allPgnGames) analyzePgnGames(chessMoves []chess.Move, engine *uci.Engine) {
+func (allGames *allPgnGames) analyzePgnGames(pgnMoves []pgn.Move, engine *uci.Engine) {
 
 	// All standard chess games start with the same position
 	startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -104,10 +105,14 @@ func (allGames allPgnGames) analyzePgnGames(chessMoves []chess.Move, engine *uci
 	currentFen := board.Fen()
 	// Original board will keep FEN string of the position before the next move is made
 	originalBoard := board
+	var malbrechtMove chess.Move
 
-	for _, move := range chessMoves {
+	for _, move := range pgnMoves {
 
-		board = board.MakeMove(move)
+		malbrechtMove.From = getEngineSquare(move.From.String())
+		malbrechtMove.To = getEngineSquare(move.To.String())
+		malbrechtMove.Promotion = pgnPromoteToMalbrechtPromote(move.Promote)
+		board = board.MakeMove(malbrechtMove)
 
 		isOk, bestMove := engineSearchDepth(currentFen, engine, gameAnalysis.Depth)
 		currentFen = board.Fen()
@@ -134,7 +139,7 @@ func (allGames allPgnGames) analyzePgnGames(chessMoves []chess.Move, engine *uci
 		gameAnalysis.Moves = append(gameAnalysis.Moves, moveAnalysis)
 	}
 
-	allGames = append(allGames, gameAnalysis)
+	*allGames = append(*allGames, gameAnalysis)
 }
 
 // Convert JSON list of FEN strings into malbrecht chess notation for stock fish analysis

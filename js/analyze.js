@@ -18,7 +18,7 @@ function analyzeGameByPgn(pgnData){
         dataType: 'html',
         data : { 'pgnData': pgnData, 'depth': document.getElementById('depthspinbox').value},
         success : function(data) {	
-            		
+            console.log(data)
             //analyzeGame(data);
         }	
     });

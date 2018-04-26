@@ -9,6 +9,7 @@ import (
 
 	"github.com/malbrecht/chess"
 	"github.com/malbrecht/chess/engine/uci"
+	pgn "gopkg.in/freeeve/pgn.v1"
 )
 
 // malbrecht chess engine uses notation where a1 is 0, b1 is 1 c1 is 2...h8 is 63
@@ -30,32 +31,31 @@ const (
 	Black
 )
 
-// Piece types
-const (
-	NoPiece = iota << 1 // 0
-	Pawn                // 2
-	Knight              // 4
-	Bishop              // 6
-	Rook                // 8
-	Queen               // 10
-	King                // 12
-)
-
-// Pieces
-const (
-	WP = White | Pawn
-	WN = White | Knight
-	WB = White | Bishop
-	WR = White | Rook
-	WQ = White | Queen
-	WK = White | King
-	BP = Black | Pawn
-	BN = Black | Knight
-	BB = Black | Bishop
-	BR = Black | Rook
-	BQ = Black | Queen
-	BK = Black | King
-)
+// Converts pgn to malbrecht promote for piece promotion
+func pgnPromoteToMalbrechtPromote(piece pgn.Piece) chess.Piece {
+	result := chess.Piece(pgn.NoPiece)
+	switch piece {
+	case pgn.WhiteKnight:
+		result = chess.WN
+	case pgn.WhiteBishop:
+		result = chess.WB
+	case pgn.WhiteRook:
+		result = chess.WR
+	case pgn.WhiteQueen:
+		result = chess.WQ
+	case pgn.BlackBishop:
+		result = chess.BB
+	case pgn.BlackKnight:
+		result = chess.BN
+	case pgn.BlackRook:
+		result = chess.BR
+	case pgn.BlackQueen:
+		result = chess.BQ
+	default:
+		result = chess.NoPiece
+	}
+	return result
+}
 
 // Converts gochess square notation to engine square notation
 // Returns -1 if no notation matches
@@ -79,13 +79,13 @@ func getGochessSquare(engineNotation chess.Sq) string {
 }
 
 func getGoChessPromotionPiece(enginePiece chess.Piece) string {
-	if enginePiece == WN || enginePiece == BN {
+	if enginePiece == chess.WN || enginePiece == chess.BN {
 		return "n"
-	} else if enginePiece == WB || enginePiece == BB {
+	} else if enginePiece == chess.WB || enginePiece == chess.BB {
 		return "b"
-	} else if enginePiece == WQ || enginePiece == BQ {
+	} else if enginePiece == chess.WQ || enginePiece == chess.BQ {
 		return "q"
-	} else if enginePiece == WR || enginePiece == BR {
+	} else if enginePiece == chess.WR || enginePiece == chess.BR {
 		return "r"
 	} else {
 		return ""
@@ -94,16 +94,16 @@ func getGoChessPromotionPiece(enginePiece chess.Piece) string {
 
 // Engine promotion piece
 func getPromotionPiece(piece string, color int) chess.Piece {
-	enginePiece := NoPiece
+	enginePiece := chess.NoPiece
 	switch piece {
 	case "q":
-		enginePiece = Queen
+		enginePiece = chess.Queen
 	case "r":
-		enginePiece = Rook
+		enginePiece = chess.Rook
 	case "b":
-		enginePiece = Bishop
+		enginePiece = chess.Bishop
 	case "n":
-		enginePiece = Knight
+		enginePiece = chess.Knight
 	default: // Can't promote to anything other then queen, rook, bishop or knight
 		fmt.Println("Invalid piece in getPromotionPiece", piece, color)
 	}
