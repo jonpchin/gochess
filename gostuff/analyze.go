@@ -128,9 +128,9 @@ func (allGames *allPgnGames) analyzePgnGames(pgnMoves []pgn.Move, engine *uci.En
 		moveAnalysis.PlayedMoveFen = currentFen
 		moveAnalysis.BestMoveFen = bestMoveBoard.Fen()
 
-		moveAnalysis.PlayedMoveSrc = getGochessSquare(bestMove.From)
-		moveAnalysis.PlayedMoveTar = getGochessSquare(bestMove.To)
-		moveAnalysis.PlayedMovePromotion = getGoChessPromotionPiece(bestMove.Promotion)
+		moveAnalysis.PlayedMoveSrc = move.From.String()
+		moveAnalysis.PlayedMoveTar = move.To.String()
+		moveAnalysis.PlayedMovePromotion = string(move.Promote)
 
 		moveAnalysis.BestMoveSrc = engineBoard[bestMove.From]
 		moveAnalysis.BestMoveTar = engineBoard[bestMove.To]

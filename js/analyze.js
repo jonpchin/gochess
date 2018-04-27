@@ -1,4 +1,7 @@
 
+// Once pgn file is uploaded store all loaded games
+var jsonGames = "";
+
 function analyzeGameById(gameID){
     $.ajax({
         url: 'gameAnalysisById',
@@ -6,7 +9,7 @@ function analyzeGameById(gameID){
         dataType: 'html',
         data : { 'id': gameID, 'depth': document.getElementById('depthspinbox').value},
         success : function(data) {			
-            analyzeGame(data);
+            analyzeGames(data);
         }	
     });
 }
@@ -19,12 +22,13 @@ function analyzeGameByPgn(pgnData){
         data : { 'pgnData': pgnData, 'depth': document.getElementById('depthspinbox').value},
         success : function(data) {	
             console.log(data)
-            //analyzeGame(data);
+            analyzeGames(data);
         }	
     });
 }
 
-function analyzeGame(data){
+// Analyzes already stored game from scanned pgn file
+function analyzeGame(moves){
     
     board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 
@@ -36,11 +40,7 @@ function analyzeGame(data){
 
     document.getElementById('analysis').innerHTML = analysisTable;
     var engineTable = document.getElementById("engineTable");
-
-    var analyzedGame = JSON.parse(data);
-    console.log(analyzedGame);
-    var moves = analyzedGame.Moves;
-
+    
     for(var i=1; i<moves.length; ++i){
         var move = game.move({
             from: moves[i].PlayedMoveSrc,
@@ -68,6 +68,39 @@ function analyzeGame(data){
             console.log(i, moves.length);
         }
     }
+}
+
+function analyzeGameByIndex(index){
+    if(jsonGames !== ""){
+        analyzeGame(analyzedGames[index].Moves);
+    }else{
+        console.log("Please upload a PGN or specify a game ID to load.");
+    }
+}
+
+// Used to load initial games into cache if there are multiple games scanned from pgn
+function analyzeGames(data){
+    
+    board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
+
+    var analysisTable = `Analysis:<br> <table class="table3" id="engineTable">
+        <tr>
+        <th>Played Move</th><th>Best Move</th>
+        </tr>
+    </table>`;
+
+    document.getElementById('analysis').innerHTML = analysisTable;
+
+    var analyzedGames = JSON.parse(data);
+    jsonGames = analyzedGames
+    console.log(analyzedGames);
+    var moves = analyzedGames.Moves;
+
+    if (typeof analyzedGames !== 'undefined' && analyzedGames.length > 0) {
+        // then there is multiple games being analyzed
+        moves = analyzedGames[0].Moves
+    }
+    analyzeGame(moves); 
 }
 
 // When a row is clicked on the analysis engine table the board will update according to the row clicked
