@@ -34,7 +34,7 @@ function analyzeGame(moves){
 
     var analysisTable = `Analysis:<br> <table class="table3" id="engineTable">
         <tr>
-        <th>Played Move</th><th>Best Move</th>
+        <th>Move #</th><th>Played Move</th><th>Best Move</th>
         </tr>
     </table>`;
 
@@ -50,7 +50,7 @@ function analyzeGame(moves){
 
         // Construct engine analysis table
         $('#engineTable').html(function() {
-            return  $(this).html() + '<tr  onclick="goToMove(' + i + ');"><td>' + moves[i].PlayedMoveSrc + 
+            return  $(this).html() + '<tr  onclick="goToMove(' + i + ');"><td>'+ i + '.</td><td>' + moves[i].PlayedMoveSrc + 
                 moves[i].PlayedMoveTar + moves[i].PlayedMovePromotion +'</td><td>' + 
                 moves[i].BestMoveSrc + moves[i].BestMoveTar + moves[i].BestMovePromotion
                 '</td></tr>';
