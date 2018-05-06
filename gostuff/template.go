@@ -71,6 +71,8 @@ func ParseTemplates(templateArgs interface{}, writer http.ResponseWriter, output
 
 	if writer == nil {
 		f, err := os.Create(outputPath)
+		defer f.Close()
+
 		if err != nil {
 			log.Println(err)
 			return
