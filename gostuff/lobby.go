@@ -456,7 +456,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	//starting white's clock first, this goroutine will keep track of both players clock for this game
 	// the name of person passed in does not matter as long as its one of the two players
 	table := Verify.AllTables[game.ID]
-	go table.startClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, game.WhitePlayer)
+	go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, game.WhitePlayer)
 
 	// a match was succesfully started so do not proceed in sending a new seek
 	return false

@@ -666,7 +666,7 @@ func (c *Connection) ChessConnect() {
 
 				//starting white's clock first, this goroutine will keep track of both players clock for this game
 				table := Verify.AllTables[game.ID]
-				go table.startClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, t.Name)
+				go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, t.Name)
 
 			case "draw_game":
 

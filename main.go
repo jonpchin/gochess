@@ -143,6 +143,7 @@ func main() {
 			//gostuff.CompressDatabase()
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
+			gostuff.InitForum()
 			//mud.ConnectDb()
 			//worldId := "0"
 			//mud.LoadMapsIntoMemory(worldId)

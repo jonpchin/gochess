@@ -512,7 +512,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 
 	//starting white's clock first, this goroutine will keep track of both players clock for this game
 	table := Verify.AllTables[game.ID]
-	go table.startClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, user)
+	go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, user)
 
 	//delete saved game from database now that its in memory
 	stmt, err := db.Prepare("DELETE FROM saved where id=?")
@@ -563,6 +563,68 @@ func CheckUserNameInDb(username string) bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+// Checks forum to see if initial forum rows are missing, if they are then initialize them
+func InitForum() {
+	var rows int
+	err := db.QueryRow("SELECT COUNT(*) FROM forums").Scan(&rows)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Primary key ID is autoincremented and does need to be specified
+	type ForumData struct {
+		title        string
+		description  string
+		totalthreads int
+		totalposts   int
+		recentuser   string
+		date         time.Time
+	}
+
+	initialForumData := []ForumData{
+		ForumData{
+			title:        "General Chess Discussion",
+			description:  "Discuss general chess topics here",
+			totalthreads: 0,
+			totalposts:   0,
+			recentuser:   "",
+			date:         time.Now(),
+		},
+		ForumData{
+			title:        "Feedback and Bug Reports",
+			description:  "Report bugs and suggest improvements here",
+			totalthreads: 0,
+			totalposts:   0,
+			recentuser:   "",
+			date:         time.Now(),
+		},
+	}
+
+	if rows == 0 {
+		for _, value := range initialForumData {
+			// The initialize forum with default values in database
+			stmt, err := db.Prepare(`INSERT INTO forums (title, description, 
+				totalthreads, totalposts, recentuser, date) VALUES (?, ?, ?, ?, ?, ?)`)
+			defer stmt.Close()
+
+			if err != nil {
+				fmt.Println("InitForum 1", err)
+				return
+			}
+
+			_, err = stmt.Exec(value.title, value.description, value.totalthreads,
+				value.totalposts, value.recentuser, value.date)
+			if err != nil {
+				fmt.Println("InitForum 2", err)
+				return
+			}
+		}
+	} else {
+		fmt.Println("No need to initialize forum tables, everything is good to go!")
 	}
 }
 

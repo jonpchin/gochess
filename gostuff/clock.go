@@ -9,7 +9,7 @@ import (
 )
 
 // keep track of both sides of the clock, when function exits the game is over
-func (table *Table) startClock(gameID int, minutes int, seconds int, name string) {
+func (table *Table) StartClock(gameID int, minutes int, seconds int, name string) {
 
 	timerChan := time.NewTicker(time.Second).C
 
