@@ -153,7 +153,6 @@ func main() {
 			//weather.FetchWeather()
 			//gostuff.RemoveGameHistory(days)
 		}
-		//gostuff.SpawnProcess()
 
 		//setting up clean up function for graceful shutdown
 		c := make(chan os.Signal, 1)

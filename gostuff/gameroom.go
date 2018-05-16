@@ -397,13 +397,13 @@ func (c *Connection) ChessConnect() {
 
 				check, mate := isCheckMate(game.Fen)
 				if check && mate {
-					fmt.Println("Verified its mate")
+					log.Println("Verified its mate")
 				} else if check {
-					fmt.Println("It's only a check, no mate.")
+					log.Println("It's only a check, no mate.")
 				} else if mate {
-					fmt.Println("It is a stalemate.")
+					log.Println("It is a stalemate.")
 				} else {
-					fmt.Println("It's not mate, check or stalemate.")
+					log.Println("It's not mate, check or stalemate.")
 				}
 
 				if game.Status == "White" {
@@ -427,7 +427,12 @@ func (c *Connection) ChessConnect() {
 					log.Println(mater, "has checkmated", mated, "in", totalMoves, "moves.")
 				} else {
 					log.Println("No Checkmate for player, could be bug or cheat attempt by", mater, "on move", totalMoves, "against", mated)
-					break
+					if !mate {
+						fmt.Println("Both mates cannot be verified.")
+						break
+					} else {
+						log.Println("Conflincting checkmates", checkMate, check, mate)
+					}
 				}
 
 				var result float64

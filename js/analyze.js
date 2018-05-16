@@ -52,7 +52,7 @@ function analyzeGame(moves){
         $('#engineTable').html(function() {
             return  $(this).html() + '<tr  onclick="goToMove(' + i + ');"><td>'+ i + '.</td><td>' + moves[i].PlayedMoveSrc + 
                 moves[i].PlayedMoveTar + moves[i].PlayedMovePromotion +'</td><td>' + 
-                moves[i].BestMoveSrc + moves[i].BestMoveTar + moves[i].BestMovePromotion
+                moves[i].BestMoveSrc + moves[i].BestMoveTar + moves[i].BestMovePromotion +
                 '</td></tr>';
         });
 
