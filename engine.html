@@ -24,8 +24,10 @@
 
 <div id="chatleft">
 <textarea id="textbox"  cols="30" rows="28"  readonly="true" ></textarea><br>
-Depth: <input type="number" id="depthspinbox"  min="1" max="7" step="1" value="3" required>
-<input type="file" id="pgnFiles" multiple onchange="handleFiles(this.files)"><button id="uploadPGN">Upload</button></p>
+{{if $.CanLock}}
+	Depth: <input type="number" id="depthspinbox"  min="1" max="7" step="1" value="3" required>
+	<input type="file" id="pgnFiles" multiple onchange="handleFiles(this.files)"><button id="uploadPGN">Upload</button></p>
+{{end}}
 <div id="pgn-validator"></div>
 <input type="radio" id="cinnamonRadioButton" name="engineSwitch" value="cinnamon" onclick="startCinnamon()"> Cinnamon
 <input type="radio" id="stockfishRadioButton" name="engineSwitch" value="stockfish" onclick="startStockFish()" checked> Stockfish

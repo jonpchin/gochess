@@ -19,6 +19,18 @@ func GameAnalysisByPgn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	username, err := r.Cookie("username")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// If user is an admin or a mod then they allowed to analyze games in back end
+	if IsAdmin(username.Value) == false && IsMod(username.Value) == false {
+		fmt.Println(username.Value, "tried analyzing a game when they shouldn't have GameAnalysisByPgn")
+		return
+	}
+
 	// Get the gameID specified in the front end
 	pgnData := r.FormValue("pgnData")
 	depth, err := strconv.Atoi(template.HTMLEscapeString(r.FormValue("depth")))

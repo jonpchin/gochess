@@ -368,7 +368,11 @@ func database(w http.ResponseWriter, r *http.Request) {
 		var memberHome = template.Must(template.ParseFiles("database.html"))
 		username, _ := r.Cookie("username")
 
-		p := gostuff.Person{User: username.Value}
+		p := struct {
+			User string
+		}{
+			username.Value,
+		}
 
 		if err := memberHome.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -531,7 +535,19 @@ func engine(w http.ResponseWriter, r *http.Request) {
 		var engine = template.Must(template.ParseFiles("engine.html"))
 		username, _ := r.Cookie("username")
 
-		p := gostuff.Person{User: username.Value}
+		canLock := false
+
+		if gostuff.IsAdmin(username.Value) || gostuff.IsMod(username.Value) {
+			canLock = true
+		}
+
+		p := struct {
+			User    string
+			CanLock bool
+		}{
+			username.Value,
+			canLock,
+		}
 
 		if err := engine.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -708,7 +724,7 @@ func logs(w http.ResponseWriter, r *http.Request) {
 func mudConsole(w http.ResponseWriter, r *http.Request) {
 	if isAuthorized(w, r) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		var engine = template.Must(template.ParseFiles("mud.html"))
+		var mud = template.Must(template.ParseFiles("mud.html"))
 		username, _ := r.Cookie("username")
 		sessionID, _ := r.Cookie("sessionID")
 
@@ -720,7 +736,7 @@ func mudConsole(w http.ResponseWriter, r *http.Request) {
 			sessionID.Value,
 		}
 
-		if err := engine.Execute(w, &p); err != nil {
+		if err := mud.Execute(w, &p); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}

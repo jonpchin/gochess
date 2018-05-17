@@ -19,15 +19,6 @@ import (
 // global SessionManager["username"] = sessionID
 var SessionManager = make(map[string]string)
 
-//stores rating inforation about user in memory
-type Person struct {
-	User           string
-	Bullet         int16
-	Blitz          int16
-	Standard       int16
-	Correspondence int16
-}
-
 //process user input when signing in
 func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
