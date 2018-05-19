@@ -1,11 +1,9 @@
 package gostuff
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strings"
 )
 
@@ -23,18 +21,6 @@ type IPLocation struct {
 	Metro_code   string
 }
 
-func GetIpStackKey() string {
-	readFile, err := os.Open("secret/ipstack.txt")
-	defer readFile.Close()
-	if err != nil {
-		fmt.Println("getIpStackKey ", err)
-	}
-
-	scanner := bufio.NewScanner(readFile)
-	scanner.Scan()
-	return scanner.Text()
-}
-
 // Sets the country the player is from in the database the first time they register
 // returns back what the country name that was set
 func setCountry(username string, ipAddress string) string {
@@ -43,8 +29,8 @@ func setCountry(username string, ipAddress string) string {
 
 	client := TimeOutHttp(5)
 
-	response, err := client.Get("http://api.ipstack.com/" + ipAddress + "?access_key=" + GetIpStackKey() +
-		"&output=json&legacy=1")
+	response, err := client.Get("http://api.ipstack.com/" + ipAddress + "?access_key=" +
+		ReadOneLine("secret/ipstack.txt") + "&output=json&legacy=1")
 	if response == nil {
 		fmt.Println("URL time out for http://api.ipstack.com/ in setCountry")
 		return "globe"
@@ -92,6 +78,7 @@ func GetCountry(username string) string {
 
 	err := db.QueryRow("SELECT country from userinfo WHERE username=?", username).Scan(&country)
 	if err != nil { // then country is nil
+		fmt.Println("Error getting country for", username, err)
 		return "globe"
 	}
 	return country

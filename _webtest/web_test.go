@@ -144,7 +144,7 @@ func loginToLobby(host string, page *agouti.Page, user string, t *testing.T) {
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
 	}
-	pass := readPass(user)
+	pass := ReadOneLine("data/" + user + ".txt")
 	err = page.FindByID("password").Fill(pass)
 	if err != nil {
 		t.Fatal("Couldn't fill login info:", err)
@@ -420,17 +420,4 @@ func TestLoginProduction(t *testing.T) {
 	if err := driver.Stop(); err != nil {
 		t.Error("Failed to close pages and stop WebDriver:", err)
 	}
-}
-*/
-// returns pass of user's account
-func readPass(user string) string {
-	config, err := os.Open("data/" + user + ".txt")
-	defer config.Close()
-	if err != nil {
-		log.Println("web_Test.go readAccount 1 ", err)
-	}
-	scanner := bufio.NewScanner(config)
-	scanner.Scan()
-
-	return scanner.Text()
 }

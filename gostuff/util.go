@@ -1,6 +1,7 @@
 package gostuff
 
 import (
+	"bufio"
 	"fmt"
 	"image"
 	"io/ioutil"
@@ -319,4 +320,17 @@ func CreateDirIfNotExist(dir string) {
 			panic(err)
 		}
 	}
+}
+
+// Reads one line in the file and returns its contents, usually used to get activiation tokens for services
+func ReadOneLine(path string) string {
+	readFile, err := os.Open(path)
+	defer readFile.Close()
+	if err != nil {
+		fmt.Println("ReadOneLine can't find read file ", path, err)
+	}
+
+	scanner := bufio.NewScanner(readFile)
+	scanner.Scan()
+	return scanner.Text()
 }

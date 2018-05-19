@@ -1,11 +1,9 @@
 package lichess
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/jonpchin/gochess/gostuff"
 )
@@ -22,7 +20,7 @@ func GetAccount() {
 		return
 	}
 
-	req.Header.Set("Authorization", "Bearer "+getLichessToken())
+	req.Header.Set("Authorization", "Bearer "+ReadOneLine("secret/lichess.txt"))
 
 	response, err := client.Do(req)
 	if err != nil {
@@ -36,16 +34,4 @@ func GetAccount() {
 		fmt.Println(err)
 	}
 	fmt.Println(string(htmlData))
-}
-
-func getLichessToken() string {
-	readFile, err := os.Open("secret/lichess.txt")
-	defer readFile.Close()
-	if err != nil {
-		fmt.Println("getLichessToken ", err)
-	}
-
-	scanner := bufio.NewScanner(readFile)
-	scanner.Scan()
-	return scanner.Text()
 }

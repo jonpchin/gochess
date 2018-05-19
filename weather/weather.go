@@ -1,7 +1,6 @@
 package weather
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -62,7 +61,7 @@ func FetchWeather() {
 		log.Println("Just receieved a message I couldn't decode:", string(responseData), err)
 	}
 
-	geo.SetGoogleAPIKey(getGoogleMapsApiKey())
+	geo.SetGoogleAPIKey(ReadOneLine("weather/keys/google_maps_api_key.txt"))
 
 	for _, value := range weatherData.Items {
 		point := geo.NewPoint(value.Weather_stn_lat, value.Weather_stn_long)
@@ -78,23 +77,4 @@ func FetchWeather() {
 
 func (allWeather weatherAtStations) processWeatherStations() {
 
-}
-
-// returns news API key
-func getGoogleMapsApiKey() string {
-
-	// The file path where the news API key is
-	const apiKeyPath = "weather/keys/google_maps_api_key.txt"
-	config, err := os.Open(apiKeyPath)
-	defer config.Close()
-
-	if err != nil {
-		fmt.Println("news.go getApiKey 1", err)
-	}
-
-	scanner := bufio.NewScanner(config)
-
-	// Google maps API Key
-	scanner.Scan()
-	return scanner.Text()
 }
