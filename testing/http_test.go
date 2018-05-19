@@ -14,7 +14,7 @@ func TestLocale(t *testing.T) {
 	client := gostuff.TimeOutHttp(5)
 	ipStackApiKey := ""
 
-	if gostuff.IsEnvironmentTravis() {
+	if gostuff.IsEnvironmentTravis() || gostuff.IsEnvironmentAppVeyor() {
 		ipStackApiKey = os.Getenv("IpStackApiKey")
 	} else {
 		ipStackApiKey = gostuff.ReadOneLine("../secret/ipstack.txt")
