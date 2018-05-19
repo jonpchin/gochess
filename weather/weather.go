@@ -61,7 +61,7 @@ func FetchWeather() {
 		log.Println("Just receieved a message I couldn't decode:", string(responseData), err)
 	}
 
-	geo.SetGoogleAPIKey(ReadOneLine("weather/keys/google_maps_api_key.txt"))
+	geo.SetGoogleAPIKey(gostuff.ReadOneLine("weather/keys/google_maps_api_key.txt"))
 
 	for _, value := range weatherData.Items {
 		point := geo.NewPoint(value.Weather_stn_lat, value.Weather_stn_long)

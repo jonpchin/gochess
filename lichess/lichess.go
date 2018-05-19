@@ -20,7 +20,7 @@ func GetAccount() {
 		return
 	}
 
-	req.Header.Set("Authorization", "Bearer "+ReadOneLine("secret/lichess.txt"))
+	req.Header.Set("Authorization", "Bearer "+gostuff.ReadOneLine("secret/lichess.txt"))
 
 	response, err := client.Do(req)
 	if err != nil {
