@@ -391,6 +391,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 		name := r.URL.Query().Get("name")
 		username, _ := r.Cookie("username")
+		country := "globe"
 
 		var inputName string                 //used to pass to template to specify what profile name is being viewed
 		if r.URL.Query().Get("name") == "" { //then look at own profile
@@ -398,6 +399,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 				bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(username.Value)
 			all = gostuff.GetGames(username.Value)
 			inputName = username.Value
+			country = gostuff.GetCountry(inputName)
 		} else { //otherwise look at specified player's profile
 			ratErr, bulletRating, blitzRating, standardRating, correspondenceRating,
 				bulletRD, blitzRD, standardRD, correspondenceRD = gostuff.GetRatingAndRD(name)
@@ -407,9 +409,8 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 			}
 			all = gostuff.GetGames(name)
 			inputName = name
+			country = gostuff.GetCountry(name)
 		}
-
-		country := gostuff.GetCountry(name)
 
 		//rounding floats
 		bulletN := gostuff.Round(bulletRating)

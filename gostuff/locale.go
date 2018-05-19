@@ -1,10 +1,11 @@
 package gostuff
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
+	"os"
 	"strings"
 )
 
@@ -19,7 +20,19 @@ type IPLocation struct {
 	Time_zone    string
 	Latitude     float32
 	Longitude    float32
-	Metro_code   int
+	Metro_code   string
+}
+
+func GetIpStackKey() string {
+	readFile, err := os.Open("secret/ipstack.txt")
+	defer readFile.Close()
+	if err != nil {
+		fmt.Println("getIpStackKey ", err)
+	}
+
+	scanner := bufio.NewScanner(readFile)
+	scanner.Scan()
+	return scanner.Text()
 }
 
 // Sets the country the player is from in the database the first time they register
@@ -29,9 +42,11 @@ func setCountry(username string, ipAddress string) string {
 	var country = "globe"
 
 	client := TimeOutHttp(5)
-	response, err := client.Get("http://freegeoip.net/json/" + ipAddress)
+
+	response, err := client.Get("http://api.ipstack.com/" + ipAddress + "?access_key=" + GetIpStackKey() +
+		"&output=json&legacy=1")
 	if response == nil {
-		fmt.Println("URL time out for http://freegeoip.net/json/ in setCountry")
+		fmt.Println("URL time out for http://api.ipstack.com/ in setCountry")
 		return "globe"
 	}
 	defer response.Body.Close()
@@ -39,6 +54,7 @@ func setCountry(username string, ipAddress string) string {
 		fmt.Println("error in get language 1", err)
 		return "globe"
 	}
+
 	htmlData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println("error in get language 2", err)
@@ -55,13 +71,13 @@ func setCountry(username string, ipAddress string) string {
 	stmt, err := db.Prepare("UPDATE userinfo SET country=? WHERE username=?")
 	defer stmt.Close()
 	if err != nil {
-		log.Println("error in get language 4", err)
+		fmt.Println("error in get language 4", err)
 		return "globe"
 	}
 	country = strings.ToLower(ipLocation.Country_code)
 	_, err = stmt.Exec(country, username)
 	if err != nil {
-		log.Println("error in get language 5", err)
+		fmt.Println("error in get language 5", err)
 		return "globe"
 	}
 	return country

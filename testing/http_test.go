@@ -11,9 +11,10 @@ import (
 func TestLocale(t *testing.T) {
 
 	client := gostuff.TimeOutHttp(5)
-	response, err := client.Get("http://freegeoip.net/json/77.124.0.0")
+	response, err := client.Get("http://api.ipstack.com/77.124.0.0?access_key=" + getIpStackKey()
+	+ "&output=json&legacy=1")
 	if response == nil {
-		t.Error("URL time out for http://freegeoip.net/json/77.124.0.0 in TestLocale")
+		t.Error("URL time out for http://api.ipstack.com/77.124.0.0?access_key=")
 	}
 	if err != nil {
 		t.Error("Failed TestLocale http get")
