@@ -3,6 +3,7 @@ package testing
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/jonpchin/gochess/gostuff"
@@ -11,8 +12,15 @@ import (
 func TestLocale(t *testing.T) {
 
 	client := gostuff.TimeOutHttp(5)
+	ipStackApiKey := ""
+
+	if gostuff.IsEnvironmentTravis() {
+		ipStackApiKey = os.Getenv("IpStackApiKey")
+	} else {
+		ipStackApiKey = gostuff.ReadOneLine("../secret/ipstack.txt")
+	}
 	response, err := client.Get("http://api.ipstack.com/77.124.0.0?access_key=" +
-		gostuff.ReadOneLine("../secret/ipstack.txt") + "&output=json&legacy=1")
+		ipStackApiKey + "&output=json&legacy=1")
 	if response == nil {
 		t.Error("URL time out for http://api.ipstack.com/77.124.0.0?access_key=")
 	}
