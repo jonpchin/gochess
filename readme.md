@@ -43,6 +43,7 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>20. Web server runs in Windows and Linux.</p>
 <p>21. Forum</p>
 <p>22. Daily news feed, contains mostly tech articles but it can be configured to get other types of news.</p>
+<p>23. Post game analysis with Stockfish engine (beta, only for developers)</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Chess TV where live games are randomly broadcasted.</p>
@@ -50,11 +51,10 @@ Once your changes are ready, make a pull request and I"ll review it.
 <p>3. Friends list</p>
 <p>4. Inbox system</p>
 <p>5. Update help, documentation and screenshots</p>
-<p>6. Post game analysis with Stockfish engine</p>
-<p>7. Statistics page</p>
-<p>8. Store zipped source files and databas backup in Google Drive or Dropbox.</p>
-<p>9. Read write meta data of each tile to file when saving and loading memory map.</p>
-<p>10. Setup algorithm to pick starting player location and save player's map vision to database.</p>
+<p>6. Statistics page</p>
+<p>7. Store zipped source files and databas backup in Google Drive or Dropbox.</p>
+<p>8. Read write meta data of each tile to file when saving and loading memory map.</p>
+<p>9. Setup algorithm to pick starting player location and save player's map vision to database.</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
