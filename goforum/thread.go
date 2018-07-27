@@ -151,7 +151,9 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 
 					if post.createPost() {
 						updateThreadReplies(post.ThreadID)
-						updateForumPostCount(getForumId(forumTitle))
+						forumId := getForumId(forumTitle)
+						updateLastPost(username.Value, threadId, forumId)
+						updateForumPostCount(forumId)
 						w.Write([]byte("createPost"))
 						return
 					} else {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/dchest/captcha"
@@ -114,6 +115,11 @@ func main() {
 	//gostuff.OneTimeParseTemplates()
 
 	go func() {
+
+		if runtime.GOOS == "windows" {
+			gostuff.StartMySQLService()
+		}
+
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")
 
@@ -173,6 +179,7 @@ func main() {
 
 	//notes.GetAllClosedCommits()
 	//lichess.GetAccount()
+
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
 			fmt.Printf("ListenAndServeTLS error: %v\n", err)

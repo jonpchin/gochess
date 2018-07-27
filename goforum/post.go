@@ -63,6 +63,33 @@ func (post *Post) createPost() bool {
 	return true
 }
 
+// Updates forum and thread last post
+func updateLastPost(username string, threadId int64, forumId int) {
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	stmt, err := db.Prepare("UPDATE threads SET lastpost=? WHERE id=?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = stmt.Exec(username, threadId)
+	if err != nil {
+		log.Println(err)
+	}
+
+	stmt, err = db.Prepare("UPDATE forums SET recentuser=? WHERE id=?")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = stmt.Exec(username, forumId)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func updateThreadReplies(threadId int64) {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
