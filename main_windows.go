@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 
 	"github.com/dchest/captcha"
@@ -116,9 +115,7 @@ func main() {
 
 	go func() {
 
-		if runtime.GOOS == "windows" {
-			gostuff.StartMySQLService()
-		}
+		gostuff.StartMySQLService()
 
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")

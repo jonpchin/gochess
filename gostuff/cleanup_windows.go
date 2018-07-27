@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -16,9 +15,8 @@ func Cleanup() {
 
 	fmt.Println("Web server is shutting down...saving games please wait...")
 
-	if runtime.GOOS == "windows" {
-		StopMySQLService()
-	}
+	StopMySQLService()
+
 	var message ChatInfo
 	message.Type = "massMessage"
 	message.Text = "ATTENTION: Web server is shutting down NOW for maintenance, brace for impact..."

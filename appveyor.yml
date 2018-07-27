@@ -32,7 +32,7 @@ build_script:
   - bash importAppVeyorTemplate.sh
   - bash importAppVeyorTables.sh
   - cd ../..
-  - go build main.go
+  - go build
   - go test ./testing
   - go test ./_appveyor
 

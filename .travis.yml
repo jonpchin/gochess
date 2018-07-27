@@ -27,7 +27,7 @@ before_install:
 - cd ../../
 
 script:
-- go build main.go
-- sudo ./main &
+- go build
+- sudo ./gochess &
 - go test ./testing
 - go test ./_travis
