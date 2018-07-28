@@ -13,6 +13,9 @@ import (
 	pgn "gopkg.in/freeeve/pgn.v1"
 )
 
+// On a brand new installation on a server make sure to check if castle fix is incorporated
+// in third party library at https://github.com/malbrecht/chess/pull/3
+
 // FEN string of played move and best move suggested by engine
 type MoveAnalysis struct {
 	PlayedMoveFen       string

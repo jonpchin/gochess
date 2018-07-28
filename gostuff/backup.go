@@ -15,19 +15,21 @@ func ExportDatabase(isTemplate bool) {
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
 	defer problems.Close()
 	log.SetOutput(problems)
-	backup := "backup"
+
+	command := "mysqldump --databases gochess --ignore-table=gochess.grandmaster > ./../backup/gochessNoGrandmaster.sql"
+
 	if isTemplate {
-		backup = "exportTemplate"
+		command = "cd config && mysqldump --databases gochess --no-data > ./../backup/gochessTemplate.sql"
 	}
 
 	if runtime.GOOS == "windows" {
-		_, err := exec.Command("cmd.exe", "/C", "cd config && bash "+backup+".sh").Output()
+		_, err := exec.Command("cmd.exe", "/C", command).Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in exporting database, please check logs")
 		}
 	} else {
-		_, err := exec.Command("/bin/bash", "-c", "cd config && bash  "+backup+".sh").Output()
+		_, err := exec.Command("/bin/bash", "-c", command).Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in exporting database, please check logs")

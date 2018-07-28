@@ -2,17 +2,21 @@ package gostuff
 
 import (
 	"bufio"
+	"bytes"
 	"database/sql"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/go-ini/ini"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -40,8 +44,18 @@ type GoGame struct {
 	CountryBlack string
 }
 
+type DatabaseInfo struct {
+	Host     string
+	User     string
+	Password string
+	DbName   string
+	Port     string
+}
+
 var (
-	isWindows = false
+	isWindows        = false
+	USER_CONFIG_PATH = "secret/config.txt"
+	ROOT_CONFIG_PATH = "secret/checkdb.txt"
 )
 
 var db *sql.DB
@@ -65,8 +79,8 @@ func DbSetup(backup string) bool {
 		}
 	}
 
-	var checkDBConnectFile = "secret/checkdb.txt"
-	var sqlOpenFile = "secret/config.txt"
+	var checkDBConnectFile = ROOT_CONFIG_PATH
+	var sqlOpenFile = USER_CONFIG_PATH
 
 	if IsEnvironmentTravis() {
 		checkDBConnectFile = "_travis/data/dbtravis.txt"
@@ -195,6 +209,40 @@ func CheckDBConnection(path string) bool {
 		return false
 	}
 	return true
+}
+
+func (databaseInfo *DatabaseInfo) ReadFile(path string) {
+
+	config, err := os.Open(path)
+	defer config.Close()
+	if err != nil {
+		log.Println("database.go ReadFile 1 ", err)
+	}
+
+	scanner := bufio.NewScanner(config)
+	scanner.Scan()
+
+	//user
+	databaseInfo.User = scanner.Text()
+
+	//pass
+	scanner.Scan()
+	//decode
+	ans, _ := hex.DecodeString(scanner.Text())
+	result, _ := base64.StdEncoding.DecodeString(string(ans))
+	databaseInfo.Password = string(result)
+
+	//host
+	scanner.Scan()
+	databaseInfo.Host = scanner.Text()
+
+	//port
+	scanner.Scan()
+	databaseInfo.Port = scanner.Text()
+
+	//database name
+	scanner.Scan()
+	databaseInfo.DbName = scanner.Text()
 }
 
 // the parameter path is where the text file is located containing the database connection info
@@ -628,20 +676,86 @@ func InitForum() {
 	}
 }
 
-/*
-// execute line by line in sql script, does not work for stored procedures
-func executeSqlScript(filepath string) {
-	file, err := ioutil.ReadAll("/path/to/file")
+// Configures settings of MySQL .ini file
+func SetupMySqlIni() {
 
-	if err != nil {
-		// handle error
-	}
-
-	requests := strings.Split(string(file), ";")
-
-	for _, request := range requests {
-		result, err := db.Exec(request)
-		// do whatever you need with result and error
+	if runtime.GOOS == "windows" {
+		configMySqlIni("C:/my.ini")
+	} else {
+		configMySqlIni(os.Getenv("HOME") + "/.my.cnf")
 	}
 }
-*/
+
+func configMySqlIni(mysqlIniPath string) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+	var databaseInfo DatabaseInfo
+	databaseInfo.ReadFile(ROOT_CONFIG_PATH)
+
+	found, err := isDirOrFileExists(mysqlIniPath)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if found {
+		cfg, err := ini.Load(mysqlIniPath)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		if cfg.Section("client").Key("password").String() == "" ||
+			cfg.Section("client").Key("user").String() == "" {
+			_, err = cfg.Section("client").NewKey("user", databaseInfo.User)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			_, err = cfg.Section("client").NewKey("password", databaseInfo.Password)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			cfg.SaveTo(mysqlIniPath)
+		}
+	} else {
+		err := ioutil.WriteFile(mysqlIniPath,
+			[]byte("[client]\nuser = "+databaseInfo.User+"\npassword = "+databaseInfo.Password), 0666)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		log.Println("Created ini file at ", mysqlIniPath)
+	}
+}
+
+func executeSqlScript(sqlFilePath string) {
+
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
+	var databaseInfo DatabaseInfo
+	databaseInfo.ReadFile(ROOT_CONFIG_PATH)
+
+	cmd := exec.Command("mysql", "-h"+databaseInfo.Host, "-P"+databaseInfo.Port,
+		"-D"+databaseInfo.DbName)
+
+	dump, err := os.Open(sqlFilePath)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	cmd.Stdin = dump
+
+	var out, stderr bytes.Buffer
+
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error executing query. Command Output: %+v\n: %+v, %v", out.String(), stderr.String(), err))
+		log.Fatalf("Error executing query. Command Output: %+v\n: %+v, %v", out.String(), stderr.String(), err)
+	}
+}

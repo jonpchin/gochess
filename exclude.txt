@@ -15,10 +15,11 @@ main.exe
 travis.yml
 logs
 exports
-/_webtest/debug.log
 news.html
-/gochess.exe
-/gochess.exe.manifest
-/gochess.syso
-/secret/fullchain.pem
-/secret/privkey.pem
+gochess.exe
+gochess.exe.manifest
+gochess.syso
+secret/fullchain.pem
+secret/privkey.pem
+nohup.out
+gochess/privatedata/news

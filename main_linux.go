@@ -114,7 +114,7 @@ func main() {
 	//gostuff.OneTimeParseTemplates()
 
 	go func() {
-
+		gostuff.SetupMySqlIni()
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")
 
@@ -140,7 +140,7 @@ func main() {
 			//}
 			// pass in true to export template(No grandmaster) without data in the tables
 
-			//gostuff.ExportDatabase(true)
+			gostuff.ExportDatabase(true)
 			//gostuff.CompressDatabase()
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
