@@ -17,3 +17,8 @@ logs
 exports
 /_webtest/debug.log
 news.html
+/gochess.exe
+/gochess.exe.manifest
+/gochess.syso
+/secret/fullchain.pem
+/secret/privkey.pem
