@@ -4,6 +4,7 @@ package gostuff
 
 import (
 	"fmt"
+	"os"
 
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -11,10 +12,17 @@ import (
 
 func ListServices() {
 
-	manager, err := mgr.ConnectRemote("ux31e")
+	hostname, err := os.Hostname()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	manager, err := mgr.ConnectRemote(hostname)
 
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer manager.Disconnect()
 	services, err := manager.ListServices()
@@ -29,16 +37,16 @@ func ListServices() {
 
 func getMySQLService() *mgr.Service {
 
-	// Contains host name of Windows machine
-	serviceFile := "secret/service.txt"
-	host := ReadOneLine(serviceFile)
-	if host == "" {
-		fmt.Println("Could not find host in", serviceFile, "is the file missing?")
+	hostname, err := os.Hostname()
+	if err != nil {
+		fmt.Println(err)
 		return nil
 	}
-	manager, err := mgr.ConnectRemote(host)
+
+	manager, err := mgr.ConnectRemote(hostname)
 	if err != nil {
 		fmt.Println("Could not connect to remote host", err)
+		return nil
 	}
 	defer manager.Disconnect()
 

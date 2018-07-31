@@ -213,10 +213,12 @@ func CheckDBConnection(path string) bool {
 
 func (databaseInfo *DatabaseInfo) ReadFile(path string) {
 
+	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	config, err := os.Open(path)
 	defer config.Close()
+	
 	if err != nil {
-		log.Println("database.go ReadFile 1 ", err)
+		log.Println(err)
 	}
 
 	scanner := bufio.NewScanner(config)
