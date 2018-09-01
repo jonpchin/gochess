@@ -72,9 +72,6 @@ func (allGames *allPgnGames) readPgn(pgnData string) {
 		}
 		fmt.Println(game.Tags)
 
-		// TODO:
-		// cannot use game.Moves (type []pgn.Move) as type []chess.Move in argument to allGames.analyzePgnGames
-		// convert pgn.Move into chess.Move
 		allGames.analyzePgnGames(game.Moves, engine)
 	}
 

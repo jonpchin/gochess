@@ -6,6 +6,7 @@ import (
 	"github.com/jonpchin/gochess/gostuff"
 )
 
+// Tests king castle
 func TestKingCastle(t *testing.T) {
 
 	var legal bool
@@ -14,93 +15,41 @@ func TestKingCastle(t *testing.T) {
 	//don't matter for testing
 	gostuff.InitGame(gameID, "", "")
 
-	legal = gostuff.ChessVerify("e2", "e4", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move two squares white")
+	cases := []struct {
+		src   string
+		dst   string
+		legal bool
+		msg   string
+	}{
+		{"e2", "e4", false, "e2 e4 can't move two squares white"},
+		{"e7", "e5", false, "e7 e5 can't move two squares black"},
+		{"g1", "f3", false, "g1 f3 can't move knight"},
+		{"d8", "h4", false, "d8 h4 can't move queen"},
+		{"f1", "b5", false, "f1 b5 can't move bishop"},
+		{"h4", "e4", false, "h4 e4  can't move queen"},
+		{"e1", "e2", true, "e1 e2 king is in check and should not be able to move"},
+		{"d1", "e2", false, "d1 e2 can't move bishop"},
+		{"g8", "f6", false, "g8 f6 can't move knight"},
+		{"e1", "g1", false, "e1 g1 can't castle"},
+		{"f8", "b4", false, "f8 b4 can't move bishop"},
+		{"e2", "c4", false, "e2 c4 can't move queen"},
+		{"a7", "a6", false, "a7 a6 can't move pawn"},
+		{"c4", "c5", false, "c4 c5 can't move bishop"},
+		{"e8", "g8", true, "e8 g8 can't move through check"},
+		{"h8", "g8", false, "h8, g8  can't move rook"},
+		{"g1", "f1", true, "g1 f1  rook is already there"},
+		{"g1", "h1", false, "g1 h1 can't move bishop"},
+		{"g8", "h8", false, "g8 h8 can't move rook"},
+		{"h1", "f3", true, "h1 f3  illegal king move"},
+		{"c5", "c3", false, "c5 c3 can't move queen"},
+		{"e8", "f8", false, "e8 f8 can't move king"},
 	}
-	legal = gostuff.ChessVerify("e7", "e5", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move two squares black")
-	}
-	legal = gostuff.ChessVerify("g1", "f3", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move knight")
-	}
-	legal = gostuff.ChessVerify("d8", "h4", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move queen")
-	}
-	legal = gostuff.ChessVerify("f1", "b5", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move bishop")
-	}
-	legal = gostuff.ChessVerify("h4", "e4", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move queen")
-	}
-	legal = gostuff.ChessVerify("e1", "e2", "", gameID)
-	if legal == true {
-		t.Error("castle_test.go TestKingCastle() king is in check and should not be able to move")
-	}
-	legal = gostuff.ChessVerify("d1", "e2", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move bishop")
-	}
-	legal = gostuff.ChessVerify("g8", "f6", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move knight")
-	}
-	legal = gostuff.ChessVerify("e1", "g1", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't castle")
-	}
-	legal = gostuff.ChessVerify("f8", "b4", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move bishop")
-	}
-	legal = gostuff.ChessVerify("e2", "c4", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move queen")
-	}
-	legal = gostuff.ChessVerify("a7", "a6", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move pawn")
-	}
-	legal = gostuff.ChessVerify("c4", "c5", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move bishop")
-	}
-	legal = gostuff.ChessVerify("e8", "g8", "", gameID)
-	if legal == true {
-		t.Error("castle_test.go TestKingCastle() can't move through check")
-	}
-	legal = gostuff.ChessVerify("h8", "g8", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move rook")
-	}
-	legal = gostuff.ChessVerify("g1", "f1", "", gameID)
-	if legal == true {
-		t.Error("castle_test.go TestKingCastle() rook is already there")
-	}
-	legal = gostuff.ChessVerify("g1", "h1", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move bishop")
-	}
-	legal = gostuff.ChessVerify("g8", "h8", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move rook")
-	}
-	legal = gostuff.ChessVerify("h1", "f3", "", gameID)
-	if legal == true {
-		t.Error("castle_test.go TestKingCastle() illegal king move")
-	}
-	legal = gostuff.ChessVerify("c5", "c3", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move queen")
-	}
-	legal = gostuff.ChessVerify("e8", "f8", "", gameID)
-	if legal == false {
-		t.Error("castle_test.go TestKingCastle() can't move king")
+
+	for _, c := range cases {
+		legal = gostuff.ChessVerify(c.src, c.dst, "", gameID)
+		if legal == c.legal {
+			t.Error(c.msg)
+		}
 	}
 }
 

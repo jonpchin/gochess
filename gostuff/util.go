@@ -18,16 +18,32 @@ import (
 	"github.com/mholt/archiver"
 )
 
-// Returns true if a given file or directory exist in the path
-func isDirOrFileExists(path string) (bool, error) {
+//return trues if path is a directory, errors are explicitly not logged
+func IsDirectory(path string) bool {
+
+	f, err := os.Open(path)
+
+	if err != nil {
+		return false
+	}
+	stat, err := f.Stat()
+
+	return stat.IsDir()
+}
+
+// Returns true if a given file exist in the path
+func isFileExist(path string) bool {
+
+	isExist := true
 	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
+	if err != nil {
+
 	}
 	if os.IsNotExist(err) {
-		return false, nil
+		isExist = false
 	}
-	return true, err
+
+	return isExist
 }
 
 // Archives a group of files as an array of string into a destination zip file
@@ -117,10 +133,8 @@ func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight
 	var width int
 	var height int
 	// if target image does not exist use the image that hasn't been resized
-	exists, err := isDirOrFileExists(targetPath)
-	if err != nil {
-		log.Println(err)
-	}
+	exists := isFileExist(targetPath)
+
 	if exists {
 		width, height = getImageDimensions(targetPath)
 	} else {
@@ -280,20 +294,6 @@ func RecurseDirectory(searchDir string, fp func(string), pattern string) {
 			}
 		}
 	}
-}
-
-//return trues if path is a directory
-func IsDirectory(path string) bool {
-	f, err := os.Open(path)
-	if err != nil {
-		fmt.Println("isDirectory 1", err)
-		return false
-	}
-	stat, err := f.Stat()
-	if err != nil {
-		fmt.Println("isDirectory 2", err)
-	}
-	return stat.IsDir()
 }
 
 // Print out memory usage

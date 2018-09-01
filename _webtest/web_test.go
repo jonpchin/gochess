@@ -22,7 +22,7 @@ func TestLoginDev(t *testing.T) {
 	if gostuff.IsEnvironmentTravis() {
 		dbFile = "../_travis/data/dbtravis.txt"
 	} else {
-		dbFile = "../secret/checkdb.txt"
+		dbFile = "../secret/root.txt"
 	}
 
 	// make sure MySQL connection is alive before proceeding

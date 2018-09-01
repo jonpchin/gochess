@@ -64,9 +64,11 @@ func main() {
 	http.HandleFunc("/lockThread", goforum.LockThread)
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
+	http.HandleFunc("/audio", audio)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	//http.HandleFunc("/drawchart", plot.DrawChart)
 	http.HandleFunc("/mudserver/mud", mudConsole)
+	
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -112,8 +114,10 @@ func main() {
 	}
 	//gostuff.PrintMemoryStats()
 	//gostuff.OneTimeParseTemplates()
+	gostuff.SetupSecretDir()
 
 	go func() {
+
 		gostuff.SetupMySqlIni()
 		gostuff.StartMySQLService()
 
@@ -583,6 +587,25 @@ func saved(w http.ResponseWriter, r *http.Request) {
 		}
 
 		gostuff.ParseTemplates(p, w, "saved.html", []string{"templates/savedTemplate.html",
+			"templates/memberHeader.html"}...)
+	}
+}
+
+func audio(w http.ResponseWriter, r *http.Request) {
+
+	if isAuthorized(w, r) {
+		w.Header().Set("Cache-Control", "private, max-age=432000")
+
+		username, _ := r.Cookie("username")
+		p := struct {
+			User      string
+			PageTitle string // Title of the web page
+		}{
+			username.Value,
+			"Audio",
+		}
+
+		gostuff.ParseTemplates(p, w, "audio.html", []string{"templates/audioTemplate.html",
 			"templates/memberHeader.html"}...)
 	}
 }

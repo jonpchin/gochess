@@ -55,7 +55,7 @@ type DatabaseInfo struct {
 var (
 	isWindows        = false
 	USER_CONFIG_PATH = "secret/config.txt"
-	ROOT_CONFIG_PATH = "secret/checkdb.txt"
+	ROOT_CONFIG_PATH = "secret/root.txt"
 )
 
 var db *sql.DB
@@ -68,10 +68,8 @@ func DbSetup(backup string) bool {
 	}
 
 	//Checks if backup folder for database export exists
-	exists, err := isDirOrFileExists(backup)
-	if err != nil {
-		fmt.Println("database.go DbSetup 0, error checking if directory exists", err)
-	}
+	exists := IsDirectory(backup)
+
 	if exists == false {
 		err := os.Mkdir(backup, 0777)
 		if err != nil {
@@ -91,7 +89,7 @@ func DbSetup(backup string) bool {
 	if CheckDBConnection(checkDBConnectFile) == false {
 		return false
 	}
-
+	var err error
 	dbString, database := ReadFile(sqlOpenFile)
 	db, err = sql.Open("mysql", dbString)
 
@@ -216,7 +214,7 @@ func (databaseInfo *DatabaseInfo) ReadFile(path string) {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 	config, err := os.Open(path)
 	defer config.Close()
-	
+
 	if err != nil {
 		log.Println(err)
 	}
@@ -694,11 +692,7 @@ func configMySqlIni(mysqlIniPath string) {
 	var databaseInfo DatabaseInfo
 	databaseInfo.ReadFile(ROOT_CONFIG_PATH)
 
-	found, err := isDirOrFileExists(mysqlIniPath)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	found := isFileExist(mysqlIniPath)
 
 	if found {
 		cfg, err := ini.Load(mysqlIniPath)

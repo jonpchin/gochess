@@ -112,6 +112,7 @@ func main() {
 	}
 	//gostuff.PrintMemoryStats()
 	//gostuff.OneTimeParseTemplates()
+	gostuff.SetupSecretDir()
 
 	go func() {
 		gostuff.SetupMySqlIni()

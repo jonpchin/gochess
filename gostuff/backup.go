@@ -57,14 +57,14 @@ func importDatabase() bool {
 		return false
 	}
 	if runtime.GOOS == "windows" {
-		_, err := exec.Command("cmd.exe", "/C", "cd config && bash importgochess.sh").Output()
+		_, err := exec.Command("cmd.exe", "/C", "mysql < ./backup/gochess.sql").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")
 			return false
 		}
 	} else {
-		_, err := exec.Command("/bin/bash", "-c", "bash config/importgochess.sh").Output()
+		_, err := exec.Command("/bin/bash", "-c", "mysql < ./backup/gochess.sql").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing gochess database, please check logs")
@@ -82,14 +82,14 @@ func importTemplateDatabase() bool {
 
 	//determine which operating system to execute appropriate shell command
 	if runtime.GOOS == "windows" {
-		_, err := exec.Command("cmd.exe", "/C", "cd config && bash importTemplate.sh").Output()
+		_, err := exec.Command("cmd.exe", "/C", "mysql < ./backup/gochessTemplate.sql").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing template database, please check logs")
 			return false
 		}
 	} else {
-		_, err := exec.Command("/bin/bash", "-c", "cd config && bash importTemplate.sh").Output()
+		_, err := exec.Command("/bin/bash", "-c", "mysql < ./backup/gochessTemplate.sql").Output()
 		if err != nil {
 			log.Println(err)
 			fmt.Println("Error in importing template database, please check logs")
