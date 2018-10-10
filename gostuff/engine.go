@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/malbrecht/chess"
-	"github.com/malbrecht/chess/engine/uci"
+	"github.com/jonpchin/chess"
+	"github.com/jonpchin/chess/engine/uci"
 	pgn "gopkg.in/freeeve/pgn.v1"
 )
 

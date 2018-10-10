@@ -76,19 +76,12 @@ func DbSetup(backup string) bool {
 			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
 		}
 	}
-
-	var checkDBConnectFile = ROOT_CONFIG_PATH
 	var sqlOpenFile = USER_CONFIG_PATH
 
 	if IsEnvironmentTravis() {
-		checkDBConnectFile = "_travis/data/dbtravis.txt"
 		sqlOpenFile = "_travis/data/dbtravis.txt"
 	}
 
-	// make sure MySQL connection is alive before proceeding
-	if CheckDBConnection(checkDBConnectFile) == false {
-		return false
-	}
 	var err error
 	dbString, database := ReadFile(sqlOpenFile)
 	db, err = sql.Open("mysql", dbString)

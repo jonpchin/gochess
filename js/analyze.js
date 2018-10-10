@@ -110,28 +110,29 @@ function goToMove(row){
     moveCounter = row;
 }
 
-document.getElementById('uploadPGN').onclick = function() {
-    for(var i=0; i<document.getElementById("pgnFiles").files.length; ++i){
-        (function(index) { 
-            var file = document.getElementById("pgnFiles").files[index];
-            console.log(file);
-            if (file) {
-                var reader = new FileReader();
-                reader.readAsText(file, "UTF-8");
-                reader.onload = function (evt) {
-                    //console.log(evt.target.result);
-                    if(isValidPGN(evt.target.result)){
-                        analyzeGameByPgn(evt.target.result);
-                    }else{
-                        document.getElementById('textbox').innerHTML += 
-                            (timeStamp() + " Invalid PGN at index " + i + " in file: " + file.name + '\n');
+if (document.getElementById('uploadPGN') !=null){
+    document.getElementById('uploadPGN').onclick = function() {
+        for(var i=0; i<document.getElementById("pgnFiles").files.length; ++i){
+            (function(index) { 
+                var file = document.getElementById("pgnFiles").files[index];
+                console.log(file);
+                if (file) {
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function (evt) {
+                        if(isValidPGN(evt.target.result)){
+                            analyzeGameByPgn(evt.target.result);
+                        }else{
+                            document.getElementById('textbox').innerHTML += 
+                                (timeStamp() + " Invalid PGN at index " + i + " in file: " + file.name + '\n');
+                        }
+                    }
+                    reader.onerror = function (evt) {
+                        console.log("error reading file");
                     }
                 }
-                reader.onerror = function (evt) {
-                    console.log("error reading file");
-                }
-            }
-        })(i);
+            })(i);
+        }
     }
 }
 

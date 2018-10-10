@@ -193,7 +193,7 @@ table.table7 tr:hover, table.table8 tr:hover, table.table9 tr:hover{
 		float:left;
 	}
 	#board {
-		width:230%;
+		width:150%;
 	}
 	#content {
 	    float: left;
@@ -224,7 +224,7 @@ table.table7 tr:hover, table.table8 tr:hover, table.table9 tr:hover{
 	    width: 12%;
 	}
 	#board {
-		width:150%;
+		width:100%;
 	}
 	#content {
 	    float: left;
