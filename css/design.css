@@ -52,6 +52,12 @@ button:disabled {
   color: white;
 }
 
+#analysis {
+    height:550px;
+    width:210px;
+    overflow:scroll;
+}
+
 table.tableCenter {
     width:80%;
     margin-left:10%; 

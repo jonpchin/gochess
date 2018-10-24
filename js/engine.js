@@ -235,6 +235,7 @@ document.getElementById('goStart').onclick = function(){
 	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 	moveCounter = 0;
 	setPGN(totalPGN[moveCounter]);
+	makeTableRowGreen(moveCounter);
 }
 
 //go forward one move
@@ -246,6 +247,7 @@ document.getElementById('goForward').onclick = function(){
 	//make a global array and iterate forwards through the global array when going forward
 	board.position(totalFEN[moveCounter]);	
 	setPGN(totalPGN[moveCounter]);
+	makeTableRowGreen(moveCounter);
 } 
 
 $('#goBack').on('click', function() {
@@ -256,6 +258,7 @@ $('#goBack').on('click', function() {
 	//make a global array and iterate backwards through the global array when going back
 	board.position(totalFEN[moveCounter]);	
 	setPGN(totalPGN[moveCounter]);
+	makeTableRowGreen(moveCounter);
 });
 
 //move forward to last move
@@ -267,6 +270,7 @@ document.getElementById('goEnd').onclick = function(){
 	moveCounter = totalFEN.length-1;
 	if(moveCounter>=0){
 		setPGN(totalPGN[moveCounter]);
+		makeTableRowGreen(moveCounter);
 	}
 }
 

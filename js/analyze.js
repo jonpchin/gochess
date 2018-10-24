@@ -108,6 +108,18 @@ function goToMove(row){
     board.position(totalFEN[row]);	
     setPGN(totalPGN[row]);
     moveCounter = row;
+    makeTableRowGreen(row);
+}
+
+function makeTableRowGreen(rowNum){
+    var engineTable = document.getElementById("engineTable");
+    for (var i = 0, row; row = engineTable.rows[i]; i++) {
+        if (i === rowNum){
+            row.style.backgroundColor = "#C1FFC1"; 
+        }else if(row.style.backgroundColor !== "white"){
+            row.style.backgroundColor = "white"; 
+        }
+    }
 }
 
 if (document.getElementById('uploadPGN') !=null){
