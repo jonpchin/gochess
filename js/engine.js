@@ -76,13 +76,10 @@ function checkGameStatus(moveColor){
 	var status = "";
 	if (game.in_checkmate() === true) {
 		status = 'Game over, ' + moveColor + ' is in checkmate.';
-		sendNotification(status);
 	} else if (game.in_draw() === true) { // draw?
 		status = 'Game over, drawn position';
-		sendNotification(status);
 	} else { // game still on
 		status = moveColor + ' to move';
-
 		// check?
 		if (game.in_check() === true) {
 			status += ', ' + moveColor + ' is in check';
@@ -235,6 +232,7 @@ document.getElementById('goStart').onclick = function(){
 	board.position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR');
 	moveCounter = 0;
 	setPGN(totalPGN[moveCounter]);
+	makeTableRowGreen(moveCounter);
 }
 
 //go forward one move
@@ -246,6 +244,7 @@ document.getElementById('goForward').onclick = function(){
 	//make a global array and iterate forwards through the global array when going forward
 	board.position(totalFEN[moveCounter]);	
 	setPGN(totalPGN[moveCounter]);
+	makeTableRowGreen(moveCounter);
 } 
 
 $('#goBack').on('click', function() {
@@ -256,6 +255,7 @@ $('#goBack').on('click', function() {
 	//make a global array and iterate backwards through the global array when going back
 	board.position(totalFEN[moveCounter]);	
 	setPGN(totalPGN[moveCounter]);
+	makeTableRowGreen(moveCounter);
 });
 
 //move forward to last move
@@ -267,6 +267,7 @@ document.getElementById('goEnd').onclick = function(){
 	moveCounter = totalFEN.length-1;
 	if(moveCounter>=0){
 		setPGN(totalPGN[moveCounter]);
+		makeTableRowGreen(moveCounter);
 	}
 }
 
@@ -333,47 +334,6 @@ function getCookie(cname) { //gets cookies value
         if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
     }
     return "";
-}
-
-// Ask user to support notifications
-function askNotificationPermission(){
-	
-	if (!Notification) {
-		alert('Desktop notifications not available in your browser. Try Chromium.'); 
-		return;
-	}
-
-	if (Notification.permission !== "granted"){
-		Notification.requestPermission();
-	}	
-}
-askNotificationPermission();
-
-function sendNotification(message) {
-	
-	// check if the browser supports notifications
-	if (!("Notification" in window)) {
-		alert("This browser does not support system notifications");
-	}
-  
-	// check whether notification permissions have already been granted
-	else if (Notification.permission === "granted") {
-		// create a notification
-		var notification = new Notification(message);
-	}
-  
-	// Otherwise, ask the user for permission
-	else if (Notification.permission !== 'denied') {
-		Notification.requestPermission(function (permission) {
-			// If the user accepts, create a notification
-			if (permission === "granted") {
-				var notification = new Notification(message);
-			}
-		});
-	}
-	else{
-		document.getElementById('textbox').innerHTML += (message + '\n');
-	}
 }
 
 function detectMobile(){ //tries to detect if user is using a mobile device

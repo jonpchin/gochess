@@ -50,9 +50,9 @@ func getMySQLService() *mgr.Service {
 	}
 	defer manager.Disconnect()
 
-	mysql, err := manager.OpenService("MySQL57")
+	mysql, err := manager.OpenService("MySQL80")
 	if err != nil {
-		fmt.Println("Could not open MySQL57 service", err)
+		fmt.Println("Could not open MySQL80 service", err)
 		return nil
 	}
 	return mysql
@@ -74,7 +74,7 @@ func StartMySQLService() {
 	if status.State == svc.Stopped {
 		err = mysql.Start()
 		if err != nil {
-			fmt.Println("Could not start MySQL57 service", err)
+			fmt.Println("Could not start MySQL80 service", err)
 			return
 		}
 		fmt.Println("MySQL service was started succesfully.")

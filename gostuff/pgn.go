@@ -49,6 +49,7 @@ func GameAnalysisByPgn(w http.ResponseWriter, r *http.Request) {
 	allGames.readPgn(pgnData)
 
 	jsonGamesAnalysis, err := json.Marshal(allGames)
+
 	if err != nil {
 		fmt.Println("Could not marshal gameAnalysis", err)
 		return

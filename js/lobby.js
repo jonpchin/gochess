@@ -2,8 +2,10 @@ if (!window.WebSocket){
 	$('#checkwebsocket').html("Your browser doesn't support websockets." + 
 		"Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
+
 var wsuri = "wss://"+ window.location.host +"/server";
 var sock = new WebSocket(wsuri);
+
 $(window).on('beforeunload', function(){
 	sock.close();
 });  
@@ -15,7 +17,7 @@ var standard = document.getElementById('standard').value;
 var correspondence = document.getElementById('correspondence').value;
 
 window.onload = function() {	
-	
+
 	//setting up user preferences
 	var challenge = new Audio('../sound/challenge.mp3');
 	var toggleSound = getCookie("sound");
@@ -33,6 +35,7 @@ window.onload = function() {
 			Type: "fetch_players",
 			Name: user
 		}
+
 	    sock.send(JSON.stringify(message));
 		
 		document.getElementById('textbox').innerHTML = "";
