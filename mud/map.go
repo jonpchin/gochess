@@ -51,25 +51,25 @@ func trimNewlinesAndSides(filename string) {
 
 	fscanner := bufio.NewScanner(file)
 
-    for fscanner.Scan() {
+	for fscanner.Scan() {
 
-        result = fscanner.Text()
+		result = fscanner.Text()
 
-		if doesStringHaveMapChar(result){
-			for pos, char := range result{
-				if char != ' '{
+		if doesStringHaveMapChar(result) {
+			for pos, char := range result {
+				if char != ' ' {
 					if pos < start {
 						start = pos
 					}
 					break
-				}	
+				}
 			}
-			for pos, _ := range result{
+			for pos, _ := range result {
 				// Start checking chars from back to see where spaces end
 				backIndex := len(result) - pos - 1
 				backChar := result[backIndex]
-				
-				if backChar != ' '{
+
+				if backChar != ' ' {
 					if pos < back {
 						back = pos
 					}
@@ -79,15 +79,14 @@ func trimNewlinesAndSides(filename string) {
 			finalOutput += (result + "\n")
 		}
 
-        if err != nil {
+		if err != nil {
 			fmt.Println(err)
-            break
-        }
-    }
+			break
+		}
+	}
 
-
-    err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
-	if err != nil{
+	err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
+	if err != nil {
 		fmt.Println(err)
 	}
 
@@ -108,7 +107,7 @@ func doesStringHaveMapChar(result string) bool {
 }
 
 //Returns array exxcluding space in tileChar array
-func excludeSpaceInTiles(tiles []string) []string{
+func excludeSpaceInTiles(tiles []string) []string {
 	var result []string
 	for _, value := range tiles {
 		if value != " " {
@@ -121,25 +120,25 @@ func excludeSpaceInTiles(tiles []string) []string{
 // Trims leading and ending spaces of each line in a file
 func trimLeadAndEnd(start int, back int, filename string) {
 
-    file, err := os.Open(filename)
-    defer file.Close()
+	file, err := os.Open(filename)
+	defer file.Close()
 
-    if err != nil {
-        fmt.Println(err)
+	if err != nil {
+		fmt.Println(err)
 		return
-    }
+	}
 
-    fscanner := bufio.NewScanner(file)
+	fscanner := bufio.NewScanner(file)
 
 	result := ""
 	finalOutput := ""
 
-    for fscanner.Scan() {
+	for fscanner.Scan() {
 
 		result = fscanner.Text()
 
-		if len(result) !=0  {
-			temp := result[start:(len(result)-back)]
+		if len(result) != 0 {
+			temp := result[start:(len(result) - back)]
 			finalOutput += (temp + "\n")
 
 			if err != nil {
@@ -147,10 +146,9 @@ func trimLeadAndEnd(start int, back int, filename string) {
 				break
 			}
 		}
-		
-    }
+	}
 	err = ioutil.WriteFile(filename, []byte(finalOutput), 0644)
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 	}
 }

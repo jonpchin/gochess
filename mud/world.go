@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
 )
 
@@ -49,13 +50,62 @@ func CreateWorld() {
 		floor.Level = i
 		floor.initFloorTileType()
 		floor.makeRooms(i)
+		//floor.pruneFloorPlan()
 		world.Floors[i] = floor
 	}
 }
 
-// Loads entire world from file to memory
-func loadWorldFile() {
+// Loads entire world from json file to memory
+func LoadWorldFile(id string) {
 
+	data, err := ioutil.ReadFile("mud/tile_metadata/" + id + ".json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var tempWorld World
+
+	err = json.Unmarshal(data, &tempWorld)
+	if err != nil {
+		log.Fatal(err)
+	}
+	world = tempWorld
+}
+
+// Sets the map vision of the player based on his coordinate and vision (default is 5 vision)
+func (player *Player) setMapVision(tempWorld World) {
+
+	// TODO: Ensure player vision is not tampered
+	player.Vision = 5
+
+	lowestRow := player.Location.Row - player.Vision
+	highestRow := player.Location.Row + player.Vision
+	lowestCol := player.Location.Col - player.Vision
+	highestCol := player.Location.Col + player.Vision
+
+	if lowestRow < 0 {
+		lowestRow = 0
+	}
+
+	if lowestCol < 0 {
+		lowestCol = 0
+	}
+
+	if highestCol >= tempWorld.Floors[player.Location.Level].Width {
+		highestCol = tempWorld.Floors[player.Location.Level].Width - 1
+	}
+
+	if highestRow >= tempWorld.Floors[player.Location.Level].Length {
+		highestRow = tempWorld.Floors[player.Location.Level].Length - 1
+	}
+
+	player.Map = ""
+
+	for i := lowestRow; i < highestRow; i++ {
+		for j := lowestCol; j < highestCol; j++ {
+			player.Map += tempWorld.Floors[player.Location.Level].Plan[player.Location.Row][player.Location.Col].TileType
+		}
+	}
 }
 
 func SaveMetadataToFile(id string) {
@@ -84,5 +134,7 @@ func (floor *Floor) writeFloorToFile(index int, worldNumber string) {
 	}
 	filename := "mud/world/" + worldNumber + "/floor_" + strconv.Itoa(index) + ".txt"
 	ioutil.WriteFile(filename, []byte(floorData), 0666)
-	trimNewlinesAndSides(filename)
+
+	// Disabled for now until pruneFloorPlan is working
+	//trimNewlinesAndSides(filename)
 }

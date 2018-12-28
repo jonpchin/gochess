@@ -11,10 +11,19 @@ import (
 )
 
 type Authentication struct {
-	Type      string
 	Username  string // Go Play Chess account
 	Name      string // Mud account (optional)
 	SessionID string
+}
+
+type Credentials struct {
+	Type  string
+	Creds Authentication
+}
+
+type CommandMessage struct {
+	Type    string
+	Command string
 }
 
 func (c *MudConnection) MudConnect() {
@@ -27,7 +36,7 @@ func (c *MudConnection) MudConnect() {
 		if err := websocket.Message.Receive(c.websocket, &reply); err != nil {
 			break
 		}
-		var a Authentication
+		var a Credentials
 		message := []byte(reply)
 
 		if err := json.Unmarshal(message, &a); err != nil {
@@ -36,12 +45,23 @@ func (c *MudConnection) MudConnect() {
 		}
 
 		// Check to make sure player is not pretending to be someone else or changing name without permission
-		if MudServer.Players[a.Username].isCredValid(a.Username, a.SessionID) == false {
+		if MudServer.Players[a.Creds.Username].isCredValid(a.Creds.Username, a.Creds.SessionID) == false {
 			log.Println("Invalid credentials")
 			break
 		}
 
 		switch a.Type {
+		case "command":
+
+			var command CommandMessage
+			if err := json.Unmarshal(message, &command); err != nil {
+				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
+				break
+			}
+
+			player := MudServer.Players[a.Creds.Username]
+			player.processCommand(command.Command, c)
+			MudServer.Players[a.Creds.Username].Location = player.Location
 
 		case "connect_mud":
 
@@ -54,6 +74,10 @@ func (c *MudConnection) MudConnect() {
 			if isNameExistForPlayer(c.username) {
 				player.Type = "enter_world"
 				player.enterWorld(LOAD_PLAYER, c) // Name already exists for player
+
+				//TODO: Make sure all other data is set for players
+				MudServer.Players[a.Creds.Username].Location = player.Location
+
 				fmt.Println("Player already exists", c.username)
 			} else {
 				a.Type = "ask_name"
@@ -63,7 +87,7 @@ func (c *MudConnection) MudConnect() {
 				}
 			}
 		case "check_name":
-			if isNameTaken(a.Name) {
+			if isNameTaken(a.Creds.Name) {
 				a.Type = "name_taken"
 				c.sendJSONWebSocket(&a)
 			} else {
@@ -88,17 +112,17 @@ func (c *MudConnection) MudConnect() {
 			player.enterWorld(SKIP_LOAD, c)
 		case "fetch_map":
 
-			var playerMap PlayerMap
-			if err := json.Unmarshal(message, &playerMap); err != nil {
+			var player Player
+			if err := json.Unmarshal(message, &player); err != nil {
 				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
 				break
 			}
 
-			playerMap.Type = "update_map"
-			playerMap.setPlayerMap()
-			c.sendJSONWebSocket(&playerMap)
+			player.Type = "update_map"
+			player.setPlayerMap()
+			c.sendJSONWebSocket(&player)
 		default:
-			log.Println("I'm not familiar with type in MUD", a.Type, " sent by ", a.Name)
+			log.Println("I'm not familiar with type in MUD", a.Type, " sent by ", a.Creds.Name)
 		}
 	}
 }

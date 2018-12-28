@@ -1,7 +1,7 @@
 // Displays a portion of the map that surrounds the player
 function displayMap(mapString){
 
-    var rowLength = sqrt(mapstring.length);
+    var rowLength = Math.sqrt(mapString.length);
 
     for(var i=0; i<rowLength; ++i){
         

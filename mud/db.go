@@ -16,13 +16,19 @@ func ConnectDb() {
 }
 
 // Checks if Go Play Chess username is present in MUD table if not then add it
-func lookupName(username string) {
+func lookupName(username string) error {
 	var name string
 	//checking if name exists
-	_ = db.QueryRow("SELECT username FROM mud WHERE username=?", username).Scan(&name)
+	err := db.QueryRow("SELECT username FROM mud WHERE username=?", username).Scan(&name)
+
+	if err != nil {
+		return err
+	}
 	if name == "" { // already exists, case insensitive comparison
 		registerUsername(username)
 	}
+
+	return nil
 }
 
 // Checks if a player has an adventurer name

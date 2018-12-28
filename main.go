@@ -119,7 +119,6 @@ func main() {
 	go func() {
 
 		gostuff.SetupMySqlIni()
-		//gostuff.StartMySQLService()
 
 		//setting up database, the directory location of database backups is passed in
 		proceed := gostuff.DbSetup("./backup")
@@ -152,12 +151,14 @@ func main() {
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			gostuff.InitForum()
-			//mud.ConnectDb()
-			//worldId := "0"
+			mud.ConnectDb()
+			worldId := "0"
+			mud.LoadWorldFile(worldId)
+			mud.ParseKnownCommands()
 			//mud.LoadMapsIntoMemory(worldId)
 			//mud.CreateWorld()
-			//mud.SaveMetadataToFile(worldId)
-			//mud.PrintWorldToFile(worldId)
+			//mud.SaveMetadataToFile("1")
+			//mud.PrintWorldToFile("1")
 			//weather.FetchWeather()
 			//gostuff.RemoveGameHistory(days)
 		}
