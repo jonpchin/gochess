@@ -48,7 +48,7 @@ func isFileExist(path string) bool {
 
 // Archives a group of files as an array of string into a destination zip file
 func compress(destination string, source []string) bool {
-	err := archiver.Zip.Make(destination, source)
+	err := archiver.Archive(source, destination)
 	if err != nil {
 		fmt.Println("util.go compress There was an error in compressing the file", err)
 		return false
@@ -58,7 +58,7 @@ func compress(destination string, source []string) bool {
 
 // Unzips an archive and places it in a destination folder
 func unzip(source string, destination string) bool {
-	err := archiver.Zip.Open(source, destination)
+	err := archiver.Unarchive(source, destination)
 	if err != nil {
 		fmt.Println("util.go unzip There was an error in archiving the file", err)
 		return false
