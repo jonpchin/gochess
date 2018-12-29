@@ -7,7 +7,7 @@ function displayMap(mapString){
         
         for(var j=0; j<rowLength; ++j){
             var char = mapString[(i*rowLength)+j];
-            displayToTextBoxNoNewLine(char, getMapCharColor(char));
+            displayToTextBoxNoNewLine(char, getMapCharColor(char), j);
         }
         displayToTextBox("");
     }
@@ -71,8 +71,16 @@ function getMapCharColor(char){
             //whirlpool 
             color = "blue";
             break;
+        case "=":
+            //corridor
+            color = "yellowgreen";
+            break;
+        case "*":
+            color = "salmon";
+            break;
         default:
             console.log("No such map char exists");
+            console.log(char);
     }
 
     return color;

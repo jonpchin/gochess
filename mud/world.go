@@ -103,7 +103,12 @@ func (player *Player) setMapVision(tempWorld World) {
 
 	for i := lowestRow; i < highestRow; i++ {
 		for j := lowestCol; j < highestCol; j++ {
-			player.Map += tempWorld.Floors[player.Location.Level].Plan[player.Location.Row][player.Location.Col].TileType
+			// The middle should be the player char
+			if highestRow-i == player.Vision && highestCol-j == player.Vision {
+				player.Map += "*"
+			} else {
+				player.Map += tempWorld.Floors[player.Location.Level].Plan[i][j].TileType
+			}
 		}
 	}
 }

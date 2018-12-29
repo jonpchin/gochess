@@ -65,7 +65,6 @@ func (player *Player) processCommand(command string, connection *MudConnection) 
 					player.Location.Col = player.Location.Col + 1
 					player.setMapVision(world)
 					player.Type = "update_map"
-					fmt.Println("player map is ", player.Map)
 					connection.sendJSONWebSocket(&player)
 				}
 			case "south":

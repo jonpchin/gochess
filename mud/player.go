@@ -103,6 +103,7 @@ func (player *Player) loadMap() {
 	// default view for map is 5
 	//viewDistance := 5
 
+	// TODO: Set this somewhere else, for this is hard coded for testing
 	player.Location.Row = 47
 	player.Location.Col = 35
 	player.Location.Level = 0

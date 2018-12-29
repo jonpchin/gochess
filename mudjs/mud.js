@@ -94,7 +94,6 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 displayToTextBox(json.Map);
                 break;
             case "update_map":
-                console.log("map is updated");
                 console.log(json);
                 displayMap(json.Map);
                 break;
@@ -116,24 +115,26 @@ function displayToTextBox(message, textColor){
     }
     var lastLine = codeMirror.lastLine();
     codeMirror.replaceRange(message + "\n", CodeMirror.Pos(lastLine));
-    codeMirror.markText({line:lastLine-1,ch:0},{line:lastLine-1,ch:lastLine.length},{css:"color: " + textColor});
+    codeMirror.markText({line:lastLine-1,ch:0},{line:lastLine-1,ch:message.length},{css:"color: " + textColor});
     codeMirror.scrollTo(0, codeMirror.getScrollInfo().height);
 }
 
 // Displays to textbox without appending the newline, used for printing out the map
-function displayToTextBoxNoNewLine(message, textColor){
+// charIndex is the index to mark the color of the char
+function displayToTextBoxNoNewLine(message, textColor, charIndex){
 
     // Default text black as the default color unless the background is white,
     // then the text would default to white
     if(textColor){
        //console.log("Font color is set!");
+       //console.log(textColor);
     }else{
         // TODO: Check the background color and set the default text color appropriately
         textColor="#000000";
     }
     var lastLine = codeMirror.lastLine();
     codeMirror.replaceRange(message, CodeMirror.Pos(lastLine));
-    codeMirror.markText({line:lastLine-1,ch:lastLine.length-1},{line:lastLine-1,ch:lastLine.length},{css:"color: " + textColor});
+    codeMirror.markText({line:lastLine,ch:charIndex},{line:lastLine,ch:charIndex+1},{css:"color: " + textColor});  
 }
 
 document.getElementById('sendButton').onclick = function(){
@@ -230,7 +231,6 @@ function determineMessageType(message){
                 displayToTextBox("You walk north.");
                 break;
             case "east":
-                console.log("reached east");
                 sendCommand("east");
                 displayToTextBox("You walk east.");
                 break;
