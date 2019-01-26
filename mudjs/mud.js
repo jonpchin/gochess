@@ -3,7 +3,8 @@ if (!window.WebSocket){
 		"Please use the latest version of Firefox, Chrome, IE, Opera or Microsoft Edge.");
 }
 var wsuri = "wss://"+ window.location.host +"/mudserver";
-var sock = new WebSocket(wsuri);
+
+var mainWebsocket = new WebSocket(wsuri);
 var codeMirror = CodeMirror.fromTextArea(document.getElementById('textbox'), {
     lineNumbers: true,
     lineWrapping: true,
@@ -14,17 +15,19 @@ var codeMirror = CodeMirror.fromTextArea(document.getElementById('textbox'), {
 var GameState = {
     status: "connect", // Determines what kind of message gets sent over the websocket
     name: "",          // Player's adventurer name
-    ingame: false      // If true then player is in the MUD world
+    ingame: false,      // If true then player is in the MUD world
+    validCommands: []
 };
 
 window.onload = function() {
-    
+    setupCommands();
+
     // Removes blank space at the start
     codeMirror.setValue(""); 
     // Focuses mouse cursor on load
     $("#message").focus();
-    
-    sock.onopen = function() {
+
+    mainWebsocket.onopen = function() {
 	    displayToTextBox(`                                                                                                        dddddddd
         GGGGGGGGGGGGG                      MMMMMMMM               MMMMMMMM                              d::::::d
      GGG::::::::::::G                      M:::::::M             M:::::::M                              d::::::d
@@ -45,19 +48,24 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
         displayToTextBox("");
         displayToTextBox("");
         displayToTextBox("Welcome to Go MUD!");
+
+        var credentials = {
+            Username: Mud.Player.Username,
+            SessionID: Mud.Player.SessionID
+        }
+
 		var message = {
             Type: "connect_mud",
-            Username: Mud.Player.Username,
-            SessionID:  Mud.Player.SessionID
+            Creds: credentials
 		}
-	    sock.send(JSON.stringify(message));
+	    mainWebsocket.send(JSON.stringify(message));
     }
 
-    sock.onclose = function(e) {
+    mainWebsocket.onclose = function(e) {
         console.log("Socket closing")
 	}
 
-     sock.onmessage = function(e) {
+    mainWebsocket.onmessage = function(e) {
         json = JSON.parse(e.data);
 
         switch(json.Type){
@@ -77,13 +85,16 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 break;
             case "update_player":
                 // TODO: Unmarshal player data that was sent from server into client memory
+                console.log("update_player");
                 console.log(json);
                 updatePlayer(json);
                 break;
             case "enter_world":
+                GameState.ingame = true;
                 displayToTextBox(json.Map);
                 break;
             case "update_map":
+                console.log(json);
                 displayMap(json.Map);
                 break;
             default:
@@ -104,24 +115,26 @@ function displayToTextBox(message, textColor){
     }
     var lastLine = codeMirror.lastLine();
     codeMirror.replaceRange(message + "\n", CodeMirror.Pos(lastLine));
-    codeMirror.markText({line:lastLine-1,ch:0},{line:lastLine-1,ch:lastLine.length},{css:"color: " + textColor});
+    codeMirror.markText({line:lastLine-1,ch:0},{line:lastLine-1,ch:message.length},{css:"color: " + textColor});
     codeMirror.scrollTo(0, codeMirror.getScrollInfo().height);
 }
 
 // Displays to textbox without appending the newline, used for printing out the map
-function displayToTextBoxNoNewLine(message, textColor){
+// charIndex is the index to mark the color of the char
+function displayToTextBoxNoNewLine(message, textColor, charIndex){
 
     // Default text black as the default color unless the background is white,
     // then the text would default to white
     if(textColor){
        //console.log("Font color is set!");
+       //console.log(textColor);
     }else{
         // TODO: Check the background color and set the default text color appropriately
         textColor="#000000";
     }
     var lastLine = codeMirror.lastLine();
     codeMirror.replaceRange(message, CodeMirror.Pos(lastLine));
-    codeMirror.markText({line:lastLine-1,ch:lastLine.length-1},{line:lastLine-1,ch:lastLine.length},{css:"color: " + textColor});
+    codeMirror.markText({line:lastLine,ch:charIndex},{line:lastLine,ch:charIndex+1},{css:"color: " + textColor});  
 }
 
 document.getElementById('sendButton').onclick = function(){
@@ -132,20 +145,27 @@ document.getElementById('sendButton').onclick = function(){
 
 // Checks if name is available
 function checkName(name){
+
+    var credentials = {
+        Username: Mud.Player.Username,
+        Name: Mud.Player.Name,
+        SessionID: Mud.Player.SessionID
+    }
+
     var message = {
         Type: "check_name",
-        Name: name
+        Creds: credentials
     }
-    sock.send(JSON.stringify(message));
+ 
+    mainWebsocket.send(JSON.stringify(message));
 }
 
 function enterWorldFirstTime(){
     Mud.Player.Type = "enter_world_first_time";
-    sock.send(JSON.stringify(Mud.Player));
+    mainWebsocket.send(JSON.stringify(Mud.Player));
     GameState.ingame = true;
-    displayToTextBox("Welcome " + Mud.PLayer.Name + "! To get started type on your first quest type quest.", "blue");
+    displayToTextBox("Welcome " + Mud.Player.Name + "! To get started type on your first quest type quest.", "blue");
 }
-
 
 function fetchMap(){
     
@@ -158,32 +178,48 @@ function fetchMap(){
         Type: "fetch_map",
         Creds: credentials
     }
-    sock.send(JSON.stringify(message));
+    mainWebsocket.send(JSON.stringify(message));
+}
+
+function sendCommand(command){
+    var credentials = {
+        Username: Mud.Player.Username,
+        Name: Mud.Player.Name,
+        SessionID: Mud.Player.SessionID
+    }
+    var message = {
+        Type: "command",
+        Creds: credentials,
+        Command: command
+    }
+    mainWebsocket.send(JSON.stringify(message));
+}
+
+function setupCommands(){
+    $.getJSON('../data/mud/commands.json', function(data) {         
+        for (i=0; i<data.commands.length; ++i){
+            GameState.validCommands.push(data.commands[i]);
+        }   
+    });
 }
 
 function searchCommands(command){
-
-    $.getJSON('../data/mud/commands.json', function(data) {        
-        
-        for (var key in data) {
-            // skip loop if the property is from prototype
-            if (!data.hasOwnProperty(key)){
-                continue;
-            }
-            if(command.startsWith(key)){
-                return key;
-            }
+    for (i=0; i<GameState.validCommands.length; ++i){
+        if(command.startsWith(GameState.validCommands[i])){
+            return GameState.validCommands[i];
         }
-    });
+    }    
     return "";
 }
 
 function determineMessageType(message){
     var status = GameState.status;
-    
+
     if (GameState.ingame){
         // Searches command for matching starting substring, all commands are lowercase
-        switch(searchCommands(message).toLowerCase()){
+        var finalResult = searchCommands(message).toLowerCase();
+
+        switch(finalResult){
             case "":
                 displayToTextBox("I do not understand.");
                 break;
@@ -191,15 +227,19 @@ function determineMessageType(message){
                 fetchMap();
                 break;
             case "north":
+                sendCommand("north");
                 displayToTextBox("You walk north.");
                 break;
             case "east":
+                sendCommand("east");
                 displayToTextBox("You walk east.");
                 break;
             case "south":
+                sendCommand("south");
                 displayToTextBox("You walk south.");
                 break;
             case "west":
+                sendCommand("west");
                 displayToTextBox("You walk west.");
                 break;
             default:

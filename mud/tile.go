@@ -22,6 +22,7 @@ type Area struct {
 }
 
 // asterisk character is reserved for adventurer (self), characters shoulds should be no longer then length one
+// 	ADVENTURER *
 const (
 	UNUSED     = iota // " "
 	FLOOR             // "."

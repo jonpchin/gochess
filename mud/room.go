@@ -64,6 +64,84 @@ func (floor *Floor) makeRooms(floorLevel int) {
 	}
 }
 
+// Prunes floor plan in memory, this is done to match the file pruning, this is experimental and not working
+func (floor *Floor) pruneFloorPlan() {
+	left := floor.Width
+	right := 0
+	top := 0
+	bottom := floor.Length
+	foundTile := false
+
+	for rowIndex, row := range floor.Plan {
+		for colIndex := 0; colIndex < len(row); colIndex++ {
+			if row[colIndex].TileType != tileChars[UNUSED] {
+				if colIndex < left {
+					left = colIndex
+				}
+
+				if foundTile == false {
+					top = rowIndex
+				}
+				bottom = rowIndex
+				foundTile = true
+				break
+			}
+		}
+
+		for colIndex := len(row) - 1; colIndex >= 0; colIndex-- {
+			if row[colIndex].TileType != tileChars[UNUSED] {
+				if colIndex > right {
+					right = colIndex
+				}
+			}
+		}
+	}
+
+	newColTotal := right - left
+	newRowTotal := bottom - top
+	fmt.Println("right", right, "left", left)
+	fmt.Println("top", top, "bottom", bottom)
+	fmt.Println(newColTotal)
+	fmt.Println(newRowTotal)
+	newPlan := make([][]Tile, newRowTotal)
+
+	for planIndex, _ := range newPlan {
+		newPlan[planIndex] = make([]Tile, newColTotal)
+	}
+	i := 0
+	j := 0
+
+	type Tile struct {
+		Coordinate                // Contains X (row) and Y (col) coordinates of tile
+		Name        string        // Name of the tile an adventurer will see when they enter the room
+		Description string        // Description of tile adventurer will see when they enter the room
+		Area        Area          // The area the tile is located
+		Room        Room          // The room the tile is located
+		TileType    string        // The type of tile such as floor, wall, openDoor, etc
+		Items       []interface{} // List of items or objects in the tile
+		Players     []Player      // Adventurers in the tile
+		Monsters    []Monster     // NPC in the tile
+	}
+
+	for floorRow := bottom; floorRow < top; floorRow++ {
+		i++
+		for floorCol := left; floorCol < right; floorCol++ {
+			newPlan[i][j].Coordinate = floor.Plan[floorRow][floorCol].Coordinate
+			newPlan[i][j].Name = floor.Plan[floorRow][floorCol].Name
+			newPlan[i][j].Description = floor.Plan[floorRow][floorCol].Description
+			newPlan[i][j].Area = floor.Plan[floorRow][floorCol].Area
+			newPlan[i][j].Room = floor.Plan[floorRow][floorCol].Room
+			newPlan[i][j].TileType = floor.Plan[floorRow][floorCol].TileType
+			newPlan[i][j].Items = floor.Plan[floorRow][floorCol].Items
+			newPlan[i][j].Players = floor.Plan[floorRow][floorCol].Players
+			newPlan[i][j].Monsters = floor.Plan[floorRow][floorCol].Monsters
+			j++
+		}
+	}
+
+	floor.Plan = newPlan
+}
+
 // Returns true if room is within floor dimensions
 func (floor *Floor) isRoomWithinFloorDimensions(row, col, width, length int) bool {
 

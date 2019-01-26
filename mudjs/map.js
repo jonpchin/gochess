@@ -1,13 +1,13 @@
 // Displays a portion of the map that surrounds the player
 function displayMap(mapString){
 
-    var rowLength = sqrt(mapstring.length);
+    var rowLength = Math.sqrt(mapString.length);
 
     for(var i=0; i<rowLength; ++i){
         
         for(var j=0; j<rowLength; ++j){
             var char = mapString[(i*rowLength)+j];
-            displayToTextBoxNoNewLine(char, getMapCharColor(char));
+            displayToTextBoxNoNewLine(char, getMapCharColor(char), j);
         }
         displayToTextBox("");
     }
@@ -71,8 +71,16 @@ function getMapCharColor(char){
             //whirlpool 
             color = "blue";
             break;
+        case "=":
+            //corridor
+            color = "yellowgreen";
+            break;
+        case "*":
+            color = "salmon";
+            break;
         default:
             console.log("No such map char exists");
+            console.log(char);
     }
 
     return color;

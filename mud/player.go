@@ -51,22 +51,16 @@ type Player struct {
 	Experience int
 	Location   Coordinate
 	Area       Area
+	Vision     int
 }
 
 // Contains string of MapVision of player and the details of the room he is in
 // Used when player "looks"
 type PlayerMap struct {
 	Type        string
-	Creds       Credentials
 	Map         string
 	Coordinates Coordinate
 	CurrentTile Tile
-}
-
-type Credentials struct {
-	Username  string
-	Name      string
-	SessionID string
 }
 
 type PlayerStats struct {
@@ -108,6 +102,14 @@ func (player *Player) loadMap() {
 	//mapView := ""
 	// default view for map is 5
 	//viewDistance := 5
+
+	// TODO: Set this somewhere else, for this is hard coded for testing
+	player.Location.Row = 47
+	player.Location.Col = 35
+	player.Location.Level = 0
+
+	// Make sure the world is already set
+	player.setMapVision(world)
 }
 
 func (player *Player) loadPlayerData() {
@@ -134,19 +136,19 @@ func (player *Player) loadPlayerData() {
 }
 
 // Sets the player map to be sent to the client
-func (playerMap *PlayerMap) setPlayerMap() {
+func (player *Player) setPlayerMap() {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
 	err := db.QueryRow(`SELECT x, y, z FROM location where name=?`,
-		playerMap.Creds.Name).Scan(&playerMap.Coordinates.Row, &playerMap.Coordinates.Col,
-		&playerMap.Coordinates.Level)
+		player.Username).Scan(&player.Location.Row, &player.Location.Col,
+		&player.Location.Level)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	playerMap.CurrentTile = world.Floors[playerMap.Coordinates.Level].Plan[playerMap.Coordinates.Row][playerMap.Coordinates.Col]
+	//playerMap.CurrentTile = world.Floors[playerMap.Coordinates.Level].Plan[playerMap.Coordinates.Row][playerMap.Coordinates.Col]
 }
 
 func (player *Player) save() {
@@ -199,6 +201,7 @@ func (player *Player) updateByRaceClass(jsonFile string) {
 // Returns true if player's username and sessionID are all valid
 func (player *Player) isCredValid(username, sessionID string) bool {
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
+
 	if player.Username != username {
 		log.Println("player.Username:", player.Username, "username:", username)
 		return false

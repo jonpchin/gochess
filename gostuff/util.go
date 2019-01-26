@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/disintegration/imaging"
-	"github.com/mholt/archiver"
+	"github.com/jonpchin/archiver"
 )
 
 //return trues if path is a directory, errors are explicitly not logged

@@ -14,11 +14,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 5/31/2016 This project is officially open source. - All commit history has been cleared as some of the git history contained sensitive data. 
 <br><br>
 4/30/2017 I've decided to add a MUD. Chess and MUD's don't usually go together but by having them on the same web server and domain allows me to save server costs. More details will be revealed soon.
-<br><br>If you are interesting in contributing please open a new issue here:
-https://github.com/jonpchin/gochess/issues
-In the issue state what you want to work on and I'll add you as a contributor. 
-If you are open to doing anything I can assign you one of the open tasks in the back log.
-Once your changes are ready, make a pull request and I"ll review it.
+<br><br>This project is a experimental project and only intended for my personal use.
 <br>
 <br><b>Features:</b><br>
 <p>1. User accounts</p>
