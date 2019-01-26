@@ -45,8 +45,11 @@ func (c *Connection) LobbyConnect() {
 		case "fetch_matches":
 			//send in array instead of sending individual
 			for _, value := range Pending.Matches {
-				if err := websocket.JSON.Send(c.websocket, &value); err != nil {
-					log.Println(err)
+				// Ensure only the recipient or sender sees the private match proposal
+				if t.Name == value.Name || t.Name == value.Opponent {
+					if err := websocket.JSON.Send(c.websocket, &value); err != nil {
+						log.Println(err)
+					}
 				}
 			}
 
@@ -58,14 +61,14 @@ func (c *Connection) LobbyConnect() {
 			var uniquePlayers []string
 
 			// show all players in the lobby and those that are playing a game
-			for key, _ := range Chat.Lobby {
+			for key := range Chat.Lobby {
 				player.Name = key
 				uniquePlayers = append(uniquePlayers, player.Name)
 				if err := websocket.JSON.Send(c.websocket, player); err != nil {
 					log.Println(err)
 				}
 			}
-			for key, _ := range Active.Clients {
+			for key := range Active.Clients {
 
 				player.Name = key
 				found := false
@@ -136,7 +139,7 @@ func (c *Connection) LobbyConnect() {
 			}
 
 			if proceed {
-				var start int = 0
+				start := 0
 				for {
 					if _, ok := Pending.Matches[start]; ok {
 						start++
@@ -276,7 +279,7 @@ func (c *Connection) LobbyConnect() {
 			Pending.Matches[start] = &match
 
 			go func() {
-				for name, _ := range Chat.Lobby {
+				for name := range Chat.Lobby {
 					if name == match.Opponent || name == match.Name { //send to self and opponent
 						if err := websocket.JSON.Send(Chat.Lobby[name], &match); err != nil {
 							// we could not send the message to a peer
