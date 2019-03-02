@@ -1,8 +1,6 @@
 package mud
 
 import (
-	"fmt"
-
 	"github.com/jonpchin/gochess/gostuff"
 	"golang.org/x/net/websocket"
 )
@@ -21,17 +19,15 @@ func EnterMud(ws *websocket.Conn) {
 				Client := &MudConnection{username.Value, ws, ip, ""}
 
 				MudServer.Lobby[username.Value] = ws
-				// Ensures username is registered in mud table
-				err := lookupName(username.Value)
-				if err == nil {
-					var player Player
-					player.Username = username.Value
-					player.SessionID = sessionID.Value
-					MudServer.Players[username.Value] = &player
-					Client.MudConnect()
-				} else {
-					fmt.Println("Could not get username from mud", err)
-				}
+				// Ensures username is registered in mud table, if not adds it
+				//err := lookupName(username.Value)
+
+				var player Player
+				player.Username = username.Value
+				player.SessionID = sessionID.Value
+				MudServer.Players[username.Value] = &player
+				Client.MudConnect()
+
 			}
 		}
 	}
