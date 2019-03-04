@@ -20,10 +20,10 @@ func (floor *Floor) initFloorTileType() {
 
 	floor.Plan = make([][]Tile, floor.Length)
 
-	for i := 0; i < floor.Length; i += 1 {
+	for i := 0; i < floor.Length; i++ {
 		floor.Plan[i] = make([]Tile, floor.Width)
 
-		for j := 0; j < floor.Width; j += 1 {
+		for j := 0; j < floor.Width; j++ {
 			floor.Plan[i][j].TileType = tileChars[UNUSED]
 			floor.Plan[i][j].Row = i
 			floor.Plan[i][j].Col = j

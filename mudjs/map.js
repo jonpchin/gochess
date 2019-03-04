@@ -25,7 +25,7 @@ function getMapCharColor(char){
             break;
         case ".": 
             //floor
-            color = "yellow";
+            color = "green";
             break;
         case ",":
             //corridor 
@@ -41,7 +41,7 @@ function getMapCharColor(char){
             break;
         case "-":
             //open door 
-            color = "green";
+            color = "black";
             break;
         case "<":
             //upstairs 
@@ -107,9 +107,9 @@ Mud.Tile = {
 }
 
 Mud.Coordinate = {
-    Row: 5,
-    Col: 5,
-    Level: 5
+    Row: 47,
+    Col: 35,
+    Level: 0
 }
 
 Mud.Area = {

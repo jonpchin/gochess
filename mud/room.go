@@ -44,7 +44,7 @@ func (floor *Floor) makeRooms(floorLevel int) {
 		width, length, distanceBetweenRooms)
 
 	// TODO: If failed to make a room decrement i
-	for i := 1; i < numRooms; i += 1 {
+	for i := 1; i < numRooms; i++ {
 		room := floor.getRandomRoomOnFloor()
 		tile := room.getRandomTileOnWall()
 		rand.Seed(time.Now().UnixNano())
@@ -236,8 +236,8 @@ func (floor *Floor) makeRoom(row int, col int, dir Direction,
 
 // If the room is already occupied return true
 func (floor *Floor) isRoomUsed(topLeft, bottomRight Coordinate) bool {
-	for i := topLeft.Row; i < bottomRight.Row; i += 1 {
-		for j := topLeft.Col; j < bottomRight.Col; j += 1 {
+	for i := topLeft.Row; i < bottomRight.Row; i++ {
+		for j := topLeft.Col; j < bottomRight.Col; j++ {
 			if floor.isValidCoordinate(i, j) && floor.Plan[i][j].TileType != tileChars[UNUSED] {
 				return true
 			}
@@ -265,8 +265,8 @@ func (floor *Floor) createTilesInRoom(topLeft, bottomRight Coordinate, terrainTy
 
 	var room Room
 
-	for i := topLeft.Row; i <= bottomRight.Row; i += 1 {
-		for j := topLeft.Col; j <= bottomRight.Col; j += 1 {
+	for i := topLeft.Row; i <= bottomRight.Row; i++ {
+		for j := topLeft.Col; j <= bottomRight.Col; j++ {
 			if floor.isValidCoordinate(i, j) {
 
 				var tile Tile

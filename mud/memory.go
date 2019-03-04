@@ -40,7 +40,7 @@ func getLinesInFile(filepath string) int {
 	fscanner := bufio.NewScanner(file)
 	count := 0
 	for fscanner.Scan() {
-		count += 1
+		count++
 	}
 
 	return count

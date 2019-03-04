@@ -20,8 +20,6 @@ func EnterMud(ws *websocket.Conn) {
 
 				MudServer.Lobby[username.Value] = ws
 				// Ensures username is registered in mud table, if not adds it
-				//err := lookupName(username.Value)
-
 				var player Player
 				player.Username = username.Value
 				player.SessionID = sessionID.Value

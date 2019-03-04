@@ -7,7 +7,7 @@ func (floor *Floor) createCorridorInDirection(tile Tile, dir Direction, length i
 
 	if dir == NORTH {
 		i := 0
-		for i = 1; i < length; i += 1 {
+		for i = 1; i < length; i++ {
 			floor.Plan[tile.Row-i][tile.Col].makeCorridor()
 			floor.Plan[tile.Row-i][tile.Col].Row = tile.Row - i
 			floor.Plan[tile.Row-i][tile.Col].Col = tile.Col
@@ -16,7 +16,7 @@ func (floor *Floor) createCorridorInDirection(tile Tile, dir Direction, length i
 
 	} else if dir == EAST {
 		i := 0
-		for i = 1; i < length; i += 1 {
+		for i = 1; i < length; i++ {
 			floor.Plan[tile.Row][tile.Col+i].makeCorridor()
 			floor.Plan[tile.Row][tile.Col+i].Row = tile.Row
 			floor.Plan[tile.Row][tile.Col+i].Col = tile.Col + i
@@ -24,7 +24,7 @@ func (floor *Floor) createCorridorInDirection(tile Tile, dir Direction, length i
 		floor.Plan[tile.Row][tile.Col+i].createWallFeature()
 	} else if dir == SOUTH {
 		i := 0
-		for i = 1; i < length; i += 1 {
+		for i = 1; i < length; i++ {
 			floor.Plan[tile.Row+i][tile.Col].makeCorridor()
 			floor.Plan[tile.Row+i][tile.Col].Row = tile.Row + i
 			floor.Plan[tile.Row+i][tile.Col].Col = tile.Col
@@ -32,7 +32,7 @@ func (floor *Floor) createCorridorInDirection(tile Tile, dir Direction, length i
 		floor.Plan[tile.Row+i][tile.Col].createWallFeature()
 	} else if dir == WEST {
 		i := 0
-		for i = 1; i < length; i += 1 {
+		for i = 1; i < length; i++ {
 			floor.Plan[tile.Row][tile.Col-i].makeCorridor()
 			floor.Plan[tile.Row][tile.Col-i].Row = tile.Row
 			floor.Plan[tile.Row][tile.Col-i].Col = tile.Col - i

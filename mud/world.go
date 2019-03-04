@@ -26,8 +26,9 @@ func (player *Player) enterWorld(loadPlayer bool, connection *MudConnection) {
 
 	if loadPlayer {
 		player.loadPlayerData()
-		player.loadMap()
+
 	}
+	player.loadMap()
 	// Send player data to client
 	connection.sendJSONWebSocket(&player)
 }
@@ -43,7 +44,7 @@ func CreateWorld() {
 	numOfFloors := getRandomIntRange(low, high)
 	world.Floors = make([]Floor, numOfFloors)
 
-	for i := 0; i < numOfFloors; i += 1 {
+	for i := 0; i < numOfFloors; i++ {
 		var floor Floor
 		floor.Width = getRandomIntRange(floorLow, floorHigh)
 		floor.Length = getRandomIntRange(floorLow, floorHigh)
@@ -58,6 +59,7 @@ func CreateWorld() {
 // Loads entire world from json file to memory
 func LoadWorldFile(id string) {
 
+	// TODO: Pros and cons of loading tile_metadata vs world folder
 	data, err := ioutil.ReadFile("mud/tile_metadata/" + id + ".json")
 	if err != nil {
 		log.Fatal(err)
@@ -131,8 +133,8 @@ func PrintWorldToFile(worldNumber string) {
 func (floor *Floor) writeFloorToFile(index int, worldNumber string) {
 
 	floorData := ""
-	for i := 0; i < len(floor.Plan); i += 1 {
-		for j := 0; j < len(floor.Plan[i]); j += 1 {
+	for i := 0; i < len(floor.Plan); i++ {
+		for j := 0; j < len(floor.Plan[i]); j++ {
 			floorData += floor.Plan[i][j].TileType
 		}
 		floorData += "\n"

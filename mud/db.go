@@ -2,9 +2,9 @@ package mud
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/jonpchin/gochess/gostuff"
 )
@@ -23,9 +23,6 @@ func lookupName(username string) error {
 
 	if err != nil {
 		return err
-	}
-	if name == "" { // already exists, case insensitive comparison
-		registerUsername(username)
 	}
 
 	return nil
@@ -54,36 +51,35 @@ func isNameTaken(name string) bool {
 	return true
 }
 
-// Update name into mud and insert name into location with default coordinates
-func registerName(name string, username string) {
+// Update player into database
+func (player *Player) registerPlayer() {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	stmt, err := db.Prepare("UPDATE mud SET name=? WHERE username=?")
+
+	status := ""
+
+	for _, value := range player.Status {
+		status = status + "," + value
+	}
+
+	// Removing leading and trailing commas
+	status = strings.Trim(status, ",")
+
+	stmt, err := db.Prepare("INSERT mud SET username=?, name=?, class=?, race=?, gender=?, status=?, level=?, experience=?")
 	defer stmt.Close()
 
-	_, err = stmt.Exec(name, username)
+	_, err = stmt.Exec(player.Username, player.Name, player.Class, player.Race, player.Gender, status, player.Level, player.Experience)
 	if err != nil {
 		log.Println(err)
 	}
 
-	stmt, err = db.Prepare("INSERT mud SET username=?, area=?, x=?, y=?, z=?")
-	defer stmt.Close()
-
-	_, err = stmt.Exec(username, "Cain's Hideout", 5, 5, 5)
+	stmt, err = db.Prepare("INSERT location SET name=?, area=?, x=?, y=?, z=?")
 	if err != nil {
 		log.Println(err)
 	}
-}
 
-// If a player username does not exist then register it
-func registerUsername(username string) {
-
-	stmt, err := db.Prepare(`INSERT INTO mud (username, name, class, race, gender, status, level, experience) 
-		VALUES (?, "", "", "", "", "", 0, 0)`)
-	defer stmt.Close()
-
-	_, err = stmt.Exec(username)
+	_, err = stmt.Exec(player.Name, player.Area.Name, player.Location.Row, player.Location.Col, player.Location.Level)
 	if err != nil {
-		fmt.Println("registerUsername 1", err)
+		log.Println(err)
 	}
 }

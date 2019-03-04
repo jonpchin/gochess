@@ -22,10 +22,10 @@ func convertMapToTiles(mapString string) [][]string {
 		temp = append(temp, string(r))
 	}
 
-	for i := 0; i < intLength; i += 1 {
+	for i := 0; i < intLength; i++ {
 		tiles[i] = make([]string, intLength)
 
-		for j := 0; j < intLength; j += 1 {
+		for j := 0; j < intLength; j++ {
 			tiles[i][j] = temp[(i*intLength)+j]
 		}
 	}

@@ -49,16 +49,9 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
         displayToTextBox("");
         displayToTextBox("Welcome to Go MUD!");
 
-        var credentials = {
-            Username: Mud.Player.Username,
-            SessionID: Mud.Player.SessionID
-        }
+        Mud.Player.Type = "connect_mud";
 
-		var message = {
-            Type: "connect_mud",
-            Creds: credentials
-		}
-	    mainWebsocket.send(JSON.stringify(message));
+	    mainWebsocket.send(JSON.stringify(Mud.Player));
     }
 
     mainWebsocket.onclose = function(e) {
@@ -81,7 +74,8 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 break;
             case "name_available":
                 GameState.status="save_name";
-                determineMessageType(json.Name); // Saving player name and asking for class
+                Mud.Player.Name = json.Name;
+                askClass();
                 break;
             case "update_player":
                 // TODO: Unmarshal player data that was sent from server into client memory
@@ -91,10 +85,12 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
                 break;
             case "enter_world":
                 GameState.ingame = true;
-                displayToTextBox(json.Map);
+                updatePlayer(json);
+                displayMap(json.Map);
                 break;
             case "update_map":
                 console.log(json);
+                updatePlayer(json);
                 displayMap(json.Map);
                 break;
             default:
@@ -146,18 +142,10 @@ document.getElementById('sendButton').onclick = function(){
 // Checks if name is available
 function checkName(name){
 
-    var credentials = {
-        Username: Mud.Player.Username,
-        Name: Mud.Player.Name,
-        SessionID: Mud.Player.SessionID
-    }
-
-    var message = {
-        Type: "check_name",
-        Creds: credentials
-    }
+    Mud.Player.Type = "check_name";
+    Mud.Player.Name = name;
  
-    mainWebsocket.send(JSON.stringify(message));
+    mainWebsocket.send(JSON.stringify(Mud.Player));
 }
 
 function enterWorldFirstTime(){
@@ -168,31 +156,14 @@ function enterWorldFirstTime(){
 }
 
 function fetchMap(){
-    
-    var credentials = {
-        Username: Mud.Player.Username,
-        Name: Mud.Player.Name,
-        SessionID: Mud.Player.SessionID
-    }
-    var message = {
-        Type: "fetch_map",
-        Creds: credentials
-    }
-    mainWebsocket.send(JSON.stringify(message));
+    Mud.Player.Type = "fetch_map";
+    mainWebsocket.send(JSON.stringify(Mud.Player));
 }
 
 function sendCommand(command){
-    var credentials = {
-        Username: Mud.Player.Username,
-        Name: Mud.Player.Name,
-        SessionID: Mud.Player.SessionID
-    }
-    var message = {
-        Type: "command",
-        Creds: credentials,
-        Command: command
-    }
-    mainWebsocket.send(JSON.stringify(message));
+    Mud.Player.Type = "command";
+    Mud.Player.Command = command;
+    mainWebsocket.send(JSON.stringify(Mud.Player));
 }
 
 function setupCommands(){
@@ -255,15 +226,24 @@ function determineMessageType(message){
                 checkName(message);
                 break;
             case "save_name":
-                savePlayerData(status, message);
+                Mud.Player.Name = message;
                 askClass();
                 break;
-            case "register_class":
+            case "save_class":
                 if(isValidClass(message) === false){
                     displayToTextBox("That is not a valid class. Please try again.");
                     askClass();
                 }else{
-                    savePlayerData(status, message);
+                    Mud.Player.Class = message;
+                    askGender();
+                }
+                break;
+            case "save_gender":
+                if(isValidGender(message) === false){
+                    displayToTextBox("That is not a valid gender. Please try again.");
+                    askGender();
+                }else{
+                    Mud.Player.Gender = getGenderAbbreviation(message);
                     askRace();
                 }
                 break;
@@ -272,7 +252,7 @@ function determineMessageType(message){
                     displayToTextBox("That is not a valid race. Please try again.");
                     askRace();
                 }else{
-                    savePlayerData(status, message);
+                    Mud.Player.Race = message;
                     enterWorldFirstTime();
                 }
                 break;
@@ -280,18 +260,28 @@ function determineMessageType(message){
                 console.log("No matching message type for", status);
         }
     }
-
-   
 }
 
 function askClass(){
     displayToTextBox("Select your class. Options are: " + Mud.Classes.join(", "), "forestgreen");
-    GameState.status="register_class";
+    GameState.status="save_class";
 } 
 
 function askRace(){
     displayToTextBox("Select your race. Options are: " + Mud.Races.join(", "), "forestgreen");
     GameState.status="save_race";
+}
+
+function askGender(){
+    displayToTextBox("Select your gender. Options are: " + "male or female", "forestgreen");
+    GameState.status="save_gender";
+}
+
+function getGenderAbbreviation(gender){
+    if (gender.toLowerCase() === "male"){
+        return "m";
+    }
+    return "f";
 }
 
 function isValidClass(mudClass){
@@ -311,21 +301,13 @@ function isValidRace(mudRace){
     }
     return false;
 }
-function savePlayerData(type, message){
-    
-    switch(type){
-        case "save_name":
-            Mud.Player.Name = message;
-            break;
-        case "register_class":
-            Mud.Player.Class = message;
-            break;
-        case "save_race":
-            Mud.Player.Race = message;
-            break;
-        default:
-            console.log(type, "is not a valid savePlayerData type");
+
+function isValidGender(mudGender){
+    if (mudGender.toLowerCase() === "male" || mudGender.toLowerCase() === "m" || 
+        mudGender.toLowerCase() === "female" || mudGender.toLowerCase() === "f"){
+        return true;       
     }
+    return false;
 }
 
 // If enter is pressed auto submit

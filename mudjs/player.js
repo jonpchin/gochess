@@ -26,7 +26,8 @@ Mud.Player = {
 	Level: 1, 
 	Experience: 0,
 	Location: Mud.Coordinate,
-	Area: Mud.Area
+	Area: Mud.Area,
+	Command: ""
 }
 
 // Map of mud name to Mud.Player
@@ -82,6 +83,10 @@ function updatePlayer(player){
 	Mud.Player.Inventory = player.Inventory;	
 	Mud.Player.Equipment = player.Equipment;
 	Mud.Player.Stats   = player.Stats;
+	Mud.Player.Map     = player.Map;
+	Mud.Player.Bleed = player.Bleed;
+	Mud.Player.Location.Row = player.Location.Row;
+	Mud.Player.Location.Col = player.Location.Col;
+	Mud.Player.Location.Level = player.Location.Level;
 
-	console.log(Mud.Player);
 }

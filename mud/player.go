@@ -9,7 +9,7 @@ import (
 )
 
 // Default location new players start is their home base
-var HOME_BASE = Coordinate{Row: 10, Col: 10, Level: 5}
+var HOME_BASE = Coordinate{Row: 47, Col: 35, Level: 0}
 
 // Same as Player but without sensitive sessionID
 // This struct will be used to send to other players
@@ -102,11 +102,6 @@ func (player *Player) loadMap() {
 	//mapView := ""
 	// default view for map is 5
 	//viewDistance := 5
-
-	// TODO: Set this somewhere else, for this is hard coded for testing
-	player.Location.Row = 47
-	player.Location.Col = 35
-	player.Location.Level = 0
 
 	// Make sure the world is already set
 	player.setMapVision(world)
