@@ -19,15 +19,14 @@ var GameState = {
     validCommands: []
 };
 
-window.onload = function() {
-    setupCommands();
+setupCommands();
 
-    // Removes blank space at the start
-    codeMirror.setValue(""); 
-    // Focuses mouse cursor on load
-    $("#message").focus();
+// Removes blank space at the start
+codeMirror.setValue(""); 
+// Focuses mouse cursor on load
+$("#message").focus();
 
-    mainWebsocket.onopen = function() {
+mainWebsocket.onopen = function() {
 	    displayToTextBox(`                                                                                                        dddddddd
         GGGGGGGGGGGGG                      MMMMMMMM               MMMMMMMM                              d::::::d
      GGG::::::::::::G                      M:::::::M             M:::::::M                              d::::::d
@@ -52,52 +51,53 @@ G:::::G        G::::Go::::o     o::::o     M::::::M    M:::::M    M::::::Mu::::u
         Mud.Player.Type = "connect_mud";
 
 	    mainWebsocket.send(JSON.stringify(Mud.Player));
+}
+
+mainWebsocket.onclose = function(e) {
+    console.log("Socket closing")
+}
+
+mainWebsocket.onmessage = function(e) {
+    json = JSON.parse(e.data);
+
+    switch(json.Type){
+        case "ask_name":
+            // There seems to be a default tab spacing
+            displayToTextBox("What is your name?", "forestgreen");
+            GameState.status="check_name";
+            break;
+        case "name_taken":
+            displayToTextBox("That name is already taken.", "red");
+            displayToTextBox("What is your name?", "forestgreen");
+            GameState.status="check_name";
+            break;
+        case "name_available":
+            GameState.status="save_name";
+            Mud.Player.Name = json.Name;
+            askClass();
+            break;
+        case "update_player":
+            // TODO: Unmarshal player data that was sent from server into client memory
+            Mud.Player = json;
+            console.log("update_player test123");
+            console.log(Mud.Player);
+            break;
+        case "enter_world":
+            GameState.ingame = true;
+            updatePlayer(json);
+            displayMap(json.Map);
+            break;
+        case "update_map":
+            
+            Mud.Player = json;
+            console.log(Mud.Player);
+            displayMap(json.Map);
+            break;
+        default:
+            console.log("No such socket type", json.Type);
     }
+}
 
-    mainWebsocket.onclose = function(e) {
-        console.log("Socket closing")
-	}
-
-    mainWebsocket.onmessage = function(e) {
-        json = JSON.parse(e.data);
-
-        switch(json.Type){
-            case "ask_name":
-                // There seems to be a default tab spacing
-                displayToTextBox("What is your name?", "forestgreen");
-                GameState.status="check_name";
-                break;
-            case "name_taken":
-                displayToTextBox("That name is already taken.", "red");
-                displayToTextBox("What is your name?", "forestgreen");
-                GameState.status="check_name";
-                break;
-            case "name_available":
-                GameState.status="save_name";
-                Mud.Player.Name = json.Name;
-                askClass();
-                break;
-            case "update_player":
-                // TODO: Unmarshal player data that was sent from server into client memory
-                console.log("update_player");
-                console.log(json);
-                updatePlayer(json);
-                break;
-            case "enter_world":
-                GameState.ingame = true;
-                updatePlayer(json);
-                displayMap(json.Map);
-                break;
-            case "update_map":
-                console.log(json);
-                updatePlayer(json);
-                displayMap(json.Map);
-                break;
-            default:
-                console.log("No such socket type", json.Type);
-        }
-     }
-};
 
 function displayToTextBox(message, textColor){
     
