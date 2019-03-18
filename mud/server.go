@@ -95,7 +95,6 @@ func (c *MudConnection) MudConnect() {
 			player.Inventory = nil
 
 			MudServer.Players[player.Name] = &player
-
 			player.registerPlayer()
 			player.enterWorld(SKIP_LOAD, c)
 		case "fetch_map":

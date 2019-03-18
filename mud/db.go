@@ -78,6 +78,17 @@ func (player *Player) registerPlayer() {
 		log.Println(err)
 	}
 
+	stmt, err = db.Prepare("INSERT equipment SET name=?, weapon=?, sidearm=?, shield=?, helmet=?, torso=?, belt=?, arms=?, legs=?, shoes=?, ring=?, floating=?")
+	if err != nil {
+		log.Println(err)
+	}
+
+	// All new players get some newbie gear
+	_, err = stmt.Exec(player.Name, "None", "None", "None", "Newbie Helm", "Newbie Mail", "Newbie Belt", "None", "Newbie Pants", "Newbie Boots", "None", "None")
+	if err != nil {
+		log.Println(err)
+	}
+
 	_, err = stmt.Exec(player.Name, player.Area.Name, player.Location.Row, player.Location.Col, player.Location.Level)
 	if err != nil {
 		log.Println(err)

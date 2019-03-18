@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
@@ -103,6 +105,9 @@ func main() {
 	var certPath = "secret/device.crt"
 	var keyPath = "secret/device.key"
 
+	// Seed random generator once
+	rand.Seed(time.Now().Unix())
+
 	//parse console arguments to determine OS environment to use localhost or goplaychess.com
 	//default is localhost if no argument is passed
 	if len(os.Args) > 1 {
@@ -155,6 +160,7 @@ func main() {
 			worldId := "0"
 			mud.LoadWorldFile(worldId)
 			mud.ParseKnownCommands()
+			mud.GenerateEquipmentStats()
 			//mud.LoadMapsIntoMemory(worldId)
 			//mud.CreateWorld()
 			//mud.SaveMetadataToFile("1")

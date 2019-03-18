@@ -27,18 +27,7 @@ func generateRandomBytes(n int) ([]byte, error) {
 	return b, nil
 }
 
-// Calling getRandomInt(100) will return a random number 0 to 100 inclusive
-// If max is less then zero, then zero will be returned
-func getRandomInt(max int) int {
-	rand.Seed(time.Now().UnixNano())
-	if max >= 0 {
-		return rand.Intn(max)
-	}
-	return 0
-}
-
 func getRandomIntRange(min, max int) int {
-	rand.Seed(time.Now().Unix())
 	return rand.Intn(max-min) + min
 }
 
@@ -143,7 +132,7 @@ func getRandomItemFromPath(file *os.File) string {
 	for scanner.Scan() {
 		counter++
 	}
-	maxNum := getRandomInt(counter)
+	maxNum := rand.Intn(counter)
 
 	_, err := file.Seek(0, 0)
 	if err != nil {

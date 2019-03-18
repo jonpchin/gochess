@@ -15,7 +15,6 @@ var HOME_BASE = Coordinate{Row: 47, Col: 35, Level: 0}
 // This struct will be used to send to other players
 type PlayerPublic struct {
 	Type       string // Message type
-	Username   string // Go Play Chess account
 	Name       string // Mud account name
 	Class      string
 	Race       string
@@ -25,10 +24,12 @@ type PlayerPublic struct {
 	Stats      PlayerStats
 	Status     []string // List of afflictions or buffs affecting player
 	Bleed      int      // Amount of health the player will lose every tick
+	Map        string   // Shows the section of the map where a player's vision is limited too
 	Level      int
 	Experience int
 	Location   Coordinate
 	Area       Area
+	Vision     int
 }
 
 // Map will always be square and limited to odd number so MapVision 5 is 11x11, MapVision 4 is 9x9
@@ -52,6 +53,7 @@ type Player struct {
 	Location   Coordinate
 	Area       Area
 	Vision     int
+	Tile       Tile // The tile the adventurer is currently in
 }
 
 // Contains string of MapVision of player and the details of the room he is in
@@ -65,14 +67,14 @@ type PlayerMap struct {
 
 type PlayerStats struct {
 	Name         string
-	Health       int
-	Mana         int
-	Energy       int
-	Strength     int
-	Speed        int
-	Dexterity    int
-	Intelligence int
-	Wisdom       int
+	Health       int // Health points
+	Mana         int // Mana points (skills that require magic)
+	Energy       int // Move points (skils that require physical effort)
+	Strength     int // Multiplier for physical attacks
+	Speed        int // Mhance to dodge, block and parry physical attacks
+	Dexterity    int // Multiplier to regain balance
+	Intelligence int // Multipier to regain mental stabliity
+	Wisdom       int // Multiplier for magic attacks
 }
 
 // Default actions for all players

@@ -4,15 +4,15 @@ package mud
 // A single movement such as going north, east, south, west, up, down
 // will cause a player to move to a different tile
 type Tile struct {
-	Coordinate                // Contains X (row) and Y (col) coordinates of tile
-	Name        string        // Name of the tile an adventurer will see when they enter the room
-	Description string        // Description of tile adventurer will see when they enter the room
-	Area        Area          // The area the tile is located
-	Room        Room          // The room the tile is located
-	TileType    string        // The type of tile such as floor, wall, openDoor, etc
-	Items       []interface{} // List of items or objects in the tile
-	Players     []Player      // Adventurers in the tile
-	Monsters    []Monster     // NPC in the tile
+	Coordinate                 // Contains X (row) and Y (col) coordinates of tile
+	Name        string         // Name of the tile an adventurer will see when they enter the room
+	Description string         // Description of tile adventurer will see when they enter the room
+	Area        Area           // The area the tile is located
+	Room        Room           // The room the tile is located
+	TileType    string         // The type of tile such as floor, wall, openDoor, etc
+	Items       []interface{}  // List of items or objects in the tile
+	Players     []PlayerPublic // Adventurers in the room (does not include self)
+	Monsters    []Monster      // NPC in the tile
 }
 
 // An area may consist of many rooms and is one way to identify the general
