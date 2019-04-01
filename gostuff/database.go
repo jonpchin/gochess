@@ -685,7 +685,7 @@ func configMySqlIni(mysqlIniPath string) {
 	var databaseInfo DatabaseInfo
 	databaseInfo.ReadFile(ROOT_CONFIG_PATH)
 
-	found := isFileExist(mysqlIniPath)
+	found := IsFileExist(mysqlIniPath)
 
 	if found {
 		cfg, err := ini.Load(mysqlIniPath)

@@ -4,9 +4,8 @@ type ObjectInfo struct {
 	Type        string // Used to identify what type of item such as potion, dagger, shield, etc
 	Name        string
 	Description string
-	Weight      int        // Players can only carry so much weight in their inventory
-	Value       int        // 50% of value is what shop owners are willing to pay for this item
-	Location    Coordinate // Used to locate where the object is in the world
+	Weight      int // Players can only carry so much weight in their inventory
+	Value       int // 50% of value is what shop owners are willing to pay for this item
 }
 
 type Weapon struct {

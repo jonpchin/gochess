@@ -71,6 +71,8 @@ func main() {
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	//http.HandleFunc("/drawchart", plot.DrawChart)
 	http.HandleFunc("/mudserver/mud", mudConsole)
+	http.HandleFunc("/shop", shop)
+	http.HandleFunc("/thankyou", thankyou)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -248,6 +250,7 @@ func screenshots(w http.ResponseWriter, r *http.Request) {
 	gostuff.ParseTemplates(d, w, "screenshots.html", []string{"templates/screenshotsTemplate.html",
 		"templates/guestHeader.html"}...)
 }
+
 func register(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -776,6 +779,32 @@ func mudConsole(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func shop(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	d := struct {
+		PageTitle string
+	}{
+		"Shop",
+	}
+	gostuff.ParseTemplates(d, w, "register.html", []string{"templates/shopTemplate.html",
+		"templates/memberHeader.html"}...)
+
+}
+
+func thankyou(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	d := struct {
+		PageTitle string
+	}{
+		"Thank you",
+	}
+	gostuff.ParseTemplates(d, w, "register.html", []string{"templates/thankyouTmplate.html",
+		"templates/memberHeader.html"}...)
+
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {

@@ -36,7 +36,7 @@ func setupSecretConfig() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	// Root MySQL
-	if isFileExist(secretRootPath) == false {
+	if IsFileExist(secretRootPath) == false {
 		fmt.Println("Please enter your MySQL password for your root account:")
 
 		for scanner.Scan() {
@@ -51,7 +51,7 @@ func setupSecretConfig() {
 	}
 
 	// Non root MySQL
-	if isFileExist(secretUserPath) == false {
+	if IsFileExist(secretUserPath) == false {
 		// Setting up MySQL database should have a non root account for security reasons
 		fmt.Println("Please enter your MySQL username for your non root account:")
 

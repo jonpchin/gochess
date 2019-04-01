@@ -32,7 +32,7 @@ func IsDirectory(path string) bool {
 }
 
 // Returns true if a given file exist in the path
-func isFileExist(path string) bool {
+func IsFileExist(path string) bool {
 
 	isExist := true
 	_, err := os.Stat(path)
@@ -133,7 +133,7 @@ func resizeImage(path string, targetPath string, desiredWidth int, desiredHeight
 	var width int
 	var height int
 	// if target image does not exist use the image that hasn't been resized
-	exists := isFileExist(targetPath)
+	exists := IsFileExist(targetPath)
 
 	if exists {
 		width, height = getImageDimensions(targetPath)
