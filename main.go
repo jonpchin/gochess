@@ -67,12 +67,9 @@ func main() {
 	http.HandleFunc("/lockThread", goforum.LockThread)
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
-	http.HandleFunc("/audio", audio)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	//http.HandleFunc("/drawchart", plot.DrawChart)
 	http.HandleFunc("/mudserver/mud", mudConsole)
-	http.HandleFunc("/shop", shop)
-	http.HandleFunc("/thankyou", thankyou)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -158,11 +155,11 @@ func main() {
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			gostuff.InitForum()
-			mud.ConnectDb()
-			worldId := "0"
-			mud.LoadWorldFile(worldId)
-			mud.ParseKnownCommands()
-			mud.GenerateEquipmentStats()
+			//mud.ConnectDb()
+			//worldId := "0"
+			//mud.LoadWorldFile(worldId)
+			//mud.ParseKnownCommands()
+			//mud.GenerateEquipmentStats()
 			//mud.LoadMapsIntoMemory(worldId)
 			//mud.CreateWorld()
 			//mud.SaveMetadataToFile("1")
@@ -601,25 +598,6 @@ func saved(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func audio(w http.ResponseWriter, r *http.Request) {
-
-	if isAuthorized(w, r) {
-		w.Header().Set("Cache-Control", "private, max-age=432000")
-
-		username, _ := r.Cookie("username")
-		p := struct {
-			User      string
-			PageTitle string // Title of the web page
-		}{
-			username.Value,
-			"Audio",
-		}
-
-		gostuff.ParseTemplates(p, w, "audio.html", []string{"templates/audioTemplate.html",
-			"templates/memberHeader.html"}...)
-	}
-}
-
 func runJsTests(w http.ResponseWriter, r *http.Request) {
 	if isAuthorized(w, r) {
 		http.ServeFile(w, r, "runJsTests.html")
@@ -779,19 +757,6 @@ func mudConsole(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
-}
-
-func shop(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	d := struct {
-		PageTitle string
-	}{
-		"Shop",
-	}
-	gostuff.ParseTemplates(d, w, "register.html", []string{"templates/shopTemplate.html",
-		"templates/memberHeader.html"}...)
-
 }
 
 func thankyou(w http.ResponseWriter, r *http.Request) {

@@ -188,12 +188,14 @@ func GenerateEquipmentStats() {
 	TOTAL_SHIELDS = len(shields)
 	TOTAL_SHOES = len(shoes)
 	TOTAL_TORSO = len(torsos)
+	TOTAL_WEAPONS = len(weapons)
 
 	// Sort equipment by value so their drop frequency can be scaled with lower value drops occuring more often
 	sort.Slice(belts, func(i, j int) bool { return belts[i].Value < belts[j].Value })
 	sort.Slice(helmets, func(i, j int) bool { return helmets[i].Value < helmets[j].Value })
 	sort.Slice(legs, func(i, j int) bool { return legs[i].Value < legs[j].Value })
 	sort.Slice(shoes, func(i, j int) bool { return shoes[i].Value < shoes[j].Value })
+	sort.Slice(weapons, func(i, j int) bool { return weapons[i].Value < weapons[j].Value })
 
 	beltsFinal, err := json.Marshal(belts)
 	if err != nil {

@@ -401,7 +401,7 @@ func FetchLogs(w http.ResponseWriter, r *http.Request) {
 			w.Write(data)
 		}
 	} else if logType == "main" {
-		data, err := ioutil.ReadFile("logs/mainLog.txt")
+		data, err := ioutil.ReadFile("nohup.out")
 		if err != nil {
 			w.Write([]byte(err.Error()))
 		} else {
