@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dchest/captcha"
@@ -89,6 +90,12 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 	if db.Ping() != nil {
 		return "<img src='img/ajax/not-available.png' /> Can't ping database.",
 			errors.New("DATABASE DOWN in register.go Register 0")
+	}
+
+	// Make sure username does not contain the word "guest"
+	if strings.Contains(userInfo.Username, "guest") {
+		return "<img src='img/ajax/not-available.png' /> Make sure username does not contain the word \"guest\"",
+			errors.New("username has the word guest in it")
 	}
 
 	//check if username already exists, if it does then break out and inform user
