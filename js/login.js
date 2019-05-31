@@ -53,10 +53,24 @@ document.getElementById('reload').onclick = function()  { //used to reload captc
 	return false;
 }
 
-document.getElementById('loginAsGuest').onclick = fu
+document.getElementById('loginAsGuest').onclick = function() {
+	document.getElementById('login').disabled = true;
+	document.getElementById('loginAsGuest').disabled = true;
+
+	$('#submit-result').html('<img src="img/ajax/loading.gif" />Login in progress...');
+    $.ajax({
+  		url: 'enterGuest',
+   		type: 'post',
+   		dataType: 'html',
+   		success : function(data) {			
+      		$('#submit-result').html(data);	
+   		}	
+    });
+}
 
 document.getElementById('login').onclick = function(){
 	document.getElementById('login').disabled = true;
+	document.getElementById('loginAsGuest').disabled = true;
 	setTimeout(function() {
 		// enable click after 1 second
 		document.getElementById('login').disabled = false;

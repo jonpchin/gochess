@@ -300,9 +300,9 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16, c
 	err2 := db.QueryRow("SELECT bullet, blitz, standard, correspondence FROM rating WHERE username=?",
 		name).Scan(&bullet, &blitz, &standard, &correspondence)
 
+	// Player doesn't exist, assume its a guest
 	if err2 != nil {
-		log.Println(err2)
-		return "No such player", 0, 0, 0, 0
+		return "", 1500, 1500, 1500, 1500
 	}
 	return "", bullet, blitz, standard, correspondence
 }
@@ -318,7 +318,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, corre
 	//check if database connection is open
 	if db.Ping() != nil {
 		log.Println("DATABASE DOWN!")
-		return "DB down @GetRatingAndRD()", 0, 0, 0, 0, 0, 0, 0, 0
+		return "DB down @GetRatingAndRD()", 1500, 1500, 1500, 1500, 350.0, 350.0, 350.0, 350.0
 	}
 
 	//looking up players rating
@@ -329,7 +329,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, corre
 
 	if err2 != nil {
 		log.Println(err2)
-		return "No such player", 0, 0, 0, 0, 0, 0, 0, 0
+		return "No such player", 1500, 1500, 1500, 1500, 350.0, 350.0, 350.0, 350.0
 	}
 	return "", bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondenceRD
 }
@@ -587,7 +587,6 @@ func GetRatingHistory(name string, gametype string) (string, bool, error) {
 
 	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
 	if err == sql.ErrNoRows { // this will occur if there is no name exist
-		log.Println("No name found in ratinghistory for ", name)
 		return "", false, err
 	} else if err != nil { // Name found but no rating history
 		log.Println(err)

@@ -44,6 +44,11 @@ $(document).ready(function() {
 			$('#user-result').html("<img src='img/ajax/not-available.png' /> Too short.");
 			return
 		}
+		if(username.includes("guest")){
+			$('#user-result').html("<img src='img/ajax/not-available.png' /> Username cannot contain word \"guest\".");
+			return
+		}
+
 	    $('#user-result').html('<img src="img/ajax/loading.gif" />');
 	      $.ajax({
 	      	url: 'checkname',

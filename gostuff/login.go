@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/dchest/captcha"
@@ -214,20 +215,23 @@ func RandomString() string {
 	return base64.URLEncoding.EncodeToString(rb)
 }
 
-func enterGuest(w http.ResponseWriter) {
+func EnterGuest(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		Show404Page(w, r)
+		return
+	}
 
 	var index int = 0
 	username := "guest0"
 	for {
 		if _, ok := SessionManager[username]; ok {
 			index++
-			username = "guest" + string(index)
+			username = "guest" + strconv.Itoa(index)
 		} else {
 			break
 		}
 	}
-
-	username = "guest" + string(index)
 
 	expiration := time.Now().Add(5 * 24 * time.Hour)
 	cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}

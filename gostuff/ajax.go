@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/dchest/captcha"
 	"golang.org/x/net/websocket"
@@ -31,25 +32,12 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	// the name of the player being looked up by the AJAX call
 	lookupName := template.HTMLEscapeString(r.FormValue("user"))
 
-	//getting player rating
-	ratingError, bulletRating, blitzRating, standardRating,
-		_ := GetRating(lookupName)
-
-	if ratingError != "" {
-		w.Write([]byte("Service is down."))
-		return
-	}
-
-	bullet := fmt.Sprintf("%d", bulletRating)
-	blitz := fmt.Sprintf("%d", blitzRating)
-	standard := fmt.Sprintf("%d", standardRating)
-	//correspondence := fmt.Sprintf("%d", correspondenceRating)
-
 	//checking if the player is a game
 	status := ""
 	icon := ""
 	url := ""
 	endUrl := "" //closing the href link
+
 	countryFlag := GetCountry(lookupName)
 	enemyFlag := GetCountry(PrivateChat[lookupName])
 	if countryFlag == "" {
@@ -68,6 +56,30 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 		url = "<a href=/chess/memberChess?spectate&id=" + strconv.Itoa(id) + ">"
 		endUrl = "</a>"
 	}
+
+	if strings.Contains(lookupName, "guest") {
+		var result = icon + url + lookupName + " " + status + endUrl +
+			"<br><img src='../img/icons/bullet.png' alt='bullet'>1500" +
+			"<img src='../img/icons/blitz.png' alt='blitz'>1500" +
+			"<img src='../img/icons/standard.png' alt='standard'>1500"
+
+		w.Write([]byte(result))
+		return
+	}
+
+	//getting player rating
+	ratingError, bulletRating, blitzRating, standardRating,
+		_ := GetRating(lookupName)
+
+	if ratingError != "" {
+		w.Write([]byte("Could not find player, " + lookupName))
+		return
+	}
+
+	bullet := fmt.Sprintf("%d", bulletRating)
+	blitz := fmt.Sprintf("%d", blitzRating)
+	standard := fmt.Sprintf("%d", standardRating)
+	//correspondence := fmt.Sprintf("%d", correspondenceRating)
 
 	var result = icon + url + lookupName + "<img src='../img/flags/" + countryFlag +
 		".png'>" + " " + status + endUrl +

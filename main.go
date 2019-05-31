@@ -52,6 +52,7 @@ func main() {
 	http.HandleFunc("/processResetPass", gostuff.ProcessResetPass)
 	http.HandleFunc("/processRegister", gostuff.ProcessRegister)
 	http.HandleFunc("/processLogin", gostuff.ProcessLogin)
+	http.HandleFunc("/enterGuest", gostuff.EnterGuest)
 	http.HandleFunc("/processActivate", gostuff.ProcessActivate)
 	http.HandleFunc("/settings", settings)
 	http.HandleFunc("/robots.txt", robot)
@@ -308,15 +309,11 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 
 		var bulletRating, blitzRating, standardRating, correspondenceRating int16
-		var errMessage string
+
 		username, _ := r.Cookie("username")
 
-		errMessage, bulletRating, blitzRating, standardRating,
+		_, bulletRating, blitzRating, standardRating,
 			correspondenceRating = gostuff.GetRating(username.Value)
-
-		if errMessage != "" {
-			fmt.Println("Problem fetching rating lobby main.go")
-		}
 
 		p := struct {
 			User           string

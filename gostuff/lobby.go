@@ -45,10 +45,17 @@ func (c *Connection) LobbyConnect() {
 		case "fetch_matches":
 			//send in array instead of sending individual
 			for _, value := range Pending.Matches {
-				// Ensure only the recipient or sender sees the private match proposal
-				if t.Name == value.Name || t.Name == value.Opponent {
+
+				if value.Opponent == "" {
 					if err := websocket.JSON.Send(c.websocket, &value); err != nil {
 						log.Println(err)
+					}
+				} else {
+					// Ensure only the recipient or sender sees the private match proposal
+					if t.Name == value.Name || t.Name == value.Opponent {
+						if err := websocket.JSON.Send(c.websocket, &value); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 			}
