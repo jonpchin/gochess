@@ -214,6 +214,35 @@ func RandomString() string {
 	return base64.URLEncoding.EncodeToString(rb)
 }
 
+func enterGuest(w http.ResponseWriter) {
+
+	var index int = 0
+	username := "guest0"
+	for {
+		if _, ok := SessionManager[username]; ok {
+			index++
+			username = "guest" + string(index)
+		} else {
+			break
+		}
+	}
+
+	username = "guest" + string(index)
+
+	expiration := time.Now().Add(5 * 24 * time.Hour)
+	cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	//generating random session ID to be stored in the backend
+	sessionID := RandomString()
+	cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	SessionManager[username] = sessionID
+
+	w.Write([]byte("<script>window.location = '/server/lobby'</script>"))
+}
+
 // after successfully identifying credentials, setup session and cookies
 func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 	expiration := time.Now().Add(3 * 24 * time.Hour)
@@ -231,7 +260,7 @@ func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 	http.SetCookie(w, &cookie)
 	SessionManager[username] = sessionID
 
-	w.Write([]byte("<script>window.location = '/memberHome'</script>"))
+	w.Write([]byte("<script>window.location = '/server/lobby'</script>"))
 }
 
 // sends an email again to reactivate an inactivated account

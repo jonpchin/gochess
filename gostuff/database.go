@@ -76,7 +76,7 @@ func DbSetup(backup string) bool {
 			fmt.Println("database.go DbSetup 1, error creating backup directory", err)
 		}
 	}
-	var sqlOpenFile = USER_CONFIG_PATH
+	var sqlOpenFile = ROOT_CONFIG_PATH
 
 	if IsEnvironmentTravis() {
 		sqlOpenFile = "_travis/data/dbtravis.txt"
@@ -84,6 +84,7 @@ func DbSetup(backup string) bool {
 
 	var err error
 	dbString, database := ReadFile(sqlOpenFile)
+
 	db, err = sql.Open("mysql", dbString)
 
 	if err != nil {

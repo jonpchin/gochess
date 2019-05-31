@@ -53,6 +53,8 @@ document.getElementById('reload').onclick = function()  { //used to reload captc
 	return false;
 }
 
+document.getElementById('loginAsGuest').onclick = fu
+
 document.getElementById('login').onclick = function(){
 	document.getElementById('login').disabled = true;
 	setTimeout(function() {
