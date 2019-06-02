@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -312,6 +313,12 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 
 		username, _ := r.Cookie("username")
 
+		isGuest := false
+
+		if strings.Contains(username.Value, "guest") {
+			isGuest = true
+		}
+
 		_, bulletRating, blitzRating, standardRating,
 			correspondenceRating = gostuff.GetRating(username.Value)
 
@@ -322,6 +329,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 			Blitz          int16
 			Standard       int16
 			Correspondence int16
+			IsGuest        bool
 		}{
 			username.Value,
 			"Chess Room",
@@ -329,6 +337,7 @@ func lobby(w http.ResponseWriter, r *http.Request) {
 			blitzRating,
 			standardRating,
 			correspondenceRating,
+			isGuest,
 		}
 
 		gostuff.ParseTemplates(p, w, "memberlobby.html", []string{"templates/memberlobbyTemplate.html",
@@ -342,6 +351,7 @@ func memberChess(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 
 		username, _ := r.Cookie("username")
+
 		p := struct {
 			User      string
 			PageTitle string // Title of the web page
@@ -618,9 +628,12 @@ func forum(w http.ResponseWriter, r *http.Request) {
 	canLock := false
 
 	if isAuthorizedNo404(w, r) {
-		authorized = true
 		username, _ := r.Cookie("username")
 		user = username.Value
+		authorized = true
+		if strings.Contains(user, "guest") {
+			authorized = false
+		}
 
 		if gostuff.IsAdmin(user) || gostuff.IsMod(user) {
 			canLock = true

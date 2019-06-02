@@ -55,8 +55,12 @@
 		</select>
 		<p>Rated</p>
 		<select id="isRated">
-		  <option value="Yes" selected>Yes</option>
-		  <option value="No">No</option>
+				{{ if .IsGuest }}
+					<option value="No" selected>No</option>
+				{{else}}
+					<option value="Yes" selected>Yes</option>
+					<option value="No">No</option>
+				{{end}}
 		</select>
 		<button id="sendSeek">Send Seek</button>
 		<p>Username</p><p><input id="privateName" type="text" maxlength="12" size="12" ><button id="sendPrivateMatch">Send Private Match</button></p>

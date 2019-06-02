@@ -40,6 +40,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>21. Forum</p>
 <p>22. Daily news feed, contains mostly tech articles but it can be configured to get other types of news.</p>
 <p>23. Post game analysis with Stockfish engine (beta, only for developers)</p>
+<p>24. Guest play</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Chess TV where live games are randomly broadcasted.</p>

@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -422,6 +423,11 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	game.Spectate = false
 	game.CountryWhite = GetCountry(game.WhitePlayer)
 	game.CountryBlack = GetCountry(game.BlackPlayer)
+
+	// Guests should always be unrated games
+	if strings.Contains(game.WhitePlayer, "guest") || strings.Contains(game.BlackPlayer, "guest") {
+		game.Rated = "No"
+	}
 
 	var start int = 0
 	for {

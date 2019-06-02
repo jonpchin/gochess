@@ -1,10 +1,5 @@
 package gostuff
 
-import (
-	"log"
-	"os"
-)
-
 func IsMod(username string) bool {
 	return getRole(username) == "mod"
 }
@@ -15,13 +10,9 @@ func IsAdmin(username string) bool {
 
 func getRole(username string) string {
 
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	// Always default to user for safety reasons
-	role := "user"
+	// Always default to guest for safety reasons
+	role := "guest"
 
-	err := db.QueryRow("SELECT role from userinfo where username=?", username).Scan(&role)
-	if err != nil {
-		log.Println(err)
-	}
+	db.QueryRow("SELECT role from userinfo where username=?", username).Scan(&role)
 	return role
 }
