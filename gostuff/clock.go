@@ -27,7 +27,7 @@ func (table *Table) StartClock(gameID int, minutes int, seconds int, name string
 			return
 
 		case <-timerChan:
-			if table.whiteToMove {
+			if table.whiteTurn {
 
 				whiteClock--
 				remainingMinutes := whiteClock / 60

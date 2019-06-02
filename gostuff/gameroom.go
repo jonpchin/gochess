@@ -93,14 +93,11 @@ func (c *Connection) ChessConnect() {
 				//now switch to the other players turn
 				if chessgame.Status == "White" {
 					chessgame.Status = "Black"
-					table.whiteToMove = false
-
 					if chessgame.GameType == "correspondence" {
 						table.resetWhiteTime <- true
 					}
 				} else if chessgame.Status == "Black" {
 					chessgame.Status = "White"
-					table.whiteToMove = true
 					if chessgame.GameType == "correspondence" {
 						table.resetBlackTime <- true
 					}

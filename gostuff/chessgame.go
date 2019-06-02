@@ -113,7 +113,6 @@ type Table struct {
 	resetWhiteTime chan bool
 	resetBlackTime chan bool
 	gameOver       chan bool
-	whiteToMove    bool
 
 	moveCount int       //keeps track of how many moves are made (moveCount+1) /2 to get move number
 	promotion string    //keeps track of the piece that is being promoted too
