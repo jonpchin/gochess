@@ -100,8 +100,21 @@ func main() {
 	http.Handle("/sound/", http.FileServer(currentDir))
 
 	http.Handle("/mudserver", websocket.Handler(mud.EnterMud))
-	http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
-	http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
+	//http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
+	//http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
+
+	// Allows non browser client like Android to connect to websocket https://stackoverflow.com/questions/19708330/serving-a-websocket-in-go
+	http.HandleFunc("/server",
+		func(w http.ResponseWriter, req *http.Request) {
+			s := websocket.Server{Handler: websocket.Handler(gostuff.EnterLobby)}
+			s.ServeHTTP(w, req)
+		})
+
+	http.HandleFunc("/chess",
+		func(w http.ResponseWriter, req *http.Request) {
+			s := websocket.Server{Handler: websocket.Handler(gostuff.EnterChess)}
+			s.ServeHTTP(w, req)
+		})
 
 	var certPath = "secret/device.crt"
 	var keyPath = "secret/device.key"

@@ -97,18 +97,6 @@ func (c *Connection) LobbyConnect() {
 
 		case "match_seek":
 
-			//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
-			if c.totalMatches >= 3 {
-				t.Type = "maxThree"
-				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
-					// we could not send the message to a peer
-					log.Println("Could not send message to ", c.username, err)
-				}
-				break //notify user that only three matches pending max are allowed
-			} else {
-				c.totalMatches++
-			}
-
 			var match SeekMatch
 			if err := json.Unmarshal(message, &match); err != nil {
 				log.Println("Just receieved a message I couldn't decode:", string(reply), err)
@@ -146,7 +134,20 @@ func (c *Connection) LobbyConnect() {
 				}
 			}
 
-			if proceed {
+			if proceed && match.isDuplicateMatch() == false {
+
+				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
+				if c.totalMatches >= 3 {
+					t.Type = "maxThree"
+					if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
+						// we could not send the message to a peer
+						log.Println("Could not send message to ", c.username, err)
+					}
+					break //notify user that only three matches pending max are allowed
+				} else {
+					c.totalMatches++
+				}
+
 				start := 0
 				for {
 					if _, ok := Pending.Matches[start]; ok {
@@ -257,7 +258,7 @@ func (c *Connection) LobbyConnect() {
 				break
 			}
 
-			if match.assignMatchRatingType() == false {
+			if match.assignMatchRatingType() == false || match.isDuplicateMatch() {
 				break
 			}
 
@@ -301,6 +302,19 @@ func (c *Connection) LobbyConnect() {
 			log.Println("I'm not familiar with type ", t.Type, " sent by ", c.username)
 		}
 	}
+}
+
+func (match *SeekMatch) isDuplicateMatch() bool {
+
+	for _, targetMatch := range Pending.Matches {
+		if match.TimeControl == targetMatch.TimeControl &&
+			targetMatch.MinRating == match.MinRating && targetMatch.MaxRating == match.MaxRating &&
+			match.Rated == targetMatch.Rated &&
+			match.Name == targetMatch.Name {
+			return true
+		}
+	}
+	return false
 }
 
 // Send chat to all users in the lobby

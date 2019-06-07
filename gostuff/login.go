@@ -244,7 +244,8 @@ func EnterGuest(w http.ResponseWriter, r *http.Request) {
 
 	SessionManager[username] = sessionID
 
-	w.Write([]byte("<script>window.location = '/server/lobby'</script>"))
+	//w.Write([]byte("<script>window.location = '/server/lobby'</script>"))
+	w.Write([]byte(username + "," + sessionID))
 }
 
 // after successfully identifying credentials, setup session and cookies

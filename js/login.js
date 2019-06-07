@@ -63,7 +63,7 @@ document.getElementById('loginAsGuest').onclick = function() {
    		type: 'post',
    		dataType: 'html',
    		success : function(data) {			
-      		$('#submit-result').html(data);	
+			window.location = '/server/lobby';	
    		}	
     });
 }
@@ -74,6 +74,10 @@ document.getElementById('login').onclick = function(){
 	setTimeout(function() {
 		// enable click after 1 second
 		document.getElementById('login').disabled = false;
+	}, 1000); //  second delay
+	setTimeout(function() {
+		// enable click after 1 second
+		document.getElementById('loginAsGuest').disabled = false;
 	}, 1000); //  second delay
 	
 	var user = document.getElementById('user').value;
@@ -92,8 +96,13 @@ document.getElementById('login').onclick = function(){
    		type: 'post',
    		dataType: 'html',
    		data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
-   		success : function(data) {			
-      		$('#submit-result').html(data);	
+   		success : function(data) {
+			if (data === "<img src='img/ajax/not-available.png' /> Wrong username/password combination."){
+				
+				$('#submit-result').html(data);	
+			}else{
+				window.location = '/server/lobby';
+			}	
    		}	
     });
 	
