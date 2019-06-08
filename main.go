@@ -43,6 +43,7 @@ func main() {
 	http.HandleFunc("/database", database)
 	http.HandleFunc("/profile", playerProfile)
 	http.HandleFunc("/logout", logout)
+	http.HandleFunc("/logoutGuest", logoutGuest)
 	http.HandleFunc("/help", help)
 	http.HandleFunc("/screenshots", screenshots)
 	http.HandleFunc("/activate", activate)
@@ -522,6 +523,19 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &cookie)
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		http.ServeFile(w, r, "index.html")
+	}
+}
+
+// An API used by Android client, can only be used to log off guests
+func logoutGuest(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "POST" {
+		username := template.HTMLEscapeString(r.FormValue("username"))
+		password := template.HTMLEscapeString(r.FormValue("password"))
+
+		if strings.Contains(username, "guest") && gostuff.SessionManager[username] == password {
+			delete(gostuff.SessionManager, username)
+		}
 	}
 }
 
