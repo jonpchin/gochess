@@ -9,10 +9,9 @@ import (
 
 //used to identify who the socket connection is
 type Connection struct {
-	username     string
-	websocket    *websocket.Conn
-	clientIP     string
-	totalMatches int8
+	username  string
+	websocket *websocket.Conn
+	clientIP  string
 }
 
 //stores information for a message from chat for JSON
@@ -74,11 +73,7 @@ func EnterLobby(ws *websocket.Conn) {
 			if SessionManager[username.Value] == sessionID.Value {
 
 				ip := ws.Request().RemoteAddr
-
-				var total int8
-				//gets total number of pending matches a player has
-				total = countMatches(username.Value)
-				Client := &Connection{username.Value, ws, ip, total}
+				Client := &Connection{username.Value, ws, ip}
 
 				//only difference between lobby and chatroom is the two lines below
 				Chat.Lobby[username.Value] = ws
@@ -98,11 +93,7 @@ func EnterChess(ws *websocket.Conn) {
 			if SessionManager[username.Value] == sessionID.Value {
 
 				ip := ws.Request().RemoteAddr
-
-				var total int8
-				//gets total number of pending matches a player has
-				total = countMatches(username.Value)
-				Client := &Connection{username.Value, ws, ip, total}
+				Client := &Connection{username.Value, ws, ip}
 				Active.Clients[username.Value] = ws
 
 				Client.ChessConnect()

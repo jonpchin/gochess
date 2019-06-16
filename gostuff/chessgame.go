@@ -1,6 +1,10 @@
 package gostuff
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/notnil/chess"
+)
 
 //stores chess game information
 type ChessGame struct {
@@ -25,6 +29,7 @@ type ChessGame struct {
 	Spectate     bool
 	CountryWhite string
 	CountryBlack string
+	Validator    *chess.Game
 }
 
 //source and destination of piece moves

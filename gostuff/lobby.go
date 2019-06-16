@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/notnil/chess"
 	"golang.org/x/net/websocket"
 )
 
@@ -137,15 +138,13 @@ func (c *Connection) LobbyConnect() {
 			if proceed && match.isDuplicateMatch() == false {
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
-				if c.totalMatches >= 3 {
+				if countMatches(c.username) >= 3 {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
 						// we could not send the message to a peer
 						log.Println("Could not send message to ", c.username, err)
 					}
 					break //notify user that only three matches pending max are allowed
-				} else {
-					c.totalMatches++
 				}
 
 				start := 0
@@ -181,8 +180,6 @@ func (c *Connection) LobbyConnect() {
 
 			delete(Pending.Matches, match.MatchID)
 
-			//deletes pending match counter
-			c.totalMatches--
 			//check if its a private match, if so then delete it and break out
 			if match.Opponent != "" {
 				fmt.Println("Private match deleted")
@@ -263,15 +260,13 @@ func (c *Connection) LobbyConnect() {
 			}
 
 			//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
-			if c.totalMatches >= 3 {
+			if countMatches(c.username) >= 3 {
 				t.Type = "maxThree"
 				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
 					// we could not send the message to a peer
 					log.Println("Could not send message to ", c.username, err)
 				}
 				break //notify user that only three matches pending max are allowed
-			} else {
-				c.totalMatches++
 			}
 
 			var start int = 0
@@ -437,6 +432,9 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	game.Spectate = false
 	game.CountryWhite = GetCountry(game.WhitePlayer)
 	game.CountryBlack = GetCountry(game.BlackPlayer)
+
+	// Long AlgebraicNotation Notation
+	game.Validator = chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}))
 
 	// Guests should always be unrated games
 	if strings.Contains(game.WhitePlayer, "guest") || strings.Contains(game.BlackPlayer, "guest") {

@@ -60,6 +60,14 @@ func (c *Connection) ChessConnect() {
 				var white = chessgame.WhitePlayer
 				var black = chessgame.BlackPlayer
 
+				// Check if the color that is moving is the correct player
+				if chessgame.Status == "White" && white != c.username {
+					break
+				}
+				if chessgame.Status == "Black" && black != c.username {
+					break
+				}
+
 				// spectators should not be able to make moves for the two chess players
 				if t.Name != white && t.Name != black {
 					fmt.Println(t.Name, "tried to cheat by making a move as a spectator")
@@ -74,6 +82,12 @@ func (c *Connection) ChessConnect() {
 					totalMoves := (len(chessgame.GameMoves) + 1) / 2
 					log.Printf("Invalid chess move by %s move %s - %s in gameID %d on move %d", c.username, game.Source, game.Target, game.ID, totalMoves)
 					break
+				}
+
+				chessgame.Validator.MoveStr(game.Source + game.Target + game.Promotion)
+
+				if game.Fen == "" {
+					game.Fen = chessgame.Validator.Position().String()
 				}
 
 				table := Verify.AllTables[game.ID]
@@ -521,15 +535,13 @@ func (c *Connection) ChessConnect() {
 				}
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
-				if c.totalMatches >= 3 {
+				if countMatches(c.username) >= 3 {
 					t.Type = "maxThree"
 					if err := websocket.JSON.Send(Active.Clients[t.Name], &t); err != nil {
 						// we could not send the message to a peer
 						log.Println("Could not send message to ", t.Name, err)
 					}
 					break //notify user that only three matches pending max are allowed
-				} else {
-					c.totalMatches++
 				}
 
 				var start int = 0

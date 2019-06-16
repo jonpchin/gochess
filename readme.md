@@ -52,6 +52,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>7. Store zipped source files and databas backup in Google Drive or Dropbox.</p>
 <p>8. Read write meta data of each tile to file when saving and loading memory map.</p>
 <p>9. Setup algorithm to pick starting player location and save player's map vision to database.</p>
+<p>10. Add chess engine in lobby so players on mobile can play them. </p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
