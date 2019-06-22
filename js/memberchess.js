@@ -569,9 +569,6 @@ window.onload = function() {
 					gameSound.play();
 				}
 				break;
-			case "valid_move":
-				// Do nothing, implemented on clients that do not have client side chess move validation
-				break;
 			default:
 				console.log("Unknown API type json.Type is " + json.Type);
 		}

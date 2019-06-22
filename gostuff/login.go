@@ -222,27 +222,33 @@ func EnterGuest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var index int = 0
-	username := "guest0"
-	for {
-		if _, ok := SessionManager[username]; ok {
-			index++
-			username = "guest" + strconv.Itoa(index)
-		} else {
-			break
+	username := template.HTMLEscapeString(r.FormValue("user"))
+	sessionID := template.HTMLEscapeString(r.FormValue("pass"))
+
+	if sessionID == "" || SessionManager[username] != sessionID {
+
+		var index int = 0
+		username = "guest0"
+		for {
+			if _, ok := SessionManager[username]; ok {
+				index++
+				username = "guest" + strconv.Itoa(index)
+			} else {
+				break
+			}
 		}
+
+		expiration := time.Now().Add(5 * 24 * time.Hour)
+		cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}
+		http.SetCookie(w, &cookie)
+
+		//generating random session ID to be stored in the backend
+		sessionID = RandomString()
+		cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
+		http.SetCookie(w, &cookie)
+
+		SessionManager[username] = sessionID
 	}
-
-	expiration := time.Now().Add(5 * 24 * time.Hour)
-	cookie := http.Cookie{Name: "username", Value: username, Secure: true, HttpOnly: true, Expires: expiration}
-	http.SetCookie(w, &cookie)
-
-	//generating random session ID to be stored in the backend
-	sessionID := RandomString()
-	cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
-	http.SetCookie(w, &cookie)
-
-	SessionManager[username] = sessionID
 
 	//w.Write([]byte("<script>window.location = '/server/lobby'</script>"))
 	w.Write([]byte(username + "," + sessionID))

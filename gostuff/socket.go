@@ -70,7 +70,7 @@ func EnterLobby(ws *websocket.Conn) {
 	if err == nil {
 		sessionID, err := ws.Request().Cookie("sessionID")
 		if err == nil {
-			if SessionManager[username.Value] == sessionID.Value {
+			if sessionID.Value != "" && SessionManager[username.Value] == sessionID.Value {
 
 				ip := ws.Request().RemoteAddr
 				Client := &Connection{username.Value, ws, ip}
@@ -90,7 +90,7 @@ func EnterChess(ws *websocket.Conn) {
 	if err == nil {
 		sessionID, err := ws.Request().Cookie("sessionID")
 		if err == nil {
-			if SessionManager[username.Value] == sessionID.Value {
+			if sessionID.Value != "" && SessionManager[username.Value] == sessionID.Value {
 
 				ip := ws.Request().RemoteAddr
 				Client := &Connection{username.Value, ws, ip}

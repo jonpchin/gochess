@@ -12,7 +12,7 @@ func EnterMud(ws *websocket.Conn) {
 	if err == nil {
 		sessionID, err := ws.Request().Cookie("sessionID")
 		if err == nil {
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
+			if sessionID.Value != "" && gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				ip := ws.Request().RemoteAddr
 

@@ -533,7 +533,7 @@ func logoutGuest(w http.ResponseWriter, r *http.Request) {
 		username := template.HTMLEscapeString(r.FormValue("username"))
 		password := template.HTMLEscapeString(r.FormValue("password"))
 
-		if strings.Contains(username, "guest") && gostuff.SessionManager[username] == password {
+		if password != "" && strings.Contains(username, "guest") && gostuff.SessionManager[username] == password {
 			delete(gostuff.SessionManager, username)
 		}
 	}
@@ -823,7 +823,7 @@ func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
+			if sessionID.Value != "" && gostuff.SessionManager[username.Value] == sessionID.Value {
 				return true
 			}
 		}
@@ -838,7 +838,7 @@ func isAuthorizedNo404(w http.ResponseWriter, r *http.Request) bool {
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
+			if sessionID.Value != "" && gostuff.SessionManager[username.Value] == sessionID.Value {
 				return true
 			}
 		}

@@ -124,6 +124,7 @@ func (c *Connection) ChessConnect() {
 				move.S = game.Source
 				move.T = game.Target
 				move.P = game.Promotion
+				move.Fen = game.Fen
 
 				//append move to back end storage for retrieval from database later
 				chessgame.GameMoves = append(chessgame.GameMoves, move)

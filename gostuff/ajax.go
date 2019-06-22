@@ -359,7 +359,7 @@ func ValidateCredentials(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 
-	if SessionManager[username.Value] != sessionID.Value {
+	if sessionID.Value == "" || SessionManager[username.Value] != sessionID.Value {
 		w.Write([]byte("Could not authenticate user"))
 		return false
 	}

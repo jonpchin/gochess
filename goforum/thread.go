@@ -63,7 +63,7 @@ func SendForumPost(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		sessionID, err := r.Cookie("sessionID")
 		if err == nil {
-			if gostuff.SessionManager[username.Value] == sessionID.Value {
+			if sessionID.Value != "" && gostuff.SessionManager[username.Value] == sessionID.Value {
 
 				log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 				canPost, seconds := canUserPost(username.Value)
