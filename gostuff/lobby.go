@@ -120,7 +120,7 @@ func (c *Connection) LobbyConnect() {
 			}
 
 			// if a seek matches an existing one do not post another seek
-			var proceed = true
+			var started = false
 
 			// If this seek matches an already existing seek in pending matches then start the seek right away
 			// only verify if target's criteria matches seeker's crieria as startPendingMatch checks if
@@ -131,11 +131,12 @@ func (c *Connection) LobbyConnect() {
 					match.Rated == targetMatch.Rated &&
 					match.Name != targetMatch.Name { // a player should not be able to play himself
 
-					proceed = startPendingMatch(match.Name, matchID)
+					started = startPendingMatch(match.Name, matchID)
 				}
 			}
 
-			if proceed && match.isDuplicateMatch() == false {
+			// Do not send another seek if it was started already
+			if started == false && match.isDuplicateMatch() == false {
 
 				//check to make sure player only has a max of three matches seeks pending, used to prevent flood match seeking
 				if countMatches(c.username) >= 3 {
@@ -347,7 +348,7 @@ func (t *MessageType) sendLobbyChatToAll(reply string, start *time.Time, counter
 // if a pending match is accepted start game for both players that are waiting
 // seekerName is name of seeker and matchID is the ID that belongs to player
 // waiting in pending matches
-// if a match cannot be started then return true to indicate proceeding with setting up a new seek
+// if a match cannot be started then return false to indicate the match did not start succesfully
 func startPendingMatch(seekerName string, matchID int) bool {
 
 	var game ChessGame
@@ -356,25 +357,31 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	errMessage, bullet, blitz, standard, correspondence := GetRating(seekerName)
 	if errMessage != "" {
 		fmt.Println("Cannot get rating connection.go accept_match")
-		return true
+		return false
 	}
 
 	match := Pending.Matches[matchID]
 
+	//isPlayersInGame function is located in socket.go
+	if isPlayersInGame(match.Name, match.Opponent) {
+		log.Println("Player is already in a game")
+		return false
+	}
+
 	if match.Opponent == "" { //only use this case for public matches
 		if match.GameType == "bullet" && (bullet < match.MinRating || bullet > match.MaxRating) {
 			//fmt.Println("Bullet Rating not in range.")
-			return true
+			return false
 		} else if match.GameType == "blitz" && (blitz < match.MinRating || blitz > match.MaxRating) {
 			//fmt.Println("Blitz Rating not in range.")
-			return true
+			return false
 		} else if match.GameType == "standard" && (standard < match.MinRating || standard > match.MaxRating) {
 			//fmt.Println("Standard Rating not in range.")
-			return true
+			return false
 		} else if match.GameType == "correspondence" && (correspondence < match.MinRating ||
 			correspondence > match.MaxRating) {
 			//fmt.Println("Correspondence Rating not in range.")
-			return true
+			return false
 		}
 	}
 
@@ -486,8 +493,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	table := Verify.AllTables[game.ID]
 	go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, game.WhitePlayer)
 
-	// a match was succesfully started so do not proceed in sending a new seek
-	return false
+	return true
 }
 
 // Assigns a match as bullet, blitz, standard or correspondence type,

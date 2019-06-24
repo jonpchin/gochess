@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"time"
 
@@ -569,119 +568,12 @@ func (c *Connection) ChessConnect() {
 			case "accept_rematch":
 
 				var match SeekMatch
-				var game ChessGame
 				if err := json.Unmarshal(message, &match); err != nil {
 					log.Println("Just receieved a message I couldn't decode:", string(message), err)
 					break
 				}
-				//isPlayersInGame function is located in socket.go
-				if isPlayersInGame(match.Name, match.Opponent) {
-					log.Println("Player is already in a game")
-					break
-				}
 
-				//checking to make sure both player's rating is in range, used as a backend rating check
-				errMessage, bullet, blitz, standard, correspondence := GetRating(match.Name)
-				if errMessage != "" {
-					log.Println("Cannot get rating")
-					break
-				}
-
-				game.Type = "chess_game"
-
-				//bullet, blitz or standard game type
-				game.GameType = Pending.Matches[match.MatchID].GameType
-
-				//seting up the game info such as white/black player, time control, etc
-				rand.Seed(time.Now().UnixNano())
-
-				//randomly selects both players to be white or black
-				if rand.Intn(2) == 0 {
-					game.WhitePlayer = match.Name
-					if game.GameType == "bullet" {
-						game.WhiteRating = bullet
-
-					} else if game.GameType == "blitz" {
-						game.WhiteRating = blitz
-
-					} else if game.GameType == "standard" {
-						game.WhiteRating = standard
-
-					} else {
-						game.WhiteRating = correspondence
-					}
-
-					game.BlackRating = Pending.Matches[match.MatchID].Rating
-					game.BlackPlayer = Pending.Matches[match.MatchID].Name
-
-				} else {
-					game.WhitePlayer = Pending.Matches[match.MatchID].Name
-					if game.GameType == "bullet" {
-						game.BlackRating = bullet
-
-					} else if game.GameType == "blitz" {
-						game.BlackRating = blitz
-
-					} else if game.GameType == "standard" {
-						game.BlackRating = standard
-
-					} else {
-						game.BlackRating = correspondence
-					}
-
-					game.WhiteRating = Pending.Matches[match.MatchID].Rating
-					game.BlackPlayer = match.Name
-				}
-				//White for white to move or Black for black to move, white won, black won, stalemate or draw.
-				game.Status = "White"
-
-				//no moves yet so nill/null
-				game.GameMoves = nil
-				game.TimeControl = Pending.Matches[match.MatchID].TimeControl
-				game.WhiteMinutes = Pending.Matches[match.MatchID].TimeControl
-				game.WhiteSeconds = 0
-				game.BlackMinutes = Pending.Matches[match.MatchID].TimeControl
-				game.BlackSeconds = 0
-				game.PendingDraw = false
-				game.Rated = Pending.Matches[match.MatchID].Rated
-
-				var start int = 0
-				for {
-					if _, ok := All.Games[start]; ok {
-						start++
-
-					} else {
-						break
-					}
-				}
-
-				game.ID = start
-				//used in backend to keep track of all pending games waiting for a player to accept
-				All.Games[start] = &game
-
-				//no longer need all the pending matches as game will be started
-				for key, value := range Pending.Matches {
-					//deletes all pending matches for either players
-					if value.Name == game.WhitePlayer || value.Name == game.BlackPlayer {
-						delete(Pending.Matches, key)
-					}
-				}
-
-				//intitalizes all the variables of the game
-				InitGame(game.ID, game.WhitePlayer, game.BlackPlayer)
-
-				//starting game for both players, this does NOT include spectators
-				for _, name := range Verify.AllTables[game.ID].observe.Names {
-					if client, ok := Active.Clients[name]; ok {
-						if err := websocket.JSON.Send(client, &game); err != nil {
-							log.Println(err)
-						}
-					}
-				}
-
-				//starting white's clock first, this goroutine will keep track of both players clock for this game
-				table := Verify.AllTables[game.ID]
-				go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, t.Name)
+				startPendingMatch(match.Name, match.MatchID)
 
 			case "draw_game":
 
