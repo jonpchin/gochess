@@ -356,15 +356,16 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	//checking to make sure player's rating is in range, used as a backend rating check
 	errMessage, bullet, blitz, standard, correspondence := GetRating(seekerName)
 	if errMessage != "" {
-		fmt.Println("Cannot get rating connection.go accept_match")
+		fmt.Println("Cannot get rating lobby.go startPendingMatch")
 		return false
 	}
 
 	match := Pending.Matches[matchID]
-
+	if match == nil {
+		return false
+	}
 	//isPlayersInGame function is located in socket.go
 	if isPlayersInGame(match.Name, match.Opponent) {
-		log.Println("Player is already in a game")
 		return false
 	}
 
@@ -387,6 +388,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 
 	//bullet, blitz, standard or correspondence game type
 	game.GameType = match.GameType
+	game.Type = "chess_game"
 
 	//seting up the game info such as white/black player, time control, etc
 	rand.Seed(time.Now().UnixNano())
@@ -482,9 +484,19 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	//intitalizes all the variables of the game
 	InitGame(game.ID, acceptmatch.Name, acceptmatch.TargetPlayer)
 
+	// Redirects when players in the lobby
 	for _, cs := range Chat.Lobby {
 		if err := websocket.JSON.Send(cs, &acceptmatch); err != nil {
-			log.Println(err)
+			fmt.Println(err)
+		}
+	}
+
+	// Redirects for players in the game room
+	for _, name := range Verify.AllTables[game.ID].observe.Names {
+		if client, ok := Active.Clients[name]; ok {
+			if err := websocket.JSON.Send(client, &game); err != nil {
+				fmt.Println(err)
+			}
 		}
 	}
 

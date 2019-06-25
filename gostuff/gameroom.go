@@ -557,7 +557,7 @@ func (c *Connection) ChessConnect() {
 				//used in backend to keep track of all pending seeks waiting for a player to accept
 				Pending.Matches[start] = &match
 
-				if _, ok := PrivateChat[match.Opponent]; ok {
+				if _, ok := Active.Clients[match.Opponent]; ok {
 					t.Type = "rematch"
 					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &t); err != nil {
 						// we could not send the message to a peer
