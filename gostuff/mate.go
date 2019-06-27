@@ -356,35 +356,36 @@ func (game *ChessGame) threeRep() bool {
 	var oneTar string
 
 	var length = len(game.GameMoves)
+	if length >= 8 {
+		eightSrc = game.GameMoves[length-1].S
+		eightTar = game.GameMoves[length-1].T
 
-	eightSrc = game.GameMoves[length-1].S
-	eightTar = game.GameMoves[length-1].T
+		sevenSrc = game.GameMoves[length-2].S
+		sevenTar = game.GameMoves[length-2].T
 
-	sevenSrc = game.GameMoves[length-2].S
-	sevenTar = game.GameMoves[length-2].T
+		sixSrc = game.GameMoves[length-3].S
+		sixTar = game.GameMoves[length-3].T
 
-	sixSrc = game.GameMoves[length-3].S
-	sixTar = game.GameMoves[length-3].T
+		fiveSrc = game.GameMoves[length-4].S
+		fiveTar = game.GameMoves[length-4].T
 
-	fiveSrc = game.GameMoves[length-4].S
-	fiveTar = game.GameMoves[length-4].T
+		fourSrc = game.GameMoves[length-5].S
+		fourTar = game.GameMoves[length-5].T
 
-	fourSrc = game.GameMoves[length-5].S
-	fourTar = game.GameMoves[length-5].T
+		threeSrc = game.GameMoves[length-6].S
+		threeTar = game.GameMoves[length-6].T
 
-	threeSrc = game.GameMoves[length-6].S
-	threeTar = game.GameMoves[length-6].T
+		twoSrc = game.GameMoves[length-7].S
+		twoTar = game.GameMoves[length-7].T
 
-	twoSrc = game.GameMoves[length-7].S
-	twoTar = game.GameMoves[length-7].T
+		oneSrc = game.GameMoves[length-8].S
+		oneTar = game.GameMoves[length-8].T
 
-	oneSrc = game.GameMoves[length-8].S
-	oneTar = game.GameMoves[length-8].T
-
-	if eightSrc == fourSrc && eightTar == fourTar && sevenSrc == threeSrc &&
-		sevenTar == threeTar && sixSrc == twoSrc && sixTar == twoTar &&
-		fiveSrc == oneSrc && fiveTar == oneTar {
-		return true
+		if eightSrc == fourSrc && eightTar == fourTar && sevenSrc == threeSrc &&
+			sevenTar == threeTar && sixSrc == twoSrc && sixTar == twoTar &&
+			fiveSrc == oneSrc && fiveTar == oneTar {
+			return true
+		}
 	}
 
 	return false

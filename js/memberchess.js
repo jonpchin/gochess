@@ -88,8 +88,7 @@ window.onload = function() {
 	var reviewMoves = token.moves;
 	
 	if (typeof reviewMoves !== "undefined"){
-		
-		reviewGame = true;
+
 		detectMobile(false); // Show notation when reviewing game
 			
 		var whiteName = token.white;
@@ -633,30 +632,6 @@ window.onload = function() {
 		}
 	}
 };
-function finishGame(color, gameFen){ //color is the color player that is checkmated
- 	//prevents sending null sock.send() when going over a game
-	if(reviewGame){
-		return;
-	}
-	var message = {
-		Type:   "game_over",
-		Name:   user,	
-		ID:     matchID,
-		Fen:    gameFen,
-		Status: color
-	}
-	sock.send(JSON.stringify(message));
-}
-	
-//game is now drawn
-function drawGame(){
-	var message = {
-			Type: "draw_game",
-			Name: user,	
-			ID: matchID
-	}
-	sock.send(JSON.stringify(message));
-}
 
 //this function is called from boardsetup.js
 function sendMove(src, dest, pawnPromotion, gameFen){

@@ -29,8 +29,6 @@ var sideToMove = "White";
 var togglePremove = getCookie("premove");
 var pieceTheme = getCookie("pieceTheme");
 var togglePromotion = getCookie("promote");
-//used to check if a player is viewing a game
-var reviewGame = false;
 
 //used when pausing the promotion so user can click which piece
 var skipPromotion = false;
@@ -147,15 +145,10 @@ var updateStatus = function() {
 	// checkmate?
 	if (game.in_checkmate() === true) {
 		status = 'Game over, ' + moveColor + ' is in checkmate.';
-		if(WhiteSide === user){ // prevents game over duplication being sent to server
-			finishGame(moveColor, game.fen()); //function call located in memberchess.js
-		}	
 	}
 	else if (game.in_draw() === true) { // draw, todo: need to message server when this is triggered
 		status = 'Game over, drawn position';
-		if(WhiteSide === user){ // prevents game over duplication being sent to server
-			drawGame(); //function call located in memberchess.js
-		}
+
 	}
   	else {   // game still on
 	    status = moveColor + ' to move';

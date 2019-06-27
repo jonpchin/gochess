@@ -140,6 +140,8 @@ func (c *Connection) ChessConnect() {
 					}
 				}
 
+				checkGameOver(t.Name, game.ID, game.Fen, chessgame.Status)
+
 			case "chat_private":
 
 				if len(reply) > 500 {
@@ -390,91 +392,6 @@ func (c *Connection) ChessConnect() {
 
 				wrapUpGame(game.ID)
 
-			case "game_over":
-
-				var game Fin
-
-				if err := json.Unmarshal(message, &game); err != nil {
-					log.Println("Just receieved a message I couldn't decode:", string(message), err)
-					break
-				}
-
-				var checkMate bool
-				var mater string
-				var mated string
-
-				chessgame := All.Games[game.ID]
-				table := Verify.AllTables[game.ID]
-
-				check, mate := isCheckMate(game.Fen)
-				if check && mate {
-					log.Println("Verified its mate")
-				} else if check {
-					log.Println("It's only a check, no mate.")
-				} else if mate {
-					log.Println("It is a stalemate.")
-				} else {
-					log.Println("It's not mate, check or stalemate.")
-				}
-
-				if game.Status == "White" {
-					checkMate = table.isWhiteInMate()
-					mater = chessgame.BlackPlayer
-					mated = chessgame.WhitePlayer
-
-				} else if game.Status == "Black" {
-					mater = chessgame.WhitePlayer
-					mated = chessgame.BlackPlayer
-					checkMate = table.isBlackInMate()
-
-				} else { //this should never happen, if it does most likely caused by tampering or its a bug
-					fmt.Println("Invalid game status for checking mate.")
-					break
-				}
-				//gets length of all the moves in the game
-				totalMoves := (len(chessgame.GameMoves) + 1) / 2
-
-				if checkMate {
-					log.Println(mater, "has checkmated", mated, "in", totalMoves, "moves.")
-				} else {
-					log.Println("No Checkmate for player, could be bug or cheat attempt by", mater, "on move", totalMoves, "against", mated)
-					if !mate {
-						fmt.Println("Both mates cannot be verified.")
-						break
-					} else {
-						log.Println("Conflincting checkmates", checkMate, check, mate)
-					}
-				}
-
-				var result float64
-
-				if game.Status == "White" { //then white was checkmated
-					chessgame.Status = "White is checkmated"
-					result = 0
-
-				} else { // then its black that was checkmated
-					chessgame.Status = "Black is checkmated"
-					result = 1.0
-				}
-
-				table.gameOver <- true
-
-				//notifying both players and spectators game is over
-				for _, name := range table.observe.Names {
-					if _, ok := Active.Clients[name]; ok {
-						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
-							log.Println(err)
-						}
-					}
-				}
-
-				//update ratings
-				if chessgame.Rated == "Yes" {
-					ComputeRating(t.Name, game.ID, chessgame.GameType, result)
-				}
-
-				wrapUpGame(game.ID)
-
 			case "resign":
 
 				var game GameMove
@@ -575,65 +492,122 @@ func (c *Connection) ChessConnect() {
 
 				startPendingMatch(match.Name, match.MatchID)
 
-			case "draw_game":
-
-				var game GameMove
-				if err := json.Unmarshal(message, &game); err != nil {
-					log.Println(err)
-				}
-
-				table := Verify.AllTables[game.ID]
-				chessgame := All.Games[game.ID]
-
-				check, mate := isCheckMate(game.Fen)
-				if mate && !check {
-					log.Println("It is a stalemate.")
-				} else {
-					//checking to see if the side whose turn it is to move is in stalemate
-					if table.whiteTurn {
-						if table.isWhiteStaleMate() || table.noMaterial() ||
-							chessgame.threeRep() || table.fiftyMoves(game.ID) {
-							log.Println("forced draw_game")
-						} else {
-							break
-						}
-					} else {
-
-						if table.isBlackStaleMate() || table.noMaterial() ||
-							chessgame.threeRep() || table.fiftyMoves(game.ID) {
-							log.Println("forced draw_game")
-						} else {
-							break
-						}
-					}
-				}
-
-				table.gameOver <- true
-				chessgame.Status = "Forced Draw"
-				//2 means the game is a draw and stored as an int in the database
-				chessgame.Result = 2
-
-				//rate.go
-				if chessgame.Rated == "Yes" {
-					ComputeRating(t.Name, game.ID, chessgame.GameType, 0.5)
-				}
-
-				//closing web socket on front end for self and opponent
-				for _, name := range table.observe.Names {
-					if client, ok := Active.Clients[name]; ok {
-						if err := websocket.Message.Send(client, reply); err != nil {
-							log.Println(err)
-						}
-					}
-				}
-				wrapUpGame(game.ID)
-
 			default:
 				fmt.Println("I'm not familiar with type " + t.Type)
 			}
 		} else {
 			log.Printf("IP %s Invalid websocket authentication in chess room.\n", c.clientIP)
 			return
+		}
+	}
+}
+
+// Detects if checkmate, stalemate, 50 move rule, 3 repetition or insufficent material to checkmate
+func checkGameOver(playerName string, gameID int, gameFen string, gameStatus string) {
+
+	var mater string
+	var mated string
+
+	chessgame := All.Games[gameID]
+	table := Verify.AllTables[gameID]
+
+	check, mate := isCheckMate(gameFen)
+
+	isDraw := false
+
+	if gameStatus == "White" {
+		mater = chessgame.BlackPlayer
+		mated = chessgame.WhitePlayer
+
+	} else if gameStatus == "Black" {
+		mater = chessgame.WhitePlayer
+		mated = chessgame.BlackPlayer
+
+	} else { //this should never happen, if it does most likely caused by tampering or its a bug
+		fmt.Println("Invalid game status for checking mate.")
+		return
+	}
+	//gets length of all the moves in the game
+	totalMoves := (len(chessgame.GameMoves) + 1) / 2
+
+	if check && mate {
+		log.Println(mater, "has checkmated", mated, "in", totalMoves, "moves.")
+		var result float64
+
+		if gameStatus == "White" { //then white was checkmated
+			chessgame.Status = "White is checkmated"
+			result = 0
+
+		} else { // then its black that was checkmated
+			chessgame.Status = "Black is checkmated"
+			result = 1.0
+		}
+
+		table.gameOver <- true
+
+		reply := struct {
+			Type string
+		}{
+			"game_over",
+		}
+
+		//notifying both players and spectators game is over
+		for _, name := range table.observe.Names {
+			if _, ok := Active.Clients[name]; ok {
+				if err := websocket.JSON.Send(Active.Clients[name], &reply); err != nil {
+					fmt.Println(err)
+				}
+			}
+		}
+
+		//update ratings
+		if chessgame.Rated == "Yes" {
+			ComputeRating(playerName, gameID, chessgame.GameType, result)
+		}
+
+		wrapUpGame(gameID)
+
+	} else if mate {
+		log.Println(mater, "has stalemated", mated, "in", totalMoves, "moves.")
+		isDraw = true
+		chessgame.Status = "Stalemate"
+	} else if table.noMaterial() {
+		log.Println(mater, "does not have sufficient mating material to mate", mated, "in", totalMoves, "moves.")
+		isDraw = true
+		chessgame.Status = "Insufficent mating material"
+	} else if chessgame.threeRep() {
+		log.Println(mater, "has triggered three reptition draw", mated, "in", totalMoves, "moves.")
+		isDraw = true
+		chessgame.Status = "Three repetition draw"
+	} else if table.fiftyMoves(gameID) {
+		log.Println(mater, "has triggered fifty move rule", mated, "in", totalMoves, "moves.")
+		isDraw = true
+		chessgame.Status = "Fifty move rule draw"
+	}
+
+	if isDraw {
+		table.gameOver <- true
+		//2 means the game is a draw and stored as an int in the database
+		chessgame.Result = 2
+
+		//rate.go
+		if chessgame.Rated == "Yes" {
+			ComputeRating(playerName, gameID, chessgame.GameType, 0.5)
+		}
+
+		reply := struct {
+			Type string
+		}{
+			"draw_game",
+		}
+
+		//closing web socket on front end for self and opponent
+		for _, name := range table.observe.Names {
+			if client, ok := Active.Clients[name]; ok {
+				if err := websocket.JSON.Send(client, &reply); err != nil {
+					log.Println("Can't send message for draw game isGameOver()", err)
+				}
+			}
 		}
 	}
 }
