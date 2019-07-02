@@ -28,7 +28,6 @@ var sideToMove = "White";
 //user preferences
 var togglePremove = getCookie("premove");
 var pieceTheme = getCookie("pieceTheme");
-var togglePromotion = getCookie("promote");
 
 //used when pausing the promotion so user can click which piece
 var skipPromotion = false;
@@ -77,19 +76,13 @@ var onDrop = function(source, target, piece) {
 			return;
 		}
 	}
-	if (togglePromotion === "false" && skipPromotion === false){
+	if (skipPromotion === false){
 		//check if its a pawn promotion
 		isPromote = checkPawnPromote(source, target, piece);
 		if(isPromote){
 			
 			//this function will set the pawPromotion global variable
 			showPawnPromotionPopup(source, target, color);
-			
-			//the close box was clicked so it returns back to the initital position
-			if(pawnPromotion === "x"){
-				//reseting the default pawn promotion to queen
-				pawnPromotion = "q";
-			}
 			return;
 		}
 	}
@@ -98,7 +91,7 @@ var onDrop = function(source, target, piece) {
 	var move = game.move({
     	from: source,
     	to: target,
-    	promotion: pawnPromotion // NOTE: always promote to a queen for example simplicity
+    	promotion: pawnPromotion
   	});
 	
   	// illegal move
@@ -124,6 +117,9 @@ var onDrop = function(source, target, piece) {
 		board.position(game.fen());
 		skipPromotion = false;
 	}
+
+	// Return pawn promotion back to original 
+	pawnPromotion = "";
 };
 
 // update the board position after the piece snap 
@@ -274,7 +270,7 @@ function showPawnPromotionPopup(source, target, color){
 	}
 	
 	document.getElementById('closeModal').onclick = function() {
-	    pawnPromotion = 'x';
+	    pawnPromotion = "";
 		modal.style.display = "none";
 	}
 }

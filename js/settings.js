@@ -25,7 +25,6 @@ function setupCookies() {
 	var togglePremove = getCookie("premove");
 	var toggleChat = getCookie("chat");
 	var toggleSpectate = getCookie("spectate");
-	var togglePromote = getCookie("promote");
 	var pieceTheme = getCookie("pieceTheme");
 	var boardColor = getCookie("boardColor");
 
@@ -57,13 +56,6 @@ function setupCookies() {
     }
 	else if(toggleSpectate === "false"){ //if its true then leave as default otherwise set it as false
 		document.getElementById("toggleSpectate").checked = false;
-	}
-	
-	if (togglePromote === "") { //if no cookie exist then set it to true
-        setCookie("promote", "true", 30);
-    }
-	else if(togglePromote === "false"){ //if its true then leave as default otherwise set it as false
-		document.getElementById("togglePromote").checked = false;
 	}
 	
 	if (pieceTheme === "") { //if no cookie exist then set it to true
@@ -132,14 +124,6 @@ document.getElementById('toggleSpectate').onclick = function(){
 	}
 	else{	
 		setCookie("spectate",  "true", 30);	
-	}
-}
-document.getElementById('togglePromote').onclick = function(){
-	if(document.getElementById("togglePromote").checked === false){
-		setCookie("promote", "false", 30);
-	}
-	else{	
-		setCookie("promote",  "true", 30);	
 	}
 }
 
