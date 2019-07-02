@@ -106,7 +106,6 @@ func (c *Connection) LobbyConnect() {
 
 			//check if player already has a game started, if there is a game in progress alert player
 			if isPlayersInGame(c.username, match.Opponent) {
-				fmt.Println("Player is already in a game!")
 				t.Type = "alert"
 				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
 					// we could not send the message to a peer
