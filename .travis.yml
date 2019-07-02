@@ -3,31 +3,12 @@ language: go
 go:
 - 1.10.1
 
-services:
-- mysql
-
 env:
 - GOCHESSENV=travis
 
 sudo: true
 dist: trusty
 
-before_install:
-- go get github.com/sclevine/agouti 
-- sudo apt-get update
-- bash ./_travis/data/travis-install-mysql-5.7.sh
-- mysql --version
-- pwd
-- cd ./_travis/data
-- openssl aes-256-cbc -K $encrypted_bec7680ae95b_key -iv $encrypted_bec7680ae95b_iv
-  -in travis.tar.enc -out travis.tar -d
-- tar xvf travis.tar
-- bash ./importTravisTemplate.sh
-- bash ./importTravisTables.sh
-- cd ../../
-
 script:
 - go build
-- sudo ./gochess &
 - go test ./testing
-- go test ./_travis

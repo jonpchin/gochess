@@ -250,7 +250,6 @@ func (table *Table) isBlackStaleMate() bool {
 					fmt.Println("Mate.go blackStalemate not valid piece")
 				}
 			}
-
 		}
 	}
 	return true
