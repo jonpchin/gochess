@@ -253,9 +253,11 @@ func (c *Connection) ChessConnect() {
 				}
 
 				table := Verify.AllTables[game.ID]
+				chessgame.Type = "abort_game"
+				chessgame.Status = "Game aborted by " + t.Name
 				for _, name := range table.observe.Names {
 					if _, ok := Active.Clients[name]; ok {
-						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+						if err := websocket.JSON.Send(Active.Clients[name], &chessgame); err != nil {
 							log.Println("error sending abort message", err)
 						}
 					}
@@ -376,10 +378,11 @@ func (c *Connection) ChessConnect() {
 				chessgame.Status = "Agreed Draw"
 				//2 means the game is a draw and stored as an int in the database
 				chessgame.Result = 2
+				chessgame.Type = "accept_draw"
 
 				for _, name := range table.observe.Names {
 					if _, ok := Active.Clients[name]; ok {
-						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+						if err := websocket.JSON.Send(Active.Clients[name], &chessgame); err != nil {
 							log.Println(err)
 						}
 					}
@@ -400,6 +403,7 @@ func (c *Connection) ChessConnect() {
 				}
 				var result float64
 				chessgame := All.Games[game.ID]
+				chessgame.Type = "resign"
 
 				if t.Name == chessgame.WhitePlayer {
 					chessgame.Status = "White Resigned"
@@ -422,7 +426,7 @@ func (c *Connection) ChessConnect() {
 				//letting both players and spectators know that a resignation occured
 				for _, name := range table.observe.Names {
 					if _, ok := Active.Clients[name]; ok {
-						if err := websocket.Message.Send(Active.Clients[name], reply); err != nil {
+						if err := websocket.JSON.Send(Active.Clients[name], &chessgame); err != nil {
 							log.Println(err)
 						}
 					}
@@ -544,17 +548,12 @@ func checkGameOver(playerName string, gameID int, gameFen string, gameStatus str
 		}
 
 		table.gameOver <- true
-
-		reply := struct {
-			Type string
-		}{
-			"game_over",
-		}
+		chessgame.Type = "game_over"
 
 		//notifying both players and spectators game is over
 		for _, name := range table.observe.Names {
 			if _, ok := Active.Clients[name]; ok {
-				if err := websocket.JSON.Send(Active.Clients[name], &reply); err != nil {
+				if err := websocket.JSON.Send(Active.Clients[name], &chessgame); err != nil {
 					fmt.Println(err)
 				}
 			}
@@ -595,20 +594,18 @@ func checkGameOver(playerName string, gameID int, gameFen string, gameStatus str
 			ComputeRating(playerName, gameID, chessgame.GameType, 0.5)
 		}
 
-		reply := struct {
-			Type string
-		}{
-			"draw_game",
-		}
+		chessgame.Type = "draw_game"
 
 		//closing web socket on front end for self and opponent
 		for _, name := range table.observe.Names {
 			if client, ok := Active.Clients[name]; ok {
-				if err := websocket.JSON.Send(client, &reply); err != nil {
+				if err := websocket.JSON.Send(client, &chessgame); err != nil {
 					log.Println("Can't send message for draw game isGameOver()", err)
 				}
 			}
 		}
+
+		wrapUpGame(gameID)
 	}
 }
 
