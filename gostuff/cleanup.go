@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -19,29 +20,35 @@ func Cleanup() {
 	message.Type = "massMessage"
 	message.Text = "ATTENTION: Web server is shutting down NOW for maintenance, brace for impact..."
 
-	for _, value := range Active.Clients {
-		if err := websocket.JSON.Send(value, &message); err != nil {
-			// we could not send the message to a peer
-			fmt.Println("cleanup.go CleanUp() error 1  Could not send message to ", err)
+	for username, value := range Active.Clients {
+		if strings.Contains(username, "guest") == false {
+			if err := websocket.JSON.Send(value, &message); err != nil {
+				// we could not send the message to a peer
+				fmt.Println("cleanup.go CleanUp() error 1  Could not send message to ", err)
+			}
 		}
 	}
 
-	for _, value := range Chat.Lobby {
-		if err := websocket.JSON.Send(value, &message); err != nil {
-			// we could not send the message to a peer
-			fmt.Println("cleanup.go CleanUp() error 2  Could not send message to ", err)
+	for username, value := range Chat.Lobby {
+		if strings.Contains(username, "guest") == false {
+			if err := websocket.JSON.Send(value, &message); err != nil {
+				// we could not send the message to a peer
+				fmt.Println("cleanup.go CleanUp() error 2  Could not send message to ", err)
+			}
 		}
 	}
 
 	for _, game := range All.Games {
-		//now store game in MySQL database
-		allMoves, err := json.Marshal(game.GameMoves)
-		if err == nil {
-			//gets length of all the moves in the game
-			totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
-			saveGame(totalMoves, allMoves, game)
-		} else {
-			fmt.Println("Error in Cleanup.go cleanup 1")
+		if strings.Contains(game.WhitePlayer, "guest") == false && strings.Contains(game.BlackPlayer, "guest") == false {
+			//now store game in MySQL database
+			allMoves, err := json.Marshal(game.GameMoves)
+			if err == nil {
+				//gets length of all the moves in the game
+				totalMoves := (len(All.Games[game.ID].GameMoves) + 1) / 2
+				saveGame(totalMoves, allMoves, game)
+			} else {
+				fmt.Println("Error in Cleanup.go cleanup 1")
+			}
 		}
 	}
 	fmt.Println("All games are saved. Web server is shutting down in 1 second.")
