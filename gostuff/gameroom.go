@@ -335,12 +335,20 @@ func (c *Connection) ChessConnect() {
 					log.Println(t.Name, " tried to offer draw while spectating")
 					return
 				}
-				chessgame.PendingDraw = true
 
-				//offering draw to opponent if he is still connected
-				if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
-					if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
-						log.Println(err)
+				table := Verify.AllTables[game.ID]
+
+				// Check for fifty move rule
+				if table.checkMovesForDraw(game.ID, 75) {
+					chessgame.drawGame(game.ID, t.Name)
+				} else {
+					chessgame.PendingDraw = true
+
+					//offering draw to opponent if he is still connected
+					if _, ok := Active.Clients[PrivateChat[t.Name]]; ok { // send data if other guy is still connected
+						if err := websocket.Message.Send(Active.Clients[PrivateChat[t.Name]], reply); err != nil {
+							log.Println(err)
+						}
 					}
 				}
 
@@ -517,8 +525,6 @@ func checkGameOver(playerName string, gameID int, gameFen string, gameStatus str
 
 	check, mate := isCheckMate(gameFen)
 
-	isDraw := false
-
 	if gameStatus == "White" {
 		mater = chessgame.BlackPlayer
 		mated = chessgame.WhitePlayer
@@ -568,45 +574,47 @@ func checkGameOver(playerName string, gameID int, gameFen string, gameStatus str
 
 	} else if mate {
 		log.Println(mater, "has stalemated", mated, "in", totalMoves, "moves.")
-		isDraw = true
 		chessgame.Status = "Stalemate"
+		chessgame.drawGame(gameID, playerName)
 	} else if table.noMaterial() {
 		log.Println(mater, "does not have sufficient mating material to mate", mated, "in", totalMoves, "moves.")
-		isDraw = true
 		chessgame.Status = "Insufficent mating material"
+		chessgame.drawGame(gameID, playerName)
 	} else if chessgame.threeRep() {
 		log.Println(mater, "has triggered three reptition draw", mated, "in", totalMoves, "moves.")
-		isDraw = true
 		chessgame.Status = "Three repetition draw"
-	} else if table.fiftyMoves(gameID) {
-		log.Println(mater, "has triggered fifty move rule", mated, "in", totalMoves, "moves.")
-		isDraw = true
-		chessgame.Status = "Fifty move rule draw"
+		chessgame.drawGame(gameID, playerName)
+	} else if table.checkMovesForDraw(gameID, 75) {
+		log.Println(mater, "has triggered seventy-five move rule", mated, "in", totalMoves, "moves.")
+		chessgame.Status = "Seventy five move rule draw"
+		chessgame.drawGame(gameID, playerName)
+	}
+}
+
+func (chessgame ChessGame) drawGame(gameID int, playerName string) {
+
+	table := Verify.AllTables[gameID]
+	table.gameOver <- true
+	//2 means the game is a draw and stored as an int in the database
+	chessgame.Result = 2
+
+	//rate.go
+	if chessgame.Rated == "Yes" {
+		ComputeRating(playerName, gameID, chessgame.GameType, 0.5)
 	}
 
-	if isDraw {
-		table.gameOver <- true
-		//2 means the game is a draw and stored as an int in the database
-		chessgame.Result = 2
+	chessgame.Type = "draw_game"
 
-		//rate.go
-		if chessgame.Rated == "Yes" {
-			ComputeRating(playerName, gameID, chessgame.GameType, 0.5)
-		}
-
-		chessgame.Type = "draw_game"
-
-		//closing web socket on front end for self and opponent
-		for _, name := range table.observe.Names {
-			if client, ok := Active.Clients[name]; ok {
-				if err := websocket.JSON.Send(client, &chessgame); err != nil {
-					log.Println("Can't send message for draw game isGameOver()", err)
-				}
+	//closing web socket on front end for self and opponent
+	for _, name := range table.observe.Names {
+		if client, ok := Active.Clients[name]; ok {
+			if err := websocket.JSON.Send(client, &chessgame); err != nil {
+				log.Println("Can't send message for draw game isGameOver()", err)
 			}
 		}
-
-		wrapUpGame(gameID)
 	}
+
+	wrapUpGame(gameID)
 }
 
 // Cleanup function to store game in database and delete from memory

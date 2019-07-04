@@ -390,15 +390,15 @@ func (game *ChessGame) threeRep() bool {
 	return false
 }
 
-//checks if fifty moves have been made without a pawn push or capture
-func (table *Table) fiftyMoves(gameID int) bool {
+//checks if fifty or seventy-five moves have been made without a pawn push or capture
+func (table *Table) checkMovesForDraw(gameID int, moves int) bool {
 	var thisMove int
 	thisMove = (len(All.Games[gameID].GameMoves) + 1) / 2
-	//no capture within 50 moves
-	if (thisMove - table.lastCapture) >= 50 {
+	//no capture within # of moves
+	if (thisMove - table.lastCapture) >= moves {
 		return true
-		//no pawn move within 50 moves
-	} else if (thisMove - table.pawnMove) >= 50 {
+		//no pawn move within # of moves
+	} else if (thisMove - table.pawnMove) >= moves {
 		return true
 	}
 	return false
