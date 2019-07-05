@@ -76,7 +76,7 @@ func (c *Connection) ChessConnect() {
 
 				err = chessgame.Validator.MoveStr(gameMove.S + gameMove.T + gameMove.P)
 				if err != nil {
-					fmt.Println("Can't decode using notil validator", err, gameMove.S+gameMove.T+gameMove.P)
+					fmt.Println("Can't decode using nontil validator", err, gameMove.S+gameMove.T+gameMove.P)
 					break
 				}
 

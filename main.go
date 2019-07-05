@@ -101,8 +101,6 @@ func main() {
 	http.Handle("/sound/", http.FileServer(currentDir))
 
 	http.Handle("/mudserver", websocket.Handler(mud.EnterMud))
-	//http.Handle("/server", websocket.Handler(gostuff.EnterLobby))
-	//http.Handle("/chess", websocket.Handler(gostuff.EnterChess))
 
 	// Allows non browser client like Android to connect to websocket https://stackoverflow.com/questions/19708330/serving-a-websocket-in-go
 	http.HandleFunc("/server",
@@ -128,10 +126,8 @@ func main() {
 	if len(os.Args) > 1 {
 		certPath = "secret/fullchain.pem" //chain.pem and cert.pem combined
 		keyPath = "secret/privkey.pem"
-	} else if gostuff.IsEnvironmentTravis() {
-		certPath = "_travis/data/device.crt"
-		keyPath = "_travis/data/device.key"
 	}
+
 	//gostuff.PrintMemoryStats()
 	//gostuff.OneTimeParseTemplates()
 	gostuff.SetupSecretDir()
@@ -199,10 +195,8 @@ func main() {
 	//gostuff.FetchNewsSources()
 	//gostuff.ReadAllNews()
 	//gostuff.UpdateNewsFromConfig()
-	//gostuff.FakeDataForTravis()
 
 	//notes.GetAllClosedCommits()
-	//lichess.GetAccount()
 
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
