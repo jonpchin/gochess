@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/notnil/chess"
 	"golang.org/x/net/websocket"
 )
 
@@ -441,9 +440,6 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	game.CountryWhite = GetCountry(game.WhitePlayer)
 	game.CountryBlack = GetCountry(game.BlackPlayer)
 
-	// Long AlgebraicNotation Notation
-	game.Validator = chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}))
-
 	// Guests should always be unrated games
 	if strings.Contains(game.WhitePlayer, "guest") || strings.Contains(game.BlackPlayer, "guest") {
 		game.Rated = "No"
@@ -491,7 +487,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	}
 
 	// Redirects for players in the game room
-	for _, name := range Verify.AllTables[game.ID].observe.Names {
+	for _, name := range All.Games[game.ID].observe.Names {
 		if client, ok := Active.Clients[name]; ok {
 			if err := websocket.JSON.Send(client, &game); err != nil {
 				fmt.Println(err)
@@ -501,7 +497,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 
 	//starting white's clock first, this goroutine will keep track of both players clock for this game
 	// the name of person passed in does not matter as long as its one of the two players
-	table := Verify.AllTables[game.ID]
+	table := All.Games[game.ID]
 	go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, game.WhitePlayer)
 
 	return true

@@ -511,7 +511,7 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 	}
 
 	game.Type = "chess_game"
-	var holder []Move
+	var holder []GameMove
 
 	storage := []byte(moves)
 	err = json.Unmarshal(storage, &holder)
@@ -537,14 +537,14 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 	//intitalizes all the variables of the game
 	InitGame(game.ID, game.WhitePlayer, game.BlackPlayer)
 
-	var result bool
+	table := All.Games[game.ID]
 
 	for i := 0; i < len(game.GameMoves); i++ {
-		result = ChessVerify(game.GameMoves[i].S, game.GameMoves[i].T, game.GameMoves[i].P, game.ID)
-		if result == false {
-			log.Println("something went wrong in move validation in fetchSavedGame of saved game id ", game.ID)
+		err = table.Validator.MoveStr(game.GameMoves[i].S + game.GameMoves[i].T + game.GameMoves[i].P)
+		if err != nil {
+			log.Println("something went wrong in move validation in fetchSavedGame of saved game id ",
+				game.GameMoves[i].S+game.GameMoves[i].T+game.GameMoves[i].P, game.ID)
 			//undo all game setup and break out
-			delete(Verify.AllTables, game.ID)
 			delete(All.Games, game.ID)
 			return false
 		}
@@ -553,7 +553,6 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 	PrivateChat[game.BlackPlayer] = game.WhitePlayer
 
 	//starting white's clock first, this goroutine will keep track of both players clock for this game
-	table := Verify.AllTables[game.ID]
 	go table.StartClock(game.ID, game.WhiteMinutes, game.WhiteSeconds, user)
 
 	//delete saved game from database now that its in memory

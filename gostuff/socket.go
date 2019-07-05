@@ -217,7 +217,7 @@ func removeViewer(name string, id int) []string {
 
 	var remainingViewers []string
 
-	for _, value := range Verify.AllTables[id].observe.Names {
+	for _, value := range All.Games[id].observe.Names {
 		if name != value {
 			remainingViewers = append(remainingViewers, value)
 		}

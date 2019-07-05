@@ -35,7 +35,7 @@ type GameAnalysis struct {
 
 // Uses stockfish engine to analyze game, returns a GameAnalysis that can be marshalled and sent to front end
 // that match the engine for the given depth
-func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMoves []Move) {
+func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMoves []GameMove) {
 
 	engine := startEngine(nil)
 
@@ -198,7 +198,7 @@ func GameAnalysisById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var gochessMoves []Move
+	var gochessMoves []GameMove
 
 	temp := []byte(moves)
 	err = json.Unmarshal(temp, &gochessMoves)

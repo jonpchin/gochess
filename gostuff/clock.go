@@ -9,7 +9,7 @@ import (
 )
 
 // keep track of both sides of the clock, when function exits the game is over
-func (table *Table) StartClock(gameID int, minutes int, seconds int, name string) {
+func (table *ChessGame) StartClock(gameID int, minutes int, seconds int, name string) {
 
 	timerChan := time.NewTicker(time.Second).C
 
@@ -100,7 +100,6 @@ func (game *ChessGame) whiteTimeout(name string) {
 	}
 
 	delete(All.Games, game.ID)
-	delete(Verify.AllTables, game.ID)
 }
 
 // when black's clock runs out save database information and cleanup game
@@ -139,5 +138,4 @@ func (game *ChessGame) blackTimeout(name string) {
 	}
 
 	delete(All.Games, game.ID)
-	delete(Verify.AllTables, game.ID)
 }

@@ -202,12 +202,11 @@ window.onload = function() {
 
 		switch (json.Type) {
 			case "send_move":
-			
 				// see if the move is legal
 			    var move = game.move({
-				    from: json.Source,
-				    to: json.Target,
-				    promotion: json.Promotion
+				    from: json.S,
+				    to: json.T,
+				    promotion: json.P
 			    });
 			
 			    // illegal move
@@ -640,11 +639,12 @@ function sendMove(src, dest, pawnPromotion, gameFen){
 		Type:      "send_move",
 		Name:      user,	
 		ID:        matchID,
-		Source:    src,
-		Target:    dest,
+		S:    src,
+		T:    dest,
 		Fen:       gameFen,
-		Promotion: pawnPromotion
+		P: pawnPromotion
 	}
+
     sock.send(JSON.stringify(message));
 
 	whiteClock.pause();

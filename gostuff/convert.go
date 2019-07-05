@@ -24,7 +24,7 @@ type ConvertChessGame struct {
 	BlackElo  string
 	ECO       string
 	EventDate string
-	Moves     []Move
+	Moves     []GameMove
 }
 
 type NamesAndID struct {
@@ -101,7 +101,7 @@ func convertPGN(file string) {
 		newGame.EventDate = game.Tags["EventDate"]
 
 		var temp string
-		newGame.Moves = make([]Move, len(game.Moves))
+		newGame.Moves = make([]GameMove, len(game.Moves))
 		for key, move := range game.Moves {
 
 			temp = move.String()[0:2]
@@ -179,20 +179,21 @@ func VerifyGrandmasterGames(total int) bool {
 			return false
 		}
 
-		var move []Move
+		var move []GameMove
 		if err := json.Unmarshal([]byte(allMoves), &move); err != nil {
 			fmt.Println("Just receieved a message I couldn't decode:", allMoves, err)
 			break
 		}
-		var legal bool
 
 		InitGame(gameID, "", "")
-
+		table := All.Games[gameID]
 		for j := 0; j < len(move); j++ {
-			legal = ChessVerify(move[j].S, move[j].T, move[j].P, gameID)
+
+			err = table.Validator.MoveStr(move[j].S + move[j].T + move[j].P)
+
 			totalMoves := (j / 2) + 1
 			// The people notating game ID 8035 seems to have made a mistake and notated an illegal move
-			if legal == false && gameID != 8035 {
+			if err != nil && gameID != 8035 {
 				fmt.Println("Illegal move on turn ", totalMoves, move[j].S, " to ", move[j].T, "at game ID", gameID)
 				return false
 			}
