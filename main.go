@@ -16,7 +16,6 @@ import (
 
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
-	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
 )
@@ -71,7 +70,7 @@ func main() {
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
-	//http.HandleFunc("/drawchart", plot.DrawChart)
+	//http.HandleFunc("/drawchart", DrawChart)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -141,7 +140,7 @@ func main() {
 		// this is only temporarily until all the tables are imported
 		if proceed && gostuff.IsEnvironmentTravis() == false &&
 			gostuff.IsEnvironmentAppVeyor() == false {
-			//plot.SetupCharts()
+			//SetupCharts()
 			//setting up cron job
 			gostuff.StartCron()
 
@@ -183,7 +182,7 @@ func main() {
 	//gostuff.ReadAllNews()
 	//gostuff.UpdateNewsFromConfig()
 
-	//notes.GetAllClosedCommits()
+	//GetAllClosedCommits()
 
 	go func() {
 		if err := http.ListenAndServeTLS(":443", certPath, keyPath, nil); err != nil {
@@ -469,8 +468,8 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 			Country          string
 		}{
 			inputName,
-			plot.UseGoogleCharts,
-			plot.UseFrappeCharts,
+			gostuff.UseGoogleCharts,
+			gostuff.UseFrappeCharts,
 			"Profile",
 			bulletN,
 			blitzN,

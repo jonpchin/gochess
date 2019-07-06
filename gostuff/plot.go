@@ -1,4 +1,4 @@
-package plot
+package gostuff
 
 import (
 	"bufio"
@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/jonpchin/gochess/gostuff"
 	chart "github.com/wcharczuk/go-chart"
 )
 
@@ -19,26 +18,26 @@ var (
 
 func SetupCharts() {
 	if UseFrappeCharts {
-		gostuff.ReplaceString("var useFrappeCharts = false;", "var useFrappeCharts = true;",
+		ReplaceString("var useFrappeCharts = false;", "var useFrappeCharts = true;",
 			"js/profile.js")
-		gostuff.ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
+		ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
 			"js/profile.js")
 	} else if UseGoogleCharts {
-		gostuff.ReplaceString("var useGoogleCharts = false;", "var useGoogleCharts = true;",
+		ReplaceString("var useGoogleCharts = false;", "var useGoogleCharts = true;",
 			"js/profile.js")
-		gostuff.ReplaceString("var useFrappeCharts = true;", "var useFrappeCharts = false;",
+		ReplaceString("var useFrappeCharts = true;", "var useFrappeCharts = false;",
 			"js/profile.js")
 	} else { // Then use drawchart
-		gostuff.ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
+		ReplaceString("var useGoogleCharts = true;", "var useGoogleCharts = false;",
 			"js/profile.js")
-		gostuff.ReplaceString("var useFrappeCharts = true;", "var useFrappeCharts = false;",
+		ReplaceString("var useFrappeCharts = true;", "var useFrappeCharts = false;",
 			"js/profile.js")
 	}
 }
 
 func DrawChart(w http.ResponseWriter, r *http.Request) {
 
-	valid := gostuff.ValidateCredentials(w, r)
+	valid := ValidateCredentials(w, r)
 
 	if valid == false {
 		return
@@ -63,13 +62,13 @@ func DrawChart(w http.ResponseWriter, r *http.Request) {
 
 	for _, value := range ratingList {
 
-		ratingHistory, pass, err := gostuff.GetRatingHistory(username.Value, value)
+		ratingHistory, pass, err := GetRatingHistory(username.Value, value)
 		if pass == false {
 			log.Println(err)
 			return
 		}
 
-		var ratingMemory []gostuff.RatingDate
+		var ratingMemory []RatingDate
 		var ratingDates []time.Time
 		var ratings []float64
 

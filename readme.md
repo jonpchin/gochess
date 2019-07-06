@@ -68,6 +68,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>8. robfig/cron</p>
 <p>9. gopkg.in/gomail.v2 </p>
 <p>10. golang.org/x/crypto/scrypt </p>
+<p>11. github.com/notnil/chess </p>
 <p>And many more...</p>
 
 <br>

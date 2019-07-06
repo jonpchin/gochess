@@ -1,4 +1,4 @@
-package notes
+package gostuff
 
 import (
 	"context"
