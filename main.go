@@ -13,9 +13,9 @@ import (
 
 	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/jonpchin/gochess/goforum"
 	"github.com/jonpchin/gochess/gostuff"
-	"github.com/jonpchin/gochess/mud"
 	"github.com/jonpchin/gochess/plot"
 
 	"golang.org/x/net/websocket"
@@ -72,7 +72,6 @@ func main() {
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
 	//http.HandleFunc("/drawchart", plot.DrawChart)
-	http.HandleFunc("/mudserver/mud", mudConsole)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
@@ -95,12 +94,10 @@ func main() {
 	http.Handle("/css/", cacheControl(http.FileServer(currentDir), "259200"))
 	http.Handle("/img/", http.FileServer(currentDir))
 	http.Handle("/js/", cacheControl(http.FileServer(currentDir), "86400"))
-	http.Handle("/mudjs/", cacheControl(http.FileServer(currentDir), "86400"))
+
 	http.Handle("/third-party/", cacheControl(http.FileServer(currentDir), "432000"))
 	http.Handle("/data/", http.FileServer(currentDir))
 	http.Handle("/sound/", http.FileServer(currentDir))
-
-	http.Handle("/mudserver", websocket.Handler(mud.EnterMud))
 
 	// Allows non browser client like Android to connect to websocket https://stackoverflow.com/questions/19708330/serving-a-websocket-in-go
 	http.HandleFunc("/server",
@@ -167,16 +164,7 @@ func main() {
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			gostuff.InitForum()
-			//mud.ConnectDb()
-			//worldId := "0"
-			//mud.LoadWorldFile(worldId)
-			//mud.ParseKnownCommands()
-			//mud.GenerateEquipmentStats()
-			//mud.LoadMapsIntoMemory(worldId)
-			//mud.CreateWorld()
-			//mud.SaveMetadataToFile("1")
-			//mud.PrintWorldToFile("1")
-			//weather.FetchWeather()
+
 			//gostuff.RemoveGameHistory(days)
 		}
 
@@ -189,7 +177,6 @@ func main() {
 			gostuff.Cleanup()
 			os.Exit(1)
 		}()
-		//fmt.Println("dagger is: ", mud.GetRandomDaggerName())
 		//gostuff.CheckNullInTable("rating")
 	}()
 	//gostuff.FetchNewsSources()
@@ -767,40 +754,6 @@ func logs(w http.ResponseWriter, r *http.Request) {
 			gostuff.Show404Page(w, r)
 		}
 	}
-}
-
-func mudConsole(w http.ResponseWriter, r *http.Request) {
-	if isAuthorized(w, r) {
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		var mud = template.Must(template.ParseFiles("mud.html"))
-		username, _ := r.Cookie("username")
-		sessionID, _ := r.Cookie("sessionID")
-
-		p := struct {
-			User      string
-			SessionID string
-		}{
-			username.Value,
-			sessionID.Value,
-		}
-
-		if err := mud.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
-func thankyou(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	d := struct {
-		PageTitle string
-	}{
-		"Thank you",
-	}
-	gostuff.ParseTemplates(d, w, "register.html", []string{"templates/thankyouTmplate.html",
-		"templates/memberHeader.html"}...)
-
 }
 
 func robot(w http.ResponseWriter, r *http.Request) {
