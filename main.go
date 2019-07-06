@@ -62,7 +62,6 @@ func main() {
 	http.HandleFunc("/engine", engine)
 	http.HandleFunc("/news", news)
 	http.HandleFunc("/logs", logs)
-	http.HandleFunc("/runtest", runJsTests)
 	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/createthread", createThread)
 	http.HandleFunc("/sendForumPost", goforum.SendForumPost)
@@ -609,12 +608,6 @@ func saved(w http.ResponseWriter, r *http.Request) {
 
 		gostuff.ParseTemplates(p, w, "saved.html", []string{"templates/savedTemplate.html",
 			"templates/memberHeader.html"}...)
-	}
-}
-
-func runJsTests(w http.ResponseWriter, r *http.Request) {
-	if isAuthorized(w, r) {
-		http.ServeFile(w, r, "runJsTests.html")
 	}
 }
 
