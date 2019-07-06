@@ -52,8 +52,7 @@ var onDragStart = function(source, piece, position, orientation) {
   		preMoveYes = false;	
 	}
 
-	if (game.game_over() === true ||
-		chessGameOver === true ||
+	if (chessGameOver === true ||
     	(WhiteSide === user && piece.search(/^b/) !== -1) ||
     	(BlackSide === user && piece.search(/^w/) !== -1)) {
     	return false;

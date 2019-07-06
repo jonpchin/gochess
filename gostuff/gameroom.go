@@ -335,6 +335,7 @@ func (c *Connection) ChessConnect() {
 
 				table := All.Games[game.ID]
 				table.Validator.Draw(chess.FiftyMoveRule)
+				table.Validator.Draw(chess.DrawOffer)
 				// Check for fifty move rule
 				if table.Validator.Method() == chess.FiftyMoveRule && table.Validator.Outcome() == chess.Draw {
 					chessgame.Status = "Fifty move rule draw"
@@ -597,9 +598,13 @@ func checkGameOver(playerName string, gameID int, gameFen string, gameStatus str
 		log.Println(mater, "does not have sufficient mating material to mate", mated, "in", totalMoves, "moves.")
 		chessgame.Status = "Insufficent mating material"
 		chessgame.drawGame(gameID, playerName)
-	} else if table.Validator.Method() == chess.ThreefoldRepetition {
+	} else if table.Validator.Method() == chess.FivefoldRepetition {
+		log.Println(mater, "has triggered five fold reptition draw", mated, "in", totalMoves, "moves.")
+		chessgame.Status = "Five fold repetition draw"
+	} else if isThreeFoldDraw(table.Validator.EligibleDraws()) {
 		log.Println(mater, "has triggered three reptition draw", mated, "in", totalMoves, "moves.")
 		chessgame.Status = "Three repetition draw"
+
 		chessgame.drawGame(gameID, playerName)
 	} else if table.Validator.Method() == chess.SeventyFiveMoveRule && table.Validator.Outcome() == chess.Draw {
 		log.Println(mater, "has triggered seventy-five move rule", mated, "in", totalMoves, "moves.")
@@ -608,7 +613,25 @@ func checkGameOver(playerName string, gameID int, gameFen string, gameStatus str
 	}
 }
 
-func (chessgame ChessGame) drawGame(gameID int, playerName string) {
+func isThreeFoldDraw(methods []chess.Method) bool {
+	threeFold := false
+	drawOffer := false
+
+	for _, method := range methods {
+		if method == chess.ThreefoldRepetition {
+			threeFold = true
+		}
+		if method == chess.DrawOffer {
+			drawOffer = true
+		}
+	}
+	if threeFold && drawOffer {
+		return true
+	}
+	return false
+}
+
+func (chessgame *ChessGame) drawGame(gameID int, playerName string) {
 
 	table := All.Games[gameID]
 	table.gameOver <- true
