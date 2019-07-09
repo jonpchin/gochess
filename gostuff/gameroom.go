@@ -84,6 +84,12 @@ func (c *Connection) ChessConnect() {
 					gameMove.Fen = chessgame.Validator.Position().String()
 				}
 
+				if chessgame.whiteTurn {
+					chessgame.whiteTurn = false
+				} else {
+					chessgame.whiteTurn = true
+				}
+
 				table := All.Games[gameMove.ID]
 
 				//checkin if there is a pending draw and if so it removes it

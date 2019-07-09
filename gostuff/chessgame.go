@@ -99,6 +99,7 @@ func InitGame(gameID int, name string, fighter string) {
 	All.Games[gameID].resetWhiteTime = make(chan bool)
 	All.Games[gameID].resetBlackTime = make(chan bool)
 	All.Games[gameID].gameOver = make(chan bool)
+	All.Games[gameID].whiteTurn = true
 
 	// Long AlgebraicNotation Notation
 	All.Games[gameID].Validator = chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}))
