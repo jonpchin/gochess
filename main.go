@@ -162,6 +162,7 @@ func main() {
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			gostuff.InitForum()
+			go gostuff.StartStockfishBot()
 
 			//gostuff.RemoveGameHistory(days)
 		}

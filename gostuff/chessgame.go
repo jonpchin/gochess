@@ -64,13 +64,6 @@ type Nrating struct {
 	BlackRating float64
 }
 
-type Fin struct { //used to hold the result when a player is mated
-	Type   string
-	ID     int
-	Fen    string // FEN string of the board with the move played
-	Status string
-}
-
 // contains an array of player names observing the table
 type Observers struct {
 	sync.RWMutex

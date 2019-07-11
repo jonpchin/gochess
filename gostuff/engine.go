@@ -189,6 +189,24 @@ func engineSearchTime(fen string, engine *uci.Engine, t time.Duration) (bool, ch
 	return false, chessMove
 }
 
+func engineSearchTimeRaw(fen string, engine *uci.Engine, t time.Duration) (bool, string) {
+
+	board, err := chess.ParseFen(fen)
+
+	if err != nil {
+		return false, ""
+	}
+
+	engine.SetPosition(board)
+
+	for info := range engine.SearchTime(t) {
+		if move, ok := info.BestMoveRaw(); ok {
+			return ok, move
+		}
+	}
+	return false, ""
+}
+
 func Quit(engine *uci.Engine) {
 	engine.Stop()
 	engine.Quit()
