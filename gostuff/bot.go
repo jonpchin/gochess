@@ -83,25 +83,26 @@ func StartStockfishBot() {
 					log.Println("Just receieved a message I couldn't decode 2:", result, err)
 					break
 				}
+				if match.Rated == "No" {
+					acceptMatch := struct {
+						Type    string
+						Name    string
+						MatchID int
+					}{
+						"accept_match",
+						username,
+						match.MatchID,
+					}
 
-				acceptMatch := struct {
-					Type    string
-					Name    string
-					MatchID int
-				}{
-					"accept_match",
-					username,
-					match.MatchID,
-				}
+					matchID = match.MatchID
+					timeControl = match.TimeControl
 
-				matchID = match.MatchID
-				timeControl = match.TimeControl
-
-				acceptMatchResult, err := json.Marshal(acceptMatch)
-				if err != nil {
-					fmt.Println("Could not unmarshal accept match")
-				} else {
-					lobbyHandler <- acceptMatchResult
+					acceptMatchResult, err := json.Marshal(acceptMatch)
+					if err != nil {
+						fmt.Println("Could not unmarshal accept match")
+					} else {
+						lobbyHandler <- acceptMatchResult
+					}
 				}
 
 			default:
@@ -158,13 +159,82 @@ func StartStockfishBot() {
 					game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
 					currentFen := game.FEN()
 
+					if timeControl > 45 {
+						timeControl = 45
+					}
+
 					seconds := rand.Intn(timeControl)
 					isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
 
+					if isOk {
+						if err != nil {
+							fmt.Println("error with movestr 1", err)
+						}
+						promotion := ""
+						if len(bestMove) > 4 {
+							promotion = bestMove[4:5]
+						}
+
+						sendMove := struct {
+							Type string
+							Name string
+							ID   int
+							S    string
+							T    string
+							Fen  string
+							P    string
+						}{
+							"send_move",
+							username,
+							matchID,
+							bestMove[0:2],
+							bestMove[2:4],
+							game.FEN(),
+							promotion,
+						}
+
+						sendMoveResult, err := json.Marshal(sendMove)
+
+						if err != nil {
+							fmt.Println("chess_game error in marshal", err)
+						} else {
+							chessroomHandler <- sendMoveResult
+
+						}
+					} else {
+						fmt.Println("Isokay is false", bestMove)
+					}
+				}
+
+			case "send_move":
+
+				var gameMove GameMove
+
+				if err := json.Unmarshal(message, &gameMove); err != nil {
+					log.Println("Just receieved a message I couldn't decode chessgame:", result, err)
+					break
+				}
+
+				fen, err := chess.FEN(gameMove.Fen)
+				if err != nil {
+					fmt.Println("can't start chess position", err)
+				}
+
+				game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
+				currentFen := game.FEN()
+
+				if timeControl > 45 {
+					timeControl = 45
+				}
+				seconds := rand.Intn(timeControl)
+				isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
+
+				if isOk {
 					err = game.MoveStr(bestMove)
 					if err != nil {
-						fmt.Println("error with movestr 1", err)
+						fmt.Println("error with movestr 2", err)
 					}
+
 					promotion := ""
 					if len(bestMove) > 4 {
 						promotion = bestMove[4:5]
@@ -189,78 +259,15 @@ func StartStockfishBot() {
 					}
 
 					sendMoveResult, err := json.Marshal(sendMove)
-
 					if err != nil {
-						fmt.Println("chess_game error in marshal", err)
+						fmt.Println("Can't marsal sendMove", sendMove)
 					} else {
-						if isOk {
-							chessroomHandler <- sendMoveResult
-
-						} else {
-							fmt.Println("move is not okay, exiting")
-						}
-					}
-				}
-
-			case "send_move":
-
-				var gameMove GameMove
-
-				if err := json.Unmarshal(message, &gameMove); err != nil {
-					log.Println("Just receieved a message I couldn't decode chessgame:", result, err)
-					break
-				}
-
-				fen, err := chess.FEN(gameMove.Fen)
-				if err != nil {
-					fmt.Println("can't start chess position", err)
-				}
-
-				game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
-				currentFen := game.FEN()
-
-				seconds := rand.Intn(timeControl)
-				isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
-
-				err = game.MoveStr(bestMove)
-				if err != nil {
-					fmt.Println("error with movestr 2", err)
-				}
-
-				promotion := ""
-				if len(bestMove) > 4 {
-					promotion = bestMove[4:5]
-				}
-
-				sendMove := struct {
-					Type string
-					Name string
-					ID   int
-					S    string
-					T    string
-					Fen  string
-					P    string
-				}{
-					"send_move",
-					username,
-					matchID,
-					bestMove[0:2],
-					bestMove[2:4],
-					game.FEN(),
-					promotion,
-				}
-
-				sendMoveResult, err := json.Marshal(sendMove)
-				if err != nil {
-					fmt.Println("Can't marsal sendMove", sendMove)
-				} else {
-					if isOk {
 						chessroomHandler <- sendMoveResult
-
-					} else {
-						fmt.Println("send move is not okay, exiting")
 					}
+				} else {
+					fmt.Println("Isokay is false", bestMove)
 				}
+
 			case "rematch":
 
 				var match SeekMatch

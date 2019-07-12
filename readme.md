@@ -47,6 +47,7 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Update help, documentation and screenshots</p>
+<p>2. Add android client for goplaychess</p>
 <br>
 
 <b>Special thanks to those who provided amazing third party libaries</b>:
