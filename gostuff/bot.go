@@ -51,14 +51,16 @@ func StartStockfishBot() {
 	chessroomHandler := make(chan []byte)
 	lobbyHandler := make(chan []byte)
 	var engine *uci.Engine
-	engine = nil
 
 	matchID := 0
-	timeControl := 15
+	timeControl := 5
 	rand.Seed(time.Now().Unix())
 
 	go func() {
 		defer close(doneLobby)
+
+		sendDefaultMatch(username, lobbyHandler)
+
 		for {
 			_, message, err := lobbyConnection.ReadMessage()
 			if err != nil {
@@ -77,13 +79,13 @@ func StartStockfishBot() {
 			}
 
 			switch t.Type {
-			case "match_seek":
+			case "private_match":
 				var match SeekMatch
 				if err := json.Unmarshal(message, &match); err != nil {
 					log.Println("Just receieved a message I couldn't decode 2:", result, err)
 					break
 				}
-				if match.Rated == "No" {
+				if match.Opponent == username {
 					acceptMatch := struct {
 						Type    string
 						Name    string
@@ -104,7 +106,8 @@ func StartStockfishBot() {
 						lobbyHandler <- acceptMatchResult
 					}
 				}
-
+			case "chat_all":
+				sendDefaultMatch(username, lobbyHandler)
 			default:
 
 			}
@@ -138,9 +141,7 @@ func StartStockfishBot() {
 					break
 				}
 
-				if engine == nil {
-					engine = startEngine(nil)
-				}
+				engine = startEngine(nil)
 
 				if chessGame.WhitePlayer == username {
 
@@ -158,6 +159,7 @@ func StartStockfishBot() {
 
 					game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
 					currentFen := game.FEN()
+					timeControl = chessGame.TimeControl
 
 					if timeControl > 45 {
 						timeControl = 45
@@ -167,9 +169,11 @@ func StartStockfishBot() {
 					isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
 
 					if isOk {
+						err = game.MoveStr(bestMove)
 						if err != nil {
 							fmt.Println("error with movestr 1", err)
 						}
+
 						promotion := ""
 						if len(bestMove) > 4 {
 							promotion = bestMove[4:5]
@@ -296,20 +300,14 @@ func StartStockfishBot() {
 					chessroomHandler <- acceptRematchResult
 				}
 			case "abort_game":
-				if engine != nil {
-					engine.Quit()
-					engine = nil
-				}
+				engine.Stop()
+				sendDefaultMatch(username, lobbyHandler)
 			case "resign":
-				if engine != nil {
-					engine.Quit()
-					engine = nil
-				}
+				engine.Stop()
+				sendDefaultMatch(username, lobbyHandler)
 			case "game_over":
-				if engine != nil {
-					engine.Quit()
-					engine = nil
-				}
+				engine.Stop()
+				sendDefaultMatch(username, lobbyHandler)
 			default:
 			}
 		}
@@ -352,9 +350,7 @@ func StartStockfishBot() {
 			}
 		case <-interrupt:
 			log.Println("interrupt")
-			if engine != nil {
-				engine.Quit()
-			}
+			engine.Quit()
 
 			// Cleanly close the connection by sending a close message and then
 			// waiting (with timeout) for the server to close the connection.
@@ -395,4 +391,23 @@ func enterGuestForBot() (string, string) {
 		fmt.Println("creds length is not 2")
 	}
 	return "", ""
+}
+
+func sendDefaultMatch(username string, lobbyHandler chan []byte) {
+
+	var defaultMatch SeekMatch
+
+	defaultMatch.Type = "match_seek"
+	defaultMatch.Name = username
+	defaultMatch.TimeControl = 5 // bot will send out a 5 minute seek by default
+	defaultMatch.MinRating = 500
+	defaultMatch.MaxRating = 2700
+	defaultMatch.Rated = "No"
+
+	acceptMatchResult, err := json.Marshal(defaultMatch)
+	if err != nil {
+		fmt.Println("Could not unmarshal accept match")
+	} else {
+		lobbyHandler <- acceptMatchResult
+	}
 }
