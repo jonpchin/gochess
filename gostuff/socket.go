@@ -40,6 +40,7 @@ type AcceptMatch struct {
 	Type         string
 	Name         string
 	TargetPlayer string
+	MatchID      int
 }
 
 //active users connected to chess room socket

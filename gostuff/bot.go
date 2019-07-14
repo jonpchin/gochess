@@ -52,7 +52,6 @@ func StartStockfishBot() {
 	lobbyHandler := make(chan []byte)
 	var engine *uci.Engine
 
-	matchID := 0
 	timeControl := 5
 	rand.Seed(time.Now().Unix())
 
@@ -96,7 +95,6 @@ func StartStockfishBot() {
 						match.MatchID,
 					}
 
-					matchID = match.MatchID
 					timeControl = match.TimeControl
 
 					acceptMatchResult, err := json.Marshal(acceptMatch)
@@ -134,6 +132,7 @@ func StartStockfishBot() {
 
 			switch t.Type {
 			case "chess_game":
+
 				var chessGame ChessGame
 
 				if err := json.Unmarshal(message, &chessGame); err != nil {
@@ -142,29 +141,29 @@ func StartStockfishBot() {
 				}
 
 				engine = startEngine(nil)
+				startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+				// Get latest FEN position
+				if len(chessGame.GameMoves) > 0 {
+					startPosition = chessGame.GameMoves[len(chessGame.GameMoves)-1].Fen
+				}
+
+				fen, err := chess.FEN(startPosition)
+				if err != nil {
+					fmt.Println("can't start chess position", err)
+				}
+
+				game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
+
+				timeControl = chessGame.TimeControl
+
+				if timeControl > 45 {
+					timeControl = 45
+				}
 
 				if chessGame.WhitePlayer == username {
 
-					startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
-					// Get latest FEN position
-					if len(chessGame.GameMoves) > 0 {
-						startPosition = chessGame.GameMoves[len(chessGame.GameMoves)-1].Fen
-					}
-
-					fen, err := chess.FEN(startPosition)
-					if err != nil {
-						fmt.Println("can't start chess position", err)
-					}
-
-					game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
 					currentFen := game.FEN()
-					timeControl = chessGame.TimeControl
-
-					if timeControl > 45 {
-						timeControl = 45
-					}
-
 					seconds := rand.Intn(timeControl)
 					isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
 
@@ -190,7 +189,7 @@ func StartStockfishBot() {
 						}{
 							"send_move",
 							username,
-							matchID,
+							chessGame.ID,
 							bestMove[0:2],
 							bestMove[2:4],
 							game.FEN(),
@@ -255,7 +254,7 @@ func StartStockfishBot() {
 					}{
 						"send_move",
 						username,
-						matchID,
+						gameMove.ID,
 						bestMove[0:2],
 						bestMove[2:4],
 						game.FEN(),
@@ -292,6 +291,8 @@ func StartStockfishBot() {
 					match.Opponent,
 					match.TimeControl,
 				}
+
+				timeControl = match.TimeControl
 
 				acceptRematchResult, err := json.Marshal(acceptRematch)
 				if err != nil {

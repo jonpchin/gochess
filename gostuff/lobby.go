@@ -201,7 +201,6 @@ func (c *Connection) LobbyConnect() {
 
 			//check if player already has a game started, if there is a game in progress alert player
 			if isPlayersInGame(match.Name, match.Opponent) {
-				log.Println("Player already has a game. ")
 				//alerting player
 				t.Type = "alert"
 				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
@@ -222,7 +221,6 @@ func (c *Connection) LobbyConnect() {
 			}
 			//check if player already has a game started, if there is a game in progress alert player
 			if isPlayersInGame(match.Name, match.Opponent) {
-				fmt.Println("Player already has a game.")
 				//alerting player
 				t.Type = "alert"
 				if err := websocket.JSON.Send(Chat.Lobby[c.username], &t); err != nil {
@@ -471,6 +469,7 @@ func startPendingMatch(seekerName string, matchID int) bool {
 	acceptmatch.Type = "accept_match"
 	acceptmatch.Name = game.WhitePlayer
 	acceptmatch.TargetPlayer = game.BlackPlayer
+	acceptmatch.MatchID = matchID
 
 	//setting up the private chat between two players and send move connection
 	PrivateChat[acceptmatch.Name] = acceptmatch.TargetPlayer

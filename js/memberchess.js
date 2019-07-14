@@ -543,6 +543,7 @@ window.onload = function() {
 				break;
 				
 			case "rematch":
+				matchID = json.MatchID
 				document.getElementById('textbox').innerHTML += (timeStamp() + " Your opponent offers you a rematch." + '\n');
 				document.getElementById('rematchButton').innerHTML = "Accept Rematch";
 				break;
@@ -698,6 +699,7 @@ document.getElementById('rematchButton').onclick = function(){
 	}
 	
 	if(document.getElementById('rematchButton').innerHTML === "Rematch"){
+
 		var message = {
 			Type: "rematch",
 			Name: user,	
@@ -711,8 +713,7 @@ document.getElementById('rematchButton').onclick = function(){
 		var message = {
 			Type: "accept_rematch",
 			Name: user,	
-			Opponent: fighter,
-			TimeControl: timeGet
+			MatchID: matchID,
 		}
 		document.getElementById('rematchButton').innerHTML = "Rematch";
 	}

@@ -447,7 +447,7 @@ func (c *Connection) ChessConnect() {
 					chessgame.Result = 1
 
 				} else {
-					fmt.Println("Invalid resign, no player found.")
+					fmt.Println("Invalid resign no player found for .", t.Name)
 					break
 				}
 
@@ -511,8 +511,8 @@ func (c *Connection) ChessConnect() {
 				Pending.Matches[start] = &match
 
 				if _, ok := Active.Clients[match.Opponent]; ok {
-					t.Type = "rematch"
-					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &t); err != nil {
+					match.Type = "rematch"
+					if err := websocket.JSON.Send(Active.Clients[match.Opponent], &match); err != nil {
 						// we could not send the message to a peer
 						log.Println("Could not send message to ", match.Opponent, err)
 					}
