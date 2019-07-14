@@ -281,15 +281,13 @@ func StartStockfishBot() {
 				}
 
 				acceptRematch := struct {
-					Type        string
-					Name        string
-					Opponent    string
-					TimeControl int
+					Type    string
+					Name    string
+					MatchID int
 				}{
 					"accept_rematch",
 					username,
-					match.Opponent,
-					match.TimeControl,
+					match.MatchID,
 				}
 
 				timeControl = match.TimeControl
