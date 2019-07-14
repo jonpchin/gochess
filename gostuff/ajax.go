@@ -47,6 +47,12 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 		enemyFlag = "globe"
 	}
 
+	device := ""
+
+	if DeviceManager[lookupName] == "android" {
+		device = "<img src='../img/icons/android.ico'>"
+	}
+
 	//second username is nil as it only checks one name
 	if checkTable(lookupName) {
 		status = "vs. " + PrivateChat[lookupName] + "<src='img/flags/'" +
@@ -58,11 +64,10 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if strings.Contains(lookupName, "guest") {
-		var result = icon + url + lookupName + " " + status + endUrl +
+		var result = device + icon + url + lookupName + " " + status + endUrl +
 			"<br><img src='../img/icons/bullet.png' alt='bullet'>1500" +
 			"<img src='../img/icons/blitz.png' alt='blitz'>1500" +
 			"<img src='../img/icons/standard.png' alt='standard'>1500"
-
 		w.Write([]byte(result))
 		return
 	}
@@ -81,7 +86,7 @@ func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 	standard := fmt.Sprintf("%d", standardRating)
 	//correspondence := fmt.Sprintf("%d", correspondenceRating)
 
-	var result = icon + url + lookupName + "<img src='../img/flags/" + countryFlag +
+	var result = device + icon + url + lookupName + "<img src='../img/flags/" + countryFlag +
 		".png'>" + " " + status + endUrl +
 		"<br><img src='../img/icons/bullet.png' alt='bullet'>" + bullet +
 		"<img src='../img/icons/blitz.png' alt='blitz'>" + blitz +

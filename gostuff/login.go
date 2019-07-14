@@ -19,6 +19,7 @@ import (
 
 // global SessionManager["username"] = sessionID
 var SessionManager = make(map[string]string)
+var DeviceManager = make(map[string]string)
 
 //process user input when signing in
 func ProcessLogin(w http.ResponseWriter, r *http.Request) {
@@ -46,6 +47,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	if result == "" {
 		enterInside(w, userinfo.Username, userinfo.IpAddress)
+		DeviceManager[userinfo.Username] = r.UserAgent()
 	} else {
 		w.Write([]byte(result))
 	}
@@ -246,6 +248,14 @@ func EnterGuest(w http.ResponseWriter, r *http.Request) {
 		sessionID = RandomString()
 		cookie = http.Cookie{Name: "sessionID", Value: sessionID, Secure: true, HttpOnly: true, Expires: expiration}
 		http.SetCookie(w, &cookie)
+
+		userAgent := r.UserAgent()
+
+		if userAgent == "okhttp/3.11.0" {
+			DeviceManager[username] = "android"
+		} else {
+			DeviceManager[username] = userAgent
+		}
 
 		SessionManager[username] = sessionID
 	}

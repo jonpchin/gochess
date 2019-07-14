@@ -53,7 +53,6 @@ func StartStockfishBot() {
 	var engine *uci.Engine
 
 	timeControl := 5
-	rand.Seed(time.Now().Unix())
 
 	go func() {
 		defer close(doneLobby)

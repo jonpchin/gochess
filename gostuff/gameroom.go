@@ -166,7 +166,7 @@ func (c *Connection) ChessConnect() {
 				var black = All.Games[gameID].BlackPlayer
 
 				if t.Name != white && t.Name != black {
-					log.Println(t.Name, " tried to send a chat message while spectating")
+					// Prevent sending chat when spectating
 					break
 				}
 
