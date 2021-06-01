@@ -17,9 +17,9 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <br><br>
 7/6/2019 The mud is being migrated to a different repository. The mud will be hosted on a different server.
 <br><br>This project is a experimental project and only intended for my personal use.
-<br>
+<br><br>
 6/1/2021 The Go Play Chess server is no longer online. 
-<br>
+<br><br>
 <br><b>Features:</b><br>
 <p>1. User accounts</p>
 <p>2. Time controls</p>
