@@ -1,7 +1,4 @@
-![Alt text](https://travis-ci.org/jonpchin/gochess.svg?branch=master "Travis CI Go Play Chess Image")
-[![Build status](https://ci.appveyor.com/api/projects/status/96kvdw3mr190y854?svg=true)](https://ci.appveyor.com/project/jonpchin/gochess)
-[![Go Report Card](https://goreportcard.com/badge/github.com/jonpchin/gochess)](https://goreportcard.com/report/github.com/jonpchin/gochess)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 -<br><br>
 ![Alt text](/img/gif/goplaychessdemo_shrink.gif?raw=true "Go Play Chess Demo")
 <br>
