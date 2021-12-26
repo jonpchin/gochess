@@ -97,7 +97,7 @@ document.getElementById('login').onclick = function(){
    		dataType: 'html',
    		data : { 'user': user, 'password': password, 'captchaId': captchaId, 'captchaSolution': captchaSolution},
    		success : function(data) {
-			if (data === "<img src='img/ajax/not-available.png' /> Wrong username/password combination."){
+			if (data !== ""){
 				
 				$('#submit-result').html(data);	
 			}else{

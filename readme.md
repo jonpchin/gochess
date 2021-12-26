@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
--<br><br>
+<br><br>
 ![Alt text](/img/gif/goplaychessdemo_shrink.gif?raw=true "Go Play Chess Demo")
 <br>
 ![Alt text](/img/screenshots/lobbyResize.png?raw=true "Chess Lobby")

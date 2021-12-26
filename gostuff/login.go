@@ -85,6 +85,7 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
+
 	if result == "" {
 		enterInside(w, userinfo.Username, userinfo.IpAddress)
 		DeviceManager[userinfo.Username] = r.UserAgent()
@@ -94,6 +95,10 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (userinfo *UserInfo) Login(method string, url string, agent string, host string) (string, error) {
+
+	if isAccountLocked(userinfo.Username) {
+		return "<img src='img/ajax/not-available.png' /> Too many login attempts. Account is locked. Pleae try logging in later.", nil
+	}
 
 	//check if database connection is open
 	if db.Ping() != nil {
