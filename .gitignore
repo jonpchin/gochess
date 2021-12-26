@@ -26,3 +26,5 @@ games/
 /release_notes.json
 /gochess.exe.manifest
 /gochess.syso
+/test.go
+/test.exe

@@ -45,16 +45,10 @@ func main() {
 	http.HandleFunc("/logoutGuest", logoutGuest)
 	http.HandleFunc("/help", help)
 	http.HandleFunc("/screenshots", screenshots)
-	http.HandleFunc("/activate", activate)
 	http.HandleFunc("/register", register)
-	http.HandleFunc("/forgot", forgot)
-	http.HandleFunc("/processForgot", gostuff.ProcessForgot)
-	http.HandleFunc("/resetpass", resetpass)
-	http.HandleFunc("/processResetPass", gostuff.ProcessResetPass)
 	http.HandleFunc("/processRegister", gostuff.ProcessRegister)
 	http.HandleFunc("/processLogin", gostuff.ProcessLogin)
 	http.HandleFunc("/enterGuest", gostuff.EnterGuest)
-	http.HandleFunc("/processActivate", gostuff.ProcessActivate)
 	http.HandleFunc("/settings", settings)
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
@@ -256,46 +250,6 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 	gostuff.ParseTemplates(d, w, "register.html", []string{"templates/registerTemplate.html",
 		"templates/guestHeader.html"}...)
-}
-
-func activate(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	var activate = template.Must(template.ParseFiles("activate.html"))
-
-	d := struct {
-		CaptchaId string
-	}{
-		captcha.New(),
-	}
-	if err := activate.Execute(w, &d); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-func forgot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	d := struct {
-		CaptchaId string
-		PageTitle string
-	}{
-		captcha.New(),
-		"Forgot",
-	}
-	gostuff.ParseTemplates(d, w, "forgot.html", []string{"templates/forgotTemplate.html",
-		"templates/guestHeader.html"}...)
-}
-
-func resetpass(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-	var formTemplate = template.Must(template.ParseFiles("resetpass.html"))
-
-	d := struct {
-		CaptchaId string
-	}{
-		captcha.New(),
-	}
-	if err := formTemplate.Execute(w, &d); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 func lobby(w http.ResponseWriter, r *http.Request) {

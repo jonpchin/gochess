@@ -23,3 +23,4 @@ secret/fullchain.pem
 secret/privkey.pem
 nohup.out
 gochess/privatedata/news
+backup

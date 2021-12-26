@@ -98,11 +98,10 @@ document.getElementById('register').onclick = function(){
 	var user = document.getElementById('username').value;
 	var pass = document.getElementById('pass').value;
 	var confirm = document.getElementById('confirm').value;
-	var email = document.getElementById('email').value;	
 	var captchaId = document.getElementById('captchaId').value;
 	var captchaSolution = document.getElementById('captchaSolution').value;
 	
-	if(user === "" || pass === "" || confirm === "" || email === ""  || captchaSolution === ""){
+	if(user === "" || pass === "" || confirm === ""  || captchaSolution === ""){
 		$('#submit-result').html("<img src='img/ajax/not-available.png' /> Please fill out all fields.");
 		return
 	}
@@ -112,7 +111,7 @@ document.getElementById('register').onclick = function(){
   		url: 'processRegister',
    		type: 'post',
    		dataType: 'html',
-   		data : { 'username': user, 'pass': pass, 'confirm': confirm,  'email': email,
+   		data : { 'username': user, 'pass': pass, 'confirm': confirm, 
 		'captchaId': captchaId, 'captchaSolution': captchaSolution},
    		success : function(data) {			
       		$('#submit-result').html(data);	
@@ -144,19 +143,14 @@ $('#pass').keypress(function(event) {
     }
 });
 
-//when user presses enter on confirm input it will jump to email input
+//when user presses enter on confirm input it will jump to captcha input
 $('#confirm').keypress(function(event) {
-    if (event.which === 13) {  
-	   $('#email').focus();
-    }
-});
-
-//when user press enter on email it will jump to captcha
-$('#email').keypress(function(event) {
     if (event.which === 13) {  
 	   $('#captchaSolution').focus();
     }
 });
+
+
 //when user presses enter on captcha it will submit the form
 $('#captchaSolution').keypress(function(event) {
     if (event.which === 13) {  

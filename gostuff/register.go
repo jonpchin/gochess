@@ -16,16 +16,6 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-type UserInfo struct {
-	Username        string
-	Password        string
-	Email           string
-	IpAddress       string
-	Token           string
-	CaptchaId       string
-	CaptchaSolution string
-}
-
 //processes the users input when signing up
 func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 
@@ -43,7 +33,6 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 		userInfo.Username = template.HTMLEscapeString(r.FormValue("username"))
 		userInfo.Password = template.HTMLEscapeString(r.FormValue("pass"))
 		confirm := template.HTMLEscapeString(r.FormValue("confirm"))
-		userInfo.Email = template.HTMLEscapeString(r.FormValue("email"))
 		userInfo.IpAddress, _, _ = net.SplitHostPort(r.RemoteAddr)
 
 		if len(userInfo.Username) < 3 || len(userInfo.Username) > 12 {
@@ -55,9 +44,6 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 		} else if len(userInfo.Password) < 5 || len(userInfo.Password) > 32 {
 			w.Write([]byte("<img src='img/ajax/not-available.png' /> Password must be at between 5 to 32 characters long"))
 
-		} else if len(userInfo.Email) < 5 || len(userInfo.Email) > 30 {
-			w.Write([]byte("<img src='img/ajax/not-available.png' /> Please choose an email between 5 and 30 characters long"))
-
 		} else {
 
 			problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -67,12 +53,12 @@ func ProcessRegister(w http.ResponseWriter, r *http.Request) {
 			message, err := userInfo.Register(r.Host)
 			if err == nil {
 				//sends email to user
-				go Sendmail(userInfo.Email, userInfo.Token, userInfo.Username, r.Host)
-
-				message = "<script>$('#register').hide();</script><img src='img/ajax/available.png' /> Hello " +
-					userInfo.Username + "! Please check email for instructions to verify your account."
+				message := "<script>window.location = 'login?user=" + userInfo.Username + "';</script>"
 				//if reached here just notify user to check his email and continue on with the account creation
 				w.Write([]byte(message))
+
+				UpdateHighScore()
+
 			} else {
 				w.Write([]byte(message))
 				log.Println(err)
@@ -115,7 +101,7 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 	}
 
 	//inserting into database
-	stmt, err := db.Prepare("INSERT userinfo SET username=?, password=?, email=?, date=?, time=?, host=?, verify=?, captcha=?")
+	stmt, err := db.Prepare("INSERT userinfo SET username=?, password=?, date=?, time=?, host=?")
 	defer stmt.Close()
 
 	if err != nil {
@@ -124,23 +110,9 @@ func (userInfo *UserInfo) Register(host string) (string, error) {
 
 	date := time.Now()
 
-	_, err = stmt.Exec(userInfo.Username, key, userInfo.Email, date, date, userInfo.IpAddress, "NO", 0)
+	_, err = stmt.Exec(userInfo.Username, key, date, date, userInfo.IpAddress)
 	if err != nil {
 		return "<img src='img/ajax/not-available.png' /> Username is already taken.", err
-	}
-
-	log.Printf("Account %s was created in userinfo table.\n", userInfo.Username)
-	userInfo.Token = RandomString()
-
-	//preparing token activation
-	stmt, err = db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
-	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> Can't prepare token activation", err
-	}
-
-	_, err = stmt.Exec(userInfo.Username, userInfo.Token, userInfo.Email, date)
-	if err != nil {
-		return "<img src='img/ajax/not-available.png' /> Can't execute token activation", err
 	}
 
 	//setting up player's rating

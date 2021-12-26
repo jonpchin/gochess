@@ -11,15 +11,55 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
-	"github.com/dchest/captcha"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 // global SessionManager["username"] = sessionID
 var SessionManager = make(map[string]string)
 var DeviceManager = make(map[string]string)
+
+// Keeps track of users that are locked out until the next tick cycle
+var protectAccounts = struct {
+	sync.RWMutex
+	Users []UserInfo
+}{}
+
+type UserInfo struct {
+	Username        string
+	Password        string
+	IpAddress       string
+	CaptchaId       string
+	CaptchaSolution string
+	InvalidLogins   int // Number of times an account had incorrect logins, resets on lockup
+	IsLocked        bool
+}
+
+func isUserInProtectAccounts(username string) bool {
+
+	for _, value := range protectAccounts.Users {
+
+		if value.Username == username {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isAccountLocked(username string) bool {
+
+	for _, value := range protectAccounts.Users {
+
+		if value.Username == username && value.IsLocked {
+			return true
+		}
+	}
+
+	return false
+}
 
 //process user input when signing in
 func ProcessLogin(w http.ResponseWriter, r *http.Request) {
@@ -54,154 +94,60 @@ func ProcessLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (userinfo *UserInfo) Login(method string, url string, agent string, host string) (string, error) {
-	if userinfo.CaptchaSolution == "" { //then assume user was not displayed captcha
 
-		//check if database connection is open
-		if db.Ping() != nil {
-			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.",
-				errors.New("DATABASE DOWN!")
-		}
-
-		//hashing password
-		key, err := hashPass(userinfo.Username, userinfo.Password)
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Something is wrong with the server.", err
-		}
-
-		var pass string
-		var verify string
-		var captcha int
-		var email string
-
-		//getting password, verify, captcha and email
-		err = db.QueryRow("SELECT password, verify, captcha, email FROM userinfo WHERE username=?", userinfo.Username).Scan(&pass, &verify, &captcha, &email)
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Wrong username/password combination.",
-				errors.New("Incorrect login for " + userinfo.Username)
-		}
-
-		//if user entered password incorrect two times or more then they need to enter captcha to login
-		if captcha >= 2 {
-			return "<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' />" +
-				"You entered password incorrectly too many times. Now you need to enter captcha.", nil
-		}
-		//checking if password entered by user matches encrypted key
-		if pass != key {
-			var result string
-			if captcha == 1 {
-				result = "<script>$('#hiddenCap').show();</script><img src='img/ajax/not-available.png' />" +
-					"You entered password incorrectly too many times. Now you need to enter captcha."
-			} else {
-				result = "<img src='img/ajax/not-available.png' /> Wrong username/password combination."
-			}
-			addOneToCaptcha(userinfo.Username, captcha)
-			return result, fmt.Errorf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n",
-				userinfo.IpAddress, method, url, agent)
-		}
-		if verify != "YES" {
-			result, err := needToActivate(host, userinfo.Username)
-			return result, err
-		}
-		// update captcha to zero since login was a success
-		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
-		defer stmt.Close()
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Error in captcha section 3", err
-		}
-
-		_, err = stmt.Exec(0, userinfo.Username)
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Error in captcha section 4", err
-		}
-		return "", nil
-
-	} else if !captcha.VerifyString(userinfo.CaptchaId, userinfo.CaptchaSolution) {
-		return "<script>document.getElementById('captchaSolution').value = '';</script><img src='img/ajax/not-available.png' /> Wrong captcha solution! Please try again.", nil
-	} else {
-		//check if database connection is open
-		if db.Ping() != nil {
-
-			log.Println()
-			return "<img src='img/ajax/not-available.png' /> We are having trouble with our server.",
-				errors.New("DATABASE DOWN!")
-		}
-
-		//hashing password
-		key, err := hashPass(userinfo.Username, userinfo.Password)
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Something is wrong with the server.", err
-		}
-
-		var pass string
-		var verify string
-		var captcha int
-		var email string
-		var token string
-
-		//getting password, verify, captcha, email from database
-		err = db.QueryRow("SELECT password, verify, captcha, email FROM userinfo WHERE username=?", userinfo.Username).Scan(&pass, &verify, &captcha, &email)
-		if err != nil {
-			//check if there was more then one incorrect login attempt
-			return "<img src='img/ajax/not-available.png' /> Wrong username/password combination.", err
-		}
-
-		if captcha == 5 {
-
-			addOneToCaptcha(userinfo.Username, captcha)
-
-			//create activation token in database and send user notifying them that their was five incorrect login attempts
-			stmt, err := db.Prepare("INSERT activate SET username=?, token=?, email=?, expire=?")
-			if err != nil {
-				return "<img src='img/ajax/not-available.png' /> Can't prepare activation token", err
-			}
-
-			token = RandomString()
-			_, err = stmt.Exec(userinfo.Username, token, email, time.Now())
-			if err != nil {
-				return "<img src='img/ajax/not-available.png' /> Can't execute activation token", err
-			}
-			//sends email to user with the token activation
-			go SendAttempt(email, token, userinfo.Username, userinfo.IpAddress, host)
-
-			return "<img src='img/ajax/not-available.png' /> This account has been deactivated becaue too many incorrect login attempts were made. An email has been sent to you on instructions on reactivating your account.",
-				nil
-
-		} else if captcha > 5 { //tell user on the front end that this account has too many login attempts, resends activation token
-
-			err2 := db.QueryRow("SELECT token FROM activate WHERE username=?", userinfo.Username).Scan(&token)
-			if err2 != nil {
-				return "<img src='img/ajax/not-available.png' /> Can't query token from user", err2
-			}
-
-			//sends email again to user with the token activation
-			go SendAttempt(email, token, userinfo.Username, userinfo.IpAddress, host)
-
-			return "<img src='img/ajax/not-available.png' /> This account has been deactivated because too many incorrect login attempts were made. An email has been sent again regarding how to reactivate your account.", nil
-		}
-		if pass != key {
-			addOneToCaptcha(userinfo.Username, captcha)
-			return "<img src='img/ajax/not-available.png' /> Wrong username/password combination.", nil
-		}
-		if verify != "YES" {
-			result, err := needToActivate(host, userinfo.Username)
-			return result, err
-		}
-
-		// update captcha to zero since login was a success
-		stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
-		defer stmt.Close()
-
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Can't prepare captcha to zero", err
-		}
-
-		_, err = stmt.Exec(0, userinfo.Username)
-		if err != nil {
-			return "<img src='img/ajax/not-available.png' /> Can't execute captcha to zero", err
-		}
-
-		return "", nil
+	//check if database connection is open
+	if db.Ping() != nil {
+		return "<img src='img/ajax/not-available.png' /> We are having trouble with our server. Please come back later.",
+			errors.New("DATABASE DOWN!")
 	}
+
+	//hashing password
+	key, err := hashPass(userinfo.Username, userinfo.Password)
+	if err != nil {
+		return "<img src='img/ajax/not-available.png' /> Something is wrong with the server.", err
+	}
+
+	var pass string
+
+	//getting password, verify, captcha and email
+	err = db.QueryRow("SELECT password FROM userinfo WHERE username=?", userinfo.Username).Scan(&pass)
+	if err != nil {
+		return "<img src='img/ajax/not-available.png' /> Wrong username/password combination.",
+			errors.New("Incorrect login for " + userinfo.Username)
+	}
+
+	if pass != key {
+		if isUserInProtectAccounts(userinfo.Username) == false {
+
+			var user UserInfo
+			user.InvalidLogins = 0
+			user.Username = userinfo.Username
+			user.IsLocked = false
+
+			protectAccounts.Lock()
+			protectAccounts.Users = append(protectAccounts.Users, user)
+			protectAccounts.Unlock()
+
+		} else {
+			protectAccounts.Lock()
+			for index, _ := range protectAccounts.Users {
+				if protectAccounts.Users[index].Username == userinfo.Username {
+					if protectAccounts.Users[index].InvalidLogins >= 3 {
+						protectAccounts.Users[index].InvalidLogins = 0
+						protectAccounts.Users[index].IsLocked = true
+					} else {
+						protectAccounts.Users[index].InvalidLogins += 1
+					}
+				}
+			}
+			protectAccounts.Unlock()
+		}
+		return "<img src='img/ajax/not-available.png' /> Wrong username/password combination.",
+			fmt.Errorf("FAILED LOGIN IP: %s  Method: %s Location: %s Agent: %s\n",
+				userinfo.IpAddress, method, url, agent)
+	}
+
+	return "", nil
 }
 
 func RandomString() string {
@@ -282,40 +228,4 @@ func enterInside(w http.ResponseWriter, username string, ipAddress string) {
 	SessionManager[username] = sessionID
 
 	w.Write([]byte("<script>window.location = '/server/lobby'</script>"))
-}
-
-// sends an email again to reactivate an inactivated account
-func needToActivate(host string, username string) (string, error) {
-	var tokenInDB string
-	var email string
-
-	log.Printf("%s needs to activate his account before logging in.\n", username)
-
-	//checking if token matches the one entered by user
-	err2 := db.QueryRow("SELECT token, email FROM activate WHERE username=?", username).Scan(&tokenInDB, &email)
-	if err2 != nil {
-		log.Println(err2)
-	} else {
-		go Sendmail(email, tokenInDB, username, host)
-	}
-	return "<img src='img/ajax/not-available.png' /> You must activate your account by entering the activation token in your email at the activation page. " +
-		"An email has been sent again containing your activation code.", nil
-}
-
-//add 1 to captcha if password was incorrect
-func addOneToCaptcha(username string, captcha int) {
-
-	stmt, err := db.Prepare("update userinfo set captcha=? where username=?")
-	defer stmt.Close()
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	captcha = captcha + 1
-
-	_, err = stmt.Exec(captcha, username)
-	if err != nil {
-		log.Println(err)
-	}
 }
