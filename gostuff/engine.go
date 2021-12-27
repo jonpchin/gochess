@@ -112,7 +112,7 @@ func getPromotionPiece(piece string, color int) chess.Piece {
 
 // Run starts an engine executable, with the given arguments.
 // Returns the engine, make sure to call Quit() on the engine to clean up
-func startEngine(args []string) *uci.Engine {
+func StartEngine(args []string) *uci.Engine {
 
 	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
@@ -120,12 +120,14 @@ func startEngine(args []string) *uci.Engine {
 	var err error
 
 	if runtime.GOOS == "windows" {
-		engine, err = uci.Run("./stockfish/stockfish_8_x64.exe", args, log)
+		engine, err = uci.Run("stockfish_8_x64.exe", args, log)
 		if err != nil {
 			log.Println(err)
 		}
 	} else {
-		engine, err = uci.Run("./stockfish/stockfish_8_x64", args, log)
+		//engine, err = uci.Run("./stockfish/stockfish_8_x64", args, log)
+		// Compile stockfish 8 on Raspberry pi
+		engine, err = uci.Run("./stockfish", args, log)
 		if err != nil {
 			log.Println(err)
 		}
@@ -189,7 +191,7 @@ func engineSearchTime(fen string, engine *uci.Engine, t time.Duration) (bool, ch
 	return false, chessMove
 }
 
-func engineSearchTimeRaw(fen string, engine *uci.Engine, t time.Duration) (bool, string) {
+func EngineSearchTimeRaw(fen string, engine *uci.Engine, t time.Duration) (bool, string) {
 
 	board, err := chess.ParseFen(fen)
 

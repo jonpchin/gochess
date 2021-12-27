@@ -23,6 +23,7 @@ require (
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/malbrecht/chess v0.0.0-20190911134141-3465f589170a // indirect
 	github.com/nwaples/rardecode v1.1.2 // indirect
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

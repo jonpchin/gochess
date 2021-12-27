@@ -139,7 +139,7 @@ func StartStockfishBot() {
 					break
 				}
 
-				engine = startEngine(nil)
+				engine = StartEngine(nil)
 				startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 				// Get latest FEN position
@@ -152,7 +152,7 @@ func StartStockfishBot() {
 					fmt.Println("can't start chess position", err)
 				}
 
-				game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
+				game := chess.NewGame(chess.UseNotation(chess.UCINotation{}), fen)
 
 				timeControl = chessGame.TimeControl
 
@@ -164,7 +164,7 @@ func StartStockfishBot() {
 
 					currentFen := game.FEN()
 					seconds := rand.Intn(timeControl)
-					isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
+					isOk, bestMove := EngineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
 
 					if isOk {
 						err = game.MoveStr(bestMove)
@@ -222,16 +222,17 @@ func StartStockfishBot() {
 					fmt.Println("can't start chess position", err)
 				}
 
-				game := chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}), fen)
+				game := chess.NewGame(chess.UseNotation(chess.UCINotation{}), fen)
 				currentFen := game.FEN()
 
 				if timeControl > 45 {
 					timeControl = 45
 				}
 				seconds := rand.Intn(timeControl)
-				isOk, bestMove := engineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
+				isOk, bestMove := EngineSearchTimeRaw(currentFen, engine, time.Duration(time.Second*time.Duration(seconds)))
 
 				if isOk {
+
 					err = game.MoveStr(bestMove)
 					if err != nil {
 						fmt.Println("error with movestr 2", err)

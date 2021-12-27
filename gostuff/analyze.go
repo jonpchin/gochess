@@ -37,7 +37,7 @@ type GameAnalysis struct {
 // that match the engine for the given depth
 func (gameAnalysis *GameAnalysis) analyzeGame(chessMoves []chess.Move, gochessMoves []GameMove) {
 
-	engine := startEngine(nil)
+	engine := StartEngine(nil)
 
 	// All standard chess games start with the same position
 	startPosition := "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

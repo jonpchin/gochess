@@ -25,6 +25,8 @@ github.com/jonpchin/chess v0.0.0-20190711041408-906a36ecb8f4 h1:lqef7LZbmaGzA/Mx
 github.com/jonpchin/chess v0.0.0-20190711041408-906a36ecb8f4/go.mod h1:7ITiRrVaT4k7QLz+uQyN/vU6cdVIWCegM6q5Oj7H8bo=
 github.com/klauspost/compress v1.4.1/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/klauspost/cpuid v1.2.0/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
+github.com/malbrecht/chess v0.0.0-20190911134141-3465f589170a h1:rBi/ZFqgPqo3aPxj3y3ZbwED9ssvBhlla+nHCVc8KFk=
+github.com/malbrecht/chess v0.0.0-20190911134141-3465f589170a/go.mod h1:M3dArO2gsCCqXeS5WcgCemKJEDmzOK+5y01UNH2nRHU=
 github.com/notnil/chess v1.7.0 h1:yEDjZ/zasvq9M8fLEtDfCB13toLQeITbJN4jzoFW91w=
 github.com/notnil/chess v1.7.0/go.mod h1:cRuJUIBFq9Xki05TWHJxHYkC+fFpq45IWwk94DdlCrA=
 github.com/nwaples/rardecode v1.1.2 h1:Cj0yZY6T1Zx1R7AhTbyGSALm44/Mmq+BAPc4B/p/d3M=

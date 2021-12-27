@@ -95,7 +95,7 @@ func InitGame(gameID int, name string, fighter string) {
 	All.Games[gameID].whiteTurn = true
 
 	// Long AlgebraicNotation Notation
-	All.Games[gameID].Validator = chess.NewGame(chess.UseNotation(chess.LongAlgebraicNotation{}))
+	All.Games[gameID].Validator = chess.NewGame(chess.UseNotation(chess.UCINotation{}))
 
 	// the players playing the game are also observers
 	All.Games[gameID].observe.Names = append(All.Games[gameID].observe.Names, name)

@@ -63,7 +63,7 @@ func (allGames *allPgnGames) readPgn(pgnData string) {
 	reader := strings.NewReader(pgnData)
 	ps := pgn.NewPGNScanner(reader)
 
-	engine := startEngine(nil)
+	engine := StartEngine(nil)
 
 	for ps.Next() {
 		game, err := ps.Scan()
