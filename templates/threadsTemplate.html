@@ -1,7 +1,11 @@
-{{template "memberHeader" .}}
+{{if .Authorized}}
+	{{template "memberHeader" .}}
+{{else}}
+	{{template "guestHeader" .}}
+{{end}}
 <h3>Go Play Chess Forums</h3>
  <a href="/forum"><u>Forums</u></a> > <u>{{.Threads.Title}}</u> >
- {{if .Authorized}}
+ {{if and .Authorized .CanPost }}
 <button id="createThread" value="{{.Threads.Title}}">Create new thread</button>
  {{end}}
  <br><br>

@@ -1,4 +1,8 @@
-{{template "memberHeader" .}}
+{{if .Authorized}}
+	{{template "memberHeader" .}}
+{{else}}
+	{{template "guestHeader" .}}
+{{end}}
 {{ $length := len .Posts }}
 {{ if gt $length 0 }} 
  <a href="/forum"><u>Forums</u></a> >  <a href="{{.ForumUrl}}"><u>{{.PageTitle}}</u></a> > <u>{{(index .Posts 0).Title}}</u><br><br>
@@ -22,7 +26,7 @@
 		{{end}}	
 	</table>
 {{ end }}
-{{if .Authorized}}
+{{if and .Authorized  .CanPost}}
 	{{if .Locked}}
 		<center><br>Thread Locked<br></center>
 		{{if $.CanLock}}

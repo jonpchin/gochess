@@ -1,4 +1,8 @@
-{{template "memberHeader" .}}
+{{if .Authorized}}
+	{{template "memberHeader" .}}
+{{else}}
+	{{template "guestHeader" .}}
+{{end}}
 
 <h3>Go Play Chess Forums</h3>
 {{ $length := len .Forums }} 
