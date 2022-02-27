@@ -28,3 +28,5 @@ games/
 /gochess.syso
 /test.go
 /test.exe
+/sync.sh
+/stop.sh

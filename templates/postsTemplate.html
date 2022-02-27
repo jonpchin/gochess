@@ -1,8 +1,4 @@
-{{if .Authorized}}
-	{{template "memberHeader" .}}
-{{else}}
-	{{template "guestHeader" .}}
-{{end}}
+{{template "memberHeader" .}}
 {{ $length := len .Posts }}
 {{ if gt $length 0 }} 
  <a href="/forum"><u>Forums</u></a> >  <a href="{{.ForumUrl}}"><u>{{.PageTitle}}</u></a> > <u>{{(index .Posts 0).Title}}</u><br><br>
