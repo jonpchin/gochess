@@ -54,7 +54,7 @@ window.onload = function() {
 	var gameResult;
 	
 	//hide button on initial load
-    $('#rematchButton').hide();
+  $('#rematchButton').hide();
 	document.getElementById("abortButton").disabled = true;
 	document.getElementById("drawButton").disabled = true;
 	document.getElementById("resignButton").disabled = true;
@@ -154,41 +154,41 @@ window.onload = function() {
 		sock.close();
 	});  
 
-    sock.onopen = function() {
+  sock.onopen = function() {
 
-      // If a game is being spectated then do not load chess_game
-      if(typeof token.spectate !== "undefined"){
+    // If a game is being spectated then do not load chess_game
+    if(typeof token.spectate !== "undefined"){
 
-          // spectators should not be able to do anything but watch the game
-          document.getElementById("message").disabled = true;
-          document.getElementById("sendMessage").disabled = true;
-          document.getElementById("rematchButton").disabled = true;
+      // spectators should not be able to do anything but watch the game
+      document.getElementById("message").disabled = true;
+      document.getElementById("sendMessage").disabled = true;
+      document.getElementById("rematchButton").disabled = true;
 
-        var message = {
-          Type:  "spectate_game",
-          Name:  user,
-          ID:    token.id
-        }
-        sock.send(JSON.stringify(message));
+      var message = {
+        Type:  "spectate_game",
+        Name:  user,
+        ID:    token.id
+      }
+      sock.send(JSON.stringify(message));
 
-      }else{
-        document.getElementById('textbox').innerHTML = "";
-        var message = {
-          Type: "chat_private",
-          Name: user,
-          Text: "has joined the chess room."
-        }
-        sock.send(JSON.stringify(message));
-        
-        var chess_game = {
-          Type: "chess_game",
-          Name: user
-        }
-        sock.send(JSON.stringify(chess_game));
-      }		
-    }
+    }else{
+      document.getElementById('textbox').innerHTML = "";
+      var message = {
+        Type: "chat_private",
+        Name: user,
+        Text: "has joined the chess room."
+      }
+      sock.send(JSON.stringify(message));
+      
+      var chess_game = {
+        Type: "chess_game",
+        Name: user
+      }
+      sock.send(JSON.stringify(chess_game));
+    }		
+  }
 	
-    sock.onclose = function(e) {
+  sock.onclose = function(e) {
 		var currentdate = new Date(); 
 		var datetime =  + currentdate.getHours() + ":"  
              			+ currentdate.getMinutes() + ":" 
@@ -197,7 +197,7 @@ window.onload = function() {
 			 "Connection lost. Please refresh to reconnect if you are in a game." + '\n');
 	}
 
-    sock.onmessage = function(e) {
+  sock.onmessage = function(e) {
 		var json = JSON.parse(e.data);
 
 		switch (json.Type) {
@@ -571,7 +571,7 @@ window.onload = function() {
 			default:
 				console.log("Unknown API type json.Type is " + json.Type);
 		}
-    }
+  }
 	
 	document.getElementById('sendMessage').onclick = function(){
 
