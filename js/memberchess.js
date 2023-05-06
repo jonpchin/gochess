@@ -156,36 +156,36 @@ window.onload = function() {
 
     sock.onopen = function() {
 
-		// If a game is being spectated then do not load chess_game
-		if(typeof token.spectate !== "undefined"){
+      // If a game is being spectated then do not load chess_game
+      if(typeof token.spectate !== "undefined"){
 
-				// spectators should not be able to do anything but watch the game
-				document.getElementById("message").disabled = true;
-				document.getElementById("sendMessage").disabled = true;
-				document.getElementById("rematchButton").disabled = true;
+          // spectators should not be able to do anything but watch the game
+          document.getElementById("message").disabled = true;
+          document.getElementById("sendMessage").disabled = true;
+          document.getElementById("rematchButton").disabled = true;
 
-			var message = {
-				Type:  "spectate_game",
-				Name:  user,
-				ID:    token.id
-			}
-			sock.send(JSON.stringify(message));
+        var message = {
+          Type:  "spectate_game",
+          Name:  user,
+          ID:    token.id
+        }
+        sock.send(JSON.stringify(message));
 
-		}else{
-			document.getElementById('textbox').innerHTML = "";
-			var message = {
-				Type: "chat_private",
-				Name: user,
-				Text: "has joined the chess room."
-			}
-			sock.send(JSON.stringify(message));
-			
-			var chess_game = {
-				Type: "chess_game",
-				Name: user
-			}
-			sock.send(JSON.stringify(chess_game));
-		}		
+      }else{
+        document.getElementById('textbox').innerHTML = "";
+        var message = {
+          Type: "chat_private",
+          Name: user,
+          Text: "has joined the chess room."
+        }
+        sock.send(JSON.stringify(message));
+        
+        var chess_game = {
+          Type: "chess_game",
+          Name: user
+        }
+        sock.send(JSON.stringify(chess_game));
+      }		
     }
 	
     sock.onclose = function(e) {

@@ -7,21 +7,21 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-//used to identify who the socket connection is
+// used to identify who the socket connection is
 type Connection struct {
 	username  string
 	websocket *websocket.Conn
 	clientIP  string
 }
 
-//stores information for a message from chat for JSON
+// stores information for a message from chat for JSON
 type ChatInfo struct {
 	Type string
 	Name string
 	Text string
 }
 
-//sends out seek matches real time in the lobby
+// sends out seek matches real time in the lobby
 type SeekMatch struct {
 	Type        string
 	Name        string
@@ -33,9 +33,10 @@ type SeekMatch struct {
 	MinRating   int16
 	MaxRating   int16
 	Rated       string
+	IsBot       bool
 }
 
-//used to store two player's name for redirecting on the front end in JavaScript
+// used to store two player's name for redirecting on the front end in JavaScript
 type AcceptMatch struct {
 	Type         string
 	Name         string
@@ -43,13 +44,13 @@ type AcceptMatch struct {
 	MatchID      int
 }
 
-//active users connected to chess room socket
+// active users connected to chess room socket
 var Active = struct {
 	sync.RWMutex
 	Clients map[string]*websocket.Conn
 }{Clients: make(map[string]*websocket.Conn)}
 
-//active users connected to lobby socket
+// active users connected to lobby socket
 var Chat = struct {
 	sync.RWMutex
 	Lobby map[string]*websocket.Conn
@@ -63,7 +64,7 @@ type MessageType struct {
 	Message string
 }
 
-//websocket handler for lobby
+// websocket handler for lobby
 func EnterLobby(ws *websocket.Conn) {
 
 	defer ws.Close()
@@ -84,7 +85,7 @@ func EnterLobby(ws *websocket.Conn) {
 	}
 }
 
-//websocket handler for gameroom
+// websocket handler for gameroom
 func EnterChess(ws *websocket.Conn) {
 	defer ws.Close()
 	username, err := ws.Request().Cookie("username")
@@ -103,7 +104,7 @@ func EnterChess(ws *websocket.Conn) {
 	}
 }
 
-//returns the total number of seeks that a player has pending in the lobby
+// returns the total number of seeks that a player has pending in the lobby
 func countMatches(player string) int8 { //player should have no more then 3 seeks at a time
 
 	var total int8 = 0
@@ -116,7 +117,7 @@ func countMatches(player string) int8 { //player should have no more then 3 seek
 	return total
 }
 
-//broadcast to chess room that player has disconnected socket
+// broadcast to chess room that player has disconnected socket
 func broadCast(user string) {
 
 	delete(Chat.Lobby, user)
@@ -132,7 +133,7 @@ func broadCast(user string) {
 	}
 }
 
-//function is called when player leaves the chess room
+// function is called when player leaves the chess room
 func exitGame(user string) {
 	//check if user is in PrivateChat map, delete player key's if necessary
 	if _, ok := PrivateChat[user]; ok {
@@ -157,7 +158,7 @@ func exitGame(user string) {
 	delete(Active.Clients, user)
 }
 
-//returns true if a player is at a given table
+// returns true if a player is at a given table
 // function isPlayersInGame is similar to this checkTable
 // this checkTable only checks one username instead of two like isPlayersInGame
 func checkTable(user string) bool {
@@ -169,7 +170,7 @@ func checkTable(user string) bool {
 	return false
 }
 
-//returns true if a player or opponent has a game started
+// returns true if a player or opponent has a game started
 func isPlayersInGame(name, opponent string) bool {
 	for _, game := range All.Games {
 		if game.WhitePlayer == name || game.BlackPlayer == name {
@@ -182,7 +183,7 @@ func isPlayersInGame(name, opponent string) bool {
 	return false
 }
 
-//checks if a player is in the lobby
+// checks if a player is in the lobby
 func isPlayerInLobby(player string) bool {
 	for name, _ := range Chat.Lobby {
 		if name == player {
@@ -192,7 +193,7 @@ func isPlayerInLobby(player string) bool {
 	return false
 }
 
-//checks if player is in chess room
+// checks if player is in chess room
 func isPlayerInChess(player string) bool {
 	for name, _ := range Active.Clients {
 		if name == player {
@@ -202,7 +203,7 @@ func isPlayerInChess(player string) bool {
 	return false
 }
 
-//remove all pending matches from a player
+// remove all pending matches from a player
 func removePendingMatches(name string) {
 	for key, value := range Pending.Matches {
 
@@ -213,7 +214,7 @@ func removePendingMatches(name string) {
 	}
 }
 
-//remove player from the table that they were viewing when they leave the chess room
+// remove player from the table that they were viewing when they leave the chess room
 func removeViewer(name string, id int) []string {
 
 	var remainingViewers []string
@@ -226,8 +227,8 @@ func removeViewer(name string, id int) []string {
 	return remainingViewers
 }
 
-//gets the game ID that a player is currently playing
-//the bool indicates whether the player is currently playing a game
+// gets the game ID that a player is currently playing
+// the bool indicates whether the player is currently playing a game
 func GetGameID(name string) (int, bool) {
 	for key, value := range All.Games {
 		if name == value.WhitePlayer || name == value.BlackPlayer {

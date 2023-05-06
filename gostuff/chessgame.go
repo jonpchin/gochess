@@ -6,7 +6,7 @@ import (
 	"github.com/notnil/chess"
 )
 
-//stores chess game information
+// stores chess game information
 type ChessGame struct {
 	Type         string
 	ID           int
@@ -40,7 +40,7 @@ type ChessGame struct {
 	whiteTurn bool //keeps track of whose move it is, true means its whites turn and false means its blacks turn
 }
 
-//source and destination of piece moves
+// source and destination of piece moves
 type GameMove struct {
 	Type string
 	ID   int
@@ -70,22 +70,22 @@ type Observers struct {
 	Names []string
 }
 
-//active and running games on the server
+// active and running games on the server
 var All = struct {
 	sync.RWMutex
 	Games map[int]*ChessGame
 }{Games: make(map[int]*ChessGame)}
 
-//pending matches in the lobby waiting for someone to accept
+// pending matches in the lobby waiting for someone to accept
 var Pending = struct {
 	sync.RWMutex
 	Matches map[int]*SeekMatch
 }{Matches: make(map[int]*SeekMatch)}
 
-//used for quick access to identify two people who are private chatting and playing a game against each other
+// used for quick access to identify two people who are private chatting and playing a game against each other
 var PrivateChat = make(map[string]string)
 
-//intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
+// intitalize all pawns to false as they have not moved yet, and also initialize all en passent to false
 func InitGame(gameID int, name string, fighter string) {
 
 	//reset times are used for correspondence
