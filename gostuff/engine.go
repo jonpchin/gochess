@@ -125,8 +125,6 @@ func StartEngine(args []string) *uci.Engine {
 			log.Println(err)
 		}
 	} else {
-		//engine, err = uci.Run("./stockfish/stockfish_8_x64", args, log)
-		// Compile stockfish 8 on Raspberry pi
 		engine, err = uci.Run("./stockfish", args, log)
 		if err != nil {
 			log.Println(err)

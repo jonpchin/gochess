@@ -156,7 +156,12 @@ func main() {
 			//gostuff.ValidateJSONFiles()
 			goforum.ConnectDb()
 			gostuff.InitForum()
-			//go gostuff.StartStockfishBot()
+
+			numStockfishThreads := 2
+
+			for i := 0; i < numStockfishThreads; i += 1 {
+				go gostuff.StartStockfishBot()
+			}
 
 			//gostuff.RemoveGameHistory(days)
 		}
@@ -445,7 +450,7 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//logs the user out by deleting the cookies and back end session and redirecting them to the homepage
+// logs the user out by deleting the cookies and back end session and redirecting them to the homepage
 func logout(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
