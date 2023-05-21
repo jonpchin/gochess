@@ -1,4 +1,4 @@
-//Author:  Josh Hoak aka Kashomon
+// Author:  Josh Hoak aka Kashomon
 package gostuff
 
 import (
@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-//fetches player's new rating by passing both player's rating and their deviation and game result and returns their rating and deviation
+// fetches player's new rating by passing both player's rating and their deviation and game result and returns their rating and deviation
 func grabRating(pRating float64, pDeviation float64, oRating float64, oDeviation float64, results float64) (float64, float64) {
 
 	player := &Rating{pRating, pDeviation, 0.06}
@@ -30,7 +30,7 @@ func RoundPlus(f float64, places int) float64 {
 //	fmt.Println(Round(123.4999))
 //	fmt.Println(RoundPlus(123.558, 2))
 
-//computes the rating for one player and the other player and updates the database and notifies both players, result can be white, black or draw
+// computes the rating for one player and the other player and updates the database and notifies both players, result can be white, black or draw
 func ComputeRating(name string, gameID int, gameType string, result float64) {
 
 	var bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondenceRD float64
@@ -68,12 +68,8 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating(bulletString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, bulletString, whiteRating)
-			updateRatingHistory(PrivateChat[name], bulletString, blackRating)
 		} else {
 			updateRating(bulletString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], bulletString, whiteRating)
-			updateRatingHistory(name, bulletString, blackRating)
 		}
 
 	} else if gameType == blitzString {
@@ -84,12 +80,8 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 		//updates both players rating
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating(blitzString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, blitzString, whiteRating)
-			updateRatingHistory(PrivateChat[name], blitzString, blackRating)
 		} else {
 			updateRating(blitzString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], blitzString, whiteRating)
-			updateRatingHistory(name, blitzString, blackRating)
 		}
 
 	} else if gameType == standardString {
@@ -99,12 +91,8 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating(standardString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, standardString, whiteRating)
-			updateRatingHistory(PrivateChat[name], standardString, blackRating)
 		} else {
 			updateRating(standardString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], standardString, whiteRating)
-			updateRatingHistory(name, standardString, blackRating)
 		}
 	} else if gameType == correspondenceString {
 		whiteRating, whiteRD = grabRating(correspondence, correspondenceRD, oCorrespondence, oCorrespondenceRD, result)
@@ -112,12 +100,8 @@ func ComputeRating(name string, gameID int, gameType string, result float64) {
 		//updates database with players new rating and RD
 		if All.Games[gameID].WhitePlayer == name {
 			updateRating(correspondenceString, name, whiteRating, whiteRD, PrivateChat[name], blackRating, blackRD)
-			updateRatingHistory(name, correspondenceString, whiteRating)
-			updateRatingHistory(PrivateChat[name], correspondenceString, blackRating)
 		} else {
 			updateRating(correspondenceString, PrivateChat[name], whiteRating, whiteRD, name, blackRating, blackRD)
-			updateRatingHistory(PrivateChat[name], correspondenceString, whiteRating)
-			updateRatingHistory(name, correspondenceString, blackRating)
 		}
 	} else {
 		fmt.Println("Not a valid game type rate.go 1")

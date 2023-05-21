@@ -1,14 +1,11 @@
 package gostuff
 
 import (
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
@@ -21,7 +18,7 @@ func UpdateCaptcha(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(cap))
 }
 
-//displays player data when mouse hovers over
+// displays player data when mouse hovers over
 func GetPlayerData(w http.ResponseWriter, r *http.Request) {
 
 	valid := ValidateCredentials(w, r)
@@ -143,126 +140,6 @@ func ResumeGame(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("false"))
 }
 
-// fetches all data of a chess game by the ID
-func FetchGameByID(w http.ResponseWriter, r *http.Request) {
-
-	valid := ValidateCredentials(w, r)
-	if valid == false {
-		return
-	}
-
-	// a player shouldn't be using the database if they are in a game playing another person
-	user, _ := r.Cookie("username")
-	if checkTable(user.Value) {
-		w.Write([]byte("Database use is not allowed when you are playing a game against a real person!"))
-		return
-	}
-
-	id := template.HTMLEscapeString(r.FormValue("gameID"))
-
-	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer problems.Close()
-	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
-
-	num, err := strconv.Atoi(id)
-	if err != nil {
-		w.Write([]byte("Not a valid number. Please enter only digits."))
-		return
-	}
-	if num > TotalGrandmasterGames-1 || num <= 0 {
-		w.Write([]byte("Please search a game ID between 1 and " + strconv.Itoa(TotalGrandmasterGames-1)))
-		return
-	}
-
-	//check if database connection is open
-	if db.Ping() != nil {
-		log.Println("DATABASE DOWN!")
-		w.Write([]byte("The database is offline"))
-		return
-	}
-
-	var all GrandMasterGame
-
-	err = db.QueryRow("SELECT * FROM grandmaster WHERE id=?", id).Scan(&all.ID, &all.Event, &all.Site,
-		&all.Date, &all.Round, &all.White,
-		&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,
-		&all.ECO, &all.Moves, &all.EventDate)
-
-	if err != nil {
-		log.Println(err)
-		w.Write([]byte("Error in processing request"))
-		return
-	}
-
-	allGames, err := json.Marshal(all)
-	if err != nil {
-		log.Println(err)
-		w.Write([]byte("Unable to serialize data"))
-		return
-	}
-	w.Write([]byte(string(allGames)))
-}
-
-func FetchGameByECO(w http.ResponseWriter, r *http.Request) {
-	valid := ValidateCredentials(w, r)
-	if valid == false {
-		return
-	}
-
-	user, _ := r.Cookie("username")
-	if checkTable(user.Value) {
-		w.Write([]byte("Database use is not allowed when you are playing a game against a real person!"))
-		return
-	}
-
-	eco := template.HTMLEscapeString(r.FormValue("ECO"))
-	ecoIndex := template.HTMLEscapeString(r.FormValue("ECOIndex"))
-
-	// for now do not allow players to scroll past 100th game in a specific opening
-	ecoValue, err := strconv.Atoi(ecoIndex)
-	if err != nil {
-		w.Write([]byte("An invalid game index was searched"))
-		log.Println("Invalid ecoIndex")
-	}
-	if ecoValue < 0 || ecoValue > 100 {
-		log.Println("ecoIndex is out of bounds")
-		w.Write([]byte("Search index out of bounds"))
-		return
-	}
-
-	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
-	defer problems.Close()
-	log := log.New(problems, "", log.LstdFlags|log.Lshortfile)
-
-	//check if database connection is open
-	if db.Ping() != nil {
-		log.Println("DATABASE DOWN!")
-		w.Write([]byte("The database is offline"))
-		return
-	}
-
-	var all GrandMasterGame
-
-	err = db.QueryRow("select * from grandmaster where `ECO`=? ORDER BY ID LIMIT ?, 1", eco, ecoValue).Scan(&all.ID, &all.Event, &all.Site,
-		&all.Date, &all.Round, &all.White,
-		&all.Black, &all.Result, &all.WhiteElo, &all.BlackElo,
-		&all.ECO, &all.Moves, &all.EventDate)
-
-	if err != nil {
-		log.Println(err)
-		w.Write([]byte("Error in processing request"))
-		return
-	}
-
-	game, err := json.Marshal(all)
-	if err != nil {
-		log.Println(err)
-		w.Write([]byte("Unable to serialize data"))
-		return
-	}
-	w.Write([]byte(string(game)))
-}
-
 func CheckUserName(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		username := template.HTMLEscapeString(r.FormValue("username"))
@@ -287,66 +164,6 @@ func CheckUserName(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.Write([]byte(" <img src='img/ajax/available.png' /> Username available"))
 		}
-	}
-}
-
-// fetches players rating bullet history from database
-func FetchBulletHistory(w http.ResponseWriter, r *http.Request) {
-	valid := ValidateCredentials(w, r)
-	if valid == false {
-		return
-	}
-	user := template.HTMLEscapeString(r.FormValue("user"))
-	bullet, isHistory, _ := GetRatingHistory(user, "bullet")
-	if isHistory {
-		w.Write([]byte(bullet))
-	} else {
-		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
-	}
-}
-
-// fetches players blitz history rating from database
-func FetchBlitzHistory(w http.ResponseWriter, r *http.Request) {
-	valid := ValidateCredentials(w, r)
-	if valid == false {
-		return
-	}
-	user := template.HTMLEscapeString(r.FormValue("user"))
-	blitz, isHistory, _ := GetRatingHistory(user, "blitz")
-	if isHistory {
-		w.Write([]byte(blitz))
-	} else {
-		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
-	}
-}
-
-// fetches players standard rating history from database
-func FetchStandardHistory(w http.ResponseWriter, r *http.Request) {
-	valid := ValidateCredentials(w, r)
-	if valid == false {
-		return
-	}
-	user := template.HTMLEscapeString(r.FormValue("user"))
-	standard, isHistory, _ := GetRatingHistory(user, "standard")
-	if isHistory {
-		w.Write([]byte(standard))
-	} else {
-		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
-	}
-}
-
-// fetches players rating blitz history from database
-func FetchCorrespondenceHistory(w http.ResponseWriter, r *http.Request) {
-	valid := ValidateCredentials(w, r)
-	if valid == false {
-		return
-	}
-	user := template.HTMLEscapeString(r.FormValue("user"))
-	correspondence, isHistory, _ := GetRatingHistory(user, "correspondence")
-	if isHistory {
-		w.Write([]byte(correspondence))
-	} else {
-		w.Write([]byte("")) // blank string will be checked if history was succesfully fetched
 	}
 }
 

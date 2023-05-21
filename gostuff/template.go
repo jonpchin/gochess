@@ -10,8 +10,6 @@ import (
 // Goes through all templates and parses then on startup
 func OneTimeParseTemplates() {
 
-	parseNewsCache()
-
 	tempArgs := struct {
 		PageTitle string // Title of the web page
 	}{
@@ -50,13 +48,6 @@ func Show404Page(w http.ResponseWriter, r *http.Request) {
 	if err := doesNotExist.Execute(w, &p); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-func parseNewsCache() {
-	var allNewProviders AllNewsProviders
-	allNewProviders.ReadAllNews()
-	ParseTemplates(allNewProviders, nil, "news.html", []string{"templates/newsTemplate.html",
-		"templates/guestHeader.html"}...)
 }
 
 // @templateArgs Template arguments that will be parsed

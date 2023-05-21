@@ -20,7 +20,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//an individual game
+// an individual game
 type GoGame struct {
 	ID           int
 	White        string
@@ -60,7 +60,7 @@ var (
 
 var db *sql.DB
 
-//returns false if database setup failed, backup directory is passed in
+// returns false if database setup failed, backup directory is passed in
 func DbSetup(backup string) bool {
 
 	if runtime.GOOS == "windows" {
@@ -283,7 +283,7 @@ func ReadFile(path string) (string, string) {
 	return dbString, db
 }
 
-//fetches players bullet, blitz and standard rating
+// fetches players bullet, blitz and standard rating
 func GetRating(name string) (errMessage string, bullet, blitz, standard int16, correspondence int16) {
 
 	problems, _ := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -307,7 +307,7 @@ func GetRating(name string) (errMessage string, bullet, blitz, standard int16, c
 	return "", bullet, blitz, standard, correspondence
 }
 
-//fetches players bullet, blitz and standard rating and RD
+// fetches players bullet, blitz and standard rating and RD
 func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, correspondence, bulletRD,
 	blitzRD, standardRD float64, correspondenceRD float64) {
 
@@ -334,7 +334,7 @@ func GetRatingAndRD(name string) (errRate string, bullet, blitz, standard, corre
 	return "", bullet, blitz, standard, correspondence, bulletRD, blitzRD, standardRD, correspondenceRD
 }
 
-//updates both players chess rating
+// updates both players chess rating
 func updateRating(gameType string, white string, whiteRating float64, whiteRD float64,
 	black string, blackRating float64, blackRD float64) {
 
@@ -392,7 +392,7 @@ func updateRating(gameType string, white string, whiteRating float64, whiteRD fl
 	log.Printf("%s rating has changed and %d row was updated.\n", black, affect)
 }
 
-//stores game into MySQL database as a string
+// stores game into MySQL database as a string
 func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	moves := string(allMoves)
 
@@ -431,7 +431,7 @@ func storeGame(totalMoves int, allMoves []byte, game *ChessGame) {
 	log.Printf("Game ID %d has been updated in the games table.\n", id)
 }
 
-//gets all games by player from database and stores them in array of structs
+// gets all games by player from database and stores them in array of structs
 func GetGames(name string) (storage []GoGame) {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -486,7 +486,7 @@ func GetSaved(name string) (storage []GoGame) {
 	return storage
 }
 
-//fetches saved/adjourned game from database
+// fetches saved/adjourned game from database
 func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 
 	problems, err := os.OpenFile("logs/errors.txt", os.O_APPEND|os.O_WRONLY, 0666)
@@ -575,22 +575,6 @@ func (game *ChessGame) fetchSavedGame(id string, user string) bool {
 	}
 	log.Printf("%d row was deleted from the saved table by user %s\n", affect, user)
 	return true
-}
-
-// gets rating history of player based on type, returns JSON string of ratings with their date time
-// returns false if there was an error, an error could just mean there is no rating history
-func GetRatingHistory(name string, gametype string) (string, bool, error) {
-
-	log := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
-	var ratingHistory sql.NullString
-
-	err := db.QueryRow("SELECT "+gametype+" FROM ratinghistory WHERE username=?", name).Scan(&ratingHistory)
-	if err == sql.ErrNoRows { // this will occur if there is no name exist
-		return "", false, err
-	} else if err != nil { // Name found but no rating history
-		log.Println(err)
-	}
-	return ratingHistory.String, true, nil
 }
 
 // returns true if username already exists, this function assumes database is already pinged

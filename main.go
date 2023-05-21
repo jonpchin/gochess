@@ -39,7 +39,6 @@ func main() {
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/server/lobby", lobby)
 	http.HandleFunc("/chess/memberChess", memberChess)
-	http.HandleFunc("/database", database)
 	http.HandleFunc("/profile", playerProfile)
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/logoutGuest", logoutGuest)
@@ -53,8 +52,6 @@ func main() {
 	http.HandleFunc("/robots.txt", robot)
 	http.HandleFunc("/saved", saved)
 	http.HandleFunc("/highscores", highscores)
-	http.HandleFunc("/engine", engine)
-	http.HandleFunc("/news", news)
 	http.HandleFunc("/logs", logs)
 	http.HandleFunc("/forum", forum)
 	http.HandleFunc("/createthread", createThread)
@@ -63,20 +60,12 @@ func main() {
 	http.HandleFunc("/unlockThread", goforum.UnlockThread)
 	http.HandleFunc("/fetchLogs", gostuff.FetchLogs)
 	http.HandleFunc("/server/getPlayerData", gostuff.GetPlayerData)
-	//http.HandleFunc("/drawchart", DrawChart)
 
 	http.HandleFunc("/updateCaptcha", gostuff.UpdateCaptcha)
 	http.HandleFunc("/checkname", gostuff.CheckUserName)
 	http.HandleFunc("/resumeGame", gostuff.ResumeGame)
-	http.HandleFunc("/fetchgameID", gostuff.FetchGameByID)
-	http.HandleFunc("/fetchgameByECO", gostuff.FetchGameByECO)
-	http.HandleFunc("/fetchBulletHistory", gostuff.FetchBulletHistory)
-	http.HandleFunc("/fetchBlitzHistory", gostuff.FetchBlitzHistory)
-	http.HandleFunc("/fetchStandardHistory", gostuff.FetchStandardHistory)
-	http.HandleFunc("/fetchCorrespondenceHistory", gostuff.FetchCorrespondenceHistory)
+
 	http.HandleFunc("/checkInGame", gostuff.CheckInGame)
-	http.HandleFunc("/gameAnalysisById", gostuff.GameAnalysisById)
-	http.HandleFunc("/gameAnalysisByPgn", gostuff.GameAnalysisByPgn)
 
 	http.Handle("/captcha/", captcha.Server(captcha.StdWidth, captcha.StdHeight))
 
@@ -142,7 +131,7 @@ func main() {
 			//gostuff.RemoveOldForgot(days)
 			//fetch high score data from database
 			gostuff.UpdateHighScore()
-			gostuff.UpdateTotalGrandmasterGames()
+			//gostuff.UpdateTotalGrandmasterGames()
 			//gostuff.ResizeImages()
 			//pass := gostuff.VerifyGrandmasterGames(100000)
 			//if pass == true {
@@ -157,7 +146,7 @@ func main() {
 			goforum.ConnectDb()
 			gostuff.InitForum()
 
-			numStockfishThreads := 2
+			numStockfishThreads := 0
 
 			for i := 0; i < numStockfishThreads; i += 1 {
 				go gostuff.StartStockfishBot()
@@ -224,11 +213,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 func help(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=432000")
 	http.ServeFile(w, r, "help.html")
-}
-
-func news(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "public, max-age=3600")
-	http.ServeFile(w, r, "news.html")
 }
 
 func screenshots(w http.ResponseWriter, r *http.Request) {
@@ -337,25 +321,6 @@ func memberHome(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func database(w http.ResponseWriter, r *http.Request) {
-
-	if isAuthorized(w, r) {
-		w.Header().Set("Cache-Control", "private, max-age=432000")
-		var memberHome = template.Must(template.ParseFiles("database.html"))
-		username, _ := r.Cookie("username")
-
-		p := struct {
-			User string
-		}{
-			username.Value,
-		}
-
-		if err := memberHome.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-}
-
 func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 	if isAuthorized(w, r) {
@@ -409,8 +374,6 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 
 		p := struct {
 			User             string
-			IsGoogleCharts   bool
-			IsFrappeCharts   bool
 			PageTitle        string // Title of the web page
 			Bullet           float64
 			Blitz            float64
@@ -427,8 +390,6 @@ func playerProfile(w http.ResponseWriter, r *http.Request) {
 			Country          string
 		}{
 			inputName,
-			gostuff.UseGoogleCharts,
-			gostuff.UseFrappeCharts,
 			"Profile",
 			bulletN,
 			blitzN,
@@ -515,33 +476,6 @@ func highscores(w http.ResponseWriter, r *http.Request) {
 
 		gostuff.ParseTemplates(p, w, "highscores.html", []string{"templates/highscoresTemplate.html",
 			"templates/memberHeader.html"}...)
-	}
-}
-
-func engine(w http.ResponseWriter, r *http.Request) {
-
-	if isAuthorized(w, r) {
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		var engine = template.Must(template.ParseFiles("engine.html"))
-		username, _ := r.Cookie("username")
-
-		canLock := false
-
-		if gostuff.IsAdmin(username.Value) || gostuff.IsMod(username.Value) {
-			canLock = true
-		}
-
-		p := struct {
-			User    string
-			CanLock bool
-		}{
-			username.Value,
-			canLock,
-		}
-
-		if err := engine.Execute(w, &p); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
 	}
 }
 

@@ -30,19 +30,13 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>10. Automated deployment of web server to production environment (not shown on GitHub)</p>
 <p>11. Highscore board containing top bullet, blitz standard, and correspondence ratings.</p>
 <p>12. Configurable user settings, chess piece theme, sound toggle, chat toggle, etc.</p>
-<p>13. Database of over 1.8 million chess games, most of which are master/grandmaster games.</p>
-<p>14. Player profiles to view rating and past games.</p>
-<p>15. Player's name has the country flag where their IP originates from when they register</p>
-<p>16. Players can view on going chess games in real time as spectators</p>
-<p>17. Lobby and game room chat.</p>
-<p>18. Rating history timeline on player's profile using Google Charts.</p>
-<p>19. Players can play against cinnamon chess engine and stockfish chess engine (web workers).</p>
-<p>20. Web server runs in Windows and Linux.</p>
-<p>21. Forum</p>
-<p>22. Daily news feed, contains mostly tech articles but it can be configured to get other types of news.</p>
-<p>23. Post game analysis with Stockfish engine (beta, only for developers)</p>
-<p>24. Guest play</p>
-<p>25. Stockfish chess bot</p>
+<p>13. Player profiles to view rating and past games.</p>
+<p>14. Player's name has the country flag where their IP originates from when they register</p>
+<p>15. Players can view on going chess games in real time as spectators</p>
+<p>16. Lobby and game room chat.</p>
+<p>17. Forum</p>
+<p>18. Guest play</p>
+<p>19. Stockfish chess bot</p>
 <br>
 <p><b>To Do List:</b></p>
 <p>1. Update help, documentation and screenshots</p>
@@ -54,7 +48,6 @@ Go Play Chess - Free Online Real time chess web server using websockets - Creato
 <p>2. chessboard.js</p>
 <p>3. goglicko by Josh Hoak aka Kashomon</p>
 <p>4. Tock.js</p>
-<p>5. Cinnamon JS Engine</p>
 <p>6. download.js v4.1, by dandavis</p>
 <p>7. dchest/captcha</p>
 <p>8. robfig/cron</p>
